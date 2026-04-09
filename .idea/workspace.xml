@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="f808c6d7-aa71-4ad4-bd8e-7a02c2741024" name="Changes" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Interface" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="localRepository" value="D:\maven-repository\my-diary" />
+        <option name="userSettingsFile" value="D:\maven-settings\settings.xml" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1
+}</component>
+  <component name="ProjectId" id="3Bem1w8Xm9f8vacBsOimxW3F6tT" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.SecurityConfig.executor": "Debug",
+    "Application.UserServiceImpl.executor": "Debug",
+    "Maven.diary-config [clean].executor": "Run",
+    "Maven.diary-config [compile].executor": "Run",
+    "Maven.diary-dao [clean].executor": "Run",
+    "Maven.diary-dao [compile].executor": "Run",
+    "Maven.diary-dao [package].executor": "Run",
+    "Maven.diary-user [clean].executor": "Run",
+    "Maven.diary-user [compile].executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "Spring Boot.DiaryConfigApplication.executor": "Debug",
+    "Spring Boot.DiaryDaoApplication.executor": "Debug",
+    "Spring Boot.DiaryGatewayApplication.executor": "Debug",
+    "Spring Boot.DiaryUserApplication.executor": "Debug",
+    "Spring Boot.DiaryUtilsApplication.executor": "Debug",
+    "Spring Boot.MyLoveDiaryApplication.executor": "Debug",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/MyLoveDiary/diary-config/src/main/resources/mapper",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.4",
+    "run.configurations.included.in.services": "true",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="ReactorSettings">
+    <option name="notificationShown" value="true" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\MyLoveDiary\diary-config\src\main\resources\mapper" />
+      <recent name="D:\MyLoveDiary\diary-user\src\main\resources" />
+      <recent name="D:\MyLoveDiary\src\main\resources" />
+      <recent name="D:\MyLoveDiary\src\main\java\diary\mylovediary" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\MyLoveDiary\diary-dao\src\main\resources" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="configurationTypes">
+      <set>
+        <option value="KtorApplicationConfigurationType" />
+        <option value="MicronautRunConfigurationType" />
+        <option value="QuarkusRunConfigurationType" />
+        <option value="SpringBootApplicationConfigurationType" />
+      </set>
+    </option>
+    <option name="configurationStatuses">
+      <map>
+        <entry key="SpringBootApplicationConfigurationType">
+          <value>
+            <map>
+              <entry key="DiaryGatewayApplication" value="STOPPED" />
+              <entry key="DiaryUserApplication" value="STOPPED" />
+            </map>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="RunManager" selected="Application.UserServiceImpl">
+    <configuration name="SecurityConfig" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="diary.config.security.SecurityConfig" />
+      <module name="diary-config" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="diary.config.security.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UserServiceImpl" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="diary.user.service.impl.UserServiceImpl" />
+      <module name="diary-user" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="diary.user.service.impl.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="DiaryGatewayApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
+      <module name="diary-gateway" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="diary.gateway.DiaryGatewayApplication" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="diary.gateway.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="DiaryUserApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
+      <module name="diary-user" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="diary.user.DiaryUserApplication" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="diary.user.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Spring Boot.DiaryGatewayApplication" />
+        <item itemvalue="Spring Boot.DiaryUserApplication" />
+        <item itemvalue="Application.UserServiceImpl" />
+        <item itemvalue="Application.SecurityConfig" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.23892.409" />
+        <option value="bundled-js-predefined-d6986cc7102b-e03c56caf84a-JavaScript-IU-252.23892.409" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="f808c6d7-aa71-4ad4-bd8e-7a02c2741024" name="Changes" comment="" />
+      <created>1774857701533</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1774857701533</updated>
+      <workItem from="1774857702921" duration="3266000" />
+      <workItem from="1774860981073" duration="2444000" />
+      <workItem from="1774864527553" duration="11106000" />
+      <workItem from="1774881521582" duration="13917000" />
+      <workItem from="1775141971616" duration="1306000" />
+      <workItem from="1775192715640" duration="76000" />
+      <workItem from="1775276006982" duration="1099000" />
+      <workItem from="1775396759030" duration="1075000" />
+      <workItem from="1775397853591" duration="2488000" />
+      <workItem from="1775401541754" duration="1229000" />
+      <workItem from="1775445568400" duration="8028000" />
+      <workItem from="1775454001196" duration="27675000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
