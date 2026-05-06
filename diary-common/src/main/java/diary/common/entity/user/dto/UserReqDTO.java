@@ -1,4 +1,4 @@
-package diary.dao.entity.user.dto;
+package diary.common.entity.user.dto;
 
 import lombok.Data;
 

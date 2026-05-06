@@ -1,7 +1,6 @@
 package diary.user.service;
 
-import diary.dao.entity.user.dto.UserReqDTO;
-import diary.dao.entity.user.po.User;
+import diary.common.entity.user.dto.UserReqDTO;
 
 import java.util.Map;
 

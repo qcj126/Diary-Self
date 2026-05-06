@@ -1,7 +1,7 @@
 package diary.user.controller;
 
-import diary.config.result.ApiResponse;
-import diary.dao.entity.user.dto.UserReqDTO;
+import diary.common.entity.user.dto.UserReqDTO;
+import diary.common.result.ApiResponse;
 import diary.user.service.UserService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

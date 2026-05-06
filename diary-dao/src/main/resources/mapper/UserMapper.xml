@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="diary.dao.mapper.user.UserMapper">
 
-    <resultMap id="UserResultMap" type="diary.dao.entity.user.po.User">
+    <resultMap id="UserResultMap" type="diary.common.entity.user.po.User">
         <id property="userId" column="user_id"/>
         <result property="username" column="username"/>
         <result property="email" column="email"/>
@@ -29,7 +29,7 @@
         select <include refid="Base_Column_List"/> from user where username = #{identify} and status = '1000'
     </select>
 
-    <insert id="userRegister" parameterType="diary.dao.entity.user.po.User">
+    <insert id="userRegister" parameterType="diary.common.entity.user.po.User">
         insert into user (user_id, username, email, phone, password)
         values (#{userId}, #{username}, #{email}, #{phone}, #{password})
     </insert>

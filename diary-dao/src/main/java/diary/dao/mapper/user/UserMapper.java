@@ -1,6 +1,6 @@
 package diary.dao.mapper.user;
 
-import diary.dao.entity.user.po.User;
+import diary.common.entity.user.po.User;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper

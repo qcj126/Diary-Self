@@ -2,16 +2,17 @@ package diary.file.impl;
 
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.model.*;
-import diary.file.config.consts.FileTypeConst;
-import diary.file.config.consts.PhotoStatusConst;
-import diary.file.config.consts.PhotoTypeConst;
-import diary.file.config.mqconfig.RabbitMqConfig;
+import diary.common.entity.file.po.OssUploadSuccessMsg;
+import diary.config.consts.FileTypeConst;
+import diary.config.consts.PhotoStatusConst;
+import diary.config.consts.PhotoTypeConst;
+import diary.config.mqconfig.RabbitMqConfig;
+import diary.utils.OSS.OssUtil;
 import diary.file.mapper.PhotoMapper;
-import diary.file.po.OssUploadSuccessMsg;
 import diary.file.service.RedisService;
 import diary.file.service.VideoFileService;
-import diary.file.util.MyOssUtils;
-import diary.file.util.MyUtils;
+import diary.utils.commonutil.MyUtils;
+
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
@@ -48,7 +49,7 @@ public class VideoFileServiceImpl implements VideoFileService {
     private RabbitTemplate rabbitTemplate;
 
     @Resource
-    private MyOssUtils  myOssUtils;
+    private OssUtil ossUtil;
 
     // 分片大小：10MB
     private static final long PART_SIZE = 10 * 1024 * 1024L;
@@ -226,7 +227,7 @@ public class VideoFileServiceImpl implements VideoFileService {
             ossClient.completeMultipartUpload(completeRequest);
 
             // 5. 生成预签名URL
-            return myOssUtils.getSignedUrlByFileName(fileName);
+            return ossUtil.getSignedUrlByFileName(fileName);
         } catch (Exception e) {
             // 如果上传失败，取消分片上传
             if (uploadId != null) {
