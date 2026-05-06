@@ -1,10 +1,12 @@
 package diary.dao.mapper.recipe;
 
-import diary.dao.entity.recipe.po.RecipeStepPO;
+import diary.common.entity.recipe.po.RecipeStepPO;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+@Mapper
 public interface RecipeStepMapper {
     /**
      * 批量插入步骤

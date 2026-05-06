@@ -4,7 +4,7 @@
 <mapper namespace="diary.dao.mapper.recipe.RecipeMapper">
 
     <!-- 结果映射 -->
-    <resultMap id="BaseResultMap" type="diary.dao.entity.recipe.po.RecipePO">
+    <resultMap id="BaseResultMap" type="diary.common.entity.recipe.po.RecipePO">
         <id column="recipe_id" property="recipeId"/>
         <result column="author_id" property="authorId"/>
         <result column="couple_id" property="coupleId"/>
@@ -35,7 +35,7 @@
     </sql>
 
     <!-- 插入 -->
-    <insert id="insert" parameterType="diary.dao.entity.recipe.po.RecipePO">
+    <insert id="insert" parameterType="diary.common.entity.recipe.po.RecipePO">
         INSERT INTO recipe (
             recipe_id, author_id, couple_id, title, cover_img, description,
             category, meal_type, difficulty, cooking_time, story, status,
@@ -56,7 +56,7 @@
     </select>
 
     <!-- 根据ID更新（动态SQL） -->
-    <update id="updateById" parameterType="diary.dao.entity.recipe.po.RecipePO">
+    <update id="updateById" parameterType="diary.common.entity.recipe.po.RecipePO">
         UPDATE recipe
         <set>
             <if test="title != null">title = #{title},</if>

@@ -1,6 +1,6 @@
 package diary.dao.mapper.recipe;
 
-import diary.dao.entity.recipe.po.RecipePO;
+import diary.common.entity.recipe.po.RecipePO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

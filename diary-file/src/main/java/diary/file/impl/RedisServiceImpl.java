@@ -1,6 +1,6 @@
 package diary.file.impl;
 
-import diary.file.config.consts.RedisKeyConst;
+import diary.config.consts.RedisKeyConst;
 import diary.file.service.RedisService;
 import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -17,7 +17,7 @@ public class RedisServiceImpl implements RedisService {
         if (oCount == null) {
             return 0L;
         }
-        return Long.parseLong((String) oCount);
+        return Long.parseLong(String.valueOf(oCount));
     }
 
     @Override

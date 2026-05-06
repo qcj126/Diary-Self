@@ -22,6 +22,7 @@
         <module>diary-utils</module>
         <module>diary-file</module>
         <module>diary-gateway</module>
+        <module>diary-common</module>
     </modules>
     
     <properties>
@@ -32,7 +33,7 @@
         <mysql-connector-j.version>9.6.0</mysql-connector-j.version>
         <mybatis-spring-boot-starter.version>3.0.5</mybatis-spring-boot-starter.version>
         <spring-boot-data-redis.version>3.5.13</spring-boot-data-redis.version>
-        <security.version>3.5.13</security.version>
+
         <fastjson.version>2.0.61</fastjson.version>
     </properties>
     
@@ -79,11 +80,7 @@
                 <version>${spring-boot-data-redis.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-security</artifactId>
-                <version>${security.version}</version>
-            </dependency>
+
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
