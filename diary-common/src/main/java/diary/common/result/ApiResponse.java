@@ -1,4 +1,4 @@
-package diary.config.result;
+package diary.common.result;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
