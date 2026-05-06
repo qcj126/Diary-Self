@@ -1,2 +1,4 @@
 # 最佳实践是直接忽略整个编译输出目录，比如 Maven 项目的 target 目录
 /target/
+.idea/
+*.class
