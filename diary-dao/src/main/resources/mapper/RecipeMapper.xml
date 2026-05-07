@@ -7,7 +7,6 @@
     <resultMap id="BaseResultMap" type="diary.common.entity.recipe.po.RecipePO">
         <id column="recipe_id" property="recipeId"/>
         <result column="author_id" property="authorId"/>
-        <result column="couple_id" property="coupleId"/>
         <result column="title" property="title"/>
         <result column="cover_img" property="coverImg"/>
         <result column="description" property="description"/>
@@ -76,11 +75,11 @@
     <!-- 插入 -->
     <insert id="insert" parameterType="diary.common.entity.recipe.po.RecipePO">
         INSERT INTO recipe (
-            recipe_id, author_id, couple_id, title, cover_img, description,
+            recipe_id, author_id, title, cover_img, description,
             category, meal_type, difficulty, cooking_time, story, status,
             is_anniversary, anniversary_date, created_at, updated_at
         ) VALUES (
-                     #{recipeId}, #{authorId}, #{coupleId}, #{title}, #{coverImg}, #{description},
+                     #{recipeId}, #{authorId}, #{title}, #{coverImg}, #{description},
                      #{category}, #{mealType}, #{difficulty}, #{cookingTime}, #{story}, #{status},
                      #{isAnniversary}, #{anniversaryDate}, NOW(), NOW()
                  )

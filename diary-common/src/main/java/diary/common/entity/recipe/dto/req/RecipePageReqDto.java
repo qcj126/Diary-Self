@@ -6,9 +6,6 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class RecipePageReqDto extends PageReqDto {
-    // 可选：情侣空间ID（必填，数据隔离）
-    private Long coupleId;
-
     // 可选：分类筛选（0-家常 1-西餐 2-甜点 3-汤粥 4-其他）
     private Integer category;
 

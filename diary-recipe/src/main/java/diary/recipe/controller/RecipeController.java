@@ -1,10 +1,8 @@
 package diary.recipe.controller;
 
-import diary.common.entity.recipe.dto.req.PageReqDto;
 import diary.common.entity.recipe.dto.req.RecipePageReqDto;
 import diary.common.entity.recipe.dto.resp.PageRespDto;
 import diary.common.entity.recipe.dto.resp.RecipeRespDto;
-import diary.common.entity.recipe.vo.RecipeVO;
 import diary.common.result.ApiResponse;
 import diary.common.entity.recipe.dto.req.RecipeReqDto;
 import jakarta.annotation.Resource;
@@ -17,7 +15,6 @@ import diary.recipe.service.delete.RecipeDeleteService;
 import diary.recipe.service.query.RecipeQueryService;
 import diary.recipe.service.update.RecipeUpdateService;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController

@@ -19,11 +19,6 @@ public class RecipePO {
     private Long authorId;
 
     /**
-     * 所属情侣空间ID
-     */
-    private Long coupleId;
-
-    /**
      * 食谱标题
      */
     private String title;

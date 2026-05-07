@@ -10,6 +10,7 @@ import diary.common.entity.recipe.po.RecipeStepPO;
 import diary.dao.mapper.recipe.RecipeIngredientMapper;
 import diary.dao.mapper.recipe.RecipeMapper;
 import diary.dao.mapper.recipe.RecipeStepMapper;
+import diary.utils.commonutil.MyUtils;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import diary.recipe.service.add.RecipeAddService;
@@ -32,7 +33,7 @@ public class RecipeAddServiceImpl implements RecipeAddService {
     @Override
     public ApiResponse<String> addRecipe(RecipeReqDto recipeReqDto) {
         if (recipeReqDto == null) return ApiResponse.fail(400, "入参为空");
-        if (recipeReqDto.getCoupleId() == null || recipeReqDto.getTitle() == null ||
+        if (recipeReqDto.getTitle() == null ||
             recipeReqDto.getCategory() == null || recipeReqDto.getMealType() == null ||
             recipeReqDto.getIngredients() == null || recipeReqDto.getSteps() == null) {
             throw new RuntimeException("食谱存在必填参数为空");
@@ -54,8 +55,8 @@ public class RecipeAddServiceImpl implements RecipeAddService {
         List<RecipeIngredientPO> recipeIngredientPOs = new ArrayList<>();
         List<RecipeStepPO> recipeStepPOs = new ArrayList<>();
         // 填充元素
+        recipePO.setRecipeId(MyUtils.getPrimaryKey());
         recipePO.setAuthorId(recipeReqDto.getAuthorId());
-        recipePO.setCoupleId(recipeReqDto.getCoupleId());
         recipePO.setTitle(recipeReqDto.getTitle());
         recipePO.setCoverImg(recipeReqDto.getCoverImg());
         recipePO.setDescription(recipeReqDto.getDescription());
@@ -77,7 +78,8 @@ public class RecipeAddServiceImpl implements RecipeAddService {
 
         for (RecipeIngredientAO ao : ingredients) {
             RecipeIngredientPO po = new RecipeIngredientPO();
-            po.setRecipeId(recipeReqDto.getRecipeId());
+            po.setIngredientId(MyUtils.getPrimaryKey());
+            po.setRecipeId(recipePO.getRecipeId());
             po.setName(ao.getName());
             po.setQuantity(ao.getQuantity());
             po.setIsMain(ao.getIsMain());
@@ -87,7 +89,8 @@ public class RecipeAddServiceImpl implements RecipeAddService {
 
         for (RecipeStepAO ao : steps) {
             RecipeStepPO po = new RecipeStepPO();
-            po.setRecipeId(recipeReqDto.getRecipeId());
+            po.setStepId(MyUtils.getPrimaryKey());
+            po.setRecipeId(recipePO.getRecipeId());
             po.setStepNumber(ao.getStepNumber());
             po.setDescription(ao.getDescription());
             po.setImageUrl(ao.getImageUrl());
