@@ -2,6 +2,9 @@ package diary.user.service.impl;
 
 import diary.common.entity.user.dto.UserReqDTO;
 import diary.common.entity.user.po.User;
+import diary.common.exception.CustomException;
+import diary.common.exception.ParamIllegalException;
+import diary.common.exception.SameDataException;
 import diary.dao.mapper.user.UserMapper;
 import diary.dao.redis.ManageVerifyCode;
 import diary.user.service.UserService;
@@ -129,37 +132,37 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Map<String, Object> register(UserReqDTO userDTO) {
+    public String register(UserReqDTO userDTO) {
         // 参数校验：username、email、phone、password 一个都不能为空
         if (userDTO.getUsername() == null || userDTO.getUsername().trim().isEmpty()) {
-            throw new RegisterException("用户名不能为空");
+            throw new ParamIllegalException("用户名不能为空");
         }
         if (userDTO.getEmail() == null || userDTO.getEmail().trim().isEmpty()) {
-            throw new RegisterException("邮箱不能为空");
+            throw new ParamIllegalException("邮箱不能为空");
         }
         if (userDTO.getPhone() == null || userDTO.getPhone().trim().isEmpty()) {
-            throw new RegisterException("手机号不能为空");
+            throw new ParamIllegalException("手机号不能为空");
         }
         if (userDTO.getPassword() == null || userDTO.getPassword().trim().isEmpty()) {
-            throw new RegisterException("密码不能为空");
+            throw new ParamIllegalException("密码不能为空");
         }
     
         // 检查用户名是否已存在
         User existUser = userMapper.selectByUsername(userDTO.getUsername());
         if (existUser != null) {
-            throw new RegisterException("用户名已存在");
+            throw new SameDataException("用户名已被注册");
         }
     
         // 检查邮箱是否已存在
         existUser = userMapper.selectByEmail(userDTO.getEmail());
         if (existUser != null) {
-            throw new RegisterException("邮箱已被注册");
+            throw new SameDataException("邮箱已被注册");
         }
     
         // 检查手机号是否已存在
         existUser = userMapper.selectByPhone(userDTO.getPhone());
         if (existUser != null) {
-            throw new RegisterException("手机号已被注册");
+            throw new SameDataException("手机号已被注册");
         }
     
         // 创建用户对象
@@ -174,14 +177,10 @@ public class UserServiceImpl implements UserService {
         // 插入数据库
         int result = userMapper.userRegister(newUser);
         if (result <= 0) {
-            throw new RegisterException("注册失败");
+            throw new CustomException("注册失败");
         }
-    
         log.info("用户注册成功: {}", userDTO.getUsername());
-    
-        return Map.of(
-                "message", "注册成功"
-        );
+        return "注册成功";
     }
 
     @Override

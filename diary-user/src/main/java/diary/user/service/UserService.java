@@ -11,7 +11,7 @@ public interface UserService {
 
     Map<String, Object> login(UserReqDTO userDTO);
 
-    Map<String, Object> register(UserReqDTO userDTO);
+    String register(UserReqDTO userDTO);
 
     Map<String, Object> resetPw(UserReqDTO userDTO);
 

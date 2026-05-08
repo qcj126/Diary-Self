@@ -23,4 +23,9 @@ public class GlobalExceptionHandler {
     public ApiResponse handleSameDataException(SameDataException e) {
         return ApiResponse.fail(500, e.getMessage());
     }
+
+    @ExceptionHandler(CustomException.class)
+    public ApiResponse handleCustomException(CustomException e) {
+        return ApiResponse.fail(500, e.getMessage());
+    }
 }

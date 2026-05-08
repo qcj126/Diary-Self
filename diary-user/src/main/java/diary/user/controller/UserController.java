@@ -28,7 +28,7 @@ public class UserController {
         return ApiResponse.success(userService.login(userDTO));
     }
     @PostMapping("/register")
-    public ApiResponse<Map<String, Object>> register(@RequestBody UserReqDTO userDTO) {
+    public ApiResponse<String> register(@RequestBody UserReqDTO userDTO) {
         return ApiResponse.success(userService.register(userDTO));
     }
     @PostMapping("/verifycode")
