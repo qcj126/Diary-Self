@@ -10,7 +10,6 @@
         <module name="diary-user" />
         <module name="diary-common" />
         <module name="diary-dao" />
-        <module name="diary-gateway" />
         <module name="diary-file" />
         <module name="diary-config" />
         <module name="diary-utils" />
@@ -21,18 +20,9 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="D:/maven-repository/my-diary/org/projectlombok/lombok/1.18.44/lombok-1.18.44.jar" />
-          <entry name="D:/maven-repository/my-diary/org/projectlombok/lombok/1.18.44/lombok-1.18.44.jar" />
-        </processorPath>
-        <module name="diary-gateway" />
-      </profile>
-      <profile name="Annotation profile for diary-recipe" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="D:/maven-repository/my-diary/org/projectlombok/lombok/1.18.44/lombok-1.18.44.jar" />
         </processorPath>
         <module name="diary-recipe" />
+        <module name="diary-gateway" />
       </profile>
     </annotationProcessing>
   </component>
