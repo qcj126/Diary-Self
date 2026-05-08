@@ -4,16 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f808c6d7-aa71-4ad4-bd8e-7a02c2741024" name="Changes" comment="项目更新">
-      <change afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/convert/AoConvertToPo.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/convert/DtoConvertToPo.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/exception/ParamIllegalException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/exception/SameDataException.java" afterDir="false" />
+    <list default="true" id="f808c6d7-aa71-4ad4-bd8e-7a02c2741024" name="Changes" comment="优化返回值">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/recipe/po/RecipeIngredientPO.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/recipe/po/RecipeIngredientPO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/exception/GlobalExceptionHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/exception/RegisterException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-recipe/src/main/java/diary/recipe/impl/add/RecipeAddServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-recipe/src/main/java/diary/recipe/impl/add/RecipeAddServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/diary-user/src/main/java/diary/user/service/impl/UserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-user/src/main/java/diary/user/service/impl/UserServiceImpl.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -35,8 +27,8 @@
       <list>
         <option value="spring-beans.schema" />
         <option value="Interface" />
-        <option value="Exception" />
         <option value="Class" />
+        <option value="Exception" />
       </list>
     </option>
   </component>
@@ -286,7 +278,7 @@
       <workItem from="1778120019376" duration="910000" />
       <workItem from="1778120950548" duration="6544000" />
       <workItem from="1778206767099" duration="609000" />
-      <workItem from="1778207412723" duration="4352000" />
+      <workItem from="1778207412723" duration="5731000" />
     </task>
     <task id="LOCAL-00001" summary="新增食谱功能">
       <option name="closed" value="true" />
@@ -360,7 +352,23 @@
       <option name="project" value="LOCAL" />
       <updated>1778208290567</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="stream流应用">
+      <option name="closed" value="true" />
+      <created>1778211802955</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1778211802955</updated>
+    </task>
+    <task id="LOCAL-00011" summary="优化返回值">
+      <option name="closed" value="true" />
+      <created>1778212061995</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1778212061995</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -370,7 +378,9 @@
     <MESSAGE value="新增食谱功能" />
     <MESSAGE value="分页查询" />
     <MESSAGE value="项目更新" />
-    <option name="LAST_COMMIT_MESSAGE" value="项目更新" />
+    <MESSAGE value="stream流应用" />
+    <MESSAGE value="优化返回值" />
+    <option name="LAST_COMMIT_MESSAGE" value="优化返回值" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

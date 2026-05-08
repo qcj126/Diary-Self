@@ -40,26 +40,19 @@ public class UserServiceImpl implements UserService {
     public Map<String, Object> login(UserReqDTO userDTO) {
         // 校验登录类型
         if (userDTO.getType() == null) {
-            throw new RuntimeException("登录类型不能为空");
+            throw new ParamIllegalException("登录类型不能为空");
         }
-        User user;
+        User user = null;
         // 根据登录类型处理不同逻辑
-        if (userDTO.getType() == 1) {
-            // 账号密码登录
-            user = loginByPassword(userDTO);
-        } else if (userDTO.getType() == 2) {
-            // 验证码登录
-            user = loginByCode(userDTO);
-        } else {
-            throw new RuntimeException("不支持的登录类型");
+        if (userDTO.getType() != 1 && userDTO.getType() != 2) {
+            throw new ParamIllegalException("不支持的登录类型");
         }
-
+        // 账号密码登录
+        user = loginByPassword(userDTO);
         // 生成 Token
         String token = jwtUtil.generateToken(user.getUsername());
 
-        return Map.of(
-                "token", token
-        );
+        return Map.of("token", token);
     }
 
     /**
@@ -68,10 +61,10 @@ public class UserServiceImpl implements UserService {
     private User loginByPassword(UserReqDTO userDTO) {
         // 参数校验
         if (userDTO.getUsername() == null && userDTO.getEmail() == null && userDTO.getPhone() == null) {
-            throw new RuntimeException("用户名、邮箱或手机号至少提供一个");
+            throw new ParamIllegalException("用户名、邮箱或手机号至少提供一个");
         }
         if (userDTO.getPassword() == null || userDTO.getPassword().trim().isEmpty()) {
-            throw new RuntimeException("密码不能为空");
+            throw new ParamIllegalException("密码不能为空");
         }
 
         // 查询用户
@@ -79,7 +72,7 @@ public class UserServiceImpl implements UserService {
         
         // 验证密码
         if (!matches(userDTO.getPassword(), user.getPassword())) {
-            throw new RuntimeException("密码错误");
+            throw new CustomException("密码错误");
         }
         
         return user;
