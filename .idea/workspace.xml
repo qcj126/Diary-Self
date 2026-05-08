@@ -4,35 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f808c6d7-aa71-4ad4-bd8e-7a02c2741024" name="Changes" comment="分页查询">
-      <change afterPath="$PROJECT_DIR$/diary-utils/src/main/java/diary/utils/crypto/BCryptUtilNoSpring.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+    <list default="true" id="f808c6d7-aa71-4ad4-bd8e-7a02c2741024" name="Changes" comment="项目更新">
+      <change afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/convert/AoConvertToPo.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/convert/DtoConvertToPo.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/exception/ParamIllegalException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/exception/SameDataException.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MyLoveDiary.iml" beforeDir="false" afterPath="$PROJECT_DIR$/Diary-Self.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-common/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-config/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-config/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-config/target/classes/diary/config/DiaryConfigApplication.class" beforeDir="false" afterPath="$PROJECT_DIR$/diary-config/target/classes/diary/config/DiaryConfigApplication.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-dao/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-dao/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-dao/target/classes/diary/dao/entity/user/dto/UserReqDTO.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-dao/target/classes/diary/dao/entity/user/po/User.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-dao/target/classes/diary/dao/entity/user/vo/UserVO.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-dao/target/classes/diary/dao/mapper/UserMapper.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-dao/target/classes/mapper/UserMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-dao/target/classes/mapper/UserMapper.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-dao/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/diary-dao/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-dao/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/diary-dao/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-file/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-file/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-gateway/diary-gateway.iml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/diary-common.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-gateway/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-gateway/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-recipe/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-recipe/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-user/diary-user.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-user/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-user/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-user/target/classes/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-user/target/classes/application.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-utils/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-utils/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/recipe/po/RecipeIngredientPO.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/recipe/po/RecipeIngredientPO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/exception/GlobalExceptionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/exception/RegisterException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-recipe/src/main/java/diary/recipe/impl/add/RecipeAddServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-recipe/src/main/java/diary/recipe/impl/add/RecipeAddServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-user/src/main/java/diary/user/service/impl/UserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-user/src/main/java/diary/user/service/impl/UserServiceImpl.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,6 +35,7 @@
       <list>
         <option value="spring-beans.schema" />
         <option value="Interface" />
+        <option value="Exception" />
         <option value="Class" />
       </list>
     </option>
@@ -303,7 +286,7 @@
       <workItem from="1778120019376" duration="910000" />
       <workItem from="1778120950548" duration="6544000" />
       <workItem from="1778206767099" duration="609000" />
-      <workItem from="1778207412723" duration="574000" />
+      <workItem from="1778207412723" duration="4352000" />
     </task>
     <task id="LOCAL-00001" summary="新增食谱功能">
       <option name="closed" value="true" />
@@ -353,7 +336,31 @@
       <option name="project" value="LOCAL" />
       <updated>1778206870002</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="项目更新">
+      <option name="closed" value="true" />
+      <created>1778208024855</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1778208024855</updated>
+    </task>
+    <task id="LOCAL-00008" summary="项目更新">
+      <option name="closed" value="true" />
+      <created>1778208152276</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1778208152276</updated>
+    </task>
+    <task id="LOCAL-00009" summary="项目更新">
+      <option name="closed" value="true" />
+      <created>1778208290567</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1778208290567</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -362,7 +369,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="新增食谱功能" />
     <MESSAGE value="分页查询" />
-    <option name="LAST_COMMIT_MESSAGE" value="分页查询" />
+    <MESSAGE value="项目更新" />
+    <option name="LAST_COMMIT_MESSAGE" value="项目更新" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

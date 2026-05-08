@@ -2,13 +2,11 @@ package diary.user.service.impl;
 
 import diary.common.entity.user.dto.UserReqDTO;
 import diary.common.entity.user.po.User;
-import diary.common.exception.RegisterException;
 import diary.dao.mapper.user.UserMapper;
 import diary.dao.redis.ManageVerifyCode;
 import diary.user.service.UserService;
 import diary.utils.commonutil.MyUtils;
 import diary.utils.jwt.JwtUtil;
-import diary.utils.snowflake.SnowflakeIdUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 

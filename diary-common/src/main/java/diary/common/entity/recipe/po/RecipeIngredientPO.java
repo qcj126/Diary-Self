@@ -1,5 +1,6 @@
 package diary.common.entity.recipe.po;
 
+import diary.common.entity.recipe.ao.RecipeIngredientAO;
 import lombok.Data;
 
 @Data
@@ -22,4 +23,5 @@ public class RecipeIngredientPO {
 
     /** 排序 */
     private Integer sortOrder;
+
 }
