@@ -7,11 +7,21 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="diary-file" />
         <module name="diary-user" />
-        <module name="diary-config" />
+        <module name="diary-common" />
         <module name="diary-dao" />
+        <module name="diary-file" />
+        <module name="diary-config" />
         <module name="diary-utils" />
+      </profile>
+      <profile name="Annotation profile for Diary-Self" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="D:/maven-repository/my-diary/org/projectlombok/lombok/1.18.44/lombok-1.18.44.jar" />
+        </processorPath>
+        <module name="diary-recipe" />
         <module name="diary-gateway" />
       </profile>
     </annotationProcessing>
@@ -19,10 +29,12 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="MyLoveDiary" options="" />
+      <module name="diary-common" options="-parameters" />
       <module name="diary-config" options="-parameters" />
       <module name="diary-dao" options="-parameters" />
       <module name="diary-file" options="-parameters" />
       <module name="diary-gateway" options="-parameters" />
+      <module name="diary-recipe" options="-parameters" />
       <module name="diary-user" options="-parameters" />
       <module name="diary-utils" options="-parameters" />
     </option>

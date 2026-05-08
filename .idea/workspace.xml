@@ -4,7 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f808c6d7-aa71-4ad4-bd8e-7a02c2741024" name="Changes" comment="" />
+    <list default="true" id="f808c6d7-aa71-4ad4-bd8e-7a02c2741024" name="Changes" comment="main">
+      <change beforePath="$PROJECT_DIR$/MyLoveDiary.iml" beforeDir="false" afterPath="$PROJECT_DIR$/Diary-Self.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-common/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-config/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-config/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-dao/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-dao/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-file/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-file/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-gateway/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-gateway/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-recipe/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-recipe/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-user/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-user/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-utils/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-utils/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -25,6 +36,7 @@
         <option name="userSettingsFile" value="D:\maven-settings\settings.xml" />
       </MavenGeneralSettings>
     </option>
+    <option name="explicitlyEnabledProfiles" value="native" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 1
@@ -34,42 +46,43 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.SecurityConfig.executor": "Debug",
-    "Application.UserServiceImpl.executor": "Debug",
-    "Maven.diary-config [clean].executor": "Run",
-    "Maven.diary-config [compile].executor": "Run",
-    "Maven.diary-dao [clean].executor": "Run",
-    "Maven.diary-dao [compile].executor": "Run",
-    "Maven.diary-dao [package].executor": "Run",
-    "Maven.diary-user [clean].executor": "Run",
-    "Maven.diary-user [compile].executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "Spring Boot.DiaryConfigApplication.executor": "Debug",
-    "Spring Boot.DiaryDaoApplication.executor": "Debug",
-    "Spring Boot.DiaryGatewayApplication.executor": "Debug",
-    "Spring Boot.DiaryUserApplication.executor": "Debug",
-    "Spring Boot.DiaryUtilsApplication.executor": "Debug",
-    "Spring Boot.MyLoveDiaryApplication.executor": "Debug",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/MyLoveDiary/diary-config/src/main/resources/mapper",
-    "node.js.detected.package.eslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Project",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.4",
-    "run.configurations.included.in.services": "true",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.SecurityConfig.executor&quot;: &quot;Debug&quot;,
+    &quot;Application.UserServiceImpl.executor&quot;: &quot;Debug&quot;,
+    &quot;Maven.diary-config [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.diary-config [compile].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.diary-dao [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.diary-dao [compile].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.diary-dao [package].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.diary-user [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.diary-user [compile].executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;Spring Boot.DiaryConfigApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;Spring Boot.DiaryDaoApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;Spring Boot.DiaryGatewayApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;Spring Boot.DiaryUserApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;Spring Boot.DiaryUtilsApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;Spring Boot.MyLoveDiaryApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/MyLoveDiary/diary-config/src/main/resources/mapper&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.4&quot;,
+    &quot;run.configurations.included.in.services&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="ReactorSettings">
     <option name="notificationShown" value="true" />
   </component>
@@ -133,6 +146,17 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="Diary-Self" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="Diary-Self" />
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
     <configuration name="DiaryGatewayApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
       <module name="diary-gateway" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="diary.gateway.DiaryGatewayApplication" />
@@ -142,6 +166,13 @@
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="DiaryRecipeApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="diary-recipe" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="diary.recipe.DiaryRecipeApplication" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
