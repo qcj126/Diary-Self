@@ -8,15 +8,14 @@ import diary.common.entity.recipe.po.RecipePO;
 import diary.common.exception.NullResultException;
 import diary.common.exception.ParamIllegalException;
 import diary.common.result.ApiResponse;
-import diary.dao.mapper.recipe.RecipeIngredientMapper;
-import diary.dao.mapper.recipe.RecipeMapper;
-import diary.dao.mapper.recipe.RecipeStepMapper;
+import diary.recipe.mapper.RecipeIngredientMapper;
+import diary.recipe.mapper.RecipeMapper;
+import diary.recipe.mapper.RecipeStepMapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import diary.recipe.service.update.RecipeUpdateService;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class RecipeUpdateServiceImpl implements RecipeUpdateService {

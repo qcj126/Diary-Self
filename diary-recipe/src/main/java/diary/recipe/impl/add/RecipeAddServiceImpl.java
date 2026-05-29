@@ -1,7 +1,7 @@
 package diary.recipe.impl.add;
 
-import diary.common.convert.AoConvertToPo;
-import diary.common.convert.DtoConvertToPo;
+import diary.common.convert.recipe.AoConvertToPo;
+import diary.common.convert.recipe.DtoConvertToPo;
 import diary.common.exception.ParamIllegalException;
 import diary.common.exception.SameDataException;
 import diary.common.result.ApiResponse;
@@ -9,9 +9,9 @@ import diary.common.entity.recipe.dto.req.RecipeReqDto;
 import diary.common.entity.recipe.po.RecipeIngredientPO;
 import diary.common.entity.recipe.po.RecipePO;
 import diary.common.entity.recipe.po.RecipeStepPO;
-import diary.dao.mapper.recipe.RecipeIngredientMapper;
-import diary.dao.mapper.recipe.RecipeMapper;
-import diary.dao.mapper.recipe.RecipeStepMapper;
+import diary.recipe.mapper.RecipeIngredientMapper;
+import diary.recipe.mapper.RecipeMapper;
+import diary.recipe.mapper.RecipeStepMapper;
 import diary.utils.commonutil.MyUtils;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;

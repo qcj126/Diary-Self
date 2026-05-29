@@ -54,13 +54,14 @@
         </dependency>
         <dependency>
             <groupId>qcj</groupId>
-            <artifactId>diary-dao</artifactId>
+            <artifactId>diary-config</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>qcj</groupId>
-            <artifactId>diary-config</artifactId>
+            <groupId>diary</groupId>
+            <artifactId>diary-common</artifactId>
             <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

@@ -9,9 +9,8 @@ import diary.common.entity.recipe.dto.resp.PageRespDto;
 import diary.common.entity.recipe.dto.resp.RecipeRespDto;
 
 import diary.common.entity.recipe.po.RecipePO;
-import diary.common.exception.CustomException;
 import diary.common.exception.NullResultException;
-import diary.dao.mapper.recipe.RecipeMapper;
+import diary.recipe.mapper.RecipeMapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import diary.recipe.service.query.RecipeQueryService;

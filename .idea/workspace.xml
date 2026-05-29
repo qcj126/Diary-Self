@@ -4,30 +4,88 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f808c6d7-aa71-4ad4-bd8e-7a02c2741024" name="Changes" comment="main">
+    <list default="true" id="f808c6d7-aa71-4ad4-bd8e-7a02c2741024" name="Changes" comment="饮食模块的增删改查">
+      <change afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/convert/diet/POConvertToVO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/diet/dietenum/MealTypeEnum.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/diet/dto/DietRecordDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/diet/dto/DietRecordImageDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/diet/po/DietRecordImagePO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/diet/po/DietRecordPO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/diet/vo/DietRecordImageVO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/diet/vo/DietRecordVO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/image/dto/ImageDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/image/po/ImagePO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/image/vo/ImageVO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-diet/src/main/java/qcj/diary/diarydiet/controller/DietController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-diet/src/main/java/qcj/diary/diarydiet/impl/add/DietAddServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-diet/src/main/java/qcj/diary/diarydiet/impl/delete/DietDeleteServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-diet/src/main/java/qcj/diary/diarydiet/impl/query/DietQueryServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-diet/src/main/java/qcj/diary/diarydiet/impl/update/DietUpdateServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-diet/src/main/java/qcj/diary/diarydiet/mapper/DietMapper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-diet/src/main/java/qcj/diary/diarydiet/service/add/DietAddService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-diet/src/main/java/qcj/diary/diarydiet/service/delete/DietDeleteService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-diet/src/main/java/qcj/diary/diarydiet/service/query/DietQueryService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-diet/src/main/java/qcj/diary/diarydiet/service/update/DietUpdateService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-diet/src/main/java/qcj/diary/diarydiet/sql/表结构信息.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-diet/src/main/resources/mapper/DietMapper.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-utils/src/main/java/diary/utils/redis/ValidatUtil.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-file/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-file/src/main/resources/application.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-gateway/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-gateway/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-gateway/src/main/java/diary/gateway/DiaryGatewayApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-gateway/src/main/java/diary/gateway/DiaryGatewayApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-gateway/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-gateway/src/main/resources/application.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-recipe/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-recipe/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-user/diary-user.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-user/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-user/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-common/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/convert/AoConvertToPo.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/convert/recipe/AoConvertToPo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/convert/DtoConvertToPo.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/convert/recipe/DtoConvertToPo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-dao/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-dao/src/main/java/diary/dao/DiaryDaoApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-dao/src/main/java/diary/dao/mapper/recipe/RecipeIngredientMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-recipe/src/main/java/diary/recipe/mapper/RecipeIngredientMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-dao/src/main/java/diary/dao/mapper/recipe/RecipeMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-recipe/src/main/java/diary/recipe/mapper/RecipeMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-dao/src/main/java/diary/dao/mapper/recipe/RecipeStepMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-recipe/src/main/java/diary/recipe/mapper/RecipeStepMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-dao/src/main/java/diary/dao/mapper/user/UserMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-user/src/main/java/diary/user/mapper/UserMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-dao/src/main/java/diary/dao/redis/ManageVerifyCode.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-dao/src/main/resources/application.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-dao/src/main/resources/mapper/PhotoMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-recipe/src/main/resources/mapper/PhotoMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-dao/src/main/resources/mapper/RecipeIngredientMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-recipe/src/main/resources/mapper/RecipeIngredientMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-dao/src/main/resources/mapper/RecipeMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-recipe/src/main/resources/mapper/RecipeMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-dao/src/main/resources/mapper/RecipeStepMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-recipe/src/main/resources/mapper/RecipeStepMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-dao/src/main/resources/mapper/UserMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-user/src/main/resources/mapper/UserMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-diet/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-diet/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-diet/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/diary-diet/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-file/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-file/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-recipe/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-recipe/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-recipe/src/main/java/diary/recipe/impl/add/RecipeAddServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-recipe/src/main/java/diary/recipe/impl/add/RecipeAddServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-recipe/src/main/java/diary/recipe/impl/delete/RecipeDeleteServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-recipe/src/main/java/diary/recipe/impl/delete/RecipeDeleteServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-recipe/src/main/java/diary/recipe/impl/query/RecipeQueryServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-recipe/src/main/java/diary/recipe/impl/query/RecipeQueryServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-recipe/src/main/java/diary/recipe/impl/update/RecipeUpdateServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-recipe/src/main/java/diary/recipe/impl/update/RecipeUpdateServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-timedJob/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/diary-timedJob/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-user/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-user/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-user/src/main/java/diary/user/service/impl/UserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-user/src/main/java/diary/user/impl/UserServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/diary-utils/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-utils/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-utils/src/main/java/diary/utils/OSS/OssUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-utils/src/main/java/diary/utils/OSS/OssUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-utils/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-utils/src/main/resources/application.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-xxljob/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-xxljob/src/main/resources/application.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CopilotChats">
+    <option name="panelChat">
+      <chat>
+        <option name="activeSessionId" value="8e455525-b065-461a-b3fa-aeea2d9f4f7a" />
+        <option name="sessions">
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="8e455525-b065-461a-b3fa-aeea2d9f4f7a" />
+            <option name="modeId" value="Ask" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+        </option>
+        <option name="type" value="PANEL" />
+      </chat>
+    </option>
   </component>
   <component name="CopilotPersistence">
     <persistenceIdMap>
@@ -42,9 +100,10 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="spring-beans.schema" />
-        <option value="Interface" />
         <option value="Exception" />
+        <option value="Enum" />
         <option value="Class" />
+        <option value="Interface" />
       </list>
     </option>
   </component>
@@ -57,20 +116,19 @@
     &quot;assignee&quot;: &quot;qcj126&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "git@github.com:qcj126/Diary-Self.git",
-    "accountId": "2e30435e-d36e-4a7c-93d9-e387c2ab191d"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;git@github.com:qcj126/Diary-Love.git&quot;,
+    &quot;accountId&quot;: &quot;457ec14a-a2ef-4cb9-bd79-5895a5a841ab&quot;
   }
-}]]></component>
+}</component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
         <option name="localRepository" value="D:\maven-repository\my-diary" />
-        <option name="userSettingsFile" value="D:\maven-settings\settings.xml" />
+        <option name="userSettingsFile" value="E:\maven\settings\settings.xml" />
       </MavenGeneralSettings>
     </option>
-    <option name="explicitlyEnabledProfiles" value="native" />
   </component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
@@ -116,7 +174,7 @@
     "Spring Boot.MyLoveDiaryApplication.executor": "Debug",
     "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "E:/Diary-Self",
+    "last_opened_file_path": "E:/Diary-Self/diary-recipe/src/main/java/diary/recipe/mapper",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -135,16 +193,19 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="E:\Diary-Love\diary-recipe\src\main\java\qcj\diary\diaryrecipe\service" />
-      <recent name="D:\MyLoveDiary\diary-config\src\main\resources\mapper" />
-      <recent name="D:\MyLoveDiary\diary-user\src\main\resources" />
-      <recent name="D:\MyLoveDiary\src\main\resources" />
-      <recent name="D:\MyLoveDiary\src\main\java\diary\mylovediary" />
+      <recent name="E:\Diary-Self\diary-recipe\src\main\java\diary\recipe\mapper" />
+      <recent name="E:\Diary-Self\diary-recipe\src\main\resources" />
+      <recent name="E:\Diary-Self\diary-user\src\main\resources" />
+      <recent name="E:\Diary-Self\diary-diet\src\main\java\qcj\diary\diarydiet\impl" />
+      <recent name="E:\Diary-Self\diary-diet\src\main\java\qcj\diary\diarydiet\service" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\MyLoveDiary\diary-dao\src\main\resources" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="diary.common.convert.diet" />
+      <recent name="qcj.diary.diarydiet.impl.update" />
+      <recent name="qcj.diary.diarydiet.impl.query" />
       <recent name="qcj.diary.diaryrecipe.impl.query" />
     </key>
   </component>
@@ -183,6 +244,13 @@
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="DiaryDietApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="diary-diet" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="qcj.diary.diarydiet.DiaryDietApplication" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -226,6 +294,13 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="DiaryTimedjobApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="diary-timedjob" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="qcj.diary.diarytimedjob.DiaryTimedjobApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="DiaryUserApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
       <module name="diary-user" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="diary.user.DiaryUserApplication" />
@@ -259,8 +334,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.23892.409" />
-        <option value="bundled-js-predefined-d6986cc7102b-e03c56caf84a-JavaScript-IU-252.23892.409" />
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.28539.33" />
+        <option value="bundled-js-predefined-d6986cc7102b-a71380e98a7c-JavaScript-IU-252.28539.33" />
       </set>
     </attachedChunks>
   </component>
@@ -297,6 +372,9 @@
       <workItem from="1778228777167" duration="1399000" />
       <workItem from="1778233903407" duration="116000" />
       <workItem from="1778249321383" duration="301000" />
+      <workItem from="1779438073150" duration="592000" />
+      <workItem from="1780034644496" duration="629000" />
+      <workItem from="1780036068136" duration="9432000" />
     </task>
     <task id="LOCAL-00001" summary="新增食谱功能">
       <option name="closed" value="true" />
@@ -426,7 +504,47 @@
       <option name="project" value="LOCAL" />
       <updated>1778227647862</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="模块">
+      <option name="closed" value="true" />
+      <created>1780038384283</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1780038384283</updated>
+    </task>
+    <task id="LOCAL-00018" summary="模块">
+      <option name="closed" value="true" />
+      <created>1780038477890</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1780038477890</updated>
+    </task>
+    <task id="LOCAL-00019" summary="模块">
+      <option name="closed" value="true" />
+      <created>1780038664518</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1780038664519</updated>
+    </task>
+    <task id="LOCAL-00020" summary="模块">
+      <option name="closed" value="true" />
+      <created>1780038685418</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1780038685418</updated>
+    </task>
+    <task id="LOCAL-00021" summary="模块">
+      <option name="closed" value="true" />
+      <created>1780038701697</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1780038701697</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -452,7 +570,9 @@
     <MESSAGE value="增加非user请求的token校验" />
     <MESSAGE value="异常校验" />
     <MESSAGE value="食谱相关代码" />
-    <option name="LAST_COMMIT_MESSAGE" value="食谱相关代码" />
+    <MESSAGE value="模块" />
+    <MESSAGE value="饮食模块的增删改查" />
+    <option name="LAST_COMMIT_MESSAGE" value="饮食模块的增删改查" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

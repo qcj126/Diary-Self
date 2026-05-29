@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ExternalStorageConfigurationManager" enabled="true" />
-  <component name="KubernetesApiProvider">{}</component>
+  <component name="KubernetesApiProvider"><![CDATA[{}]]></component>
   <component name="MavenProjectsManager">
     <option name="originalFiles">
       <list>
@@ -12,10 +12,13 @@
         <option value="$PROJECT_DIR$/xxl-job-admin/xxl-job-core/pom.xml" />
         <option value="$PROJECT_DIR$/xxl-job-admin/xxl-job-executor-samples/pom.xml" />
         <option value="$PROJECT_DIR$/xxl-job-admin/pom.xml" />
+        <option value="$PROJECT_DIR$/diary-timedjob/pom.xml" />
+        <option value="$PROJECT_DIR$/diary-diet/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
       <set>
+        <option value="$PROJECT_DIR$/diary-dao/pom.xml" />
         <option value="$PROJECT_DIR$/xxl-job-admin-master/pom.xml" />
         <option value="$PROJECT_DIR$/xxl-job-admin-master/xxl-job-core/pom.xml" />
         <option value="$PROJECT_DIR$/xxl-job-admin-master/xxl-job-executor-samples/pom.xml" />

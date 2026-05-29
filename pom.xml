@@ -17,7 +17,6 @@
     
     <modules>
         <module>diary-user</module>
-        <module>diary-dao</module>
         <module>diary-config</module>
         <module>diary-utils</module>
         <module>diary-file</module>
