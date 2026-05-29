@@ -1,4 +1,4 @@
-package diary.config.consts;
+package diary.common.consts;
 
 /**
  * 时间线分类常量

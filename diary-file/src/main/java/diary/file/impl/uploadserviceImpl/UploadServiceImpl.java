@@ -1,9 +1,9 @@
 package diary.file.impl.uploadserviceImpl;
 
 import diary.common.entity.file.po.Photo;
-import diary.config.consts.FileTypeConst;
-import diary.config.consts.PhotoStatusConst;
-import diary.config.consts.PhotoTypeConst;
+import diary.common.consts.FileTypeConst;
+import diary.common.consts.PhotoStatusConst;
+import diary.common.consts.PhotoTypeConst;
 import diary.file.mapper.PhotoMapper;
 import diary.file.service.RedisService;
 import diary.file.service.uploadservice.UploadService;

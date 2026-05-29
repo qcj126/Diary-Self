@@ -2,7 +2,7 @@ package diary.file.impl;
 
 import com.rabbitmq.client.Channel;
 import diary.common.entity.file.po.OssUploadSuccessMsg;
-import diary.config.consts.PhotoStatusConst;
+import diary.common.consts.PhotoStatusConst;
 import diary.config.mqconfig.RabbitMqConfig;
 import diary.file.mapper.PhotoMapper;
 import diary.file.service.MqConsumerService;

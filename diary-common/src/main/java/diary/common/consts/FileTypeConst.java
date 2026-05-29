@@ -1,4 +1,4 @@
-package diary.config.consts;
+package diary.common.consts;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,4 +29,10 @@ public class FileTypeConst {
     public static final List<String> DOCUMENT_EXTENSIONS = Arrays.asList(
             "pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "txt", "csv"
     );
+
+    // 图片分类名称
+    public static final String FOOD_IMAGE = "饮食图片";
+    public static final String COOK_IMAGE = "食谱图片";
+    public static final String INGREDIENT_IMAGE = "食材图片";
+
 }

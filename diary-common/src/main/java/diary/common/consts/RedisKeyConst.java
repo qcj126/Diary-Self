@@ -1,4 +1,4 @@
-package diary.config.consts;
+package diary.common.consts;
 
 public class RedisKeyConst {
     public static final String PHOTO_COUNT_KEY = "photo:count";

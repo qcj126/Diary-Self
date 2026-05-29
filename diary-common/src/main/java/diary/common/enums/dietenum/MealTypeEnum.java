@@ -1,4 +1,4 @@
-package diary.common.entity.diet.dietenum;
+package diary.common.enums.dietenum;
 
 import lombok.Getter;
 

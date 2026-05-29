@@ -1,6 +1,6 @@
 package diary.file.impl;
 
-import diary.config.consts.RedisKeyConst;
+import diary.common.consts.RedisKeyConst;
 import diary.file.service.RedisService;
 import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.RedisTemplate;

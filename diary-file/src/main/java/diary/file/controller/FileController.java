@@ -31,11 +31,11 @@ public class FileController {
     private VideoFileService videoFileService;
 
     @PostMapping("/upload/photo")
-    public ApiResponse upload(@RequestParam("files") List<MultipartFile> files) {
+    public ApiResponse upload(@RequestParam("files") List<MultipartFile> files, @RequestParam("code") Integer code) {
         // 直接先插入数据
         Map<String, Object> result = uploadService.addPhotosToDb(files);
         // 异步上传图片到OSS成功后，发送消息给mq
-        asyncService.uploadAndSendMsgAsync(result, files);
+        asyncService.uploadAndSendMsgAsync(result, files, code);
         return ApiResponse.success(result);
     }
 

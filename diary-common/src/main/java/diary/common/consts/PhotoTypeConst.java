@@ -1,4 +1,4 @@
-package diary.config.consts;
+package diary.common.consts;
 
 public class PhotoTypeConst {
     // 上传的图片分类

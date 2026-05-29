@@ -9,10 +9,11 @@ import java.util.concurrent.CompletableFuture;
 public interface AsyncService {
     /**
      * 异步上传图片到OSS并发送消息
+     *
      * @param result 数据库插入结果
-     * @param files 文件列表
+     * @param files  文件列表
      */
-    void uploadAndSendMsgAsync(Map<String, Object> result, List<MultipartFile> files);
+    void uploadAndSendMsgAsync(Map<String, Object> result, List<MultipartFile> files, Integer code);
 
     /**
      * 异步下载单个图片

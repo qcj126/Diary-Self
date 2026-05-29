@@ -11,6 +11,7 @@ import com.aliyun.oss.model.PartETag;
 import com.aliyun.oss.model.UploadPartRequest;
 import com.aliyun.oss.model.UploadPartResult;
 import diary.common.entity.file.po.OssUploadSuccessMsg;
+import diary.common.enums.typeenum.TypeEnum;
 import diary.config.mqconfig.RabbitMqConfig;
 import diary.utils.OSS.OssUtil;
 import diary.file.service.asyncservice.AsyncService;
@@ -68,7 +69,7 @@ public class AsyncServiceImpl implements AsyncService {
 
     @Async("ossUploadExecutor")
     @Override
-    public void uploadAndSendMsgAsync(Map<String, Object> result, List<MultipartFile> files) {
+    public void uploadAndSendMsgAsync(Map<String, Object> result, List<MultipartFile> files, Integer code) {
         // 获取photoId列表
         Object dataObj = result.get("data");
         if (dataObj == null) {
@@ -109,6 +110,7 @@ public class AsyncServiceImpl implements AsyncService {
 
             try {
                 // 生成唯一文件名，避免同名覆盖
+                String type = TypeEnum.getType(code);
                 String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
 
                 // 1. 上传文件到 OSS（V4 客户端会自动使用 V4 签名）

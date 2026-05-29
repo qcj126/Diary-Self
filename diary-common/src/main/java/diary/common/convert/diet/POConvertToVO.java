@@ -1,6 +1,6 @@
 package diary.common.convert.diet;
 
-import diary.common.entity.diet.dietenum.MealTypeEnum;
+import diary.common.enums.dietenum.MealTypeEnum;
 import diary.common.entity.diet.po.DietRecordPO;
 import diary.common.entity.diet.vo.DietRecordVO;
 

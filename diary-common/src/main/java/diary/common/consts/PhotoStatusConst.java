@@ -1,4 +1,4 @@
-package diary.config.consts;
+package diary.common.consts;
 
 public class PhotoStatusConst {
     public static final String PHOTO_STATUS_PROCESSING = "1200";
