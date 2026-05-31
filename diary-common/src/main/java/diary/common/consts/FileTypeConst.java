@@ -31,8 +31,12 @@ public class FileTypeConst {
     );
 
     // 图片分类名称
-    public static final String FOOD_IMAGE = "饮食图片";
-    public static final String COOK_IMAGE = "食谱图片";
+    public static final String DIET_IMAGE = "饮食图片";
+    public static final String RECIPE_IMAGE = "食谱图片";
     public static final String INGREDIENT_IMAGE = "食材图片";
 
+    // 图片路径
+    public static final String DIET_IMAGE_PATH = "food_path";
+    public static final String RECIPE_IMAGE_PATH = "cook_path";
+    public static final String INGREDIENT_IMAGE_PATH = "ingredient_path";
 }

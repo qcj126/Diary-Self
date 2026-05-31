@@ -22,14 +22,14 @@
       <option name="url" value="https://repository.jboss.org/nexus/content/repositories/public/" />
     </remote-repository>
     <remote-repository>
-      <option name="id" value="eci-group" />
-      <option name="name" value="eci-group" />
-      <option name="url" value="https://packages.aliyun.com/67a476f560ce1807612c794a/maven/eci-group" />
-    </remote-repository>
-    <remote-repository>
       <option name="id" value="central" />
       <option name="name" value="Central Repository" />
       <option name="url" value="https://maven.aliyun.com/repository/public" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="eci-group" />
+      <option name="name" value="eci-group" />
+      <option name="url" value="https://packages.aliyun.com/67a476f560ce1807612c794a/maven/eci-group" />
     </remote-repository>
     <remote-repository>
       <option name="id" value="snapshots" />

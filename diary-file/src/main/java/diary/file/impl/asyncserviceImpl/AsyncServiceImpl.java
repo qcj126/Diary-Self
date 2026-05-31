@@ -12,7 +12,10 @@ import com.aliyun.oss.model.UploadPartRequest;
 import com.aliyun.oss.model.UploadPartResult;
 import diary.common.entity.file.po.OssUploadSuccessMsg;
 import diary.common.enums.typeenum.TypeEnum;
+import diary.common.exception.CustomException;
+import diary.common.exception.ParamIllegalException;
 import diary.config.mqconfig.RabbitMqConfig;
+import diary.utils.file.FileUtil;
 import diary.utils.OSS.OssUtil;
 import diary.file.service.asyncservice.AsyncService;
 import jakarta.annotation.Resource;
@@ -67,6 +70,9 @@ public class AsyncServiceImpl implements AsyncService {
     @Value("${download.timeout:300000}")
     private int timeout;
 
+    @Resource
+    private FileUtil fileUtil;
+
     @Async("ossUploadExecutor")
     @Override
     public void uploadAndSendMsgAsync(Map<String, Object> result, List<MultipartFile> files, Integer code) {
@@ -92,6 +98,10 @@ public class AsyncServiceImpl implements AsyncService {
             log.warn("photoId数量({})与文件数量({})不匹配", photoIds.size(), files.size());
         }
 
+        if (code == null) {
+            throw new ParamIllegalException("code 不能为空");
+        }
+
         int successCount = 0;
         int failCount = 0;
         List<String> failedFiles = new ArrayList<>();
@@ -111,7 +121,10 @@ public class AsyncServiceImpl implements AsyncService {
             try {
                 // 生成唯一文件名，避免同名覆盖
                 String type = TypeEnum.getType(code);
-                String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+                if (type == null) {
+                    throw new CustomException("未知图片类型，无效的code: " + code);
+                }
+                String fileName = fileUtil.getFileName(type, file.getOriginalFilename());
 
                 // 1. 上传文件到 OSS（V4 客户端会自动使用 V4 签名）
                 ossClient.putObject(bucketName, fileName, file.getInputStream());

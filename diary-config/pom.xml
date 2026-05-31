@@ -7,8 +7,7 @@
         <artifactId>Diary-Self</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-    
-    <groupId>qcj</groupId>
+
     <artifactId>diary-config</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>diary-config</name>

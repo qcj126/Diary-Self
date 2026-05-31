@@ -7,8 +7,6 @@
         <artifactId>Diary-Self</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-    
-    <groupId>qcj</groupId>
     <artifactId>diary-utils</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>diary-utils</name>
@@ -55,6 +53,14 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
+        <!--项目模块依赖-->
+        <dependency>
+            <groupId>diary</groupId>
+            <artifactId>diary-common</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
 
     </dependencies>

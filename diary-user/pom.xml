@@ -47,13 +47,13 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>qcj</groupId>
+            <groupId>diary</groupId>
             <artifactId>diary-utils</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>qcj</groupId>
+            <groupId>diary</groupId>
             <artifactId>diary-config</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>

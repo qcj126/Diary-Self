@@ -4,23 +4,21 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f808c6d7-aa71-4ad4-bd8e-7a02c2741024" name="Changes" comment="饮食模块的增删改查">
-      <change afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/enums/typeenum/TypeEnum.java" afterDir="false" />
+    <list default="true" id="f808c6d7-aa71-4ad4-bd8e-7a02c2741024" name="Changes" comment="main">
+      <change afterPath="$PROJECT_DIR$/diary-utils/src/main/java/diary/utils/file/FileUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/convert/diet/POConvertToVO.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/convert/diet/POConvertToVO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/diet/dietenum/MealTypeEnum.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/enums/dietenum/MealTypeEnum.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-config/src/main/java/diary/config/consts/FileTypeConst.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/consts/FileTypeConst.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-config/src/main/java/diary/config/consts/PhotoStatusConst.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/consts/PhotoStatusConst.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-config/src/main/java/diary/config/consts/PhotoTypeConst.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/consts/PhotoTypeConst.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-config/src/main/java/diary/config/consts/RedisKeyConst.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/consts/RedisKeyConst.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-config/src/main/java/diary/config/consts/TimeLineCategoryConsts.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/consts/TimeLineCategoryConsts.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/controller/FileController.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/controller/FileController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/impl/MqConsumerServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/impl/MqConsumerServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/impl/RedisServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/impl/RedisServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/impl/VideoFileServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/impl/VideoFileServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/consts/FileTypeConst.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/consts/FileTypeConst.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/enums/typeenum/TypeEnum.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/enums/typeenum/TypeEnum.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-config/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-config/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-diet/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-diet/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-file/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-file/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/impl/asyncserviceImpl/AsyncServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/impl/asyncserviceImpl/AsyncServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/impl/uploadserviceImpl/UploadServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/impl/uploadserviceImpl/UploadServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/service/asyncservice/AsyncService.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/service/asyncservice/AsyncService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-gateway/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-gateway/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-recipe/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-recipe/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-user/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-user/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-utils/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-utils/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,9 +57,9 @@
       <list>
         <option value="spring-beans.schema" />
         <option value="Exception" />
-        <option value="Class" />
         <option value="Interface" />
         <option value="Enum" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -76,8 +74,8 @@
 }</component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;git@github.com:qcj126/Diary-Love.git&quot;,
-    &quot;accountId&quot;: &quot;457ec14a-a2ef-4cb9-bd79-5895a5a841ab&quot;
+    &quot;url&quot;: &quot;git@github.com:qcj126/Diary-Self.git&quot;,
+    &quot;accountId&quot;: &quot;2e30435e-d36e-4a7c-93d9-e387c2ab191d&quot;
   }
 }</component>
   <component name="MavenImportPreferences">
@@ -87,6 +85,7 @@
         <option name="userSettingsFile" value="E:\maven\settings\settings.xml" />
       </MavenGeneralSettings>
     </option>
+    <option name="explicitlyEnabledProfiles" value="native" />
   </component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
@@ -176,23 +175,8 @@
         <option value="SpringBootApplicationConfigurationType" />
       </set>
     </option>
-    <option name="configurationStatuses">
-      <map>
-        <entry key="SpringBootApplicationConfigurationType">
-          <value>
-            <map>
-              <entry key="DiaryFileApplication" value="STOPPED" />
-              <entry key="DiaryGatewayApplication" value="STOPPED" />
-              <entry key="DiaryRecipeApplication" value="STOPPED" />
-              <entry key="DiaryUserApplication" value="STOPPED" />
-              <entry key="DiaryXxljobApplication" value="STOPPED" />
-            </map>
-          </value>
-        </entry>
-      </map>
-    </option>
   </component>
-  <component name="RunManager" selected="Spring Boot.DiaryFileApplication">
+  <component name="RunManager" selected="Application.UserServiceImpl">
     <configuration name="UserServiceImpl" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="diary.user.service.impl.UserServiceImpl" />
       <module name="diary-user" />
@@ -213,61 +197,23 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="DiaryFileApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
-      <module name="diary-file" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="diary.file.DiaryFileApplication" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="diary.file.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="DiaryGatewayApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
+    <configuration name="DiaryGatewayApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <module name="diary-gateway" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="diary.gateway.DiaryGatewayApplication" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="diary.gateway.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="DiaryRecipeApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
+    <configuration name="DiaryRecipeApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <module name="diary-recipe" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="diary.recipe.DiaryRecipeApplication" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="diary.recipe.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
     <configuration name="DiaryTimedjobApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
-      <module name="diary-timedjob" />
+      <module name="diary-timedJob" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="qcj.diary.diarytimedjob.DiaryTimedjobApplication" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="DiaryUserApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
-      <module name="diary-user" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="diary.user.DiaryUserApplication" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="diary.user.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -281,10 +227,6 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Spring Boot.DiaryFileApplication" />
-        <item itemvalue="Spring Boot.DiaryUserApplication" />
-        <item itemvalue="Spring Boot.DiaryRecipeApplication" />
-        <item itemvalue="Spring Boot.DiaryGatewayApplication" />
         <item itemvalue="Application.UserServiceImpl" />
       </list>
     </recent_temporary>
@@ -292,8 +234,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.28539.33" />
-        <option value="bundled-js-predefined-d6986cc7102b-a71380e98a7c-JavaScript-IU-252.28539.33" />
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.23892.409" />
+        <option value="bundled-js-predefined-d6986cc7102b-e03c56caf84a-JavaScript-IU-252.23892.409" />
       </set>
     </attachedChunks>
   </component>
@@ -334,6 +276,9 @@
       <workItem from="1780034644496" duration="629000" />
       <workItem from="1780036068136" duration="10163000" />
       <workItem from="1780047317631" duration="1814000" />
+      <workItem from="1780105606558" duration="742000" />
+      <workItem from="1780207725520" duration="3963000" />
+      <workItem from="1780235391083" duration="657000" />
     </task>
     <task id="LOCAL-00001" summary="新增食谱功能">
       <option name="closed" value="true" />

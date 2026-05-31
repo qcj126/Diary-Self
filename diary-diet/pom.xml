@@ -7,7 +7,6 @@
         <artifactId>Diary-Self</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-    <groupId>qcj.diary</groupId>
     <artifactId>diary-diet</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>diary-diet</name>
@@ -38,7 +37,7 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>qcj</groupId>
+            <groupId>diary</groupId>
             <artifactId>diary-utils</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
