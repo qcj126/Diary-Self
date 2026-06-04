@@ -4,21 +4,328 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f808c6d7-aa71-4ad4-bd8e-7a02c2741024" name="Changes" comment="main">
-      <change afterPath="$PROJECT_DIR$/diary-utils/src/main/java/diary/utils/file/FileUtil.java" afterDir="false" />
+    <list default="true" id="f808c6d7-aa71-4ad4-bd8e-7a02c2741024" name="Changes" comment="饮食模块的增删改查">
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/XxlJobAdminApplication.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/constant/Consts.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/constant/TriggerStatus.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/controller/base/IndexController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/controller/base/LoginController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/controller/biz/JobCodeController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/controller/biz/JobGroupController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/controller/biz/JobInfoController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/controller/biz/JobLogController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/controller/biz/JobUserController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/mapper/XxlJobGroupMapper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/mapper/XxlJobInfoMapper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/mapper/XxlJobLockMapper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/mapper/XxlJobLogGlueMapper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/mapper/XxlJobLogMapper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/mapper/XxlJobLogReportMapper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/mapper/XxlJobRegistryMapper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/mapper/XxlJobUserMapper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/model/XxlJobGroup.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/model/XxlJobInfo.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/model/XxlJobLog.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/model/XxlJobLogGlue.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/model/XxlJobLogReport.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/model/XxlJobRegistry.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/model/XxlJobUser.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/model/dto/XxlBootResourceDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/alarm/JobAlarm.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/alarm/JobAlarmer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/alarm/impl/EmailJobAlarm.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/complete/JobCompleter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/config/XxlJobAdminBootstrap.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/cron/CronExpression.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/exception/XxlJobException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/misfire/MisfireHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/misfire/MisfireStrategyEnum.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/misfire/strategy/MisfireDoNothing.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/misfire/strategy/MisfireFireOnceNow.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/openapi/OpenApiController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/route/ExecutorRouteStrategyEnum.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/route/ExecutorRouter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/route/strategy/ExecutorRouteBusyover.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/route/strategy/ExecutorRouteConsistentHash.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/route/strategy/ExecutorRouteFailover.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/route/strategy/ExecutorRouteFirst.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/route/strategy/ExecutorRouteLFU.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/route/strategy/ExecutorRouteLRU.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/route/strategy/ExecutorRouteLast.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/route/strategy/ExecutorRouteRandom.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/route/strategy/ExecutorRouteRound.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/thread/JobCompleteHelper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/thread/JobFailAlarmMonitorHelper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/thread/JobLogReportHelper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/thread/JobRegistryHelper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/thread/JobScheduleHelper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/thread/JobTriggerPoolHelper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/trigger/JobTrigger.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/trigger/TriggerTypeEnum.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/type/ScheduleType.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/type/ScheduleTypeEnum.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/type/strategy/CronScheduleType.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/type/strategy/FixRateScheduleType.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/scheduler/type/strategy/NoneScheduleType.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/service/XxlJobService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/service/impl/AdminBizImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/service/impl/XxlJobServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/util/I18nUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/util/JobGroupPermissionUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/util/old/CommonDataInterceptor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/util/old/CookieUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/util/old/FtlUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/util/old/JacksonUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/util/old/LocalCacheUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/util/old/RemoteHttpJobBean.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/util/old/XxlJobDynamicScheduler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/util/old/XxlJobThreadPool.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/web/error/WebErrorPageRegistrar.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/web/error/WebHandlerExceptionResolver.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/web/xxlsso/SimpleLoginStore.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/java/com/xxl/job/admin/web/xxlsso/XxlSsoConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/application.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/i18n/message_en.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/i18n/message_zh_CN.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/i18n/message_zh_TC.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/logback.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/mapper/XxlJobGroupMapper.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/mapper/XxlJobInfoMapper.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/mapper/XxlJobLockMapper.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/mapper/XxlJobLogGlueMapper.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/mapper/XxlJobLogMapper.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/mapper/XxlJobLogReportMapper.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/mapper/XxlJobRegistryMapper.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/mapper/XxlJobUserMapper.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/Ionicons/css/ionicons.min.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/Ionicons/fonts/ionicons.eot" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/Ionicons/fonts/ionicons.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/Ionicons/fonts/ionicons.ttf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/Ionicons/fonts/ionicons.woff" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/bootstrap-daterangepicker/daterangepicker.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/bootstrap-daterangepicker/daterangepicker.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/bootstrap/css/bootstrap.min.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/bootstrap/css/bootstrap.min.css.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/bootstrap/fonts/glyphicons-halflings-regular.eot" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/bootstrap/fonts/glyphicons-halflings-regular.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/bootstrap/fonts/glyphicons-halflings-regular.ttf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/bootstrap/fonts/glyphicons-halflings-regular.woff" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/bootstrap/fonts/glyphicons-halflings-regular.woff2" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/bootstrap/js/bootstrap.min.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/ckeditor.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/config.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/contents.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/lang/zh-cn.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/plugins/image/dialogs/image.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/plugins/image/images/noimage.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/plugins/link/dialogs/anchor.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/plugins/link/dialogs/link.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/plugins/link/images/anchor.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/plugins/link/images/hidpi/anchor.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/plugins/magicline/images/hidpi/icon-rtl.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/plugins/magicline/images/hidpi/icon.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/plugins/magicline/images/icon-rtl.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/plugins/magicline/images/icon.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/plugins/scayt/dialogs/dialog.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/plugins/scayt/dialogs/options.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/plugins/scayt/dialogs/toolbar.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/plugins/scayt/skins/moono-lisa/scayt.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/plugins/specialchar/dialogs/lang/zh-cn.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/plugins/specialchar/dialogs/specialchar.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/plugins/table/dialogs/table.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/plugins/tableselection/styles/tableselection.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/plugins/wsc/skins/moono-lisa/wsc.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/skins/moono-lisa/dialog.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/skins/moono-lisa/dialog_ie.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/skins/moono-lisa/dialog_ie8.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/skins/moono-lisa/dialog_iequirks.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/skins/moono-lisa/editor.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/skins/moono-lisa/editor_gecko.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/skins/moono-lisa/editor_ie.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/skins/moono-lisa/editor_ie8.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/skins/moono-lisa/editor_iequirks.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/skins/moono-lisa/icons.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/skins/moono-lisa/icons_hidpi.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/skins/moono-lisa/images/arrow.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/skins/moono-lisa/images/close.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/skins/moono-lisa/images/hidpi/close.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/skins/moono-lisa/images/hidpi/lock-open.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/skins/moono-lisa/images/hidpi/lock.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/skins/moono-lisa/images/hidpi/refresh.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/skins/moono-lisa/images/lock-open.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/skins/moono-lisa/images/lock.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/skins/moono-lisa/images/refresh.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/skins/moono-lisa/images/spinner.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/skins/moono-lisa/readme.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/ckeditor/styles.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/fastclick/fastclick.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/font-awesome/css/font-awesome.css.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/font-awesome/css/font-awesome.min.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/font-awesome/fonts/FontAwesome.otf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/font-awesome/fonts/fontawesome-webfont.eot" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/font-awesome/fonts/fontawesome-webfont.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/font-awesome/fonts/fontawesome-webfont.ttf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/font-awesome/fonts/fontawesome-webfont.woff" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/font-awesome/fonts/fontawesome-webfont.woff2" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/jquery-slimscroll/jquery.slimscroll.min.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/jquery/jquery.min.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/moment/moment.min.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/select2/select2.min.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/bower_components/select2/select2.min.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/dist/css/AdminLTE.min.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/dist/css/skins/_all-skins.min.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/dist/js/adminlte.min.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/plugins/iCheck/icheck.min.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/plugins/iCheck/square/blue.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/plugins/iCheck/square/blue.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/adminlte/plugins/iCheck/square/blue@2x.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/biz/common/admin.setting.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/biz/common/admin.tab.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/biz/common/admin.tab.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/biz/common/admin.table.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/biz/common/admin.util.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/favicon.ico" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/bootstrap-table/bootstrap-table.min.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/bootstrap-table/bootstrap-table.min.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/bootstrap-table/extensions/treegrid/bootstrap-table-treegrid.min.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/bootstrap-table/locale/bootstrap-table-en-US.min.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/bootstrap-table/locale/bootstrap-table-zh-TW.min.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/codemirror/addon/hint/anyword-hint.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/codemirror/addon/hint/show-hint.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/codemirror/addon/hint/show-hint.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/codemirror/lib/codemirror.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/codemirror/lib/codemirror.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/codemirror/mode/clike/clike.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/codemirror/mode/javascript/javascript.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/codemirror/mode/php/php.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/codemirror/mode/powershell/powershell.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/codemirror/mode/python/python.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/codemirror/mode/shell/shell.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/cronGen/cronGen.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/cronGen/cronGen_en.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/echarts/echarts.common.min.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/fullscreen/jquery.fullscreen.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/jquery-treegrid/img/collapse.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/jquery-treegrid/img/expand.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/jquery-treegrid/jquery.treegrid.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/jquery-treegrid/jquery.treegrid.min.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/jquery/jquery.validate.min.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/layer/layer.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/layer/theme/default/icon-ext.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/layer/theme/default/icon.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/layer/theme/default/layer.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/layer/theme/default/loading-0.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/layer/theme/default/loading-1.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/layer/theme/default/loading-2.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/nprogress/nprogress.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/nprogress/nprogress.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/zTree/css/metroStyle/img/line_conn.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/zTree/css/metroStyle/img/loading.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/zTree/css/metroStyle/img/metro.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/zTree/css/metroStyle/img/metro.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/zTree/css/metroStyle/metroStyle.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/zTree/js/jquery.ztree.core.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/static/plugins/zTree/js/jquery.ztree.excheck.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/templates/base/dashboard.ftl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/templates/base/help.ftl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/templates/base/index.ftl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/templates/base/login.ftl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/templates/biz/group.list.ftl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/templates/biz/job.code.ftl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/templates/biz/job.list.ftl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/templates/biz/log.detail.ftl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/templates/biz/log.list.ftl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/templates/biz/user.list.ftl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/templates/common/common.errorpage.ftl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/src/main/resources/templates/common/common.macro.ftl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/constant/Const.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/constant/ExecutorBlockStrategyEnum.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/constant/RegistType.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/context/XxlJobContext.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/context/XxlJobHelper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/executor/XxlJobExecutor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/executor/impl/XxlJobSimpleExecutor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/executor/impl/XxlJobSpringExecutor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/glue/GlueFactory.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/glue/GlueTypeEnum.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/glue/impl/SpringGlueFactory.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/handler/IJobHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/handler/annotation/JobHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/handler/annotation/XxlJob.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/handler/impl/GlueJobHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/handler/impl/MethodJobHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/handler/impl/ScriptJobHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/log/XxlJobFileAppender.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/openapi/AdminBiz.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/openapi/ExecutorBiz.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/openapi/impl/ExecutorBizImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/openapi/model/CallbackRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/openapi/model/IdleBeatRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/openapi/model/KillRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/openapi/model/LogRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/openapi/model/LogResult.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/openapi/model/RegistryRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/openapi/model/TriggerRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/server/EmbedServer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/thread/ExecutorRegistryThread.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/thread/JobLogFileCleanThread.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/thread/JobThread.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/thread/TriggerCallbackThread.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/util/ScriptUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/util/deprecated/AdminBizClient.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/util/deprecated/DateUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/util/deprecated/ExecutorBizClient.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/util/deprecated/FileUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/util/deprecated/GsonTool.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/util/deprecated/IpUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/util/deprecated/JdkSerializeTool.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/util/deprecated/NetUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/util/deprecated/ReturnT.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/util/deprecated/ShardingUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/util/deprecated/ThrowableUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-core/src/main/java/com/xxl/job/core/util/deprecated/XxlJobRemotingUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-executor-samples/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-executor-samples/xxl-job-executor-sample-frameless/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-executor-samples/xxl-job-executor-sample-frameless/src/main/java/com/xxl/job/executor/sample/frameless/XxlJobFramelessApplication.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-executor-samples/xxl-job-executor-sample-frameless/src/main/java/com/xxl/job/executor/sample/frameless/config/FrameLessXxlJobConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-executor-samples/xxl-job-executor-sample-frameless/src/main/java/com/xxl/job/executor/sample/frameless/jobhandler/SampleXxlJob.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-executor-samples/xxl-job-executor-sample-frameless/src/main/resources/log4j.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-executor-samples/xxl-job-executor-sample-frameless/src/main/resources/xxl-job-executor.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-executor-samples/xxl-job-executor-sample-springboot-ai/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-executor-samples/xxl-job-executor-sample-springboot-ai/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-executor-samples/xxl-job-executor-sample-springboot-ai/src/main/java/com/xxl/job/executor/XxlJobAIExecutorApplication.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-executor-samples/xxl-job-executor-sample-springboot-ai/src/main/java/com/xxl/job/executor/config/XxlJobConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-executor-samples/xxl-job-executor-sample-springboot-ai/src/main/java/com/xxl/job/executor/controller/IndexController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-executor-samples/xxl-job-executor-sample-springboot-ai/src/main/java/com/xxl/job/executor/jobhandler/AIXxlJob.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-executor-samples/xxl-job-executor-sample-springboot-ai/src/main/resources/application.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-executor-samples/xxl-job-executor-sample-springboot-ai/src/main/resources/logback.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-executor-samples/xxl-job-executor-sample-springboot/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-executor-samples/xxl-job-executor-sample-springboot/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-executor-samples/xxl-job-executor-sample-springboot/src/main/java/com/xxl/job/executor/XxlJobExecutorApplication.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-executor-samples/xxl-job-executor-sample-springboot/src/main/java/com/xxl/job/executor/config/XxlJobConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-executor-samples/xxl-job-executor-sample-springboot/src/main/java/com/xxl/job/executor/consts/CityLocationInfos.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-executor-samples/xxl-job-executor-sample-springboot/src/main/java/com/xxl/job/executor/controller/IndexController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-executor-samples/xxl-job-executor-sample-springboot/src/main/java/com/xxl/job/executor/entity/UserPushConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-executor-samples/xxl-job-executor-sample-springboot/src/main/java/com/xxl/job/executor/entity/vo/WeatherInfo.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-executor-samples/xxl-job-executor-sample-springboot/src/main/java/com/xxl/job/executor/jobhandler/SampleXxlJob.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-executor-samples/xxl-job-executor-sample-springboot/src/main/java/com/xxl/job/executor/jobhandler/WeatherPushJob.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-executor-samples/xxl-job-executor-sample-springboot/src/main/java/com/xxl/job/executor/mapper/UserMapper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-executor-samples/xxl-job-executor-sample-springboot/src/main/java/com/xxl/job/executor/service/PushService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-executor-samples/xxl-job-executor-sample-springboot/src/main/java/com/xxl/job/executor/service/WeatherService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-executor-samples/xxl-job-executor-sample-springboot/src/main/java/jsons/天气json.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-executor-samples/xxl-job-executor-sample-springboot/src/main/resources/application.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-executor-samples/xxl-job-executor-sample-springboot/src/main/resources/logback.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/consts/FileTypeConst.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/consts/FileTypeConst.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/enums/typeenum/TypeEnum.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/enums/typeenum/TypeEnum.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-config/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-config/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-diet/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-diet/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-file/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-file/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/impl/asyncserviceImpl/AsyncServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/impl/asyncserviceImpl/AsyncServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-gateway/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-gateway/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-recipe/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-recipe/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-user/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-user/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-utils/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-utils/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-gateway/diary-gateway.iml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-xxljob/xxl-job-executor-samples/xxl-job-executor-sample-springboot/xxl-job-executor-sample-springboot.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-xxljob/src/main/java/qcj/diary/diaryxxljob/DiaryXxljobApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-xxljob/src/main/resources/application.yml" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -74,8 +381,8 @@
 }</component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;git@github.com:qcj126/Diary-Self.git&quot;,
-    &quot;accountId&quot;: &quot;2e30435e-d36e-4a7c-93d9-e387c2ab191d&quot;
+    &quot;url&quot;: &quot;git@github.com:qcj126/Diary-Love.git&quot;,
+    &quot;accountId&quot;: &quot;457ec14a-a2ef-4cb9-bd79-5895a5a841ab&quot;
   }
 }</component>
   <component name="MavenImportPreferences">
@@ -85,7 +392,6 @@
         <option name="userSettingsFile" value="E:\maven\settings\settings.xml" />
       </MavenGeneralSettings>
     </option>
-    <option name="explicitlyEnabledProfiles" value="native" />
   </component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
@@ -98,63 +404,63 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.SecurityConfig.executor&quot;: &quot;Debug&quot;,
-    &quot;Application.UserServiceImpl.executor&quot;: &quot;Debug&quot;,
-    &quot;Maven.Diary-Self [clean].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.Diary-Self [compile].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.diary-config [clean].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.diary-config [compile].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.diary-dao [clean].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.diary-dao [compile].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.diary-dao [package].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.diary-recipe [clean].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.diary-user [clean].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.diary-user [compile].executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
-    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
-    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
-    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;Spring Boot.DiaryConfigApplication.executor&quot;: &quot;Debug&quot;,
-    &quot;Spring Boot.DiaryDaoApplication.executor&quot;: &quot;Debug&quot;,
-    &quot;Spring Boot.DiaryFileApplication.executor&quot;: &quot;Debug&quot;,
-    &quot;Spring Boot.DiaryGatewayApplication.executor&quot;: &quot;Run&quot;,
-    &quot;Spring Boot.DiaryRecipeApplication.executor&quot;: &quot;Debug&quot;,
-    &quot;Spring Boot.DiaryUserApplication.executor&quot;: &quot;Debug&quot;,
-    &quot;Spring Boot.DiaryUtilsApplication.executor&quot;: &quot;Debug&quot;,
-    &quot;Spring Boot.DiaryXxljobApplication.executor&quot;: &quot;Debug&quot;,
-    &quot;Spring Boot.MyLoveDiaryApplication.executor&quot;: &quot;Debug&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;E:/Diary-Self/diary-recipe/src/main/java/diary/recipe/mapper&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.4&quot;,
-    &quot;run.configurations.included.in.services&quot;: &quot;true&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;MavenSettings&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.SecurityConfig.executor": "Debug",
+    "Application.UserServiceImpl.executor": "Debug",
+    "Maven.Diary-Self [clean].executor": "Run",
+    "Maven.Diary-Self [compile].executor": "Run",
+    "Maven.diary-config [clean].executor": "Run",
+    "Maven.diary-config [compile].executor": "Run",
+    "Maven.diary-dao [clean].executor": "Run",
+    "Maven.diary-dao [compile].executor": "Run",
+    "Maven.diary-dao [package].executor": "Run",
+    "Maven.diary-recipe [clean].executor": "Run",
+    "Maven.diary-user [clean].executor": "Run",
+    "Maven.diary-user [compile].executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Spring Boot.DiaryConfigApplication.executor": "Debug",
+    "Spring Boot.DiaryDaoApplication.executor": "Debug",
+    "Spring Boot.DiaryFileApplication.executor": "Debug",
+    "Spring Boot.DiaryGatewayApplication.executor": "Run",
+    "Spring Boot.DiaryRecipeApplication.executor": "Debug",
+    "Spring Boot.DiaryUserApplication.executor": "Debug",
+    "Spring Boot.DiaryUtilsApplication.executor": "Debug",
+    "Spring Boot.DiaryXxljobApplication.executor": "Debug",
+    "Spring Boot.MyLoveDiaryApplication.executor": "Debug",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "E:/Diary-Self/diary-xxljob",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.4",
+    "run.configurations.included.in.services": "true",
+    "settings.editor.selected.configurable": "reference.projectsettings.compiler.javacompiler",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="ReactorSettings">
     <option name="notificationShown" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="E:\Diary-Self\diary-xxljob" />
       <recent name="E:\Diary-Self\diary-recipe\src\main\java\diary\recipe\mapper" />
       <recent name="E:\Diary-Self\diary-recipe\src\main\resources" />
       <recent name="E:\Diary-Self\diary-user\src\main\resources" />
       <recent name="E:\Diary-Self\diary-diet\src\main\java\qcj\diary\diarydiet\impl" />
-      <recent name="E:\Diary-Self\diary-diet\src\main\java\qcj\diary\diarydiet\service" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\MyLoveDiary\diary-dao\src\main\resources" />
@@ -234,8 +540,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.23892.409" />
-        <option value="bundled-js-predefined-d6986cc7102b-e03c56caf84a-JavaScript-IU-252.23892.409" />
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.28539.33" />
       </set>
     </attachedChunks>
   </component>
