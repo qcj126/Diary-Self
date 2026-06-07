@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="diary.diarytimemachine.mapper.TimeMachineMapper">
+
+    <insert id="categoryAdd">
+
+    </insert>
+
+    <insert id="cardAdd">
+    </insert>
+
+    <select id="selectLastCategoryNum" resultType="java.lang.Integer">
+        select category_num from time_category order by category_num limit 1;
+    </select>
+
+    <select id="selectSameCategory" resultType="java.lang.Integer">
+        select count(*) from time_category where category_name = #{categoryName};
+    </select>
+</mapper>

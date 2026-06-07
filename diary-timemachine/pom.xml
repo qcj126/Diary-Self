@@ -7,11 +7,10 @@
         <artifactId>Diary-Self</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-    <artifactId>diary-recipe</artifactId>
+    <artifactId>diary-timemachine</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>diary-recipe</name>
-    <description>diary-recipe</description>
-
+    <name>diary-timedJob</name>
+    <description>diary-timedJob</description>
     <properties>
         <java.version>21</java.version>
     </properties>
@@ -20,45 +19,22 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
-        <dependency>
-            <groupId>com.mysql</groupId>
-            <artifactId>mysql-connector-j</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>druid-spring-boot-starter</artifactId>
-        </dependency>
 
-        <dependency>
-            <groupId>diary</groupId>
-            <artifactId>diary-utils</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>diary</groupId>
-            <artifactId>diary-config</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>diary</groupId>
-            <artifactId>diary-gateway</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
         <dependency>
             <groupId>diary</groupId>
             <artifactId>diary-common</artifactId>
             <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>diary</groupId>
+            <artifactId>diary-utils</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

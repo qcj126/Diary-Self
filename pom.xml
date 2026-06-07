@@ -24,7 +24,7 @@
         <module>diary-common</module>
         <module>diary-recipe</module>
         <module>diary-xxljob</module>
-        <module>diary-timedJob</module>
+        <module>diary-timemachine</module>
         <module>diary-diet</module>
     </modules>
     
