@@ -5,30 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f808c6d7-aa71-4ad4-bd8e-7a02c2741024" name="Changes" comment="main">
-      <change afterPath="$PROJECT_DIR$/diary-timemachine/src/main/java/diary/diarytimemachine/mapper/TimeMachineMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/image/image.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/timemachine/time.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/image/po/ImagePO.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/image/po/ImagePO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-diet/src/main/java/qcj/diary/diarydiet/DiaryDietApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-diet/src/main/java/diary/diarydiet/DiaryDietApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-diet/src/main/java/qcj/diary/diarydiet/controller/DietController.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-diet/src/main/java/diary/diarydiet/controller/DietController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-diet/src/main/java/qcj/diary/diarydiet/impl/add/DietAddServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-diet/src/main/java/diary/diarydiet/impl/add/DietAddServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-diet/src/main/java/qcj/diary/diarydiet/impl/delete/DietDeleteServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-diet/src/main/java/diary/diarydiet/impl/delete/DietDeleteServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-diet/src/main/java/qcj/diary/diarydiet/impl/query/DietQueryServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-diet/src/main/java/diary/diarydiet/impl/query/DietQueryServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-diet/src/main/java/qcj/diary/diarydiet/impl/update/DietUpdateServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-diet/src/main/java/diary/diarydiet/impl/update/DietUpdateServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-diet/src/main/java/qcj/diary/diarydiet/mapper/DietMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-diet/src/main/java/diary/diarydiet/mapper/DietMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-diet/src/main/java/qcj/diary/diarydiet/service/add/DietAddService.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-diet/src/main/java/diary/diarydiet/service/add/DietAddService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-diet/src/main/java/qcj/diary/diarydiet/service/delete/DietDeleteService.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-diet/src/main/java/diary/diarydiet/service/delete/DietDeleteService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-diet/src/main/java/qcj/diary/diarydiet/service/query/DietQueryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-diet/src/main/java/diary/diarydiet/service/query/DietQueryService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-diet/src/main/java/qcj/diary/diarydiet/service/update/DietUpdateService.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-diet/src/main/java/diary/diarydiet/service/update/DietUpdateService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-diet/src/main/java/qcj/diary/diarydiet/sql/表结构信息.txt" beforeDir="false" afterPath="$PROJECT_DIR$/diary-diet/src/main/java/diary/diarydiet/sql/表结构信息.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-diet/src/main/resources/mapper/DietMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-diet/src/main/resources/mapper/DietMapper.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-file/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-file/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-recipe/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-recipe/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-timedJob/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-timemachine/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-timedJob/src/main/java/qcj/diary/diarytimedjob/DiaryTimedjobApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-timemachine/src/main/java/diary/diarytimemachine/DiaryTimeMachineApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-timedJob/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-timemachine/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/timemachine/po/TimeCardPO.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/timemachine/po/TimeCardPO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/timemachine/po/TimeCategoryPO.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/timemachine/po/TimeCategoryPO.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -108,53 +90,53 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.SecurityConfig.executor": "Debug",
-    "Application.UserServiceImpl.executor": "Debug",
-    "Maven.Diary-Self [clean].executor": "Run",
-    "Maven.Diary-Self [compile].executor": "Run",
-    "Maven.diary-config [clean].executor": "Run",
-    "Maven.diary-config [compile].executor": "Run",
-    "Maven.diary-dao [clean].executor": "Run",
-    "Maven.diary-dao [compile].executor": "Run",
-    "Maven.diary-dao [package].executor": "Run",
-    "Maven.diary-recipe [clean].executor": "Run",
-    "Maven.diary-user [clean].executor": "Run",
-    "Maven.diary-user [compile].executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Spring Boot.DiaryConfigApplication.executor": "Debug",
-    "Spring Boot.DiaryDaoApplication.executor": "Debug",
-    "Spring Boot.DiaryFileApplication.executor": "Debug",
-    "Spring Boot.DiaryGatewayApplication.executor": "Run",
-    "Spring Boot.DiaryRecipeApplication.executor": "Debug",
-    "Spring Boot.DiaryUserApplication.executor": "Debug",
-    "Spring Boot.DiaryUtilsApplication.executor": "Debug",
-    "Spring Boot.DiaryXxljobApplication.executor": "Debug",
-    "Spring Boot.MyLoveDiaryApplication.executor": "Debug",
-    "git-widget-placeholder": "main",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "E:/Diary-Self/diary-common/src/main/java/diary/common/entity/timemachine/vo",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.4",
-    "run.configurations.included.in.services": "true",
-    "settings.editor.selected.configurable": "MavenSettings",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.SecurityConfig.executor&quot;: &quot;Debug&quot;,
+    &quot;Application.UserServiceImpl.executor&quot;: &quot;Debug&quot;,
+    &quot;Maven.Diary-Self [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.Diary-Self [compile].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.diary-config [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.diary-config [compile].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.diary-dao [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.diary-dao [compile].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.diary-dao [package].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.diary-recipe [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.diary-user [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.diary-user [compile].executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Spring Boot.DiaryConfigApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;Spring Boot.DiaryDaoApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;Spring Boot.DiaryFileApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;Spring Boot.DiaryGatewayApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.DiaryRecipeApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;Spring Boot.DiaryUserApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;Spring Boot.DiaryUtilsApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;Spring Boot.DiaryXxljobApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;Spring Boot.MyLoveDiaryApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;E:/Diary-Self/diary-common/src/main/java/diary/common/entity/timemachine/vo&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.4&quot;,
+    &quot;run.configurations.included.in.services&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;MavenSettings&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="ReactorSettings">
     <option name="notificationShown" value="true" />
   </component>
@@ -318,7 +300,9 @@
       <workItem from="1780105606558" duration="742000" />
       <workItem from="1780207725520" duration="3963000" />
       <workItem from="1780235391083" duration="657000" />
-      <workItem from="1780833884454" duration="6227000" />
+      <workItem from="1780833884454" duration="6530000" />
+      <workItem from="1780917159256" duration="1597000" />
+      <workItem from="1781184677880" duration="3288000" />
     </task>
     <task id="LOCAL-00001" summary="新增食谱功能">
       <option name="closed" value="true" />
@@ -496,7 +480,15 @@
       <option name="project" value="LOCAL" />
       <updated>1780046290957</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="main">
+      <option name="closed" value="true" />
+      <created>1780840406727</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1780840406728</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -524,7 +516,8 @@
     <MESSAGE value="食谱相关代码" />
     <MESSAGE value="模块" />
     <MESSAGE value="饮食模块的增删改查" />
-    <option name="LAST_COMMIT_MESSAGE" value="饮食模块的增删改查" />
+    <MESSAGE value="main" />
+    <option name="LAST_COMMIT_MESSAGE" value="main" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
