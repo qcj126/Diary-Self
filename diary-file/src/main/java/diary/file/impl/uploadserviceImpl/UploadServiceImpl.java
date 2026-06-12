@@ -1,10 +1,12 @@
 package diary.file.impl.uploadserviceImpl;
 
-import diary.common.entity.file.po.Photo;
-import diary.common.consts.FileTypeConst;
 import diary.common.consts.PhotoStatusConst;
 import diary.common.consts.PhotoTypeConst;
-import diary.file.mapper.PhotoMapper;
+import diary.common.entity.image.dto.ImageDTO;
+import diary.common.entity.image.po.ImagePO;
+import diary.common.enums.typeenum.TypeEnum;
+import diary.common.exception.ParamIllegalException;
+import diary.file.mapper.ImageMapper;
 import diary.file.service.RedisService;
 import diary.file.service.uploadservice.UploadService;
 
@@ -27,18 +29,15 @@ import static diary.utils.commonutil.MyUtils.isFileEmpty;
 @Slf4j
 public class UploadServiceImpl implements UploadService {
     @Resource
-    private PhotoMapper photoMapper;
-
-    @Resource
-    private RedisService redisService;
+    private ImageMapper imagMapper;
 
     @Override
-    public Map<String, Object> addPhotosToDb(List<MultipartFile> files) {
-        if (files == null || files.isEmpty()) {
-            return Map.of("code", 500, "message", "文件列表为空", "data", "null");
+    public List<Long> addImagesToDb(List<MultipartFile> files, ImageDTO imageDTO) {
+        if (files == null || files.isEmpty() || imageDTO == null || imageDTO.getUserId() == null || imageDTO.getCode() == null) {
+            throw new ParamIllegalException("文件列表或用户ID或图片类别为空");
         }
 
-        List<Photo> photoList = new ArrayList<>();
+        List<ImagePO> imageList = new ArrayList<>();
         List<String> failedFiles = new ArrayList<>();
 
         // 第一步：验证所有文件并构建Photo对象列表
@@ -50,8 +49,8 @@ public class UploadServiceImpl implements UploadService {
                 }
 
                 // 验证是否为图片类型
-                String photoFormat = file.getContentType();
-                if (isEmpty(photoFormat) || !photoFormat.startsWith("image")) {
+                String imageFormat = file.getContentType();
+                if (isEmpty(imageFormat) || !imageFormat.startsWith("image")) {
                     try {
                         if (ImageIO.read(file.getInputStream()) == null) {
                             failedFiles.add(file.getOriginalFilename() + ": 文件不是图片类型");
@@ -63,29 +62,28 @@ public class UploadServiceImpl implements UploadService {
                 }
 
                 long id = MyUtils.getPrimaryKey();
-                String photoType = PhotoTypeConst.PHOTO_TYPE_SWEETY;
-                String photoName = file.getOriginalFilename();
+                Integer type = TypeEnum.getCode(imageDTO.getCode());
+                String originalFilename = file.getOriginalFilename();
 
                 // 查看同一图片所属类别下是否有相同名称的图片
-                Integer isExist = photoMapper.selectPhotoByTypeAndName(photoType, photoName);
+                Integer isExist = imagMapper.selectImageByTypeAndName(type, originalFilename);
                 if (isExist > 0) {
-                    failedFiles.add(photoName + ": 图片已存在");
+                    failedFiles.add(originalFilename + ": 图片已存在");
                     continue;
                 }
 
                 long photoSize = file.getSize();
-                String photoStatus = PhotoStatusConst.PHOTO_STATUS_PROCESSING;
 
                 // 构建Photo对象（暂不设置sortOrder）
-                Photo photo = new Photo();
-                photo.setId(id);
-                photo.setPhotoType(photoType);
-                photo.setPhotoName(photoName);
-                photo.setPhotoSize(photoSize);
-                photo.setPhotoFormat(photoFormat);
-                photo.setPhotoStatus(photoStatus);
-
-                photoList.add(photo);
+                ImagePO image = new ImagePO();
+                image.setId(id);
+                image.setUserId(imageDTO.getUserId());
+                image.setFileSize(photoSize);
+                image.setOriginalName(file.getOriginalFilename());
+                image.setMimeType(file.getContentType());
+                image.setType(TypeEnum.getCode(imageDTO.getCode()));
+                image.setStatus(PhotoStatusConst.PHOTO_STATUS_PROCESSING);
+                imageList.add(image);
             } catch (Exception e) {
                 log.error("处理文件 {} 时发生异常", file.getOriginalFilename(), e);
                 failedFiles.add(file.getOriginalFilename() + ": " + e.getMessage());
@@ -93,132 +91,43 @@ public class UploadServiceImpl implements UploadService {
         }
 
         // 第二步：分批插入数据库，每批最多20条
-        List<Long> photoIds = new ArrayList<>();
+        List<Long> imageIds = new ArrayList<>();
         int batchSize = 20;
-        int totalSize = photoList.size();
+        int totalSize = imageList.size();
 
         for (int i = 0; i < totalSize; i += batchSize) {
             // 计算当前批次的结束位置
             int end = Math.min(i + batchSize, totalSize);
-            List<Photo> batchList = photoList.subList(i, end);
+            List<ImagePO> batchList = imageList.subList(i, end);
 
             try {
-                // 获取当前Redis中的图片数量，作为本批次起始序号
-                long currentCount = redisService.getPhotoCount();
-
-                // 为本批次的Photo设置连续的sortOrder
-                for (int j = 0; j < batchList.size(); j++) {
-                    batchList.get(j).setSortOrder(currentCount + j + 1);
-                }
-
-                Integer count = photoMapper.batchAddPhotoToDb(batchList);
+                Integer count = imagMapper.batchAddImageToDb(batchList);
                 if (count != null && count > 0) {
-                    // 一次性更新Redis：当前数量 + 本批次插入数量
-                    redisService.updatePhotoCount(currentCount + batchList.size());
-
                     // 收集成功插入的id
-                    for (Photo photo : batchList) {
-                        photoIds.add(photo.getId());
+                    for (ImagePO image : batchList) {
+                        imageIds.add(image.getId());
                     }
-                    log.info("批量插入照片成功，批次范围: {} - {}，插入数量: {}，sortOrder范围: {} - {}",
-                            i + 1, end, count, currentCount + 1, currentCount + batchList.size());
                 } else {
                     // 记录失败的文件
-                    for (Photo photo : batchList) {
-                        failedFiles.add(photo.getPhotoName() + ": 批量插入失败");
+                    for (ImagePO image : batchList) {
+                        failedFiles.add(image.getOriginalName() + ": 批量插入失败");
                     }
                     log.error("批量插入照片失败，批次范围: {} - {}", i + 1, end);
                 }
             } catch (Exception e) {
                 log.error("批量插入照片异常，批次范围: {} - {}", i + 1, end, e);
                 // 记录失败的文件
-                for (Photo photo : batchList) {
-                    failedFiles.add(photo.getPhotoName() + ": " + e.getMessage());
+                for (ImagePO image : batchList) {
+                    failedFiles.add(image.getOriginalName() + ": " + e.getMessage());
                 }
             }
         }
 
-        if (photoIds.isEmpty()) {
-            return Map.of("code", 500, "message", "所有文件处理失败", "data", "null", "failedFiles", failedFiles);
+        // TODO 后续处理插入失败的情况
+
+        if (imageIds.isEmpty()) {
+            throw new ParamIllegalException("所有文件均处理失败");
         }
-
-        Map<String, Object> result = new HashMap<>();
-        result.put("code", 200);
-        result.put("data", photoIds);
-        if (!failedFiles.isEmpty()) {
-            result.put("failedFiles", failedFiles);
-            result.put("message", "部分文件处理成功");
-        }
-        return result;
-    }
-
-    @Override
-    public Map<String, Object> addVideoToDb(MultipartFile file) {
-        if (file == null || file.isEmpty()) {
-            return Map.of("code", 500, "message", "文件为空", "data", "null");
-        }
-
-        try {
-            // 验证是否为视频类型
-            String contentType = file.getContentType();
-            if (contentType == null || !contentType.startsWith(FileTypeConst.CONTENT_TYPE_VIDEO_PREFIX)) {
-                // 进一步检查文件扩展名
-                String originalFilename = file.getOriginalFilename();
-                if (!isVideoFileByExtension(originalFilename)) {
-                    return Map.of("code", 500, "message", "文件不是视频类型", "data", "null");
-                }
-            }
-
-            long id = MyUtils.getPrimaryKey();
-            String videoType = PhotoTypeConst.VIDEO_TYPE;
-            String videoName = file.getOriginalFilename();
-
-            // 查看同一视频类别下是否有相同名称的视频
-            Integer isExist = photoMapper.selectPhotoByTypeAndName(videoType, videoName);
-            if (isExist > 0) {
-                return Map.of("code", 500, "message", "视频已存在", "data", "null");
-            }
-
-            long videoSize = file.getSize();
-            String videoFormat = contentType != null ? contentType : getFileExtension(videoName);
-            String videoStatus = PhotoStatusConst.PHOTO_STATUS_PROCESSING;
-
-            // 获取当前Redis中的视频数量，作为sortOrder
-            long currentCount = redisService.getPhotoCount();
-
-            // 插入数据库
-            Integer count = photoMapper.addPhotoToDb(id, videoType, videoName, videoSize, videoFormat, currentCount + 1, videoStatus);
-            if (count != null && count > 0) {
-                // 更新Redis计数
-                redisService.updatePhotoCount(currentCount + 1);
-                log.info("视频信息插入数据库成功，videoId: {}, videoName: {}", id, videoName);
-                return Map.of("code", 200, "message", "视频信息保存成功", "data", id);
-            } else {
-                log.error("视频信息插入数据库失败，videoName: {}", videoName);
-                return Map.of("code", 500, "message", "视频信息保存失败", "data", "null");
-            }
-        } catch (Exception e) {
-            log.error("处理视频文件时发生异常，文件名: {}", file.getOriginalFilename(), e);
-            return Map.of("code", 500, "message", "处理视频文件异常: " + e.getMessage(), "data", "null");
-        }
-    }
-
-    /**
-     * 根据文件扩展名判断是否为视频文件
-     */
-    private boolean isVideoFileByExtension(String fileName) {
-        if (fileName == null) return false;
-        String extension = getFileExtension(fileName).toLowerCase();
-        return FileTypeConst.VIDEO_EXTENSIONS.contains(extension);
-    }
-
-    /**
-     * 获取文件扩展名
-     */
-    private String getFileExtension(String fileName) {
-        if (fileName == null) return "";
-        int dotIndex = fileName.lastIndexOf(".");
-        return dotIndex > 0 && dotIndex < fileName.length() - 1
-                ? fileName.substring(dotIndex + 1) : "";
+        return imageIds;
     }
 }

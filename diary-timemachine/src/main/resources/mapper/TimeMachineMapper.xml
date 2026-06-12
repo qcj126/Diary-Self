@@ -1,19 +1,95 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="diary.diarytimemachine.mapper.TimeMachineMapper">
+    <resultMap id="TimeMachineCategoryResultMap" type="diary.common.entity.timemachine.po.TimeCategoryPO">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="categoryName" column="category_name"/>
+        <result property="categoryNum" column="category_num"/>
+        <result property="sort" column="sort"/>
+        <result property="deleted" column="deleted"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
 
-    <insert id="categoryAdd">
+    <resultMap id="TimeMachineCardResultMap" type="diary.common.entity.timemachine.po.TimeCardPO">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="imageId" column="image_id"/>
+        <result property="categoryId" column="category_id"/>
+        <result property="cardTitle" column="card_title"/>
+        <result property="cardContent" column="card_content"/>
+        <result property="recordTime" column="record_time"/>
+        <result property="deleted" column="deleted"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
 
+    <insert id="categoryAdd" parameterType="diary.common.entity.timemachine.po.TimeCategoryPO">
+        insert into time_category
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="categoryName != null">category_name,</if>
+            <if test="categoryNum != null">category_num,</if>
+            <if test="sort != null">sort,</if>
+            <if test="deleted != null">deleted,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="categoryName != null">#{categoryName},</if>
+            <if test="categoryNum != null">#{categoryNum},</if>
+            <if test="sort != null">#{sort},</if>
+            <if test="deleted != null">#{deleted},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
     </insert>
 
-    <insert id="cardAdd">
+    <insert id="cardAdd" parameterType="diary.common.entity.timemachine.po.TimeCardPO">
+        insert into time_card
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="imageId != null">image_id,</if>
+            <if test="categoryId != null">category_id,</if>
+            <if test="cardTitle != null">card_title,</if>
+            <if test="cardContent != null">card_content,</if>
+            <if test="recordTime != null">record_time,</if>
+            <if test="deleted != null">deleted,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="imageId != null">#{imageId},</if>
+            <if test="categoryId != null">#{categoryId},</if>
+            <if test="cardTitle != null">#{cardTitle},</if>
+            <if test="cardContent != null">#{cardContent},</if>
+            <if test="recordTime != null">#{recordTime},</if>
+            <if test="deleted != null">#{deleted},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
     </insert>
 
-    <select id="selectLastCategoryNum" resultType="java.lang.Integer">
-        select category_num from time_category order by category_num limit 1;
+    <select id="selectLastCategoryNum" resultMap="TimeMachineCategoryResultMap">
+        select category_num from time_category order by category_num desc limit 1;
     </select>
 
     <select id="selectSameCategory" resultType="java.lang.Integer">
         select count(*) from time_category where category_name = #{categoryName};
+    </select>
+
+    <select id="selectLastCategorySort" resultMap="TimeMachineCategoryResultMap">
+        select sort from time_category order by sort desc limit 1;
+    </select>
+
+    <select id="selectSameCard" resultType="java.lang.Integer">
+        select 1 from time_card where category_id = #{categoryId} and card_title = #{cardTitle};
     </select>
 </mapper>

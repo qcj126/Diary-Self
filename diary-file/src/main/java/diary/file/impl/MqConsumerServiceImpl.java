@@ -4,7 +4,7 @@ import com.rabbitmq.client.Channel;
 import diary.common.entity.file.po.OssUploadSuccessMsg;
 import diary.common.consts.PhotoStatusConst;
 import diary.config.mqconfig.RabbitMqConfig;
-import diary.file.mapper.PhotoMapper;
+import diary.file.mapper.ImageMapper;
 import diary.file.service.MqConsumerService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class MqConsumerServiceImpl implements MqConsumerService {
     @Resource
-    private PhotoMapper photoMapper;
+    private ImageMapper imageMapper;
     /*
     * 监听上传成功消息，更新数据库状态
     * */
@@ -30,7 +30,7 @@ public class MqConsumerServiceImpl implements MqConsumerService {
         try {
             log.info("收到上传成功消息，recordId: {}, ossUrl: {}", id, ossUrl);
             // 更新数据库记录
-            Integer count = photoMapper.updatePhotoStatusById(id, ossUrl, PhotoStatusConst.PHOTO_STATUS_SUCCESS);
+            Integer count = imageMapper.updateImageStatusById(id, ossUrl, PhotoStatusConst.PHOTO_STATUS_SUCCESS);
             if (count > 0) {
                 log.info("数据库记录更新成功，recordId: {}", id);
                 // 手动确认消息处理成功
@@ -71,7 +71,7 @@ public class MqConsumerServiceImpl implements MqConsumerService {
                 String ossUrl = message.getOssUrl();
                 log.info("收到更新数据库失败的消息，recordId: {}, ossUrl: {}", id, ossUrl);
                 // 更新数据库记录
-                Integer count = photoMapper.updatePhotoStatusById(id, ossUrl, PhotoStatusConst.PHOTO_STATUS_FAILED);
+                Integer count = imageMapper.updateImageStatusById(id, ossUrl, PhotoStatusConst.PHOTO_STATUS_FAILED);
                 if (count > 0) {
                     log.info("数据库记录更新成功，recordId: {}", id);
                 } else {

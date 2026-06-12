@@ -25,7 +25,7 @@ spring:
             - id: diary-timemachine
               uri: http://localhost:8804
               predicates:
-                - Path=/timemachine/**
+                - Path=/time-machine/**
           globalcors:
             corsConfigurations:
               '[/**]':

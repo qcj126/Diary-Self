@@ -4,18 +4,46 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f808c6d7-aa71-4ad4-bd8e-7a02c2741024" name="Changes" comment="饮食模块的增删改查">
-      <change afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/recipe/recipe.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+    <list default="true" id="f808c6d7-aa71-4ad4-bd8e-7a02c2741024" name="Changes" comment="规范建表">
+      <change afterPath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/impl/queryurlserviceImpl/QueryUrlServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/service/queryurlservice/QueryUrlService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-file/src/main/resources/mapper/ImageMapper.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-timemachine/src/main/java/diary/diarytimemachine/impl/delete/TimeMachineDeleteServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-timemachine/src/main/java/diary/diarytimemachine/impl/query/TimeMachineQueryServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-timemachine/src/main/java/diary/diarytimemachine/impl/update/TimeMachineUpdateServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-timemachine/src/main/java/diary/diarytimemachine/service/delete/TimeMachineDeleteService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-timemachine/src/main/java/diary/diarytimemachine/service/query/TimeMachineQueryService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/diary-timemachine/src/main/java/diary/diarytimemachine/service/update/TimeMachineUpdateService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/consts/PhotoStatusConst.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/consts/PhotoStatusConst.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/convert/timemachine/DtoConvertToPo.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/convert/timemachine/DtoConvertToPo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/file/po/Photo.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/image/dto/ImageDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/image/dto/ImageDTO.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/image/image.sql" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/image/image.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/image/po/ImagePO.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/image/po/ImagePO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/recipe/po/RecipeIngredientPO.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/recipe/po/RecipeIngredientPO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/recipe/po/RecipePO.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/recipe/po/RecipePO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/recipe/po/RecipeStepPO.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/recipe/po/RecipeStepPO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/image/vo/ImageVO.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/image/vo/ImageVO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/timemachine/dto/TimeCardDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/timemachine/dto/TimeCardDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/timemachine/dto/TimeCategoryDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/timemachine/dto/TimeCategoryDTO.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/timemachine/po/TimeCardPO.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/timemachine/po/TimeCardPO.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/timemachine/po/TimeCategoryPO.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/timemachine/po/TimeCategoryPO.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/timemachine/time.sql" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/timemachine/time.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/enums/typeenum/TypeEnum.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/enums/typeenum/TypeEnum.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/controller/FileController.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/controller/FileController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/impl/MqConsumerServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/impl/MqConsumerServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/impl/VideoFileServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/impl/VideoFileServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/impl/asyncserviceImpl/AsyncServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/impl/asyncserviceImpl/AsyncServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/impl/uploadserviceImpl/UploadServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/impl/uploadserviceImpl/UploadServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/mapper/PhotoMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/mapper/ImageMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/service/asyncservice/AsyncService.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/service/asyncservice/AsyncService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/service/uploadservice/UploadService.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/service/uploadservice/UploadService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-file/src/main/resources/mapper/PhotoMapper.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-gateway/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-gateway/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-recipe/src/main/resources/mapper/PhotoMapper.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-timemachine/src/main/java/diary/diarytimemachine/controller/TimeMachineController.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-timemachine/src/main/java/diary/diarytimemachine/controller/TimeMachineController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-timemachine/src/main/java/diary/diarytimemachine/impl/add/TimeMachineAddServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-timemachine/src/main/java/diary/diarytimemachine/impl/add/TimeMachineAddServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-timemachine/src/main/java/diary/diarytimemachine/mapper/TimeMachineMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-timemachine/src/main/java/diary/diarytimemachine/mapper/TimeMachineMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-timemachine/src/main/java/diary/diarytimemachine/service/add/TimeMachineAddService.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-timemachine/src/main/java/diary/diarytimemachine/service/add/TimeMachineAddService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-timemachine/src/main/resources/mapper/TimeMachineMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-timemachine/src/main/resources/mapper/TimeMachineMapper.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -127,7 +155,7 @@
     "Spring Boot.MyLoveDiaryApplication.executor": "Debug",
     "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "E:/Diary-Self/diary-xxljob",
+    "last_opened_file_path": "E:/Diary-Self/diary-file/src/main/java/diary/file/impl",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -137,7 +165,7 @@
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.4",
     "run.configurations.included.in.services": "true",
-    "settings.editor.selected.configurable": "reference.settings.project.maven.runner",
+    "settings.editor.selected.configurable": "Errors",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -146,20 +174,21 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="E:\Diary-Self\diary-file\src\main\java\diary\file\impl" />
+      <recent name="E:\Diary-Self\diary-timemachine\src\main\java\diary\diarytimemachine\service\" />
       <recent name="E:\Diary-Self\diary-xxljob" />
       <recent name="E:\Diary-Self\diary-recipe\src\main\java\diary\recipe\mapper" />
       <recent name="E:\Diary-Self\diary-recipe\src\main\resources" />
-      <recent name="E:\Diary-Self\diary-user\src\main\resources" />
-      <recent name="E:\Diary-Self\diary-diet\src\main\java\qcj\diary\diarydiet\impl" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\MyLoveDiary\diary-dao\src\main\resources" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
-      <recent name="diary.common.convert.diet" />
-      <recent name="qcj.diary.diarydiet.impl.update" />
-      <recent name="qcj.diary.diarydiet.impl.query" />
-      <recent name="qcj.diary.diaryrecipe.impl.query" />
+      <recent name="diary.diarytimemachine.impl.update" />
+      <recent name="diary.diarytimemachine.impl.query" />
+      <recent name="diary.diarytimemachine.impl.delete" />
+      <recent name="diary.diarytimemachine.service.update" />
+      <recent name="diary.diarytimemachine.service.query" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -451,7 +480,15 @@
       <option name="project" value="LOCAL" />
       <updated>1780046290957</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="规范建表">
+      <option name="closed" value="true" />
+      <created>1781241083474</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1781241083475</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -479,7 +516,8 @@
     <MESSAGE value="食谱相关代码" />
     <MESSAGE value="模块" />
     <MESSAGE value="饮食模块的增删改查" />
-    <option name="LAST_COMMIT_MESSAGE" value="饮食模块的增删改查" />
+    <MESSAGE value="规范建表" />
+    <option name="LAST_COMMIT_MESSAGE" value="规范建表" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

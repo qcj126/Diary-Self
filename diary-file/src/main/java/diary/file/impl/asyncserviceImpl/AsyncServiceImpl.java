@@ -11,6 +11,7 @@ import com.aliyun.oss.model.PartETag;
 import com.aliyun.oss.model.UploadPartRequest;
 import com.aliyun.oss.model.UploadPartResult;
 import diary.common.entity.file.po.OssUploadSuccessMsg;
+import diary.common.entity.image.dto.ImageDTO;
 import diary.common.enums.typeenum.TypeEnum;
 import diary.common.exception.CustomException;
 import diary.common.exception.ParamIllegalException;
@@ -75,30 +76,8 @@ public class AsyncServiceImpl implements AsyncService {
 
     @Async("ossUploadExecutor")
     @Override
-    public void uploadAndSendMsgAsync(Map<String, Object> result, List<MultipartFile> files, Integer code) {
-        // 获取photoId列表
-        Object dataObj = result.get("data");
-        if (dataObj == null) {
-            log.error("数据库插入失败，result: {}", result);
-            throw new RuntimeException("数据插入DB失败");
-        }
-
-        List<Long> photoIds;
-        if (dataObj instanceof Long) {
-            // 兼容单个ID的情况
-            photoIds = List.of((Long) dataObj);
-        } else if (dataObj instanceof List) {
-            photoIds = (List<Long>) dataObj;
-        } else {
-            log.error("未知的数据类型: {}", dataObj.getClass());
-            throw new RuntimeException("数据格式错误");
-        }
-
-        if (photoIds.size() != files.size()) {
-            log.warn("photoId数量({})与文件数量({})不匹配", photoIds.size(), files.size());
-        }
-
-        if (code == null) {
+    public void uploadAndSendMsgAsync(List<Long> result, List<MultipartFile> files, ImageDTO  imageDTO) {
+        if (imageDTO.getCode() == null) {
             throw new ParamIllegalException("code 不能为空");
         }
 
@@ -109,21 +88,11 @@ public class AsyncServiceImpl implements AsyncService {
         // 遍历文件列表，逐个上传
         for (int i = 0; i < files.size(); i++) {
             MultipartFile file = files.get(i);
-            Long photoId = (i < photoIds.size()) ? photoIds.get(i) : null;
-
-            if (photoId == null) {
-                log.warn("文件 {} 没有对应的photoId，跳过上传", file.getOriginalFilename());
-                failCount++;
-                failedFiles.add(file.getOriginalFilename() + ": 缺少photoId");
-                continue;
-            }
+            Long photoId = (i < result.size()) ? result.get(i) : null;
 
             try {
                 // 生成唯一文件名，避免同名覆盖
-                String type = TypeEnum.getType(code);
-                if (type == null) {
-                    throw new CustomException("未知图片类型，无效的code: " + code);
-                }
+                String type = TypeEnum.getType(imageDTO.getCode());
                 String fileName = fileUtil.getFileName(type, file.getOriginalFilename());
 
                 // 1. 上传文件到 OSS（V4 客户端会自动使用 V4 签名）

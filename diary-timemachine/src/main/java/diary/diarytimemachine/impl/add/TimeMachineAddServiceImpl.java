@@ -31,23 +31,26 @@ public class TimeMachineAddServiceImpl implements TimeMachineAddService {
 
         TimeCategoryPO timeCategoryPO = DtoConvertToPo.convertToPO(categoryDTO);
         timeCategoryPO.setId(MyUtils.getPrimaryKey());
-        Integer lastCategoryNum = timeMachineMapper.selectLastCategoryNum();
-        timeCategoryPO.setCategoryNum(lastCategoryNum == null ? 1000 : lastCategoryNum + 1);
-
+        TimeCategoryPO lastCategoryNum = timeMachineMapper.selectLastCategoryNum();
+        timeCategoryPO.setCategoryNum(lastCategoryNum.getCategoryNum() == null ? 1000 : lastCategoryNum.getCategoryNum() + 1);
+        TimeCategoryPO lastCategorySort = timeMachineMapper.selectLastCategorySort();
+        timeCategoryPO.setSort(lastCategorySort.getSort() == null ? 1 : lastCategorySort.getSort() + 1);
         return timeMachineMapper.categoryAdd(timeCategoryPO);
     }
 
     @Override
     public Integer cardAdd(TimeCardDTO cardDTO) {
-        if (cardDTO == null || cardDTO.getCardName() == null || cardDTO.getUserId() == null || cardDTO.getDescription() == null
-            || cardDTO.getCardTitle() == null || cardDTO.getCategoryId() == null || cardDTO.getCategoryNum() == null) {
-            throw new ParamIllegalException("卡片名称或用户ID或卡片标题或卡片描述或分类ID或分类编号或卡片描述为空");
+        if (cardDTO == null || cardDTO.getUserId() == null || cardDTO.getCardContent() == null || cardDTO.getCardTitle() == null
+                || cardDTO.getCategoryId() == null || cardDTO.getImageId() == null || cardDTO.getRecordTime() == null) {
+            throw new ParamIllegalException("卡片名称或用户ID或卡片标题或卡片内容或分类ID或图片ID或记录时间为空");
         }
 
+        Integer count = timeMachineMapper.selectSameCard(cardDTO.getCategoryId(), cardDTO.getCardTitle());
+        if (count > 0) {
+            throw new SameDataException("此分类下已存在相同标题的卡片");
+        }
         TimeCardPO timeCardPO = DtoConvertToPo.convertToPO(cardDTO);
         timeCardPO.setId(MyUtils.getPrimaryKey());
-
-        timeMachineMapper.cardAdd();
-        return 0;
+        return timeMachineMapper.cardAdd(timeCardPO);
     }
 }

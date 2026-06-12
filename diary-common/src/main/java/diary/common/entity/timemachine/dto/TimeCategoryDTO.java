@@ -13,9 +13,6 @@ public class TimeCategoryDTO {
     private Long id;
     private Long userId;
     private String categoryName;
-    private Integer categoryNum;
-    private Integer status;
-    private String createName;
-    private Date createTime;
+    private Integer deleted;
     private Integer sort;
 }

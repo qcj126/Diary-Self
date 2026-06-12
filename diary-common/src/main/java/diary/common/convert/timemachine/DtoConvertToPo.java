@@ -13,11 +13,6 @@ public class DtoConvertToPo {
         timeCategoryPO.setId(dto.getId());
         timeCategoryPO.setUserId(dto.getUserId());
         timeCategoryPO.setCategoryName(dto.getCategoryName());
-        timeCategoryPO.setCategoryNum(dto.getCategoryNum());
-        timeCategoryPO.setStatus(dto.getStatus());
-        timeCategoryPO.setCreateTime(dto.getCreateTime());
-        timeCategoryPO.setSort(dto.getSort());
-
         return timeCategoryPO;
     }
 
@@ -25,16 +20,11 @@ public class DtoConvertToPo {
         TimeCardPO timeCardPO = new TimeCardPO();
         timeCardPO.setId(dto.getId());
         timeCardPO.setUserId(dto.getUserId());
-        timeCardPO.setCardName(dto.getCardName());
         timeCardPO.setCardTitle(dto.getCardTitle());
-        timeCardPO.setDescription(dto.getDescription());
+        timeCardPO.setCardContent(dto.getCardContent());
         timeCardPO.setCategoryId(dto.getCategoryId());
-        timeCardPO.setCategoryNum(dto.getCategoryNum());
-        timeCardPO.setStatus(dto.getStatus());
-        timeCardPO.setSort(dto.getSort());
-        timeCardPO.setCreateTime(dto.getCreateTime());
-        timeCardPO.setUpdateTime(dto.getUpdateTime());
         timeCardPO.setImageId(dto.getImageId());
+        timeCardPO.setRecordTime(dto.getRecordTime());
         return timeCardPO;
     }
 }

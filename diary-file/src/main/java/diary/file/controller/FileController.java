@@ -1,12 +1,16 @@
 package diary.file.controller;
 
+import diary.common.entity.image.dto.ImageDTO;
+import diary.common.entity.image.vo.ImageVO;
 import diary.common.result.ApiResponse;
 import diary.file.service.VideoFileService;
 import diary.file.service.asyncservice.AsyncService;
 import diary.file.service.downloadservice.DownloadService;
+import diary.file.service.queryurlservice.QueryUrlService;
 import diary.file.service.uploadservice.UploadService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,16 +34,26 @@ public class FileController {
     @Resource
     private VideoFileService videoFileService;
 
-    @PostMapping("/upload/photo")
-    public ApiResponse upload(@RequestParam("files") List<MultipartFile> files, @RequestParam("code") Integer code) {
+    @Resource
+    private QueryUrlService queryUrlService;
+
+    @PostMapping("/upload/images")
+    public ApiResponse<List<Long>> upload(@RequestParam("files") List<MultipartFile> files, @RequestBody ImageDTO imageDTO) {
         // 直接先插入数据
-        Map<String, Object> result = uploadService.addPhotosToDb(files);
+        List<Long> result = uploadService.addImagesToDb(files, imageDTO);
         // 异步上传图片到OSS成功后，发送消息给mq
-        asyncService.uploadAndSendMsgAsync(result, files, code);
+        asyncService.uploadAndSendMsgAsync(result, files, imageDTO);
         return ApiResponse.success(result);
     }
 
-    @PostMapping("/download/photo")
+    @PostMapping("/query/images/urls")
+    public ApiResponse<List<ImageVO>> queryImageUrls(@RequestBody List<Long> imageIds) {
+        // 根据imageIds查询图片URL
+        List<ImageVO> result = queryUrlService.queryImageUrls(imageIds);
+        return ApiResponse.success(result);
+    }
+
+    @PostMapping("/download/image")
     public ApiResponse download(@RequestParam("ossUrls") List<String> ossUrls) {
         // 批量下载图片
         Map<String, Object> result = downloadService.batchDownloadPhotos(ossUrls);
