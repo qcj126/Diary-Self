@@ -33,17 +33,8 @@
 
     <insert id="batchAddImageToDb" parameterType="list">
         INSERT INTO image (
-        id,
-        user_id,
-        file_size,
-        url,
-        original_name,
-        mime_type,
-        type,
-        deleted,
-        status,
-        create_time,
-        update_time
+        id, user_id, file_size, url, original_name, mime_type, type,
+        deleted, status, create_time, update_time
         ) VALUES
         <foreach collection="list" item="item" separator=",">
             <trim prefix="(" suffix=")" prefixOverrides=",">
