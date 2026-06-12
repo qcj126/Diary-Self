@@ -88,7 +88,7 @@ public class AsyncServiceImpl implements AsyncService {
         // 遍历文件列表，逐个上传
         for (int i = 0; i < files.size(); i++) {
             MultipartFile file = files.get(i);
-            Long photoId = (i < result.size()) ? result.get(i) : null;
+            Long imageId = (i < result.size()) ? result.get(i) : null;
 
             try {
                 // 生成唯一文件名，避免同名覆盖
@@ -107,12 +107,12 @@ public class AsyncServiceImpl implements AsyncService {
 
                 // 构建消息对象
                 OssUploadSuccessMsg msg = new OssUploadSuccessMsg(
-                        photoId, ossUrl, file.getOriginalFilename(), System.currentTimeMillis()
+                        imageId, ossUrl, file.getOriginalFilename(), System.currentTimeMillis()
                 );
 
                 // 发送消息到rabbitmq
                 // 创建关联ID
-                String correlationId = "UPLOAD" + photoId + System.currentTimeMillis();
+                String correlationId = "UPLOAD" + imageId + System.currentTimeMillis();
                 rabbitTemplate.convertAndSend(
                         RabbitMqConfig.OSS_UPLOAD_EXCHANGE,
                         RabbitMqConfig.OSS_UPLOAD_ROUTING_KEY,
@@ -120,15 +120,15 @@ public class AsyncServiceImpl implements AsyncService {
                         new CorrelationData(correlationId)
                 );
                 log.info("OSS 上传成功，消息已发送，photoId: {}, fileName: {}, correlationId: {}",
-                        photoId, file.getOriginalFilename(), correlationId);
+                        imageId, file.getOriginalFilename(), correlationId);
                 successCount++;
             } catch (IOException e) {
-                log.error("OSS 上传失败，photoId: {}, fileName: {}", photoId, file.getOriginalFilename(), e);
+                log.error("OSS 上传失败，photoId: {}, fileName: {}", imageId, file.getOriginalFilename(), e);
                 failCount++;
                 failedFiles.add(file.getOriginalFilename() + ": " + e.getMessage());
                 // 可在此发送上传失败消息到另一个队列
             } catch (Exception e) {
-                log.error("处理文件异常，photoId: {}, fileName: {}", photoId, file.getOriginalFilename(), e);
+                log.error("处理文件异常，photoId: {}, fileName: {}", imageId, file.getOriginalFilename(), e);
                 failCount++;
                 failedFiles.add(file.getOriginalFilename() + ": " + e.getMessage());
             }

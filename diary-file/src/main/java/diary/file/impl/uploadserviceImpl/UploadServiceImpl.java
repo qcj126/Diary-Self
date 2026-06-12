@@ -61,7 +61,6 @@ public class UploadServiceImpl implements UploadService {
                     continue;
                 }
 
-                long id = MyUtils.getPrimaryKey();
                 Integer type = TypeEnum.getCode(imageDTO.getCode());
                 String originalFilename = file.getOriginalFilename();
 
@@ -72,13 +71,11 @@ public class UploadServiceImpl implements UploadService {
                     continue;
                 }
 
-                long photoSize = file.getSize();
-
                 // 构建Photo对象（暂不设置sortOrder）
                 ImagePO image = new ImagePO();
-                image.setId(id);
+                image.setId(MyUtils.getPrimaryKey());
                 image.setUserId(imageDTO.getUserId());
-                image.setFileSize(photoSize);
+                image.setFileSize(file.getSize());
                 image.setOriginalName(file.getOriginalFilename());
                 image.setMimeType(file.getContentType());
                 image.setType(TypeEnum.getCode(imageDTO.getCode()));
@@ -123,7 +120,10 @@ public class UploadServiceImpl implements UploadService {
             }
         }
 
-        // TODO 后续处理插入失败的情况
+        // TODO 后续处理插入失败的情况】
+        if (!failedFiles.isEmpty()) {
+            log.error("处理文件列表时发生异常，失败文件列表: {}", failedFiles);
+        }
 
         if (imageIds.isEmpty()) {
             throw new ParamIllegalException("所有文件均处理失败");

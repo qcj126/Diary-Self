@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class OssUploadSuccessMsg {
+    // rabbitMq成功消息体
     private Long id;
     private String ossUrl;
     private String photoName;

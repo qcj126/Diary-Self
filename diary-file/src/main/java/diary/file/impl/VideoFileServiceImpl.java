@@ -32,7 +32,7 @@ import java.util.UUID;
 @Service
 public class VideoFileServiceImpl implements VideoFileService {
     @Resource
-    private ImageMapper photoMapper;
+    private ImageMapper imageMapper;
 
     @Resource
     private RedisService redisService;

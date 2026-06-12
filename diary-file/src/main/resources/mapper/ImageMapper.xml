@@ -1,7 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="diary.file.mapper.ImageMapper">
-    <select id="selectImagesByIds" resultType="diary.common.entity.image.po.ImagePO">
+
+    <resultMap id="ImageResultMap" type="diary.common.entity.image.po.ImagePO">
+        <id property="id" column="id"/>
+        <id property="userId" column="user_id"/>
+        <id property="fileSize" column="file_size"/>
+        <id property="url" column="url"/>
+        <id property="originalName" column="original_name"/>
+        <id property="mimeType" column="mime_type"/>
+        <id property="type" column="type"/>
+        <id property="deleted" column="deleted"/>
+        <id property="status" column="status"/>
+        <id property="createTime" column="create_time"/>
+        <id property="updateTime" column="update_time"/>
+    </resultMap>
+    <select id="selectImagesByIds" resultMap="ImageResultMap">
         SELECT id, url FROM image WHERE id IN
         <foreach item="id" collection="imageIds" separator="," open="(" close=")">
             #{id}
@@ -10,14 +24,41 @@
     </select>
 
     <update id="updateImageStatusById">
-
+        update image set url = #{ossUrl}, status = #{status} where id = #{id}
     </update>
 
     <select id="selectImageByTypeAndName" resultType="java.lang.Integer">
-
+        select 1 from image where type = #{type} and original_name = #{originalFilename}
     </select>
 
-    <insert id="batchAddImageToDb">
-
+    <insert id="batchAddImageToDb" parameterType="list">
+        INSERT INTO image (
+        id,
+        user_id,
+        file_size,
+        url,
+        original_name,
+        mime_type,
+        type,
+        deleted,
+        status,
+        create_time,
+        update_time
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            <trim prefix="(" suffix=")" prefixOverrides=",">
+                <if test="item.id != null">#{item.id},</if>
+                <if test="item.userId != null">#{item.userId},</if>
+                <if test="item.fileSize != null">#{item.fileSize},</if>
+                <if test="item.url != null">#{item.url},</if>
+                <if test="item.originalName != null">#{item.originalName},</if>
+                <if test="item.mimeType != null">#{item.mimeType},</if>
+                <if test="item.type != null">#{item.type},</if>
+                <if test="item.deleted != null">#{item.deleted},</if>
+                <if test="item.status != null">#{item.status},</if>
+                <if test="item.createTime != null">#{item.createTime},</if>
+                <if test="item.updateTime != null">#{item.updateTime}</if>
+            </trim>
+        </foreach>
     </insert>
 </mapper>

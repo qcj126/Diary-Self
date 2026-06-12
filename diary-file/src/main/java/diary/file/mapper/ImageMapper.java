@@ -12,7 +12,7 @@ public interface ImageMapper {
 
     Integer selectImageByTypeAndName(Integer type, String originalFilename);
 
-    Integer updateImageStatusById(Long id, String ossUrl, int photoStatusSuccess);
+    Integer updateImageStatusById(Long id, String ossUrl, int status);
 
     List<ImagePO> selectImagesByIds(List<Long> imageIds);
 }
