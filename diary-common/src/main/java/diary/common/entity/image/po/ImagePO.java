@@ -6,15 +6,24 @@ import java.time.LocalDateTime;
 
 @Data
 public class ImagePO {
-    private Long id; // 主键
-    private Long userId; // 用户ID
-    private Integer fileSize; // 文件大小（字节）
-    private Boolean deleted; // 是否删除
-    private String url; // 图片访问URL
-    private String thumbnailUrl; // 缩略图URL
-    private String originalName; // 原始文件名
-    private String mimeType; // MIME类型，如 image/jpeg
-    private Integer type; // 图片类型  1000 正常图，1100 缩略图，1200 裁剪图，2000 未知类型
-    private LocalDateTime createdTime; // 上传时间
-    private LocalDateTime updatedTime; // 更新时间
+    @NotNull
+    private Long id;                      // 主键
+    @NotNull
+    private Long userId;                 // 用户ID
+    @NotNull
+    private Integer fileSize;          // 文件大小（字节）
+    @NotNull
+    private String url;               // 图片访问URL
+    @NotNull
+    private String originalName;      // 原始文件名
+    @NotNull
+    private String mimeType;          // MIME类型，如 image/jpeg
+    @NotNull
+    private Integer type;             // 图片类型 1000 正常图，1100 缩略图，1200 裁剪图，1300 封面图，2000 未知类型
+    @NotNull
+    private Integer sort;             // 排序
+    @NotNull
+    private Integer deleted;          // 是否删除：0-否 1-是
+    private LocalDateTime createTime;      // 上传时间
+    private LocalDateTime updateTime;      // 更新时间
 }

@@ -2,28 +2,21 @@ package diary.common.entity.recipe.po;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 public class RecipeStepPO {
-    /** 步骤主键（雪花算法生成） */
-    private Long stepId;
-
-    /** 食谱ID */
-    private Long recipeId;
-
-    /** 步骤编号 */
-    private Integer stepNumber;
-
-    /** 步骤文字描述 */
-    private String description;
-
-    /** 步骤图片URL */
-    private String imageUrl;
-
-    /** 该步骤计时（分钟），NULL 表示无需计时 */
-    private Integer timerMin;
-
-    /** 排序 */
-    private Integer sortOrder;
+    private Long id;                      // 主键
+    private Long recipeId;               // 食谱ID
+    private Long userId;                 // 创建者用户ID
+    private Integer stepNumber;           // 步骤编号
+    private String description;           // 步骤描述
+    private String imageUrl;             // 步骤图片URL
+    private Integer timerMinute;          // 步骤计时（分钟）
+    private Integer sort;                 // 排序
+    private Integer deleted;              // 是否删除：0-否 1-是
+    private LocalDateTime createTime;     // 创建时间
+    private LocalDateTime updateTime;     // 更新时间
 
 //    String apiKey = "17cea7a8-c064-49b9-b44e-f65ab17d8fd4";
 //
