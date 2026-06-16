@@ -51,8 +51,8 @@ public class RecipeAddServiceImpl implements RecipeAddService {
 
         // 类型转换
         RecipePO recipePO = DtoConvertToPo.convertToPO(recipeReqDto, MyUtils.getPrimaryKey());
-        List<RecipeIngredientPO> recipeIngredientPOs = recipeReqDto.getIngredients().stream().map(ao -> AoConvertToPo.convertToPO(ao, recipePO.getRecipeId(), MyUtils.getPrimaryKey())).toList();
-        List<RecipeStepPO> recipeStepPOs = recipeReqDto.getSteps().stream().map(ao -> AoConvertToPo.convertToPO(ao, recipePO.getRecipeId(), MyUtils.getPrimaryKey())).toList();
+        List<RecipeIngredientPO> recipeIngredientPOs = recipeReqDto.getIngredients().stream().map(ao -> AoConvertToPo.convertToPO(ao, recipePO.getId(), MyUtils.getPrimaryKey())).toList();
+        List<RecipeStepPO> recipeStepPOs = recipeReqDto.getSteps().stream().map(ao -> AoConvertToPo.convertToPO(ao, recipePO.getId(), MyUtils.getPrimaryKey())).toList();
 
         recipeMapper.insert(recipePO);
         recipeIngredientMapper.batchInsert(recipeIngredientPOs);

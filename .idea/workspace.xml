@@ -5,7 +5,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f808c6d7-aa71-4ad4-bd8e-7a02c2741024" name="Changes" comment="完成图片添加数据库功能">
-      <change beforePath="$PROJECT_DIR$/diary-file/src/main/resources/mapper/ImageMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-file/src/main/resources/mapper/ImageMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/convert/recipe/AoConvertToPo.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/convert/recipe/AoConvertToPo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/convert/recipe/DtoConvertToPo.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/convert/recipe/DtoConvertToPo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/recipe/dto/resp/RecipeRespDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/recipe/dto/resp/RecipeRespDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/timemachine/dto/TimeCardDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/timemachine/dto/TimeCardDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-diet/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-diet/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-diet/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-diet/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-file/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-file/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-gateway/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-gateway/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-recipe/src/main/java/diary/recipe/impl/add/RecipeAddServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-recipe/src/main/java/diary/recipe/impl/add/RecipeAddServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-recipe/src/main/java/diary/recipe/impl/delete/RecipeDeleteServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-recipe/src/main/java/diary/recipe/impl/delete/RecipeDeleteServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-recipe/src/main/java/diary/recipe/impl/update/RecipeUpdateServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-recipe/src/main/java/diary/recipe/impl/update/RecipeUpdateServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-recipe/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-recipe/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-timemachine/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-timemachine/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-timemachine/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-timemachine/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-user/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-user/src/main/resources/application.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -84,53 +100,60 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.SecurityConfig.executor&quot;: &quot;Debug&quot;,
-    &quot;Application.UserServiceImpl.executor&quot;: &quot;Debug&quot;,
-    &quot;Maven.Diary-Self [clean].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.Diary-Self [compile].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.diary-config [clean].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.diary-config [compile].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.diary-dao [clean].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.diary-dao [compile].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.diary-dao [package].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.diary-recipe [clean].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.diary-user [clean].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.diary-user [compile].executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
-    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
-    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
-    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;Spring Boot.DiaryConfigApplication.executor&quot;: &quot;Debug&quot;,
-    &quot;Spring Boot.DiaryDaoApplication.executor&quot;: &quot;Debug&quot;,
-    &quot;Spring Boot.DiaryFileApplication.executor&quot;: &quot;Debug&quot;,
-    &quot;Spring Boot.DiaryGatewayApplication.executor&quot;: &quot;Run&quot;,
-    &quot;Spring Boot.DiaryRecipeApplication.executor&quot;: &quot;Debug&quot;,
-    &quot;Spring Boot.DiaryUserApplication.executor&quot;: &quot;Debug&quot;,
-    &quot;Spring Boot.DiaryUtilsApplication.executor&quot;: &quot;Debug&quot;,
-    &quot;Spring Boot.DiaryXxljobApplication.executor&quot;: &quot;Debug&quot;,
-    &quot;Spring Boot.MyLoveDiaryApplication.executor&quot;: &quot;Debug&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;E:/Diary-Self/diary-file/src/main/java/diary/file/impl&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.4&quot;,
-    &quot;run.configurations.included.in.services&quot;: &quot;true&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;Errors&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.DiaryDietApplication.executor": "Debug",
+    "Application.DiaryFileApplication.executor": "Debug",
+    "Application.DiaryGatewayApplication.executor": "Debug",
+    "Application.DiaryRecipeApplication.executor": "Debug",
+    "Application.DiaryTimeMachineApplication.executor": "Debug",
+    "Application.DiaryUserApplication.executor": "Debug",
+    "Application.SecurityConfig.executor": "Debug",
+    "Application.UserServiceImpl.executor": "Debug",
+    "Application.XxlJobExecutorApplication.executor": "Debug",
+    "Maven.Diary-Self [clean].executor": "Run",
+    "Maven.Diary-Self [compile].executor": "Run",
+    "Maven.diary-config [clean].executor": "Run",
+    "Maven.diary-config [compile].executor": "Run",
+    "Maven.diary-dao [clean].executor": "Run",
+    "Maven.diary-dao [compile].executor": "Run",
+    "Maven.diary-dao [package].executor": "Run",
+    "Maven.diary-recipe [clean].executor": "Run",
+    "Maven.diary-user [clean].executor": "Run",
+    "Maven.diary-user [compile].executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Spring Boot.DiaryConfigApplication.executor": "Debug",
+    "Spring Boot.DiaryDaoApplication.executor": "Debug",
+    "Spring Boot.DiaryFileApplication.executor": "Debug",
+    "Spring Boot.DiaryGatewayApplication.executor": "Run",
+    "Spring Boot.DiaryRecipeApplication.executor": "Debug",
+    "Spring Boot.DiaryUserApplication.executor": "Debug",
+    "Spring Boot.DiaryUtilsApplication.executor": "Debug",
+    "Spring Boot.DiaryXxljobApplication.executor": "Debug",
+    "Spring Boot.MyLoveDiaryApplication.executor": "Debug",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "E:/Diary-Self/diary-file/src/main/java/diary/file/impl",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.4",
+    "run.configurations.included.in.services": "true",
+    "settings.editor.selected.configurable": "Errors",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="ReactorSettings">
     <option name="notificationShown" value="true" />
   </component>
@@ -156,20 +179,76 @@
   <component name="RunDashboard">
     <option name="configurationTypes">
       <set>
+        <option value="Application" />
         <option value="KtorApplicationConfigurationType" />
         <option value="MicronautRunConfigurationType" />
         <option value="QuarkusRunConfigurationType" />
         <option value="SpringBootApplicationConfigurationType" />
       </set>
     </option>
+    <option name="configurationStatuses">
+      <map>
+        <entry key="Application">
+          <value>
+            <map>
+              <entry key="DiaryDietApplication" value="STOPPED" />
+              <entry key="DiaryFileApplication" value="FAILED" />
+              <entry key="DiaryGatewayApplication" value="STOPPED" />
+              <entry key="DiaryRecipeApplication" value="FAILED" />
+              <entry key="DiaryTimeMachineApplication" value="STOPPED" />
+              <entry key="DiaryUserApplication" value="FAILED" />
+            </map>
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
-  <component name="RunManager" selected="Application.UserServiceImpl">
-    <configuration name="UserServiceImpl" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="diary.user.service.impl.UserServiceImpl" />
+  <component name="RunManager" selected="Application.DiaryDietApplication">
+    <configuration name="DiaryDietApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="diary.diarydiet.DiaryDietApplication" />
+      <module name="diary-diet" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="diary.diarydiet.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="DiaryRecipeApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="diary.recipe.DiaryRecipeApplication" />
+      <module name="diary-recipe" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="diary.recipe.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="DiaryTimeMachineApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="diary.diarytimemachine.DiaryTimeMachineApplication" />
+      <module name="diary-timemachine" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="diary.diarytimemachine.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="DiaryUserApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="diary.user.DiaryUserApplication" />
       <module name="diary-user" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="diary.user.service.impl.*" />
+          <option name="PATTERN" value="diary.user.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -214,7 +293,10 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.UserServiceImpl" />
+        <item itemvalue="Application.DiaryRecipeApplication" />
+        <item itemvalue="Application.DiaryUserApplication" />
+        <item itemvalue="Application.DiaryDietApplication" />
+        <item itemvalue="Application.DiaryTimeMachineApplication" />
       </list>
     </recent_temporary>
   </component>
@@ -466,7 +548,15 @@
       <option name="project" value="LOCAL" />
       <updated>1781257305445</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="完成图片添加数据库功能">
+      <option name="closed" value="true" />
+      <created>1781257980959</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1781257980959</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

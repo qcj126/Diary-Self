@@ -26,6 +26,10 @@ spring:
               uri: http://localhost:8804
               predicates:
                 - Path=/time-machine/**
+            - id: diary-diet
+              uri: http://localhost:8805
+              predicates:
+                - Path=/diet/**
           globalcors:
             corsConfigurations:
               '[/**]':

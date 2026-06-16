@@ -40,7 +40,7 @@ public class RecipeRespDto {
     public static RecipeRespDto fromEntity(RecipePO recipe) {
         if (recipe == null) return null;
         return RecipeRespDto.builder()
-                .recipeId(recipe.getRecipeId())
+                .recipeId(recipe.getId())
                 .title(recipe.getTitle())
                 // ... 其他字段
                 .build();

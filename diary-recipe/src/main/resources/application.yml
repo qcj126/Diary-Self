@@ -3,19 +3,28 @@ spring:
     name: diary-recipe
   data:
     redis:
-      password: qcjly513
-      host: 192.168.101.128
-      port: 6379
+      #      password: qcjly513
+      #      host: 192.168.101.128
+      #      port: 6379
+      host: localhost
+      port: 6333
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.101.128:3306/canal-demo?useSSL=false&serverTimezone=UTC
+    #    url: jdbc:mysql://192.168.101.128:3306/canal-demo?useSSL=false&serverTimezone=UTC
+    #    username: root
+    #    password: qcjly
+    url: jdbc:mysql://localhost:3333/diary?useSSL=false&serverTimezone=UTC
     username: root
-    password: qcjly
+    password: root
   rabbitmq:
-    host: 192.168.101.128
-    port: 5672
-    username: yxy
-    password: yxy
+    #    host: 192.168.101.128
+    #    port: 5672
+    #    username: yxy
+    #    password: yxy
+    host: localhost
+    port: 5555
+    username: root
+    password: root
     listener:
       simple:
         prefetch: 1 # ???????????

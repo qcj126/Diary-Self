@@ -3,19 +3,28 @@ spring:
     name: diary-user
   data:
     redis:
-      password: qcjly513
-      host: 192.168.101.128
-      port: 6379
+#      password: qcjly513
+#      host: 192.168.101.128
+#      port: 6379
+      host: localhost
+      port: 6333
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.101.128:3306/canal-demo?useSSL=false&serverTimezone=UTC
+#    url: jdbc:mysql://192.168.101.128:3306/canal-demo?useSSL=false&serverTimezone=UTC
+#    username: root
+#    password: qcjly
+    url: jdbc:mysql://localhost:3333/diary?useSSL=false&serverTimezone=UTC
     username: root
-    password: qcjly
+    password: root
   rabbitmq:
-    host: 192.168.101.128
-    port: 5672
-    username: yxy
-    password: yxy
+#    host: 192.168.101.128
+#    port: 5672
+#    username: yxy
+#    password: yxy
+    host: localhost
+    port: 5555
+    username: guest
+    password: guest
     listener:
       simple:
         prefetch: 1 # ???????????
@@ -26,13 +35,12 @@ spring:
           initial-interval: 1000ms      # ??????1?
           multiplier: 2                 # ????????
           max-interval: 10000ms         # ??????10?
-
+  main:
+    web-application-type: reactive
   servlet:
     multipart:
       max-file-size: 10MB
       max-request-size: 20MB
-  main:
-    web-application-type: reactive
 aliyun:
   oss:
     endpoint: your               # ??OSS Endpoint

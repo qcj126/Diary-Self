@@ -11,24 +11,22 @@ public class AoConvertToPo {
      */
     public static RecipeIngredientPO convertToPO(RecipeIngredientAO ao, Long recipeId, Long keyId) {
         RecipeIngredientPO po = new RecipeIngredientPO();
-        po.setIngredientId(keyId);
+
+        po.setId(keyId);
         po.setRecipeId(recipeId);
         po.setName(ao.getName());
         po.setQuantity(ao.getQuantity());
         po.setIsMain(ao.getIsMain());
-        po.setSortOrder(ao.getSortOrder());
         return po;
     }
 
     public static RecipeStepPO convertToPO(RecipeStepAO ao, Long recipeId, Long keyId) {
         RecipeStepPO po = new RecipeStepPO();
-        po.setStepId(keyId);
+        po.setId(keyId);
         po.setRecipeId(recipeId);
         po.setStepNumber(ao.getStepNumber());
         po.setDescription(ao.getDescription());
         po.setImageUrl(ao.getImageUrl());
-        po.setTimerMin(ao.getTimerMin());
-        po.setSortOrder(ao.getSortOrder());
         return po;
     }
 }

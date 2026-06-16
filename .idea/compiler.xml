@@ -23,36 +23,9 @@
         </processorPath>
         <module name="diary-timemachine" />
         <module name="diary-timedJob" />
-      </profile>
-      <profile name="Annotation profile for diary-diet" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="D:/maven-repository/my-diary/org/projectlombok/lombok/1.18.44/lombok-1.18.44.jar" />
-          <entry name="D:/maven-repository/my-diary/org/projectlombok/lombok/1.18.44/lombok-1.18.44.jar" />
-        </processorPath>
         <module name="diary-diet" />
-      </profile>
-      <profile name="Annotation profile for diary-gateway" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="D:/maven-repository/my-diary/org/projectlombok/lombok/1.18.44/lombok-1.18.44.jar" />
-          <entry name="D:/maven-repository/my-diary/org/projectlombok/lombok/1.18.44/lombok-1.18.44.jar" />
-        </processorPath>
-        <module name="diary-gateway" />
-      </profile>
-      <profile name="Annotation profile for diary-recipe" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="D:/maven-repository/my-diary/org/projectlombok/lombok/1.18.44/lombok-1.18.44.jar" />
-          <entry name="D:/maven-repository/my-diary/org/projectlombok/lombok/1.18.44/lombok-1.18.44.jar" />
-        </processorPath>
         <module name="diary-recipe" />
+        <module name="diary-gateway" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>

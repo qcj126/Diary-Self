@@ -36,8 +36,8 @@ public class RecipeDeleteServiceImpl implements RecipeDeleteService {
             throw new ParamIllegalException("此分类下无此食谱，无法执行删除操作");
         }
         // 根据食谱id删除食材和步骤数据
-        recipeIngredientMapper.deleteByRecipeId(recipePO.getRecipeId());
-        recipeStepMapper.deleteByRecipeId(recipePO.getRecipeId());
+        recipeIngredientMapper.deleteByRecipeId(recipePO.getId());
+        recipeStepMapper.deleteByRecipeId(recipePO.getId());
 
         return ApiResponse.success("删除成功");
     }
