@@ -50,3 +50,15 @@ server:
 jwt:
   secret: your256bitsecretkeymustbeatleast32characterslong
   expiration: 7200000 # 2 hours in milliseconds
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus,health  # 暴露 prometheus 端点
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+    tags:
+      application: ${spring.application.name}  # 添加应用名标签
+      instance: 127.0.0.1:10000  # 添加实例标签
