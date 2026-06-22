@@ -1,5 +1,6 @@
 package diary.diarytimemachine.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import diary.common.entity.timemachine.dto.TimeCardDTO;
 import diary.common.entity.timemachine.dto.TimeCategoryDTO;
 import diary.common.entity.timemachine.vo.TimeCardVO;
@@ -13,12 +14,13 @@ import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("time-machine/")
+@RequestMapping("time-machine")
 public class TimeMachineController {
     @Resource
     private TimeMachineAddService timeMachineAddService;
@@ -69,7 +71,8 @@ public class TimeMachineController {
     }
 
     @PostMapping("/card/query")
-    public ApiResponse<List<TimeCardVO>> queryCard(@RequestBody TimeCardDTO cardDTO) {
-        return ApiResponse.success(timeMachineQueryService.cardQuery(cardDTO));
+    public ApiResponse<IPage<TimeCardVO>> queryCard(@RequestParam(defaultValue = "1") Integer pageIndex,
+                                                    @RequestParam(defaultValue = "25") Integer pageSize) {
+        return ApiResponse.success(timeMachineQueryService.cardQuery(pageIndex, pageSize));
     }
 }

@@ -2,18 +2,20 @@ package diary.user.impl;
 
 import diary.common.entity.user.dto.UserReqDTO;
 import diary.common.entity.user.po.User;
+import diary.common.entity.user.vo.TokenPairVO;
+import diary.common.entity.user.vo.UserVO;
 import diary.common.exception.CustomException;
 import diary.common.exception.ParamIllegalException;
 import diary.common.exception.SameDataException;
 import diary.user.mapper.UserMapper;
-import diary.utils.redis.ValidatUtil;
+import diary.user.service.TokenService;
 import diary.user.service.UserService;
 import diary.utils.commonutil.MyUtils;
-import diary.utils.jwt.JwtUtil;
+import diary.utils.redis.ValidatUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -21,189 +23,194 @@ import java.util.Map;
 import static diary.utils.crypto.BCryptUtilNoSpring.encode;
 import static diary.utils.crypto.BCryptUtilNoSpring.matches;
 
-/**
- * 用户服务实现类
- */
 @Slf4j
 @Service
 public class UserServiceImpl implements UserService {
+
     @Resource
     private UserMapper userMapper;
 
     @Resource
-    private JwtUtil jwtUtil;
+    private ValidatUtil validatUtil;
 
     @Resource
-    private ValidatUtil validatUtil;
+    private TokenService tokenService;
 
     @Override
     public Map<String, Object> login(UserReqDTO userDTO) {
-        // 校验登录类型
         if (userDTO.getType() == null) {
-            throw new ParamIllegalException("登录类型不能为空");
+            throw new ParamIllegalException("login type is required");
         }
-        User user;
-        // 根据登录类型处理不同逻辑
         if (userDTO.getType() != 1 && userDTO.getType() != 2) {
-            throw new ParamIllegalException("不支持的登录类型");
+            throw new ParamIllegalException("unsupported login type");
         }
-        // 账号密码登录
-        user = loginByPassword(userDTO);
-        // 生成 Token
-        String token = jwtUtil.generateToken(user.getUsername());
 
-        return Map.of("token", token);
+        User user = userDTO.getType() == 2 ? loginByCode(userDTO) : loginByPassword(userDTO);
+        List<String> roles = loadRoleCodes(user.getUserId());
+        TokenPairVO tokenPair = tokenService.issueTokenPair(user.getUsername(), roles);
+
+        // OAuth2-style Bearer tokens: access token for APIs, refresh token for renewal.
+        return Map.of(
+                "tokenType", tokenPair.getTokenType(),
+                "accessToken", tokenPair.getAccessToken(),
+                "accessTokenExpiresIn", tokenPair.getAccessTokenExpiresIn(),
+                "refreshToken", tokenPair.getRefreshToken(),
+                "refreshTokenExpiresIn", tokenPair.getRefreshTokenExpiresIn()
+        );
     }
 
-    /**
-     * 账号密码登录
-     */
     private User loginByPassword(UserReqDTO userDTO) {
-        // 参数校验
-        if (userDTO.getUsername() == null && userDTO.getEmail() == null && userDTO.getPhone() == null) {
-            throw new ParamIllegalException("用户名、邮箱或手机号至少提供一个");
+        if (isBlank(userDTO.getUsername()) && isBlank(userDTO.getEmail()) && isBlank(userDTO.getPhone())) {
+            throw new ParamIllegalException("username, email or phone is required");
         }
-        if (userDTO.getPassword() == null || userDTO.getPassword().trim().isEmpty()) {
-            throw new ParamIllegalException("密码不能为空");
+        if (isBlank(userDTO.getPassword())) {
+            throw new ParamIllegalException("password is required");
         }
 
-        // 查询用户
         User user = loadUserByIdentify(userDTO);
-        
-        // 验证密码
         if (!matches(userDTO.getPassword(), user.getPassword())) {
-            throw new CustomException("密码错误");
+            throw new CustomException("password is incorrect");
         }
-        
         return user;
     }
 
-    /**
-     * 验证码登录
-     */
     private User loginByCode(UserReqDTO userDTO) {
-        // 参数校验
-        if (userDTO.getPhone() == null || userDTO.getPhone().trim().isEmpty()) {
-            throw new RuntimeException("手机号不能为空");
+        if (isBlank(userDTO.getPhone())) {
+            throw new ParamIllegalException("phone is required");
         }
-        if (userDTO.getCode() == null || userDTO.getCode().trim().isEmpty()) {
-            throw new RuntimeException("验证码不能为空");
+        if (isBlank(userDTO.getCode())) {
+            throw new ParamIllegalException("verify code is required");
         }
-        // 验证验证码
         if (!validatUtil.checkVerifyCode(userDTO.getCode())) {
-            throw new RuntimeException("验证码错误或已过期");
+            throw new CustomException("verify code is invalid or expired");
         }
-
-        // 查询用户
-        User user = loadUserByUsername(userDTO.getPhone());
-        if (user == null) {
-            throw new RuntimeException("用户不存在");
-        }
-        
-        return user;
+        return loadUserByUsername(userDTO.getPhone());
     }
 
-    /**
-     * 根据标识符（用户名/邮箱/手机号）加载用户
-     */
     private User loadUserByIdentify(UserReqDTO userDTO) {
-        User user = null;
-        
-        if (userDTO.getEmail() != null && !userDTO.getEmail().trim().isEmpty()) {
-            user =  loadUserByUsername(userDTO.getEmail());
-        } else if (userDTO.getUsername() != null && !userDTO.getUsername().trim().isEmpty()) {
-            user = loadUserByUsername(userDTO.getUsername());
-        } else if (userDTO.getPhone() != null && !userDTO.getPhone().trim().isEmpty()) {
-            user = loadUserByUsername(userDTO.getPhone());
+        if (!isBlank(userDTO.getEmail())) {
+            return loadUserByUsername(userDTO.getEmail());
         }
-        
-        if (user == null) {
-            throw new RuntimeException("用户不存在");
+        if (!isBlank(userDTO.getUsername())) {
+            return loadUserByUsername(userDTO.getUsername());
         }
-        
-        return user;
+        if (!isBlank(userDTO.getPhone())) {
+            return loadUserByUsername(userDTO.getPhone());
+        }
+        throw new ParamIllegalException("user identify is required");
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public String register(UserReqDTO userDTO) {
-        // 参数校验：username、email、phone、password 一个都不能为空
-        if (userDTO.getUsername() == null || userDTO.getUsername().trim().isEmpty()) {
-            throw new ParamIllegalException("用户名不能为空");
+        createUser(userDTO, List.of("user"));
+        return "register success";
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public String addUser(UserReqDTO userDTO) {
+        createUser(userDTO, normalizeRoles(userDTO.getRoles()));
+        return "add user success";
+    }
+
+    @Override
+    public String deleteUser(String username) {
+        if (isBlank(username)) {
+            throw new ParamIllegalException("username is required");
         }
-        if (userDTO.getEmail() == null || userDTO.getEmail().trim().isEmpty()) {
-            throw new ParamIllegalException("邮箱不能为空");
+        int affected = userMapper.disableUserByUsername(username);
+        tokenService.kickOut(username);
+        if (affected <= 0) {
+            throw new CustomException("delete user failed");
         }
-        if (userDTO.getPhone() == null || userDTO.getPhone().trim().isEmpty()) {
-            throw new ParamIllegalException("手机号不能为空");
-        }
-        if (userDTO.getPassword() == null || userDTO.getPassword().trim().isEmpty()) {
-            throw new ParamIllegalException("密码不能为空");
-        }
-    
-        // 检查用户名是否已存在
-        User existUser = userMapper.selectByUsername(userDTO.getUsername());
-        if (existUser != null) {
-            throw new SameDataException("用户名已被注册");
-        }
-    
-        // 检查邮箱是否已存在
-        existUser = userMapper.selectByEmail(userDTO.getEmail());
-        if (existUser != null) {
-            throw new SameDataException("邮箱已被注册");
-        }
-    
-        // 检查手机号是否已存在
-        existUser = userMapper.selectByPhone(userDTO.getPhone());
-        if (existUser != null) {
-            throw new SameDataException("手机号已被注册");
-        }
-    
-        // 创建用户对象
+        return "delete success";
+    }
+
+    @Override
+    public List<UserVO> queryUsers() {
+        return userMapper.selectUsers().stream().map(this::toUserVO).toList();
+    }
+
+    private void createUser(UserReqDTO userDTO, List<String> roles) {
+        validateCreateUser(userDTO);
+        assertUniqueUser(userDTO);
+
         User newUser = new User();
         newUser.setUserId(MyUtils.getPrimaryKey());
         newUser.setUsername(userDTO.getUsername());
         newUser.setEmail(userDTO.getEmail());
         newUser.setPhone(userDTO.getPhone());
-        // 使用 BCrypt 加密密码
         newUser.setPassword(encode(userDTO.getPassword()));
-    
-        // 插入数据库
+
         int result = userMapper.userRegister(newUser);
         if (result <= 0) {
-            throw new CustomException("注册失败");
+            throw new CustomException("save user failed");
         }
-        log.info("用户注册成功: {}", userDTO.getUsername());
-        return "注册成功";
+
+        // user_role stores the user-role relation. Register defaults to user.
+        for (String role : roles) {
+            Long roleId = userMapper.selectRoleIdByCode(role);
+            if (roleId == null) {
+                throw new ParamIllegalException("role does not exist: " + role);
+            }
+            userMapper.insertUserRole(MyUtils.getPrimaryKey(), newUser.getUserId(), roleId);
+        }
+        log.info("user saved: {}", userDTO.getUsername());
+    }
+
+    private void validateCreateUser(UserReqDTO userDTO) {
+        if (isBlank(userDTO.getUsername())) {
+            throw new ParamIllegalException("username is required");
+        }
+        if (isBlank(userDTO.getEmail())) {
+            throw new ParamIllegalException("email is required");
+        }
+        if (isBlank(userDTO.getPhone())) {
+            throw new ParamIllegalException("phone is required");
+        }
+        if (isBlank(userDTO.getPassword())) {
+            throw new ParamIllegalException("password is required");
+        }
+    }
+
+    private void assertUniqueUser(UserReqDTO userDTO) {
+        if (userMapper.selectByUsername(userDTO.getUsername()) != null) {
+            throw new SameDataException("username already exists");
+        }
+        if (userMapper.selectByEmail(userDTO.getEmail()) != null) {
+            throw new SameDataException("email already exists");
+        }
+        if (userMapper.selectByPhone(userDTO.getPhone()) != null) {
+            throw new SameDataException("phone already exists");
+        }
     }
 
     @Override
     public Map<String, Object> resetPw(UserReqDTO userDTO) {
-        User user = null;
-        if (userDTO.getUsername() == null && userDTO.getEmail() == null && userDTO.getPhone() == null && userDTO.getPassword() == null)
-            throw new RuntimeException("用户名或邮箱或手机号或密码不能为空");
-        if (userDTO.getEmail() != null)
-            user = loadUserByUsername(userDTO.getEmail());
-        if (userDTO.getUsername() != null)
-            user = loadUserByUsername(userDTO.getUsername());
-        if (userDTO.getPhone() != null)
-            user = loadUserByUsername(userDTO.getPhone());
-        if (user == null) throw new RuntimeException("用户不存在");
+        if (isBlank(userDTO.getPassword())) {
+            throw new ParamIllegalException("new password is required");
+        }
+        User user = loadUserByIdentify(userDTO);
         userMapper.updatePassword(user.getUsername(), encode(userDTO.getPassword()));
-        return Map.of(
-                "message", "密码重置成功"
-        );
+        tokenService.kickOut(user.getUsername());
+        return Map.of("message", "reset password success");
     }
 
     @Override
     public Map<String, Object> verifyCode(UserReqDTO userDTO) {
-        User user = null;
-        if (userDTO.getPhone() != null)
-            user = loadUserByUsername(userDTO.getPhone());
-        if (user == null) throw new RuntimeException("用户不存在");
-        // 生成验证码
+        if (isBlank(userDTO.getPhone())) {
+            throw new ParamIllegalException("phone is required");
+        }
+        loadUserByUsername(userDTO.getPhone());
         String code = String.valueOf(Math.random()).substring(2, 8);
         validatUtil.setVerifyCode(code);
-        return Map.of("message", "验证码已发送");
+        return Map.of("message", "verify code sent");
+    }
+
+    @Override
+    public TokenPairVO refresh(String refreshToken) {
+        return tokenService.refresh(refreshToken);
     }
 
     public User loadUserByUsername(String identify) {
@@ -216,10 +223,45 @@ public class UserServiceImpl implements UserService {
             user = userMapper.selectByUsername(identify);
         }
         if (user == null) {
-            throw new RuntimeException("用户不存在");
+            throw new CustomException("user does not exist");
         }
-        user.setRoles(List.of("ROLE_USER"));
+        user.setRoles(loadRoleCodes(user.getUserId()));
         return user;
     }
-}
 
+    private List<String> loadRoleCodes(Long userId) {
+        List<String> roles = userMapper.selectRoleCodesByUserId(userId);
+        return roles == null || roles.isEmpty() ? List.of("user") : roles;
+    }
+
+    private List<String> normalizeRoles(List<String> roles) {
+        if (roles == null || roles.isEmpty()) {
+            return List.of("user");
+        }
+        List<String> validRoles = roles.stream()
+                .map(String::trim)
+                .filter(role -> role.equals("admin") || role.equals("user"))
+                .distinct()
+                .toList();
+        if (validRoles.isEmpty()) {
+            throw new ParamIllegalException("role must be admin or user");
+        }
+        return validRoles;
+    }
+
+    private UserVO toUserVO(User user) {
+        UserVO vo = new UserVO();
+        vo.setUserId(user.getUserId());
+        vo.setUsername(user.getUsername());
+        vo.setEmail(user.getEmail());
+        vo.setPhone(user.getPhone());
+        vo.setStatus(user.getStatus());
+        vo.setCreateTime(user.getCreateTime());
+        vo.setRoles(loadRoleCodes(user.getUserId()));
+        return vo;
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
+    }
+}

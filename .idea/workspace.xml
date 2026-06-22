@@ -4,67 +4,56 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f808c6d7-aa71-4ad4-bd8e-7a02c2741024" name="Changes" comment="完成图片添加数据库功能">
+    <list default="true" id="fe337981-72bc-41d3-9f9c-16a8952a1ee8" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/convert/recipe/AoConvertToPo.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/convert/recipe/AoConvertToPo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/convert/recipe/DtoConvertToPo.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/convert/recipe/DtoConvertToPo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/recipe/dto/resp/RecipeRespDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/recipe/dto/resp/RecipeRespDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/timemachine/dto/TimeCardDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/timemachine/dto/TimeCardDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-diet/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-diet/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/consts/FileTypeConst.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/consts/FileTypeConst.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/consts/RedisKeyConst.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/consts/RedisKeyConst.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/timemachine/vo/TimeCardVO.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/timemachine/vo/TimeCardVO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/user/dto/UserReqDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/user/dto/UserReqDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/user/vo/UserVO.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/entity/user/vo/UserVO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/enums/typeenum/TypeEnum.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-common/src/main/java/diary/common/enums/typeenum/TypeEnum.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-config/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-config/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-config/src/main/java/diary/config/mpconfig/MybatisPlusConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-config/src/main/java/diary/config/mpconfig/MybatisPlusConfig.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/diary-diet/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-diet/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-file/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-file/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/DiaryFileApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/DiaryFileApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/controller/FileController.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/controller/FileController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/impl/uploadserviceImpl/UploadServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-file/src/main/java/diary/file/impl/uploadserviceImpl/UploadServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/diary-file/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-file/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-file/src/main/resources/mapper/ImageMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-file/src/main/resources/mapper/ImageMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-gateway/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-gateway/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-gateway/src/main/java/diary/gateway/DiaryGatewayApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-gateway/src/main/java/diary/gateway/DiaryGatewayApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-gateway/src/main/java/diary/gateway/filter/JwtAuthFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-gateway/src/main/java/diary/gateway/filter/JwtAuthFilter.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/diary-gateway/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-gateway/src/main/resources/application.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-recipe/src/main/java/diary/recipe/impl/add/RecipeAddServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-recipe/src/main/java/diary/recipe/impl/add/RecipeAddServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-recipe/src/main/java/diary/recipe/impl/delete/RecipeDeleteServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-recipe/src/main/java/diary/recipe/impl/delete/RecipeDeleteServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diary-recipe/src/main/java/diary/recipe/impl/update/RecipeUpdateServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-recipe/src/main/java/diary/recipe/impl/update/RecipeUpdateServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-recipe/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-recipe/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/diary-recipe/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-recipe/src/main/resources/application.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/diary-timemachine/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-timemachine/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-timemachine/src/main/java/diary/diarytimemachine/DiaryTimeMachineApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-timemachine/src/main/java/diary/diarytimemachine/DiaryTimeMachineApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-timemachine/src/main/java/diary/diarytimemachine/controller/TimeMachineController.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-timemachine/src/main/java/diary/diarytimemachine/controller/TimeMachineController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-timemachine/src/main/java/diary/diarytimemachine/impl/query/TimeMachineQueryServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-timemachine/src/main/java/diary/diarytimemachine/impl/query/TimeMachineQueryServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-timemachine/src/main/java/diary/diarytimemachine/mapper/TimeMachineMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-timemachine/src/main/java/diary/diarytimemachine/mapper/TimeMachineMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-timemachine/src/main/java/diary/diarytimemachine/service/query/TimeMachineQueryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-timemachine/src/main/java/diary/diarytimemachine/service/query/TimeMachineQueryService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/diary-timemachine/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-timemachine/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-timemachine/src/main/resources/mapper/TimeMachineMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-timemachine/src/main/resources/mapper/TimeMachineMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-user/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-user/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-user/src/main/java/diary/user/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-user/src/main/java/diary/user/controller/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-user/src/main/java/diary/user/impl/UserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-user/src/main/java/diary/user/impl/UserServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-user/src/main/java/diary/user/mapper/UserMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-user/src/main/java/diary/user/mapper/UserMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-user/src/main/java/diary/user/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-user/src/main/java/diary/user/service/UserService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/diary-user/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-user/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-user/src/main/resources/mapper/UserMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/diary-user/src/main/resources/mapper/UserMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-utils/src/main/java/diary/utils/file/FileUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-utils/src/main/java/diary/utils/file/FileUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diary-utils/src/main/java/diary/utils/jwt/JwtUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/diary-utils/src/main/java/diary/utils/jwt/JwtUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
-  </component>
-  <component name="CopilotChats">
-    <option name="panelChat">
-      <chat>
-        <option name="activeSessionId" value="8e455525-b065-461a-b3fa-aeea2d9f4f7a" />
-        <option name="sessions">
-          <session>
-            <option name="chatType" value="PANEL" />
-            <option name="id" value="8e455525-b065-461a-b3fa-aeea2d9f4f7a" />
-            <option name="modeId" value="Ask" />
-            <option name="modelType" value="builtin_family" />
-            <option name="modelValue" value="auto" />
-            <option name="targetType" value="LOCAL" />
-          </session>
-        </option>
-        <option name="type" value="PANEL" />
-      </chat>
-    </option>
-  </component>
-  <component name="CopilotPersistence">
-    <persistenceIdMap>
-      <entry key="_E:/Diary-Love" value="3Bem1w8Xm9f8vacBsOimxW3F6tT" />
-      <entry key="_E:/Diary-Self" value="3DQHXNwsc3zueJGzre3GKszBm6O" />
-    </persistenceIdMap>
-  </component>
-  <component name="CopilotUserSelectedChatMode">
-    <option name="chatModeId" value="Agent" />
-  </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="spring-beans.schema" />
-        <option value="Exception" />
-        <option value="Interface" />
-        <option value="Enum" />
-        <option value="Class" />
-      </list>
-    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -77,109 +66,47 @@
 }</component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;git@github.com:qcj126/Diary-Love.git&quot;,
-    &quot;accountId&quot;: &quot;457ec14a-a2ef-4cb9-bd79-5895a5a841ab&quot;
+    &quot;url&quot;: &quot;git@github.com:qcj126/Diary-Self.git&quot;,
+    &quot;accountId&quot;: &quot;2e30435e-d36e-4a7c-93d9-e387c2ab191d&quot;
   }
 }</component>
-  <component name="MavenImportPreferences">
-    <option name="generalSettings">
-      <MavenGeneralSettings>
-        <option name="localRepository" value="D:\maven-repository\my-diary" />
-        <option name="userSettingsFile" value="E:\maven\settings\settings.xml" />
-      </MavenGeneralSettings>
-    </option>
-  </component>
-  <component name="ProblemsViewState">
-    <option name="selectedTabId" value="CurrentFile" />
-  </component>
   <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 1
 }</component>
-  <component name="ProjectId" id="3Bem1w8Xm9f8vacBsOimxW3F6tT" />
+  <component name="ProjectId" id="3FR8wKLWbVlwN6MQ4vTs7HzQWvA" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.DiaryDietApplication.executor": "Debug",
-    "Application.DiaryFileApplication.executor": "Debug",
-    "Application.DiaryGatewayApplication.executor": "Debug",
-    "Application.DiaryRecipeApplication.executor": "Debug",
-    "Application.DiaryTimeMachineApplication.executor": "Debug",
-    "Application.DiaryUserApplication.executor": "Debug",
-    "Application.SecurityConfig.executor": "Debug",
-    "Application.UserServiceImpl.executor": "Debug",
-    "Application.XxlJobExecutorApplication.executor": "Debug",
-    "Maven.Diary-Self [clean].executor": "Run",
-    "Maven.Diary-Self [compile].executor": "Run",
-    "Maven.diary-config [clean].executor": "Run",
-    "Maven.diary-config [compile].executor": "Run",
-    "Maven.diary-dao [clean].executor": "Run",
-    "Maven.diary-dao [compile].executor": "Run",
-    "Maven.diary-dao [package].executor": "Run",
-    "Maven.diary-recipe [clean].executor": "Run",
-    "Maven.diary-user [clean].executor": "Run",
-    "Maven.diary-user [compile].executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Spring Boot.DiaryConfigApplication.executor": "Debug",
-    "Spring Boot.DiaryDaoApplication.executor": "Debug",
-    "Spring Boot.DiaryFileApplication.executor": "Debug",
-    "Spring Boot.DiaryGatewayApplication.executor": "Run",
-    "Spring Boot.DiaryRecipeApplication.executor": "Debug",
-    "Spring Boot.DiaryUserApplication.executor": "Debug",
-    "Spring Boot.DiaryUtilsApplication.executor": "Debug",
-    "Spring Boot.DiaryXxljobApplication.executor": "Debug",
-    "Spring Boot.MyLoveDiaryApplication.executor": "Debug",
-    "git-widget-placeholder": "main",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "E:/Diary-Self/diary-file/src/main/java/diary/file/impl",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.4",
-    "run.configurations.included.in.services": "true",
-    "settings.editor.selected.configurable": "Errors",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;Spring Boot.DiaryFileApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;Spring Boot.DiaryGatewayApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;Spring Boot.DiaryTimeMachineApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;extract.method.default.visibility&quot;: &quot;private&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;run.configurations.included.in.services&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="ReactorSettings">
     <option name="notificationShown" value="true" />
-  </component>
-  <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="E:\Diary-Self\diary-file\src\main\java\diary\file\impl" />
-      <recent name="E:\Diary-Self\diary-timemachine\src\main\java\diary\diarytimemachine\service\" />
-      <recent name="E:\Diary-Self\diary-xxljob" />
-      <recent name="E:\Diary-Self\diary-recipe\src\main\java\diary\recipe\mapper" />
-      <recent name="E:\Diary-Self\diary-recipe\src\main\resources" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\MyLoveDiary\diary-dao\src\main\resources" />
-    </key>
-    <key name="CopyClassDialog.RECENTS_KEY">
-      <recent name="diary.diarytimemachine.impl.update" />
-      <recent name="diary.diarytimemachine.impl.query" />
-      <recent name="diary.diarytimemachine.impl.delete" />
-      <recent name="diary.diarytimemachine.service.update" />
-      <recent name="diary.diarytimemachine.service.query" />
-    </key>
   </component>
   <component name="RunDashboard">
     <option name="configurationTypes">
       <set>
-        <option value="Application" />
         <option value="KtorApplicationConfigurationType" />
         <option value="MicronautRunConfigurationType" />
         <option value="QuarkusRunConfigurationType" />
@@ -188,77 +115,35 @@
     </option>
     <option name="configurationStatuses">
       <map>
-        <entry key="Application">
+        <entry key="SpringBootApplicationConfigurationType">
           <value>
             <map>
-              <entry key="DiaryDietApplication" value="STOPPED" />
-              <entry key="DiaryFileApplication" value="FAILED" />
+              <entry key="DiaryFileApplication" value="STOPPED" />
               <entry key="DiaryGatewayApplication" value="STOPPED" />
-              <entry key="DiaryRecipeApplication" value="FAILED" />
               <entry key="DiaryTimeMachineApplication" value="STOPPED" />
-              <entry key="DiaryUserApplication" value="FAILED" />
             </map>
           </value>
         </entry>
       </map>
     </option>
   </component>
-  <component name="RunManager" selected="Application.DiaryDietApplication">
-    <configuration name="DiaryDietApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="diary.diarydiet.DiaryDietApplication" />
-      <module name="diary-diet" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="diary.diarydiet.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="DiaryRecipeApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="diary.recipe.DiaryRecipeApplication" />
-      <module name="diary-recipe" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="diary.recipe.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="DiaryTimeMachineApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="diary.diarytimemachine.DiaryTimeMachineApplication" />
-      <module name="diary-timemachine" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="diary.diarytimemachine.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="DiaryUserApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="diary.user.DiaryUserApplication" />
-      <module name="diary-user" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="diary.user.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
+  <component name="RunManager" selected="Spring Boot.DiaryFileApplication">
     <configuration name="DiaryDietApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <module name="diary-diet" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="qcj.diary.diarydiet.DiaryDietApplication" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="diary.diarydiet.DiaryDietApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="DiaryFileApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
+      <module name="diary-file" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="diary.file.DiaryFileApplication" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="diary.file.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -277,324 +162,41 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="DiaryTimedjobApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
-      <module name="diary-timedJob" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="qcj.diary.diarytimedjob.DiaryTimedjobApplication" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="DiaryXxljobApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
-      <module name="diary-xxljob" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="qcj.diary.diaryxxljob.DiaryXxljobApplication" />
+    <configuration name="DiaryTimeMachineApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="diary-timemachine" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="diary.diarytimemachine.DiaryTimeMachineApplication" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.DiaryRecipeApplication" />
-        <item itemvalue="Application.DiaryUserApplication" />
-        <item itemvalue="Application.DiaryDietApplication" />
-        <item itemvalue="Application.DiaryTimeMachineApplication" />
+        <item itemvalue="Spring Boot.DiaryFileApplication" />
       </list>
     </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.28539.33" />
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.23892.409" />
+        <option value="bundled-js-predefined-d6986cc7102b-e03c56caf84a-JavaScript-IU-252.23892.409" />
       </set>
     </attachedChunks>
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="f808c6d7-aa71-4ad4-bd8e-7a02c2741024" name="Changes" comment="" />
-      <created>1774857701533</created>
+      <changelist id="fe337981-72bc-41d3-9f9c-16a8952a1ee8" name="Changes" comment="" />
+      <created>1782026759336</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1774857701533</updated>
-      <workItem from="1774857702921" duration="3266000" />
-      <workItem from="1774860981073" duration="2444000" />
-      <workItem from="1774864527553" duration="11106000" />
-      <workItem from="1774881521582" duration="13917000" />
-      <workItem from="1775141971616" duration="1306000" />
-      <workItem from="1775192715640" duration="76000" />
-      <workItem from="1775276006982" duration="1099000" />
-      <workItem from="1775396759030" duration="1075000" />
-      <workItem from="1775397853591" duration="2488000" />
-      <workItem from="1775401541754" duration="1229000" />
-      <workItem from="1775445568400" duration="8028000" />
-      <workItem from="1775454001196" duration="27675000" />
-      <workItem from="1777520671346" duration="8334000" />
-      <workItem from="1777533167929" duration="8180000" />
-      <workItem from="1778030442341" duration="34000" />
-      <workItem from="1778051664526" duration="1505000" />
-      <workItem from="1778117758822" duration="2237000" />
-      <workItem from="1778120019376" duration="910000" />
-      <workItem from="1778120950548" duration="6544000" />
-      <workItem from="1778206767099" duration="609000" />
-      <workItem from="1778207412723" duration="9943000" />
-      <workItem from="1778223360030" duration="1032000" />
-      <workItem from="1778224968431" duration="2815000" />
-      <workItem from="1778228777167" duration="1399000" />
-      <workItem from="1778233903407" duration="116000" />
-      <workItem from="1778249321383" duration="301000" />
-      <workItem from="1779438073150" duration="592000" />
-      <workItem from="1780034644496" duration="629000" />
-      <workItem from="1780036068136" duration="10163000" />
-      <workItem from="1780047317631" duration="1814000" />
-      <workItem from="1780105606558" duration="742000" />
-      <workItem from="1780207725520" duration="3963000" />
-      <workItem from="1780235391083" duration="657000" />
+      <updated>1782026759336</updated>
+      <workItem from="1782026760707" duration="8448000" />
+      <workItem from="1782036222332" duration="1650000" />
+      <workItem from="1782142201982" duration="1817000" />
     </task>
-    <task id="LOCAL-00001" summary="新增食谱功能">
-      <option name="closed" value="true" />
-      <created>1777537490504</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1777537490504</updated>
-    </task>
-    <task id="LOCAL-00002" summary="新增食谱功能">
-      <option name="closed" value="true" />
-      <created>1777538898200</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1777538898200</updated>
-    </task>
-    <task id="LOCAL-00003" summary="新增食谱功能">
-      <option name="closed" value="true" />
-      <created>1777538933470</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1777538933470</updated>
-    </task>
-    <task id="LOCAL-00004" summary="新增食谱功能">
-      <option name="closed" value="true" />
-      <created>1777540592381</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1777540592381</updated>
-    </task>
-    <task id="LOCAL-00005" summary="分页查询">
-      <option name="closed" value="true" />
-      <created>1778125928386</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1778125928386</updated>
-    </task>
-    <task id="LOCAL-00006" summary="分页查询">
-      <option name="closed" value="true" />
-      <created>1778206870002</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1778206870002</updated>
-    </task>
-    <task id="LOCAL-00007" summary="项目更新">
-      <option name="closed" value="true" />
-      <created>1778208024855</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1778208024855</updated>
-    </task>
-    <task id="LOCAL-00008" summary="项目更新">
-      <option name="closed" value="true" />
-      <created>1778208152276</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1778208152276</updated>
-    </task>
-    <task id="LOCAL-00009" summary="项目更新">
-      <option name="closed" value="true" />
-      <created>1778208290567</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1778208290567</updated>
-    </task>
-    <task id="LOCAL-00010" summary="stream流应用">
-      <option name="closed" value="true" />
-      <created>1778211802955</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1778211802955</updated>
-    </task>
-    <task id="LOCAL-00011" summary="优化返回值">
-      <option name="closed" value="true" />
-      <created>1778212061995</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1778212061995</updated>
-    </task>
-    <task id="LOCAL-00012" summary="优化返回值">
-      <option name="closed" value="true" />
-      <created>1778217381060</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1778217381060</updated>
-    </task>
-    <task id="LOCAL-00013" summary="增加非user请求的token校验">
-      <option name="closed" value="true" />
-      <created>1778219185829</created>
-      <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
-      <option name="project" value="LOCAL" />
-      <updated>1778219185829</updated>
-    </task>
-    <task id="LOCAL-00014" summary="增加非user请求的token校验">
-      <option name="closed" value="true" />
-      <created>1778220699526</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1778220699526</updated>
-    </task>
-    <task id="LOCAL-00015" summary="异常校验">
-      <option name="closed" value="true" />
-      <created>1778221384180</created>
-      <option name="number" value="00015" />
-      <option name="presentableId" value="LOCAL-00015" />
-      <option name="project" value="LOCAL" />
-      <updated>1778221384180</updated>
-    </task>
-    <task id="LOCAL-00016" summary="食谱相关代码">
-      <option name="closed" value="true" />
-      <created>1778227647862</created>
-      <option name="number" value="00016" />
-      <option name="presentableId" value="LOCAL-00016" />
-      <option name="project" value="LOCAL" />
-      <updated>1778227647862</updated>
-    </task>
-    <task id="LOCAL-00017" summary="模块">
-      <option name="closed" value="true" />
-      <created>1780038384283</created>
-      <option name="number" value="00017" />
-      <option name="presentableId" value="LOCAL-00017" />
-      <option name="project" value="LOCAL" />
-      <updated>1780038384283</updated>
-    </task>
-    <task id="LOCAL-00018" summary="模块">
-      <option name="closed" value="true" />
-      <created>1780038477890</created>
-      <option name="number" value="00018" />
-      <option name="presentableId" value="LOCAL-00018" />
-      <option name="project" value="LOCAL" />
-      <updated>1780038477890</updated>
-    </task>
-    <task id="LOCAL-00019" summary="模块">
-      <option name="closed" value="true" />
-      <created>1780038664518</created>
-      <option name="number" value="00019" />
-      <option name="presentableId" value="LOCAL-00019" />
-      <option name="project" value="LOCAL" />
-      <updated>1780038664519</updated>
-    </task>
-    <task id="LOCAL-00020" summary="模块">
-      <option name="closed" value="true" />
-      <created>1780038685418</created>
-      <option name="number" value="00020" />
-      <option name="presentableId" value="LOCAL-00020" />
-      <option name="project" value="LOCAL" />
-      <updated>1780038685418</updated>
-    </task>
-    <task id="LOCAL-00021" summary="模块">
-      <option name="closed" value="true" />
-      <created>1780038701697</created>
-      <option name="number" value="00021" />
-      <option name="presentableId" value="LOCAL-00021" />
-      <option name="project" value="LOCAL" />
-      <updated>1780038701697</updated>
-    </task>
-    <task id="LOCAL-00022" summary="饮食模块的增删改查">
-      <option name="closed" value="true" />
-      <created>1780046290957</created>
-      <option name="number" value="00022" />
-      <option name="presentableId" value="LOCAL-00022" />
-      <option name="project" value="LOCAL" />
-      <updated>1780046290957</updated>
-    </task>
-    <task id="LOCAL-00023" summary="规范建表">
-      <option name="closed" value="true" />
-      <created>1781241083474</created>
-      <option name="number" value="00023" />
-      <option name="presentableId" value="LOCAL-00023" />
-      <option name="project" value="LOCAL" />
-      <updated>1781241083475</updated>
-    </task>
-    <task id="LOCAL-00024" summary="完成图片上传与分类和卡片的添加">
-      <option name="closed" value="true" />
-      <created>1781254982334</created>
-      <option name="number" value="00024" />
-      <option name="presentableId" value="LOCAL-00024" />
-      <option name="project" value="LOCAL" />
-      <updated>1781254982334</updated>
-    </task>
-    <task id="LOCAL-00025" summary="完成图片添加数据库功能">
-      <option name="closed" value="true" />
-      <created>1781257305445</created>
-      <option name="number" value="00025" />
-      <option name="presentableId" value="LOCAL-00025" />
-      <option name="project" value="LOCAL" />
-      <updated>1781257305445</updated>
-    </task>
-    <task id="LOCAL-00026" summary="完成图片添加数据库功能">
-      <option name="closed" value="true" />
-      <created>1781257980959</created>
-      <option name="number" value="00026" />
-      <option name="presentableId" value="LOCAL-00026" />
-      <option name="project" value="LOCAL" />
-      <updated>1781257980959</updated>
-    </task>
-    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
-  </component>
-  <component name="Vcs.Log.Tabs.Properties">
-    <option name="TAB_STATES">
-      <map>
-        <entry key="MAIN">
-          <value>
-            <State />
-          </value>
-        </entry>
-      </map>
-    </option>
-  </component>
-  <component name="VcsManagerConfiguration">
-    <MESSAGE value="新增食谱功能" />
-    <MESSAGE value="分页查询" />
-    <MESSAGE value="项目更新" />
-    <MESSAGE value="stream流应用" />
-    <MESSAGE value="优化返回值" />
-    <MESSAGE value="增加非user请求的token校验" />
-    <MESSAGE value="异常校验" />
-    <MESSAGE value="食谱相关代码" />
-    <MESSAGE value="模块" />
-    <MESSAGE value="饮食模块的增删改查" />
-    <MESSAGE value="规范建表" />
-    <MESSAGE value="完成图片上传与分类和卡片的添加" />
-    <MESSAGE value="完成图片添加数据库功能" />
-    <option name="LAST_COMMIT_MESSAGE" value="完成图片添加数据库功能" />
-  </component>
-  <component name="github-copilot-workspace">
-    <instructionFileLocations>
-      <option value=".github/instructions" />
-    </instructionFileLocations>
-    <promptFileLocations>
-      <option value=".github/prompts" />
-    </promptFileLocations>
   </component>
 </project>

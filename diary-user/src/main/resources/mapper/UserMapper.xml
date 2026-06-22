@@ -41,4 +41,29 @@
     <select id="selectByUserId" resultMap="UserResultMap">
         select <include refid="Base_Column_List"/> from user where user_id = #{userId} and status = '1000'
     </select>
+
+    <select id="selectRoleCodesByUserId" resultType="java.lang.String">
+        select r.role_code
+        from user_role ur
+        inner join role r on r.role_id = ur.role_id
+        where ur.user_id = #{userId}
+          and r.status = 1000
+    </select>
+
+    <select id="selectRoleIdByCode" resultType="java.lang.Long">
+        select role_id from role where role_code = #{roleCode} and status = 1000
+    </select>
+
+    <insert id="insertUserRole">
+        insert into user_role (id, user_id, role_id)
+        values (#{id}, #{userId}, #{roleId})
+    </insert>
+
+    <update id="disableUserByUsername">
+        update user set status = 0 where username = #{username}
+    </update>
+
+    <select id="selectUsers" resultMap="UserResultMap">
+        select <include refid="Base_Column_List"/> from user where status = '1000' order by create_time desc
+    </select>
 </mapper>

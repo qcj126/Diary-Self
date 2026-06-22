@@ -38,7 +38,12 @@ public class FileController {
     private QueryUrlService queryUrlService;
 
     @PostMapping("/upload/images")
-    public ApiResponse<List<Long>> upload(@RequestParam("files") List<MultipartFile> files, @RequestBody ImageDTO imageDTO) {
+    public ApiResponse<List<Long>> upload(@RequestParam("files") List<MultipartFile> files,
+                                          @RequestParam("code") Integer code,
+                                          @RequestParam("userId") Long userId) {
+        ImageDTO imageDTO = new ImageDTO();
+        imageDTO.setCode(code);
+        imageDTO.setUserId(userId);
         // 直接先插入数据
         List<Long> result = uploadService.addImagesToDb(files, imageDTO);
         // 异步上传图片到OSS成功后，发送消息给mq

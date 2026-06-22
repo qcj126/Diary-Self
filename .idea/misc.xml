@@ -6,29 +6,8 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/pom.xml" />
-        <option value="$PROJECT_DIR$/diary-xxljob/pom.xml" />
-        <option value="$PROJECT_DIR$/xxl-job-admin-master/pom.xml" />
-        <option value="$PROJECT_DIR$/xxl-job-admin/xxl-job-admin/pom.xml" />
-        <option value="$PROJECT_DIR$/xxl-job-admin/xxl-job-core/pom.xml" />
-        <option value="$PROJECT_DIR$/xxl-job-admin/xxl-job-executor-samples/pom.xml" />
-        <option value="$PROJECT_DIR$/xxl-job-admin/pom.xml" />
-        <option value="$PROJECT_DIR$/diary-timedjob/pom.xml" />
-        <option value="$PROJECT_DIR$/diary-diet/pom.xml" />
-        <option value="$PROJECT_DIR$/diary-xxljob/xxl-job-admin/pom.xml" />
-        <option value="$PROJECT_DIR$/diary-xxljob/xxl-job-core/pom.xml" />
-        <option value="$PROJECT_DIR$/diary-xxljob/xxl-job-executor-samples/pom.xml" />
       </list>
     </option>
-    <option name="ignoredFiles">
-      <set>
-        <option value="$PROJECT_DIR$/diary-dao/pom.xml" />
-        <option value="$PROJECT_DIR$/xxl-job-admin-master/pom.xml" />
-        <option value="$PROJECT_DIR$/xxl-job-admin-master/xxl-job-core/pom.xml" />
-        <option value="$PROJECT_DIR$/xxl-job-admin-master/xxl-job-executor-samples/pom.xml" />
-      </set>
-    </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_21" project-jdk-name="21" project-jdk-type="JavaSDK">
-    <output url="file://$PROJECT_DIR$/out" />
-  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_21" default="true" project-jdk-name="21" project-jdk-type="JavaSDK" />
 </project>

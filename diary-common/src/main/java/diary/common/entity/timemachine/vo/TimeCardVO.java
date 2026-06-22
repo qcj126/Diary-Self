@@ -7,17 +7,13 @@ import java.util.Date;
 @Data
 public class TimeCardVO {
     private Long id;
-    private String cardName;
-    private String cardTitle;
-    private String description;
-    private Long categoryId;
-    private Integer categoryNum;
-    private Integer status;
-    private Integer sort;
-    private Date createTime;
-    private String createBy;
-    private Date updateTime;
-    private String updateBy;
     private Long userId;
     private Long imageId;
+    private Long categoryId;
+    private String cardTitle;
+    private String cardContent;
+    private Date recordTime;
+    private Integer deleted;
+    private Date createTime;
+    private Date updateTime;
 }

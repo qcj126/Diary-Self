@@ -66,7 +66,7 @@ public class UploadServiceImpl implements UploadService {
 
                 // 查看同一图片所属类别下是否有相同名称的图片
                 Integer isExist = imagMapper.selectImageByTypeAndName(type, originalFilename);
-                if (isExist > 0) {
+                if (isExist != null && isExist > 0) {
                     failedFiles.add(originalFilename + ": 图片已存在");
                     continue;
                 }
@@ -80,6 +80,7 @@ public class UploadServiceImpl implements UploadService {
                 image.setMimeType(file.getContentType());
                 image.setType(TypeEnum.getCode(imageDTO.getCode()));
                 image.setStatus(PhotoStatusConst.PHOTO_STATUS_PROCESSING);
+                image.setUrl("uploading...");
                 imageList.add(image);
             } catch (Exception e) {
                 log.error("处理文件 {} 时发生异常", file.getOriginalFilename(), e);

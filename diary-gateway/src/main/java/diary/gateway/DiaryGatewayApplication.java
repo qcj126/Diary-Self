@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"diary.utils.jwt"})
+@ComponentScan(basePackages = {"diary.gateway", "diary.utils.jwt"})
 public class DiaryGatewayApplication {
 
     public static void main(String[] args) {
