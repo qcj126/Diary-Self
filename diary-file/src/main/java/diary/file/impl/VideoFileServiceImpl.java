@@ -122,12 +122,8 @@ public class VideoFileServiceImpl implements VideoFileService {
         // 上传文件到OSS
         ossClient.putObject(bucketName, fileName, file.getInputStream());
 
-        // 生成预签名URL，有效期1小时
-        Date expiration = new Date(System.currentTimeMillis() + 3600 * 1000);
-        GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(bucketName, fileName);
-        request.setExpiration(expiration);
-        request.setMethod(com.aliyun.oss.HttpMethod.GET);
-        return ossClient.generatePresignedUrl(request).toString();
+        // 返回 object_key 而非签名 URL
+        return fileName;
     }
 
     /**
@@ -178,8 +174,8 @@ public class VideoFileServiceImpl implements VideoFileService {
                     bucketName, fileName, uploadId, partETags);
             ossClient.completeMultipartUpload(completeRequest);
 
-            // 5. 生成预签名URL
-            return ossUtil.getSignedUrlByFileName(fileName);
+            // 5. 返回 object_key 而非签名 URL
+            return fileName;
         } catch (Exception e) {
             // 如果上传失败，取消分片上传
             if (uploadId != null) {

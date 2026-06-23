@@ -26,11 +26,11 @@ public class MqConsumerServiceImpl implements MqConsumerService {
     public void handleUploadSuccess(OssUploadSuccessMsg message, Message amqpMessage, Channel channel) {
         long deliveryTag = amqpMessage.getMessageProperties().getDeliveryTag();
         Long id = message.getId();
-        String ossUrl = message.getOssUrl();
+        String objectKey = message.getObjectKey();
         try {
-            log.info("收到上传成功消息，recordId: {}, ossUrl: {}", id, ossUrl);
-            // 更新数据库记录
-            Integer count = imageMapper.updateImageStatusById(id, ossUrl, PhotoStatusConst.PHOTO_STATUS_SUCCESS);
+            log.info("收到上传成功消息，recordId: {}, objectKey: {}", id, objectKey);
+            // 更新数据库记录，存储 object_key
+            Integer count = imageMapper.updateImageStatusById(id, objectKey, PhotoStatusConst.PHOTO_STATUS_SUCCESS);
             if (count > 0) {
                 log.info("数据库记录更新成功，recordId: {}", id);
                 // 手动确认消息处理成功
@@ -68,10 +68,10 @@ public class MqConsumerServiceImpl implements MqConsumerService {
 
             // 将数据库记录标记为 FAILED
             if (message.getId() != null) {
-                String ossUrl = message.getOssUrl();
-                log.info("收到更新数据库失败的消息，recordId: {}, ossUrl: {}", id, ossUrl);
+                String objectKey = message.getObjectKey();
+                log.info("收到更新数据库失败的消息，recordId: {}, objectKey: {}", id, objectKey);
                 // 更新数据库记录
-                Integer count = imageMapper.updateImageStatusById(id, ossUrl, PhotoStatusConst.PHOTO_STATUS_FAILED);
+                Integer count = imageMapper.updateImageStatusById(id, objectKey, PhotoStatusConst.PHOTO_STATUS_FAILED);
                 if (count > 0) {
                     log.info("数据库记录更新成功，recordId: {}", id);
                 } else {

@@ -53,7 +53,8 @@ public class FileController {
 
     @PostMapping("/query/images/urls")
     public ApiResponse<List<ImageVO>> queryImageUrls(@RequestBody List<Long> imageIds) {
-        // 根据imageIds查询图片URL
+        // 根据 imageIds 查询图片，并动态生成签名 URL（有效期5分钟）
+        // 前端每次加载日记时都应调用此接口获取最新的签名 URL
         List<ImageVO> result = queryUrlService.queryImageUrls(imageIds);
         return ApiResponse.success(result);
     }

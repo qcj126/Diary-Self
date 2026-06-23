@@ -7,6 +7,7 @@
         <id property="userId" column="user_id"/>
         <id property="fileSize" column="file_size"/>
         <id property="url" column="url"/>
+        <id property="objectKey" column="object_key"/>
         <id property="originalName" column="original_name"/>
         <id property="mimeType" column="mime_type"/>
         <id property="type" column="type"/>
@@ -16,7 +17,7 @@
         <id property="updateTime" column="update_time"/>
     </resultMap>
     <select id="selectImagesByIds" resultMap="ImageResultMap">
-        SELECT id, url FROM image WHERE id IN
+        SELECT id, object_key FROM image WHERE id IN
         <foreach item="id" collection="imageIds" separator="," open="(" close=")">
             #{id}
         </foreach>
@@ -24,7 +25,7 @@
     </select>
 
     <update id="updateImageStatusById">
-        update image set url = #{ossUrl}, status = #{status} where id = #{id}
+        update image set object_key = #{ossUrl}, status = #{status} where id = #{id}
     </update>
 
     <select id="selectImageByTypeAndName" resultType="java.lang.Integer">

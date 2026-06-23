@@ -98,16 +98,9 @@ public class AsyncServiceImpl implements AsyncService {
                 // 1. 上传文件到 OSS（V4 客户端会自动使用 V4 签名）
                 ossClient.putObject(bucketName, fileName, file.getInputStream());
 
-                // 2. 生成 V4 预签名 URL，有效期设为 1 小时
-                Date expiration = new Date(System.currentTimeMillis() + 3600 * 1000);
-                GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(bucketName, fileName);
-                request.setExpiration(expiration);
-                request.setMethod(HttpMethod.GET);
-                String ossUrl = ossClient.generatePresignedUrl(request).toString();
-
-                // 构建消息对象
+                // 2. 构建消息对象，存储 object_key 而非签名 URL
                 OssUploadSuccessMsg msg = new OssUploadSuccessMsg(
-                        imageId, ossUrl, file.getOriginalFilename(), System.currentTimeMillis()
+                        imageId, fileName, file.getOriginalFilename(), System.currentTimeMillis()
                 );
 
                 // 发送消息到rabbitmq
@@ -251,12 +244,8 @@ public class AsyncServiceImpl implements AsyncService {
         // 上传文件到OSS
         ossClient.putObject(bucketName, fileName, file.getInputStream());
 
-        // 生成预签名URL，有效期1小时
-        Date expiration = new Date(System.currentTimeMillis() + 3600 * 1000);
-        GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(bucketName, fileName);
-        request.setExpiration(expiration);
-        request.setMethod(com.aliyun.oss.HttpMethod.GET);
-        return ossClient.generatePresignedUrl(request).toString();
+        // 返回 object_key 而非签名 URL
+        return fileName;
     }
 
     /**
@@ -307,8 +296,8 @@ public class AsyncServiceImpl implements AsyncService {
                     bucketName, fileName, uploadId, partETags);
             ossClient.completeMultipartUpload(completeRequest);
 
-            // 5. 生成预签名URL
-            return ossUtil.getSignedUrlByFileName(fileName);
+            // 5. 返回 object_key 而非签名 URL
+            return fileName;
         } catch (Exception e) {
             // 如果上传失败，取消分片上传
             if (uploadId != null) {

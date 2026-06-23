@@ -10,6 +10,9 @@ import org.springframework.stereotype.Component;
 
 import java.net.URI;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 @Slf4j
@@ -77,12 +80,33 @@ public class OssUtil {
     }
 
     private String generateSignedUrl(String key) {
+        // 生成签名URL，有效期5分钟
         Date expiration = new Date(System.currentTimeMillis() + 5 * 60 * 1000);
         GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(bucketName, key);
         request.setExpiration(expiration);
         request.setMethod(HttpMethod.GET);
 
         return ossClient.generatePresignedUrl(request).toString();
+    }
+
+    /**
+     * 批量生成签名URL
+     * @param objectKeys OSS对象键列表
+     * @return Map< objectKey, signedUrl >
+     */
+    public Map<String, String> batchGenerateSignedUrls(List<String> objectKeys) {
+        Map<String, String> urlMap = new HashMap<>();
+        for (String objectKey : objectKeys) {
+            try {
+                String signedUrl = generateSignedUrl(objectKey);
+                urlMap.put(objectKey, signedUrl);
+            } catch (Exception e) {
+                log.error("生成签名URL失败, objectKey: {}", objectKey, e);
+                // 失败时返回null或空字符串，前端可以识别
+                urlMap.put(objectKey, null);
+            }
+        }
+        return urlMap;
     }
 
 }

@@ -13,7 +13,9 @@ public class ImagePO {
     @NotNull
     private Long fileSize;          // 文件大小（字节）
     @NotNull
-    private String url;               // 图片访问URL
+    private String url;               // 图片访问URL（签名URL，前端展示用）
+    @NotNull
+    private String objectKey;         // OSS对象键（文件路径，用于生成签名URL）
     @NotNull
     private String originalName;      // 原始文件名
     @NotNull
