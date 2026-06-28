@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"diary.common", "diary.dao", "diary.config", "diary.recipe", "diary.utils"})
+@ComponentScan(basePackages = {"diary.common", "diary.config", "diary.recipe", "diary.utils"})
 public class DiaryRecipeApplication {
 
     public static void main(String[] args) {

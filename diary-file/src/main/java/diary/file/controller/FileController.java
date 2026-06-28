@@ -16,6 +16,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -24,9 +29,6 @@ import java.util.Map;
 public class FileController {
     @Resource
     private UploadService uploadService;
-
-    @Resource
-    private AsyncService asyncService;
 
     @Resource
     private DownloadService downloadService;
@@ -46,8 +48,7 @@ public class FileController {
         imageDTO.setUserId(userId);
         // 直接先插入数据
         List<Long> result = uploadService.addImagesToDb(files, imageDTO);
-        // 异步上传图片到OSS成功后，发送消息给mq
-        asyncService.uploadAndSendMsgAsync(result, files, imageDTO);
+
         return ApiResponse.success(result);
     }
 
@@ -56,6 +57,13 @@ public class FileController {
         // 根据 imageIds 查询图片，并动态生成签名 URL（有效期5分钟）
         // 前端每次加载日记时都应调用此接口获取最新的签名 URL
         List<ImageVO> result = queryUrlService.queryImageUrls(imageIds);
+        return ApiResponse.success(result);
+    }
+
+    @PostMapping("/query/images/carousel")
+    public ApiResponse<List<ImageVO>> queryCarouselImages() {
+        // 查询轮播图图片  规则：查看每个分类的最新2张图片
+        List<ImageVO> result = queryUrlService.queryCarouselImages();
         return ApiResponse.success(result);
     }
 

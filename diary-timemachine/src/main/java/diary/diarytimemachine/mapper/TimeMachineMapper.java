@@ -22,4 +22,6 @@ public interface TimeMachineMapper {
     Integer selectSameCard(Long categoryId, String cardTitle);
 
     IPage<TimeCardVO> selectCardPage(IPage<TimeCardVO> page);
+
+    void logicallyDeleteCard(Long id);
 }

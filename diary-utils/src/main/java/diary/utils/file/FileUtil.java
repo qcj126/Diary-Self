@@ -2,6 +2,14 @@ package diary.utils.file;
 
 import diary.common.exception.CustomException;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 import static diary.common.consts.FileTypeConst.BEAN_MATCHING_IMAGE;
 import static diary.common.consts.FileTypeConst.BEAN_MATCHING_IMAGE_PATH;
@@ -43,5 +51,26 @@ public class FileUtil {
             case WALK_IMAGE -> WALK_IMAGE_PATH + System.currentTimeMillis() + originalFilename;
             default -> throw new CustomException("未知图片类型");
         };
+    }
+
+    /**
+     * 将上传的文件复制到临时文件，为异步上传文件设计
+     *
+     * @param files 文件列表
+     * @return 临时文件列表
+     */
+    public List<File> copyToTempFiles(List<MultipartFile> files) {
+        List<File> tempFiles = new ArrayList<>();
+        for (MultipartFile file : files) {
+            try {
+                Path tempFile = Files.createTempFile("diary-image-upload-", ".tmp");
+                file.transferTo(tempFile);
+                tempFiles.add(tempFile.toFile());
+            } catch (IOException e) {
+                tempFiles.forEach(File::delete);
+                throw new RuntimeException("复制上传临时文件失败", e);
+            }
+        }
+        return tempFiles;
     }
 }

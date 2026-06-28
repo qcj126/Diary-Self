@@ -7,4 +7,6 @@ import java.util.List;
 public interface QueryUrlService {
 
     List<ImageVO> queryImageUrls(List<Long> imageIds);
+
+    List<ImageVO> queryCarouselImages();
 }

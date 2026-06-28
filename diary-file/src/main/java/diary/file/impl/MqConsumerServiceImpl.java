@@ -5,7 +5,7 @@ import diary.common.entity.file.po.OssUploadSuccessMsg;
 import diary.common.consts.PhotoStatusConst;
 import diary.config.mqconfig.RabbitMqConfig;
 import diary.file.mapper.ImageMapper;
-import diary.file.service.MqConsumerService;
+import diary.file.service.mqservice.MqConsumerService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;

@@ -4,6 +4,7 @@ import diary.common.entity.image.dto.ImageDTO;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.Image;
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -13,9 +14,9 @@ public interface AsyncService {
      * 异步上传图片到OSS并发送消息
      *
      * @param result 数据库插入结果
-     * @param files  文件列表
+     * @param files  已复制到应用临时目录的文件列表
      */
-    void uploadAndSendMsgAsync(List<Long> result, List<MultipartFile> files, ImageDTO imageDTO);
+    void uploadAndSendMsgAsync(List<Long> result, List<File> files, List<String> originalNames, ImageDTO imageDTO);
 
     /**
      * 异步下载单个图片

@@ -8,15 +8,18 @@ import diary.common.enums.typeenum.TypeEnum;
 import diary.common.exception.ParamIllegalException;
 import diary.file.mapper.ImageMapper;
 import diary.file.service.RedisService;
+import diary.file.service.asyncservice.AsyncService;
 import diary.file.service.uploadservice.UploadService;
 
 import diary.utils.commonutil.MyUtils;
+import diary.utils.file.FileUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +33,12 @@ import static diary.utils.commonutil.MyUtils.isFileEmpty;
 public class UploadServiceImpl implements UploadService {
     @Resource
     private ImageMapper imagMapper;
+
+    @Resource
+    private FileUtil fileUtil;
+
+    @Resource
+    private AsyncService asyncService;
 
     @Override
     public List<Long> addImagesToDb(List<MultipartFile> files, ImageDTO imageDTO) {
@@ -62,7 +71,9 @@ public class UploadServiceImpl implements UploadService {
                 }
 
                 Integer type = TypeEnum.getCode(imageDTO.getCode());
+                String typeName = TypeEnum.getType(imageDTO.getCode());
                 String originalFilename = file.getOriginalFilename();
+                String objectKey = fileUtil.getFileName(typeName, originalFilename);
 
                 // 查看同一图片所属类别下是否有相同名称的图片
                 Integer isExist = imagMapper.selectImageByTypeAndName(type, originalFilename);
@@ -78,9 +89,9 @@ public class UploadServiceImpl implements UploadService {
                 image.setFileSize(file.getSize());
                 image.setOriginalName(file.getOriginalFilename());
                 image.setMimeType(file.getContentType());
-                image.setType(TypeEnum.getCode(imageDTO.getCode()));
+                image.setType(type);
                 image.setStatus(PhotoStatusConst.PHOTO_STATUS_PROCESSING);
-                image.setUrl("uploading...");
+                image.setObjectKey(objectKey);
                 imageList.add(image);
             } catch (Exception e) {
                 log.error("处理文件 {} 时发生异常", file.getOriginalFilename(), e);
@@ -129,6 +140,12 @@ public class UploadServiceImpl implements UploadService {
         if (imageIds.isEmpty()) {
             throw new ParamIllegalException("所有文件均处理失败");
         }
+        // 异步上传图片到OSS成功后，发送消息给mq
+        List<File> tempFiles = fileUtil.copyToTempFiles(files);
+        List<String> originalNames = files.stream()
+                .map(MultipartFile::getOriginalFilename)
+                .toList();
+        asyncService.uploadAndSendMsgAsync(imageIds, tempFiles, originalNames, imageDTO);
         return imageIds;
     }
 }

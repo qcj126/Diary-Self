@@ -1,10 +1,8 @@
 package diary.file.impl.asyncserviceImpl;
 
-import com.aliyun.oss.HttpMethod;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.model.AbortMultipartUploadRequest;
 import com.aliyun.oss.model.CompleteMultipartUploadRequest;
-import com.aliyun.oss.model.GeneratePresignedUrlRequest;
 import com.aliyun.oss.model.InitiateMultipartUploadRequest;
 import com.aliyun.oss.model.InitiateMultipartUploadResult;
 import com.aliyun.oss.model.PartETag;
@@ -12,11 +10,10 @@ import com.aliyun.oss.model.UploadPartRequest;
 import com.aliyun.oss.model.UploadPartResult;
 import diary.common.entity.file.po.OssUploadSuccessMsg;
 import diary.common.entity.image.dto.ImageDTO;
-import diary.common.enums.typeenum.TypeEnum;
-import diary.common.exception.CustomException;
+import diary.common.entity.image.po.ImagePO;
 import diary.common.exception.ParamIllegalException;
 import diary.config.mqconfig.RabbitMqConfig;
-import diary.utils.file.FileUtil;
+import diary.file.mapper.ImageMapper;
 import diary.utils.OSS.OssUtil;
 import diary.file.service.asyncservice.AsyncService;
 import jakarta.annotation.Resource;
@@ -46,6 +43,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -72,11 +71,11 @@ public class AsyncServiceImpl implements AsyncService {
     private int timeout;
 
     @Resource
-    private FileUtil fileUtil;
+    private ImageMapper imageMapper;
 
     @Async("ossUploadExecutor")
     @Override
-    public void uploadAndSendMsgAsync(List<Long> result, List<MultipartFile> files, ImageDTO  imageDTO) {
+    public void uploadAndSendMsgAsync(List<Long> result, List<File> files, List<String> originalNames, ImageDTO imageDTO) {
         if (imageDTO.getCode() == null) {
             throw new ParamIllegalException("code 不能为空");
         }
@@ -84,23 +83,29 @@ public class AsyncServiceImpl implements AsyncService {
         int successCount = 0;
         int failCount = 0;
         List<String> failedFiles = new ArrayList<>();
+        Map<Long, ImagePO> imageMap = imageMapper.selectImagesForUploadByIds(result).stream()
+                .collect(Collectors.toMap(ImagePO::getId, Function.identity()));
+        int uploadCount = Math.min(result.size(), files.size());
 
         // 遍历文件列表，逐个上传
-        for (int i = 0; i < files.size(); i++) {
-            MultipartFile file = files.get(i);
-            Long imageId = (i < result.size()) ? result.get(i) : null;
+        for (int i = 0; i < uploadCount; i++) {
+            File file = files.get(i);
+            String originalName = (i < originalNames.size()) ? originalNames.get(i) : file.getName();
+            Long imageId = result.get(i);
 
             try {
-                // 生成唯一文件名，避免同名覆盖
-                String type = TypeEnum.getType(imageDTO.getCode());
-                String fileName = fileUtil.getFileName(type, file.getOriginalFilename());
+                ImagePO imagePO = imageMap.get(imageId);
+                if (imagePO == null || imagePO.getObjectKey() == null) {
+                    throw new ParamIllegalException("object_key 不能为空");
+                }
+                String fileName = imagePO.getObjectKey();
 
                 // 1. 上传文件到 OSS（V4 客户端会自动使用 V4 签名）
-                ossClient.putObject(bucketName, fileName, file.getInputStream());
+                ossClient.putObject(bucketName, fileName, file);
 
                 // 2. 构建消息对象，存储 object_key 而非签名 URL
                 OssUploadSuccessMsg msg = new OssUploadSuccessMsg(
-                        imageId, fileName, file.getOriginalFilename(), System.currentTimeMillis()
+                        imageId, fileName, originalName, System.currentTimeMillis()
                 );
 
                 // 发送消息到rabbitmq
@@ -113,17 +118,22 @@ public class AsyncServiceImpl implements AsyncService {
                         new CorrelationData(correlationId)
                 );
                 log.info("OSS 上传成功，消息已发送，photoId: {}, fileName: {}, correlationId: {}",
-                        imageId, file.getOriginalFilename(), correlationId);
+                        imageId, originalName, correlationId);
                 successCount++;
-            } catch (IOException e) {
-                log.error("OSS 上传失败，photoId: {}, fileName: {}", imageId, file.getOriginalFilename(), e);
-                failCount++;
-                failedFiles.add(file.getOriginalFilename() + ": " + e.getMessage());
-                // 可在此发送上传失败消息到另一个队列
             } catch (Exception e) {
-                log.error("处理文件异常，photoId: {}, fileName: {}", imageId, file.getOriginalFilename(), e);
+                log.error("处理文件异常，photoId: {}, fileName: {}", imageId, originalName, e);
                 failCount++;
-                failedFiles.add(file.getOriginalFilename() + ": " + e.getMessage());
+                failedFiles.add(originalName + ": " + e.getMessage());
+            } finally {
+                if (file.exists() && !file.delete()) {
+                    log.warn("删除上传临时文件失败: {}", file.getAbsolutePath());
+                }
+            }
+        }
+        for (int i = uploadCount; i < files.size(); i++) {
+            File file = files.get(i);
+            if (file.exists() && !file.delete()) {
+                log.warn("删除未上传临时文件失败: {}", file.getAbsolutePath());
             }
         }
 

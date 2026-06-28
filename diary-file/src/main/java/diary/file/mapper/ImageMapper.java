@@ -12,7 +12,11 @@ public interface ImageMapper {
 
     Integer selectImageByTypeAndName(Integer type, String originalFilename);
 
-    Integer updateImageStatusById(Long id, String ossUrl, int status);
+    Integer updateImageStatusById(Long id, String objectKey, int status);
 
-    List<ImagePO> selectImagesByIds(List<Long> imageIds);
+    ImagePO selectImagesById(Long id);
+
+    List<ImagePO> selectImagesForUploadByIds(@Param("imageIds") List<Long> imageIds);
+
+    List<ImagePO> selectLatestTwoImagesForCarousel();
 }

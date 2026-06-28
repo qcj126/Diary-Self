@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class TimeMachineDeleteServiceImpl implements TimeMachineDeleteService {
+    @Resource
+    private TimeMachineMapper timeMachineMapper;
 
     @Override
     public String categoryDelete(TimeCategoryDTO categoryDTO) {
@@ -24,6 +26,7 @@ public class TimeMachineDeleteServiceImpl implements TimeMachineDeleteService {
 
     @Override
     public String cardDelete(TimeCardDTO cardDTO) {
+        timeMachineMapper.logicallyDeleteCard(cardDTO.getId());
         return "";
     }
 }

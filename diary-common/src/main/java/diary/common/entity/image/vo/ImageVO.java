@@ -1,5 +1,6 @@
 package diary.common.entity.image.vo;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;

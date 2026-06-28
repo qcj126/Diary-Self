@@ -26,6 +26,7 @@
         <module>diary-xxljob</module>
         <module>diary-timemachine</module>
         <module>diary-diet</module>
+        <module>diary-goal</module>
     </modules>
     
     <properties>

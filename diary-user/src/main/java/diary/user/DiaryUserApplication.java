@@ -7,7 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 @Slf4j
 @SpringBootApplication
-@ComponentScan(basePackages = {"diary.common", "diary.dao", "diary.config", "diary.user", "diary.utils"})
+@ComponentScan(basePackages = {"diary.common", "diary.config", "diary.user", "diary.utils"})
 public class DiaryUserApplication {
     public static void main(String[] args) {
         SpringApplication.run(DiaryUserApplication.class, args);

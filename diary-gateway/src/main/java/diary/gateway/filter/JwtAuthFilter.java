@@ -1,6 +1,7 @@
 package diary.gateway.filter;
 
 import diary.common.consts.RedisKeyConst;
+import diary.gateway.config.AuthProperties;
 import diary.utils.jwt.JwtUtil;
 import jakarta.annotation.Resource;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -26,15 +27,8 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
     @Resource
     private ReactiveStringRedisTemplate reactiveStringRedisTemplate;
 
-    private static final List<String> EXCLUDE_PATHS = List.of(
-            "/user/login",
-            "/user/register",
-            "/user/verifycode",
-            "/user/resetPw",
-            "/user/refresh",
-            "/actuator",
-            "/favicon.ico"
-    );
+    @Resource
+    private AuthProperties authProperties;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -91,7 +85,7 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
     }
 
     private boolean shouldSkipAuth(String path) {
-        return EXCLUDE_PATHS.stream().anyMatch(excludePath ->
+        return authProperties.getExcludePaths().stream().anyMatch(excludePath ->
                 path.equals(excludePath) || path.startsWith(excludePath + "/"));
     }
 

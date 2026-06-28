@@ -6,7 +6,6 @@
         <id property="id" column="id"/>
         <id property="userId" column="user_id"/>
         <id property="fileSize" column="file_size"/>
-        <id property="url" column="url"/>
         <id property="objectKey" column="object_key"/>
         <id property="originalName" column="original_name"/>
         <id property="mimeType" column="mime_type"/>
@@ -16,16 +15,21 @@
         <id property="createTime" column="create_time"/>
         <id property="updateTime" column="update_time"/>
     </resultMap>
-    <select id="selectImagesByIds" resultMap="ImageResultMap">
+    <select id="selectImagesById" resultMap="ImageResultMap">
+        SELECT id, object_key FROM image WHERE id = #{id}
+        and deleted = 0 and status = 1000
+    </select>
+
+    <select id="selectImagesForUploadByIds" resultMap="ImageResultMap">
         SELECT id, object_key FROM image WHERE id IN
         <foreach item="id" collection="imageIds" separator="," open="(" close=")">
             #{id}
         </foreach>
-        and deleted = 0 and status = 1000
+        and deleted = 0
     </select>
 
     <update id="updateImageStatusById">
-        update image set object_key = #{ossUrl}, status = #{status} where id = #{id}
+        update image set object_key = #{objectKey}, status = #{status} where id = #{id}
     </update>
 
     <select id="selectImageByTypeAndName" resultType="java.lang.Integer">
@@ -38,7 +42,7 @@
             <if test="imageList[0].id != null">id,</if>
             <if test="imageList[0].userId != null">user_id,</if>
             <if test="imageList[0].fileSize != null">file_size,</if>
-            <if test="imageList[0].url != null">url,</if>
+            <if test="imageList[0].objectKey != null">object_key,</if>
             <if test="imageList[0].originalName != null">original_name,</if>
             <if test="imageList[0].mimeType != null">mime_type,</if>
             <if test="imageList[0].type != null">type,</if>
@@ -53,7 +57,7 @@
                 <if test="item.id != null">#{item.id},</if>
                 <if test="item.userId != null">#{item.userId},</if>
                 <if test="item.fileSize != null">#{item.fileSize},</if>
-                <if test="item.url != null">#{item.url},</if>
+                <if test="item.objectKey != null">#{item.objectKey},</if>
                 <if test="item.originalName != null">#{item.originalName},</if>
                 <if test="item.mimeType != null">#{item.mimeType},</if>
                 <if test="item.type != null">#{item.type},</if>
@@ -64,4 +68,21 @@
             </trim>
         </foreach>
     </insert>
+
+    <select id="selectLatestTwoImagesForCarousel" resultMap="ImageResultMap">
+        WITH ranked_images AS (
+            SELECT
+                i.id, i.user_id, i.original_name, i.type, c.category_id,
+                ROW_NUMBER() OVER (
+            PARTITION BY c.category_id
+            ORDER BY i.create_time DESC, i.id DESC
+        ) AS rn
+            FROM image i INNER JOIN time_card c ON i.id = c.image_id
+        )
+        SELECT
+            ri.id
+        FROM ranked_images ri
+                 INNER JOIN time_category cat ON ri.category_id = cat.id
+        WHERE ri.rn in (1, 2)
+    </select>
 </mapper>

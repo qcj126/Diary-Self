@@ -32,7 +32,7 @@ public class OssUtil {
             // 如果传入的是完整的OSS URL，提取object key
             String objectKey = extractObjectKeyFromUrl(ossUrl);
 
-            // 生成签名URL，有效期5分钟
+            // 生成签名URL，有效期10分钟
             String signedUrl = generateSignedUrl(objectKey);
             log.debug("生成签名URL成功，objectKey: {}", objectKey);
             return signedUrl;
@@ -69,7 +69,7 @@ public class OssUtil {
 
     public String getSignedUrlByFileName(String fileName) {
         try {
-            // 生成签名URL，有效期5分钟
+            // 生成签名URL，有效期10分钟
             String signedUrl = generateSignedUrl(fileName);
             log.debug("生成签名URL成功，fileName: {}", fileName);
             return signedUrl;
@@ -80,8 +80,8 @@ public class OssUtil {
     }
 
     private String generateSignedUrl(String key) {
-        // 生成签名URL，有效期5分钟
-        Date expiration = new Date(System.currentTimeMillis() + 5 * 60 * 1000);
+        // 生成签名URL，有效期10分钟
+        Date expiration = new Date(System.currentTimeMillis() + 10 * 60 * 1000);
         GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(bucketName, key);
         request.setExpiration(expiration);
         request.setMethod(HttpMethod.GET);
@@ -90,21 +90,22 @@ public class OssUtil {
     }
 
     /**
-     * 批量生成签名URL
-     * @param objectKeys OSS对象键列表
+     * 生成签名URL
+     *
+     * @param objectKey OSS对象键
+     * @param imageId
      * @return Map< objectKey, signedUrl >
      */
-    public Map<String, String> batchGenerateSignedUrls(List<String> objectKeys) {
-        Map<String, String> urlMap = new HashMap<>();
-        for (String objectKey : objectKeys) {
-            try {
-                String signedUrl = generateSignedUrl(objectKey);
-                urlMap.put(objectKey, signedUrl);
-            } catch (Exception e) {
-                log.error("生成签名URL失败, objectKey: {}", objectKey, e);
-                // 失败时返回null或空字符串，前端可以识别
-                urlMap.put(objectKey, null);
-            }
+    public Map<Long, String> generateSignedUrl(String objectKey, Long imageId) {
+        Map<Long, String> urlMap = new HashMap<>();
+        try {
+            // 生成签名URL，有效期10分钟
+            String signedUrl = generateSignedUrl(objectKey);
+            urlMap.put(imageId, signedUrl);
+        } catch (Exception e) {
+            log.error("生成签名URL失败, objectKey: {}", objectKey, e);
+            // 失败时返回null或空字符串，前端可以识别
+            urlMap.put(imageId, null);
         }
         return urlMap;
     }

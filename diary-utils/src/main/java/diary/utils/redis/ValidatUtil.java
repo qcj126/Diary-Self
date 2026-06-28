@@ -4,10 +4,13 @@ import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import static diary.common.consts.RedisKeyConst.VERIFY_CODE_KEY;
+
+/**
+ * 校验工具类
+ */
 @Component
 public class ValidatUtil {
-    public static final String VERIFY_CODE_KEY = "user:login:verifyCode: ";
-
     @Resource
     private RedisTemplate<String, Object> diaryRedisTemplate;
 

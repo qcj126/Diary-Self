@@ -103,11 +103,15 @@
     </select>
 
     <select id="selectSameCard" resultType="java.lang.Integer">
-        select count(*) from time_card where category_id = #{categoryId} and card_title = #{cardTitle};
+        select count(*) from time_card where category_id = #{categoryId} and card_title = #{cardTitle} and deleted = 0;
     </select>
 
     <select id="selectCardPage" resultMap="TimeCardVOResultMap">
         select a.id, a.user_id, a.image_id, a.category_id, a.card_title, a.card_content, a.record_time, a.deleted, a.create_time, a.update_time
         from time_card a where deleted = 0 order by create_time desc
     </select>
+
+    <update id="logicallyDeleteCard">
+        update time_card set deleted = 1 where id = #{id};
+    </update>
 </mapper>
