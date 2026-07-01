@@ -2,6 +2,7 @@ package diary.diarygoal.impl.query;
 
 import diary.common.convert.goal.POConvertToVO;
 import diary.common.entity.goal.dto.GoalQueryDTO;
+import diary.common.entity.goal.dto.StageGoalDTO;
 import diary.common.entity.goal.po.StageGoalPO;
 import diary.common.entity.goal.vo.StageGoalVO;
 import diary.common.exception.ParamIllegalException;
@@ -44,5 +45,11 @@ public class GoalQueryServiceImpl implements GoalQueryService {
                 ))
                 .toList();
         return ApiResponse.success(stageGoalVOList);
+    }
+
+    @Override
+    public StageGoalDTO queryExportData(Integer lastDays, Integer exportSize) {
+        // TODO 从数据库中查数据，封装到 StageGoalDTO 中
+        return new StageGoalDTO();
     }
 }
