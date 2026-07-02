@@ -20,8 +20,7 @@ public class ExporterFactory {
     // 策略缓存 Map (类型 -> 策略实例)
     private final Map<Integer, Exporter> exporterCache = new ConcurrentHashMap<>();
 
-    @PostConstruct
-    public void init(){
+    public ExporterFactory(List<Exporter> exporterList) {
         for (Exporter exporter : exporterList) {
             Integer type = exporter.getCode();
             exporterCache.put(type, exporter);
