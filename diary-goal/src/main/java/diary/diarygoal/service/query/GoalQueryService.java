@@ -11,6 +11,4 @@ public interface GoalQueryService {
     ApiResponse<StageGoalVO> getGoalById(Long id);
 
     ApiResponse<List<StageGoalVO>> queryGoals(GoalQueryDTO goalQueryDTO);
-
-    StageGoalDTO queryExportData(Integer lastDays, Integer exportSize);
 }

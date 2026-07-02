@@ -46,10 +46,4 @@ public class GoalQueryServiceImpl implements GoalQueryService {
                 .toList();
         return ApiResponse.success(stageGoalVOList);
     }
-
-    @Override
-    public StageGoalDTO queryExportData(Integer lastDays, Integer exportSize) {
-        // TODO 从数据库中查数据，封装到 StageGoalDTO 中
-        return new StageGoalDTO();
-    }
 }

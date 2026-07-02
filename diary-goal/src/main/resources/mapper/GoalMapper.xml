@@ -132,4 +132,8 @@
         SET is_deleted = 1, update_time = NOW()
         WHERE id = #{id}
     </update>
+
+    <select id="queryGoalData" resultType="diary.common.entity.goal.dto.StageGoalDTO">
+
+    </select>
 </mapper>
