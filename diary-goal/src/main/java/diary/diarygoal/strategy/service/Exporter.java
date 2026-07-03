@@ -1,4 +1,4 @@
-package diary.diarygoal.strategy;
+package diary.diarygoal.strategy.service;
 
 import diary.common.entity.goal.dto.StageGoalDTO;
 

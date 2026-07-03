@@ -1,28 +1,25 @@
-package diary.diarygoal.factory;
+package diary.diaryai.factory;
 
-import diary.diarygoal.strategy.service.Exporter;
+import diary.diaryai.strategy.service.InvokeAIService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Component
-public class ExporterFactory {
-    // 使用 Spring 自动注入所有 Exporter 实现
+public class AIFactory {
     @Resource
-    private List<Exporter> exporterList;
+    private List<InvokeAIService> aiServiceList;
 
-    // 策略缓存 Map (类型 -> 策略实例)
-    private final Map<Integer, Exporter> exporterCache = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, InvokeAIService> aiServiceCache = new ConcurrentHashMap<>();
 
-    public ExporterFactory() {
-        for (Exporter exporter : this.exporterList) {
+    public AIFactory() {
+        for (InvokeAIService exporter : this.aiServiceList) {
             Integer type = exporter.getCode();
-            exporterCache.put(type, exporter);
+            aiServiceCache.put(type, exporter);
             log.info("注册导出策略: {} -> {}", type, exporter.getClass().getSimpleName());
         }
     }
@@ -30,12 +27,12 @@ public class ExporterFactory {
     /**
      * 根据类型代码获取导出策略
      */
-    public Exporter getExporter(Integer typeCode) {
-        Exporter exporter = exporterCache.get(typeCode);
+    public InvokeAIService getAIService(Integer typeCode) {
+        InvokeAIService exporter = aiServiceCache.get(typeCode);
         if (exporter == null) {
             throw new IllegalArgumentException(
                     String.format("不支持的导出类型: %s，支持的类型: %s",
-                            typeCode, exporterCache.keySet())
+                            typeCode, aiServiceCache.keySet())
             );
         }
         return exporter;

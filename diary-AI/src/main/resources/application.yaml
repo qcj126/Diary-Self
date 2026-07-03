@@ -1,0 +1,79 @@
+spring:
+  application:
+    name: diary-user
+  data:
+    redis:
+#      password: qcjly513
+#      host: 192.168.101.128
+#      port: 6379
+      host: localhost
+      port: 6333
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://192.168.101.128:3306/canal-demo?useSSL=false&serverTimezone=UTC
+#    username: root
+#    password: qcjly
+    url: jdbc:mysql://localhost:3333/diary?useSSL=false&serverTimezone=UTC
+    username: root
+    password: root
+  rabbitmq:
+#    host: 192.168.101.128
+#    port: 5672
+#    username: yxy
+#    password: yxy
+    host: localhost
+    port: 5555
+    username: guest
+    password: guest
+    listener:
+      simple:
+        prefetch: 1 # ???????????
+        acknowledge-mode: manual        # ??????
+        retry:
+          enabled: true                 # ?????????
+          max-attempts: 3               # ????3?
+          initial-interval: 1000ms      # ??????1?
+          multiplier: 2                 # ????????
+          max-interval: 10000ms         # ??????10?
+  main:
+    web-application-type: reactive
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
+aliyun:
+  oss:
+    endpoint: your               # ??OSS Endpoint
+    access-key-id: your             # ??AccessKey ID
+    access-key-secret: your   # ??AccessKey Secret
+    bucket-name: your                                 # ??Bucket??
+    region: your
+download:
+  path: "C:\\Users\\QCJ\\Pictures\\Saved Pictures"  # 默认下载路径
+  timeout: 30000  # 下载超时时间（毫秒）
+mybatis:
+  mapper-locations: mapper/*.xml
+server:
+  port: 8801
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus,health  # 暴露 prometheus 端点
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+    tags:
+      application: ${spring.application.name}  # 添加应用名标签
+      instance: 127.0.0.1:8801  # 添加实例标签
+deepseek:
+  api:
+    # 从环境变量读取，例如: DEEPSEEK_API_KEY=sk-xxxxx
+    api-key: ${DEEPSEEK_API_KEY:your-default-key-here}
+    # DeepSeek API 基础地址
+    url: https://api.deepseek.com
+    # 默认模型，可选 deepseek-v4-flash 或 deepseek-v4-pro [citation:3][citation:4]
+    model: deepseek-v4-flash
+    # 控制输出随机性，范围 0-2，默认 1 [citation:3][citation:4]
+    temperature: 0.5

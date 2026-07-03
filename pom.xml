@@ -27,6 +27,7 @@
         <module>diary-timemachine</module>
         <module>diary-diet</module>
         <module>diary-goal</module>
+        <module>diary-AI</module>
     </modules>
     
     <properties>

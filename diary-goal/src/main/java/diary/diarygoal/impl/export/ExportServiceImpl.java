@@ -5,7 +5,7 @@ import diary.diarygoal.factory.ExporterFactory;
 import diary.diarygoal.impl.query.GoalQueryServiceImpl;
 import diary.diarygoal.mapper.GoalMapper;
 import diary.diarygoal.service.export.ExportService;
-import diary.diarygoal.strategy.Exporter;
+import diary.diarygoal.strategy.service.Exporter;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
