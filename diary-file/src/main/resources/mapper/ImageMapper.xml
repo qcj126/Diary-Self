@@ -15,7 +15,7 @@
         <id property="createTime" column="create_time"/>
         <id property="updateTime" column="update_time"/>
     </resultMap>
-    <select id="selectImagesById" resultMap="ImageResultMap">
+    <select id="selectImageById" resultMap="ImageResultMap">
         SELECT id, object_key FROM image WHERE id = #{id}
         and deleted = 0 and status = 1000
     </select>
@@ -85,4 +85,8 @@
                  INNER JOIN time_category cat ON ri.category_id = cat.id
         WHERE ri.rn in (1, 2)
     </select>
+
+    <delete id="deleteImageById">
+        DELETE FROM image WHERE id = #{id}
+    </delete>
 </mapper>

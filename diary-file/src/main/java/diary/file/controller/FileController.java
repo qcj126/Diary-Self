@@ -5,10 +5,12 @@ import diary.common.entity.image.vo.ImageVO;
 import diary.common.result.ApiResponse;
 import diary.file.service.VideoFileService;
 import diary.file.service.asyncservice.AsyncService;
+import diary.file.service.deleteservice.DeleteService;
 import diary.file.service.downloadservice.DownloadService;
 import diary.file.service.queryurlservice.QueryUrlService;
 import diary.file.service.uploadservice.UploadService;
 import jakarta.annotation.Resource;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +40,9 @@ public class FileController {
 
     @Resource
     private QueryUrlService queryUrlService;
+
+    @Resource
+    private DeleteService deleteService;
 
     @PostMapping("/upload/images")
     public ApiResponse<List<Long>> upload(@RequestParam("files") List<MultipartFile> files,
@@ -81,5 +86,11 @@ public class FileController {
         // 异步上传视频到OSS成功后，发送消息给mq
         videoFileService.uploadAndSendMsgAsync(result, file);
         return ApiResponse.success(result);
+    }
+
+    @PostMapping("/delete/{id}")
+    public ApiResponse<String> deleteFile(@PathVariable Long id) {
+        // Implementation for deleting a file
+        return ApiResponse.success(deleteService.deleteImage(id));
     }
 }

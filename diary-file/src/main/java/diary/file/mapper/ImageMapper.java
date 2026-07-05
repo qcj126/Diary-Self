@@ -14,9 +14,11 @@ public interface ImageMapper {
 
     Integer updateImageStatusById(Long id, String objectKey, int status);
 
-    ImagePO selectImagesById(Long id);
+    ImagePO selectImageById(Long id);
 
     List<ImagePO> selectImagesForUploadByIds(@Param("imageIds") List<Long> imageIds);
 
     List<ImagePO> selectLatestTwoImagesForCarousel();
+
+    Integer deleteImageById(Long id);
 }

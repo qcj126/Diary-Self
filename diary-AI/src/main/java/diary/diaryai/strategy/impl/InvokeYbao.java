@@ -4,10 +4,13 @@ import diary.common.enums.aienum.AIEnum;
 import diary.diaryai.strategy.service.InvokeAIService;
 import diary.diaryai.template.InvokeAITemplate;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 @Component
+@Order(1)
 public class InvokeYbao extends InvokeAITemplate implements InvokeAIService {
     @Override
     public Object invokeAI(Object data) {
@@ -33,7 +36,7 @@ public class InvokeYbao extends InvokeAITemplate implements InvokeAIService {
     }
 
     @Override
-    public Object callAI(Object data) {
+    public Mono<String> callAI(Object data) {
         return null;
     }
 

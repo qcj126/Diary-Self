@@ -21,12 +21,15 @@ public class TimeMachineDeleteServiceImpl implements TimeMachineDeleteService {
 
     @Override
     public String categoryDelete(TimeCategoryDTO categoryDTO) {
-        return "";
+        return "时光分类删除成功";
     }
 
     @Override
     public String cardDelete(TimeCardDTO cardDTO) {
-        timeMachineMapper.logicallyDeleteCard(cardDTO.getId());
-        return "";
+        Integer i = timeMachineMapper.logicallyDeleteCard(cardDTO.getId());
+        if (i > 0) {
+            return "时光卡片删除成功";
+        }
+        return "时光卡片删除失败";
     }
 }

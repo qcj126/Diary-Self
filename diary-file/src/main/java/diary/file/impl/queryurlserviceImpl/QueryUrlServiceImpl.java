@@ -39,7 +39,7 @@ public class QueryUrlServiceImpl implements QueryUrlService {
             ImageVO imageVO = new ImageVO();
             if (url == null) {
                 // 1. 从数据库查询 object_key
-                ImagePO imagePO = imageMapper.selectImagesById(imageId);
+                ImagePO imagePO = imageMapper.selectImageById(imageId);
 
                 // 2. 提取所有 object_key
                 String objectKey = imagePO.getObjectKey();

@@ -4,12 +4,14 @@ import diary.common.entity.goal.dto.StageGoalDTO;
 import diary.common.enums.exportenum.ExportEnum;
 import diary.diarygoal.strategy.service.Exporter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
 
 @Slf4j
 @Component
+@Order(1)
 public class ExcelExporter implements Exporter {
     @Override
     public ByteArrayOutputStream export(StageGoalDTO stageGoalDTO) {

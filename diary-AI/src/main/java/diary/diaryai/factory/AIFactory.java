@@ -1,11 +1,13 @@
 package diary.diaryai.factory;
 
 import diary.diaryai.strategy.service.InvokeAIService;
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
@@ -14,13 +16,20 @@ public class AIFactory {
     @Resource
     private List<InvokeAIService> aiServiceList;
 
-    private final ConcurrentHashMap<Integer, InvokeAIService> aiServiceCache = new ConcurrentHashMap<>();
+    private final Map<Integer, InvokeAIService> aiServiceCache = new ConcurrentHashMap<>();
 
-    public AIFactory() {
-        for (InvokeAIService exporter : this.aiServiceList) {
-            Integer type = exporter.getCode();
-            aiServiceCache.put(type, exporter);
-            log.info("注册导出策略: {} -> {}", type, exporter.getClass().getSimpleName());
+    public AIFactory() {}
+
+    @PostConstruct
+    public void init() {
+        if (aiServiceList != null) {
+            for (InvokeAIService exporter : this.aiServiceList) {
+                Integer type = exporter.getCode();
+                aiServiceCache.put(type, exporter);
+                log.info("注册导出策略: {} -> {}", type, exporter.getClass().getSimpleName());
+            }
+        } else {
+            log.warn("aiServiceList is null in AIFactory@PostConstruct");
         }
     }
 

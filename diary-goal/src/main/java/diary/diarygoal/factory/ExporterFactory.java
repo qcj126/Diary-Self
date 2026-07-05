@@ -1,8 +1,10 @@
 package diary.diarygoal.factory;
 
 import diary.diarygoal.strategy.service.Exporter;
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -19,11 +21,18 @@ public class ExporterFactory {
     // 策略缓存 Map (类型 -> 策略实例)
     private final Map<Integer, Exporter> exporterCache = new ConcurrentHashMap<>();
 
-    public ExporterFactory() {
-        for (Exporter exporter : this.exporterList) {
-            Integer type = exporter.getCode();
-            exporterCache.put(type, exporter);
-            log.info("注册导出策略: {} -> {}", type, exporter.getClass().getSimpleName());
+    public ExporterFactory() {}
+
+    @PostConstruct
+    public void init() {
+        if (exporterList != null) {
+            for (Exporter exporter : this.exporterList) {
+                Integer type = exporter.getCode();
+                exporterCache.put(type, exporter);
+                log.info("注册导出策略: {} -> {}", type, exporter.getClass().getSimpleName());
+            }
+        } else {
+            log.warn("exporterList is null in ExporterFactory@PostConstruct");
         }
     }
 

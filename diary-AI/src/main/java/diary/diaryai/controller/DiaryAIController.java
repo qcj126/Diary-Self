@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/invoke")
+@RequestMapping("/ai")
 public class DiaryAIController {
     private final CallAIService callAIService;
 
-    @PostMapping
+    @PostMapping("/invoke")
     public ApiResponse<Object> invokeAI (@RequestParam Integer code,
                                          @RequestParam Integer id,
                                          @RequestParam Integer type) {

@@ -12,10 +12,29 @@ public class WebClientConfig {
     @Bean
     public WebClient deepSeekWebClient(WebClient.Builder builder, DeepSeekProperty deepSeekProperty) {
         return builder.baseUrl(deepSeekProperty.getUrl())
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + deepSeekProperty.getApiKey())
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + deepSeekProperty.getKey())
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
     }
-
-
+    @Bean
+    public WebClient dbaoWebClient(WebClient.Builder builder, DeepSeekProperty deepSeekProperty) {
+        return builder.baseUrl(deepSeekProperty.getUrl())
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + deepSeekProperty.getKey())
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .build();
+    }
+    @Bean
+    public WebClient qwenWebClient(WebClient.Builder builder, DeepSeekProperty deepSeekProperty) {
+        return builder.baseUrl(deepSeekProperty.getUrl())
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + deepSeekProperty.getKey())
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .build();
+    }
+    @Bean
+    public WebClient ybaoWebClient(WebClient.Builder builder, DeepSeekProperty deepSeekProperty) {
+        return builder.baseUrl(deepSeekProperty.getUrl())
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + deepSeekProperty.getKey())
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .build();
+    }
 }

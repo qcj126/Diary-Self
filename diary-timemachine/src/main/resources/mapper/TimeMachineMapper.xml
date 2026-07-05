@@ -114,4 +114,15 @@
     <update id="logicallyDeleteCard">
         update time_card set deleted = 1 where id = #{id};
     </update>
+
+    <update id="updateCard">
+        update time_card
+        <set>
+            <if test="cardTitle != null">card_title = #{cardTitle},</if>
+            <if test="cardContent != null">card_content = #{cardContent},</if>
+            <if test="recordTime != null">record_time = #{recordTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </set>
+        where id = #{id};
+    </update>
 </mapper>

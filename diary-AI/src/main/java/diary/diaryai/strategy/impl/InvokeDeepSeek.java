@@ -4,19 +4,24 @@ import diary.common.enums.aienum.AIEnum;
 import diary.diaryai.properties.DeepSeekProperty;
 import diary.diaryai.strategy.service.InvokeAIService;
 import diary.diaryai.template.InvokeAITemplate;
+import diary.diaryai.webclient.WebClientConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
 
 @Slf4j
 @Component
+@Order(1)
 @RequiredArgsConstructor
 public class InvokeDeepSeek extends InvokeAITemplate implements InvokeAIService {
     private final DeepSeekProperty deepSeekProperty;
-
+    private final WebClient deepSeekWebClient;
     @Override
     public Object invokeAI(Object data) {
         String prompt = buildPrompt();
@@ -48,17 +53,33 @@ public class InvokeDeepSeek extends InvokeAITemplate implements InvokeAIService 
     }
 
     @Override
-    public Object callAI(Object data) {
+    public Mono<String> callAI(Object data) {
         String url = deepSeekProperty.getUrl();
-        String apiKey = deepSeekProperty.getApiKey();
+        String apiKey = deepSeekProperty.getKey();
         String model = deepSeekProperty.getModel();
         Double temperature = deepSeekProperty.getTemperature();
 
-        return null;
+        return deepSeekWebClient.post()
+                .uri(url)
+                .header("Authorization", "Bearer " + apiKey)
+                .bodyValue(data)
+                .retrieve()
+                .bodyToMono(Map.class) // 将响应解析为 Map
+                // 3. 提取并返回 AI 回复的内容
+                .map(response -> {
+                    List<Map<String, Object>> choices = (List<Map<String, Object>>) response.get("choices");
+                    if (choices != null && !choices.isEmpty()) {
+                        Map<String, Object> firstChoice = choices.getFirst();
+                        Map<String, String> message = (Map<String, String>) firstChoice.get("message");
+                        return message.get("content");
+                    }
+                    return "No response from AI.";
+                });
     }
 
     @Override
     public Object extractResult(Object aiResult) {
+
         return null;
     }
 }

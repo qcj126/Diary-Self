@@ -1,6 +1,7 @@
 package diary.diarytimemachine.mapper;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import diary.common.entity.timemachine.dto.TimeCardDTO;
 import diary.common.entity.timemachine.po.TimeCardPO;
 import diary.common.entity.timemachine.po.TimeCategoryPO;
 import diary.common.entity.timemachine.vo.TimeCardVO;
@@ -23,5 +24,7 @@ public interface TimeMachineMapper {
 
     IPage<TimeCardVO> selectCardPage(IPage<TimeCardVO> page);
 
-    void logicallyDeleteCard(Long id);
+    Integer logicallyDeleteCard(Long id);
+
+    Integer updateCard(TimeCardDTO cardDTO);
 }
