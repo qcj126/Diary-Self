@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xxl.job.executor.mapper.ImageCleanupMapper">
+
+    <resultMap id="ImageCleanupResultMap" type="com.xxl.job.executor.entity.ImageCleanupRecord">
+        <id property="id" column="id"/>
+        <result property="objectKey" column="object_key"/>
+    </resultMap>
+
+    <select id="selectUnreferencedImages" resultMap="ImageCleanupResultMap">
+        <!-- TODO: 填写扫描 image 表中未被其他业务表关联图片的 SQL，需返回 id、object_key。 -->
+        SELECT id, object_key
+        FROM image
+        WHERE 1 = 0
+    </select>
+
+    <delete id="deleteImageById">
+        DELETE FROM image WHERE id = #{id}
+    </delete>
+</mapper>
