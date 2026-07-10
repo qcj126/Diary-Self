@@ -6,10 +6,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConfigurationProperties(prefix = "deepseek.api")
+@ConfigurationProperties(prefix = "ali-cloud.api")
 @Data
-public class DeepSeekProperty{
-    private String key;
+public class AliCloudProperty{
+    private String apiKey;
     private String url;
     private String model;
     private Double temperature;

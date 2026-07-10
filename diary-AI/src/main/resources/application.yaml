@@ -67,13 +67,9 @@ management:
     tags:
       application: ${spring.application.name}  # 添加应用名标签
       instance: 127.0.0.1:8801  # 添加实例标签
-deepseek:
+ali-cloud:
   api:
-    # 从环境变量读取，例如: DEEPSEEK_API_KEY=sk-xxxxx
-    api-key: ${DEEPSEEK_API_KEY:your-default-key-here}
-    # DeepSeek API 基础地址
-    url: https://api.deepseek.com
-    # 默认模型，可选 deepseek-v4-flash 或 deepseek-v4-pro [citation:3][citation:4]
-    model: deepseek-v4-flash
-    # 控制输出随机性，范围 0-2，默认 1 [citation:3][citation:4]
-    temperature: 0.5
+    api-key: xxxx
+    url: https://llm-wdfzfqz3o6y5lf9d.cn-beijing.maas.aliyuncs.com/compatible-mode/v1
+    model: deepseek-flash-v4
+    temperature: 0.7

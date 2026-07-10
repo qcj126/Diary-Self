@@ -15,7 +15,8 @@ public class InvokeQwen extends InvokeAITemplate implements InvokeAIService {
     @Override
     public Object invokeAI(Object data) {
         String prompt = buildPrompt();
-        Object request = constructRequest(prompt);
+        String model = null;
+        Object request = constructRequest(prompt, model );
         Object aiResult = callAI(request);
         return extractResult(aiResult);
     }
@@ -30,13 +31,9 @@ public class InvokeQwen extends InvokeAITemplate implements InvokeAIService {
         return null;
     }
 
-    @Override
-    public Object constructRequest(String prompt) {
-        return null;
-    }
 
     @Override
-    public Mono<String> callAI(Object data) {
+    public Object callAI(Object data) {
         return null;
     }
 
