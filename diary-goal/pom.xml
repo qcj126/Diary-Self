@@ -7,14 +7,18 @@
         <artifactId>Diary-Self</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-    <groupId>diary</groupId>
     <artifactId>diary-goal</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>diary-goal</name>
     <description>diary-goal</description>
 
     <properties>
+        <!--    maven 编译版本    -->
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <!--    java 版本    -->
         <java.version>21</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
         <dependency>

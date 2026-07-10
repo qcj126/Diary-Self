@@ -3,25 +3,32 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.14</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <groupId>diary</groupId>
+        <artifactId>Diary-Self</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
     </parent>
     <groupId>qcj.diary</groupId>
     <artifactId>diary-xxljob</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>diary-xxljob</name>
     <description>diary-xxljob</description>
-
+    <packaging>pom</packaging>
+    <modules>
+        <module>xxl-job-admin</module>
+        <module>xxl-job-executor-sample-springboot</module>
+    </modules>
     <properties>
+        <!--    maven 编译版本    -->
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <!--    java 版本    -->
         <java.version>21</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
         <dependency>
             <groupId>com.xuxueli</groupId>
             <artifactId>xxl-job-core</artifactId>
-            <version>3.4.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

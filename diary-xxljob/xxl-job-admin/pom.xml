@@ -2,16 +2,21 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>com.xuxueli</groupId>
-		<artifactId>xxl-job</artifactId>
-		<version>3.4.0</version>
+		<groupId>qcj.diary</groupId>
+		<artifactId>diary-xxljob</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>xxl-job-admin</artifactId>
 	<packaging>jar</packaging>
 
-	<properties>
-		<maven.deploy.skip>true</maven.deploy.skip>
-	</properties>
+    <properties>
+        <!--    maven 编译版本    -->
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <!--    java 版本    -->
+        <java.version>21</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
 	<dependencies>
 
@@ -61,23 +66,5 @@
 		</dependency>
 
 	</dependencies>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>${spring-boot.version}</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>repackage</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
-		</plugins>
-	</build>
 
 </project>

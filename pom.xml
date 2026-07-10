@@ -31,7 +31,12 @@
     </modules>
     
     <properties>
+        <!--    maven 编译版本    -->
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <!--    java 版本    -->
         <java.version>21</java.version>
+
         <lombok.version>1.18.44</lombok.version>
         <spring-cloud.version>2025.0.0</spring-cloud.version>
         <spring-cloud-alibaba.version>2025.0.0.0</spring-cloud-alibaba.version>
@@ -41,6 +46,8 @@
         <mybatis-plus.version>3.5.5</mybatis-plus.version>
         <fastjson.version>2.0.61</fastjson.version>
         <aliyun-sdk-oss.version>3.18.4</aliyun-sdk-oss.version>
+        <xxl-job.version>3.4.0</xxl-job.version>
+        <xxl-sso.version>2.4.0</xxl-sso.version>
     </properties>
     
     <dependencyManagement>
@@ -53,7 +60,16 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-
+            <dependency>
+                <groupId>com.xuxueli</groupId>
+                <artifactId>xxl-job-core</artifactId>
+                <version>${xxl-job.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.xuxueli</groupId>
+                <artifactId>xxl-sso-core</artifactId>
+                <version>${xxl-sso.version}</version>
+            </dependency>
             <!-- Spring Cloud Alibaba BOM -->
             <dependency>
                 <groupId>com.alibaba.cloud</groupId>
