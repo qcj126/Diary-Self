@@ -1,23 +1,31 @@
 package diary.diaryai.strategy.impl;
 
+import com.alibaba.dashscope.aigc.generation.GenerationParam;
+import com.alibaba.dashscope.aigc.generation.GenerationResult;
 import diary.common.enums.aienum.AIEnum;
+import diary.diaryai.properties.AliCloudProperty;
 import diary.diaryai.strategy.service.InvokeAIService;
 import diary.diaryai.template.InvokeAITemplate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 @Slf4j
 @Component
 @Order(1)
 public class InvokeQwen extends InvokeAITemplate implements InvokeAIService {
+    private final AliCloudProperty aliCloudProperty;
+
+    public InvokeQwen(AliCloudProperty aliCloudProperty) {
+        super(aliCloudProperty);
+        this.aliCloudProperty = aliCloudProperty;
+    }
+
     @Override
     public Object invokeAI(Object data) {
+        String model = aliCloudProperty.getModel();
         String prompt = buildPrompt();
-        String model = null;
-        Object request = constructRequest(prompt, model );
-        Object aiResult = callAI(request);
+        GenerationResult aiResult = constructRequest(prompt, model);
         return extractResult(aiResult);
     }
 
@@ -31,14 +39,8 @@ public class InvokeQwen extends InvokeAITemplate implements InvokeAIService {
         return null;
     }
 
-
     @Override
-    public Object callAI(Object data) {
-        return null;
-    }
-
-    @Override
-    public Object extractResult(Object aiResult) {
-        return null;
+    public Object extractResult(GenerationResult aiResult) {
+        return aiResult.getOutput().getChoices().getFirst().getMessage().getContent();
     }
 }
