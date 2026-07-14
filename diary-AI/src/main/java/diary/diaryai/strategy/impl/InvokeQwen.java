@@ -23,7 +23,7 @@ public class InvokeQwen extends InvokeAITemplate implements InvokeAIService {
 
     @Override
     public Object invokeAI(Object data) {
-        String model = aliCloudProperty.getModel();
+        String model = aliCloudProperty.getQwenPlusModel();
         String prompt = buildPrompt();
         GenerationResult aiResult = constructRequest(prompt, model);
         return extractResult(aiResult);

@@ -1,9 +1,6 @@
 package diary.diaryai.strategy.impl;
 
-import com.alibaba.dashscope.aigc.generation.GenerationParam;
 import com.alibaba.dashscope.aigc.generation.GenerationResult;
-import com.alibaba.dashscope.common.Message;
-import com.alibaba.dashscope.common.Role;
 import diary.common.enums.aienum.AIEnum;
 import diary.diaryai.properties.AliCloudProperty;
 import diary.diaryai.strategy.service.InvokeAIService;
@@ -25,7 +22,7 @@ public class InvokeDeepSeek extends InvokeAITemplate implements InvokeAIService 
 
     @Override
     public Object invokeAI(Object data) {
-        String model = aliCloudProperty.getModel();
+        String model = aliCloudProperty.getDeepSeekModel();
         String prompt = buildPrompt();
         GenerationResult aiResult = constructRequest(prompt, model);
         return extractResult(aiResult);
