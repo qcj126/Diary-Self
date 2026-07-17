@@ -9,6 +9,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 public interface TimeMachineQueryService {
-    List<TimeCategoryVO> categoryQuery(TimeCategoryDTO categoryDTO);
+    List<TimeCategoryVO> categoryQuery();
     IPage<TimeCardVO> cardQuery(@RequestParam("pageIndex") Integer pageIndex, @RequestParam("pageSize") Integer pageSize);
 }

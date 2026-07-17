@@ -1,6 +1,10 @@
 spring:
   application:
-    name: diary-user
+    name: diary-ai
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
   data:
     redis:
 #      password: qcjly513
@@ -54,7 +58,7 @@ download:
 mybatis:
   mapper-locations: mapper/*.xml
 server:
-  port: 8801
+  port: 8807
 management:
   endpoints:
     web:
@@ -66,7 +70,7 @@ management:
         enabled: true
     tags:
       application: ${spring.application.name}  # 添加应用名标签
-      instance: 127.0.0.1:8801  # 添加实例标签
+      instance: 127.0.0.1:8807  # 添加实例标签
 ali-cloud:
   api:
     api-key: xxxx

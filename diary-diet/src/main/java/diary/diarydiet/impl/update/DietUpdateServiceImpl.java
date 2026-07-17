@@ -1,5 +1,6 @@
 package diary.diarydiet.impl.update;
 
+import diary.common.convert.diet.DTOConvertToPO;
 import diary.common.entity.diet.dto.DietRecordDTO;
 import diary.common.entity.diet.po.DietRecordPO;
 import diary.common.exception.ParamIllegalException;
@@ -32,42 +33,7 @@ public class DietUpdateServiceImpl implements DietUpdateService {
         }
 
         // 更新字段
-        DietRecordPO dietRecordPO = new DietRecordPO();
-        dietRecordPO.setId(dietRecordDTO.getId());
-        
-        if (dietRecordDTO.getUserId() != null) {
-            dietRecordPO.setUserId(dietRecordDTO.getUserId());
-        }
-        if (dietRecordDTO.getEatTime() != null) {
-            dietRecordPO.setEatTime(dietRecordDTO.getEatTime());
-        }
-        if (dietRecordDTO.getMealType() != null) {
-            dietRecordPO.setMealType(dietRecordDTO.getMealType());
-        }
-        if (dietRecordDTO.getFoodName() != null) {
-            dietRecordPO.setFoodName(dietRecordDTO.getFoodName());
-        }
-        if (dietRecordDTO.getCalories() != null) {
-            dietRecordPO.setCalories(dietRecordDTO.getCalories());
-        }
-        if (dietRecordDTO.getProtein() != null) {
-            dietRecordPO.setProtein(dietRecordDTO.getProtein());
-        }
-        if (dietRecordDTO.getFat() != null) {
-            dietRecordPO.setFat(dietRecordDTO.getFat());
-        }
-        if (dietRecordDTO.getCarbohydrate() != null) {
-            dietRecordPO.setCarbohydrate(dietRecordDTO.getCarbohydrate());
-        }
-        if (dietRecordDTO.getFullnessScore() != null) {
-            dietRecordPO.setFullnessScore(dietRecordDTO.getFullnessScore());
-        }
-        if (dietRecordDTO.getLocation() != null) {
-            dietRecordPO.setLocation(dietRecordDTO.getLocation());
-        }
-        if (dietRecordDTO.getNote() != null) {
-            dietRecordPO.setNote(dietRecordDTO.getNote());
-        }
+        DietRecordPO dietRecordPO = DTOConvertToPO.dietRecordDTOConvertToPO(dietRecordDTO, dietRecordDTO.getId());
 
         // 更新数据库
         dietMapper.updateById(dietRecordPO);

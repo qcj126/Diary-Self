@@ -2,6 +2,9 @@ spring:
   application:
     name: diary-gateway
   cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
     gateway:
       server:
         webflux:
@@ -11,25 +14,33 @@ spring:
               lower-case-service-id: true
           routes:
             - id: diary-user
-              uri: http://localhost:8801
+              uri: lb://diary-user
               predicates:
                 - Path=/user/**
             - id: diary-file
-              uri: http://localhost:8802
+              uri: lb://diary-file
               predicates:
                 - Path=/file/**
             - id: diary-recipe
-              uri: http://localhost:8803
+              uri: lb://diary-recipe
               predicates:
                 - Path=/recipe/**
             - id: diary-timemachine
-              uri: http://localhost:8804
+              uri: lb://diary-timemachine
               predicates:
                 - Path=/time-machine/**
             - id: diary-diet
-              uri: http://localhost:8805
+              uri: lb://diary-diet
               predicates:
                 - Path=/diet/**
+            - id: diary-goal
+              uri: lb://diary-goal
+              predicates:
+                - Path=/goal/**
+            - id: diary-ai
+              uri: lb://diary-ai
+              predicates:
+                - Path=/ai/**
           globalcors:
             corsConfigurations:
               '[/**]':

@@ -21,6 +21,10 @@ public class TimeMachineDeleteServiceImpl implements TimeMachineDeleteService {
 
     @Override
     public String categoryDelete(TimeCategoryDTO categoryDTO) {
+        Integer i = timeMachineMapper.logicallyDeleteCategory(categoryDTO.getId());
+        if (i > 0) {
+            return "时光分类删除成功";
+        }
         return "时光分类删除成功";
     }
 

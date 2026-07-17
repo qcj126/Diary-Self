@@ -1,5 +1,6 @@
 package diary.diarydiet.impl.add;
 
+import diary.common.convert.diet.DTOConvertToPO;
 import diary.common.entity.diet.dto.DietRecordDTO;
 import diary.common.entity.diet.po.DietRecordPO;
 import diary.common.exception.ParamIllegalException;
@@ -20,7 +21,7 @@ public class DietAddServiceImpl implements DietAddService {
     @Override
     public ApiResponse<String> addDietRecord(DietRecordDTO dietRecordDTO) {
         if (dietRecordDTO == null) {
-            return ApiResponse.fail(400, "入参为空");
+            throw new ParamIllegalException("入参为空");
         }
 
         // 参数校验
@@ -33,26 +34,11 @@ public class DietAddServiceImpl implements DietAddService {
         }
 
         // DTO转PO
-        DietRecordPO dietRecordPO = new DietRecordPO();
-        dietRecordPO.setId(MyUtils.getPrimaryKey());
-        dietRecordPO.setUserId(dietRecordDTO.getUserId());
-        dietRecordPO.setEatTime(dietRecordDTO.getEatTime());
-        dietRecordPO.setMealType(dietRecordDTO.getMealType());
-        dietRecordPO.setFoodName(dietRecordDTO.getFoodName());
-        dietRecordPO.setCalories(dietRecordDTO.getCalories());
-        dietRecordPO.setProtein(dietRecordDTO.getProtein());
-        dietRecordPO.setFat(dietRecordDTO.getFat());
-        dietRecordPO.setCarbohydrate(dietRecordDTO.getCarbohydrate());
-        dietRecordPO.setFullnessScore(dietRecordDTO.getFullnessScore());
-        dietRecordPO.setLocation(dietRecordDTO.getLocation());
-        dietRecordPO.setNote(dietRecordDTO.getNote());
-        dietRecordPO.setDeleted(false);
-        dietRecordPO.setCreatedAt(LocalDateTime.now());
-        dietRecordPO.setUpdatedAt(LocalDateTime.now());
+        long primaryKey = MyUtils.getPrimaryKey();
+        DietRecordPO dietRecordPO = DTOConvertToPO.dietRecordDTOConvertToPO(dietRecordDTO, primaryKey);
 
         // 插入数据库
         dietMapper.insert(dietRecordPO);
-
         return ApiResponse.success("饮食记录添加成功");
     }
 }

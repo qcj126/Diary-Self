@@ -10,9 +10,6 @@ public class POConvertToVO {
      * PO转VO
      */
     public static DietRecordVO convertToVO(DietRecordPO po) {
-        if (po == null) {
-            return null;
-        }
         return DietRecordVO.builder()
                 .id(po.getId())
                 .userId(po.getUserId())

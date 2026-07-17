@@ -1,5 +1,6 @@
 package diary.diarygoal.impl.add;
 
+import diary.common.convert.goal.DTOConvertToPO;
 import diary.common.entity.goal.dto.StageGoalDTO;
 import diary.common.entity.goal.dto.SubGoalDTO;
 import diary.common.entity.goal.po.StageGoalPO;
@@ -23,57 +24,29 @@ public class GoalAddServiceImpl implements GoalAddService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ApiResponse<String> addGoal(StageGoalDTO stageGoalDTO) {
-        if (stageGoalDTO == null) {
-            return ApiResponse.fail(400, "request body is empty");
-        }
+        if (stageGoalDTO == null) throw new ParamIllegalException("request body is empty");
         if (stageGoalDTO.getUserId() == null
-                || isBlank(stageGoalDTO.getCategory())
-                || isBlank(stageGoalDTO.getTitle())
-                || isBlank(stageGoalDTO.getDescription())) {
+                || stageGoalDTO.getCategory() == null
+                || stageGoalDTO.getTitle() == null
+                || stageGoalDTO.getDescription() == null) {
             throw new ParamIllegalException("required parameters cannot be empty");
         }
 
         Long stageGoalId = MyUtils.getPrimaryKey();
-        StageGoalPO stageGoalPO = new StageGoalPO();
-        stageGoalPO.setId(stageGoalId);
-        stageGoalPO.setUserId(stageGoalDTO.getUserId());
-        stageGoalPO.setCreator(isBlank(stageGoalDTO.getCreator()) ? String.valueOf(stageGoalDTO.getUserId()) : stageGoalDTO.getCreator());
-        stageGoalPO.setCategory(stageGoalDTO.getCategory());
-        stageGoalPO.setTitle(stageGoalDTO.getTitle());
-        stageGoalPO.setDescription(stageGoalDTO.getDescription());
-        stageGoalPO.setDeleted(false);
+        StageGoalPO stageGoalPO = DTOConvertToPO.stageGoalDTOConvertToStageGoalPO(stageGoalDTO, stageGoalId);
         goalMapper.insertStageGoal(stageGoalPO);
 
         if (stageGoalDTO.getSubGoals() != null) {
             for (SubGoalDTO subGoalDTO : stageGoalDTO.getSubGoals()) {
-                if (subGoalDTO == null || isBlank(subGoalDTO.getTitle())) {
+                if (subGoalDTO == null || subGoalDTO.getTitle() == null) {
                     continue;
                 }
-                goalMapper.insertSubGoal(buildSubGoalPO(stageGoalDTO.getUserId(), stageGoalId, subGoalDTO));
+                Long subGoalId = MyUtils.getPrimaryKey();
+                SubGoalPO subGoalPO = DTOConvertToPO.subGoalDTOConvertToSubGoalPO(subGoalDTO, subGoalId);
+                goalMapper.insertSubGoal(subGoalPO);
             }
         }
 
-        return ApiResponse.success("goal added successfully");
-    }
-
-    private SubGoalPO buildSubGoalPO(Long userId, Long stageGoalId, SubGoalDTO subGoalDTO) {
-        SubGoalPO subGoalPO = new SubGoalPO();
-        subGoalPO.setId(MyUtils.getPrimaryKey());
-        subGoalPO.setStageGoalId(stageGoalId);
-        subGoalPO.setUserId(userId);
-        subGoalPO.setTitle(subGoalDTO.getTitle());
-        subGoalPO.setContent(subGoalDTO.getContent());
-        subGoalPO.setLearnedHours(defaultZero(subGoalDTO.getLearnedHours()));
-        subGoalPO.setEstimatedHours(defaultZero(subGoalDTO.getEstimatedHours()));
-        subGoalPO.setDeleted(false);
-        return subGoalPO;
-    }
-
-    private BigDecimal defaultZero(BigDecimal value) {
-        return value == null ? BigDecimal.ZERO : value;
-    }
-
-    private boolean isBlank(String value) {
-        return value == null || value.trim().isEmpty();
+        return ApiResponse.success("新增目标成功");
     }
 }

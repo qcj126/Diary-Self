@@ -1,2 +1,23 @@
 server:
   port: 8083
+
+spring:
+  application:
+    name: diary-config
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus,health  # 暴露 prometheus 端点
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+    tags:
+      application: ${spring.application.name}  # 添加应用名标签
+      instance: 127.0.0.1:8083  # 添加实例标签

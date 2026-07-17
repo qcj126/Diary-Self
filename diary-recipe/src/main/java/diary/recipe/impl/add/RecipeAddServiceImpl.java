@@ -50,7 +50,7 @@ public class RecipeAddServiceImpl implements RecipeAddService {
             .findAny().ifPresent(step -> {throw new ParamIllegalException("步骤存在必填参数为空");});
 
         // 类型转换
-        RecipePO recipePO = DtoConvertToPo.convertToPO(recipeReqDto, MyUtils.getPrimaryKey());
+        RecipePO recipePO = DtoConvertToPo.recipeReqDtoConvertToPO(recipeReqDto, MyUtils.getPrimaryKey());
         List<RecipeIngredientPO> recipeIngredientPOs = recipeReqDto.getIngredients().stream().map(ao -> AoConvertToPo.convertToPO(ao, recipePO.getId(), MyUtils.getPrimaryKey())).toList();
         List<RecipeStepPO> recipeStepPOs = recipeReqDto.getSteps().stream().map(ao -> AoConvertToPo.convertToPO(ao, recipePO.getId(), MyUtils.getPrimaryKey())).toList();
 

@@ -66,8 +66,8 @@ public class TimeMachineController {
 
     // 查
     @PostMapping("/category/query")
-    public ApiResponse<List<TimeCategoryVO>> queryCategory(@RequestBody TimeCategoryDTO categoryDTO) {
-        return ApiResponse.success(timeMachineQueryService.categoryQuery(categoryDTO));
+    public ApiResponse<List<TimeCategoryVO>> queryCategory() {
+        return ApiResponse.success(timeMachineQueryService.categoryQuery());
     }
 
     @PostMapping("/card/query")

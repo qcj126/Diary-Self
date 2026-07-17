@@ -48,6 +48,8 @@
         <aliyun-sdk-oss.version>3.18.4</aliyun-sdk-oss.version>
         <xxl-job.version>3.4.0</xxl-job.version>
         <xxl-sso.version>2.4.0</xxl-sso.version>
+        <poi.version>5.3.0</poi.version>
+        <openpdf.version>2.0.3</openpdf.version>
     </properties>
     
     <dependencyManagement>
@@ -116,6 +118,18 @@
                 <artifactId>fastjson</artifactId>
                 <version>${fastjson.version}</version>
                 <scope>compile</scope>
+            </dependency>
+            <!-- Apache POI for Excel -->
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>${poi.version}</version>
+            </dependency>
+            <!-- OpenPDF for PDF -->
+            <dependency>
+                <groupId>com.github.librepdf</groupId>
+                <artifactId>openpdf</artifactId>
+                <version>${openpdf.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

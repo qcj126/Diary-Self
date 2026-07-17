@@ -125,4 +125,12 @@
         </set>
         where id = #{id};
     </update>
+
+    <delete id="logicallyDeleteCategory">
+        update time_category set deleted = 1 where id = #{id};
+    </delete>
+
+    <select id="selectCategory" resultType="diary.common.entity.timemachine.vo.TimeCategoryVO">
+
+    </select>
 </mapper>

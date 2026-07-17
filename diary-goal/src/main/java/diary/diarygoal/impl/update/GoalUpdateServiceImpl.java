@@ -1,5 +1,6 @@
 package diary.diarygoal.impl.update;
 
+import diary.common.convert.goal.DTOConvertToPO;
 import diary.common.entity.goal.dto.StageGoalDTO;
 import diary.common.entity.goal.dto.SubGoalDTO;
 import diary.common.entity.goal.po.StageGoalPO;
@@ -34,13 +35,7 @@ public class GoalUpdateServiceImpl implements GoalUpdateService {
             throw new ParamIllegalException("goal does not exist");
         }
 
-        StageGoalPO stageGoalPO = new StageGoalPO();
-        stageGoalPO.setId(stageGoalDTO.getId());
-        stageGoalPO.setUserId(stageGoalDTO.getUserId());
-        stageGoalPO.setCreator(stageGoalDTO.getCreator());
-        stageGoalPO.setCategory(stageGoalDTO.getCategory());
-        stageGoalPO.setTitle(stageGoalDTO.getTitle());
-        stageGoalPO.setDescription(stageGoalDTO.getDescription());
+        StageGoalPO stageGoalPO = DTOConvertToPO.stageGoalDTOConvertToStageGoalPO(stageGoalDTO, existGoal.getId());
         goalMapper.updateStageGoalById(stageGoalPO);
 
         if (stageGoalDTO.getSubGoals() != null) {
@@ -60,7 +55,7 @@ public class GoalUpdateServiceImpl implements GoalUpdateService {
     }
 
     private SubGoalPO buildNewSubGoalPO(StageGoalPO existGoal, StageGoalDTO stageGoalDTO, SubGoalDTO subGoalDTO) {
-        SubGoalPO subGoalPO = buildUpdateSubGoalPO(stageGoalDTO.getId(), subGoalDTO);
+        SubGoalPO subGoalPO = DTOConvertToPO.subGoalDTOConvertToSubGoalPO(subGoalDTO, MyUtils.getPrimaryKey());
         subGoalPO.setId(MyUtils.getPrimaryKey());
         subGoalPO.setUserId(stageGoalDTO.getUserId() == null ? existGoal.getUserId() : stageGoalDTO.getUserId());
         subGoalPO.setDeleted(false);
@@ -68,15 +63,7 @@ public class GoalUpdateServiceImpl implements GoalUpdateService {
     }
 
     private SubGoalPO buildUpdateSubGoalPO(Long stageGoalId, SubGoalDTO subGoalDTO) {
-        SubGoalPO subGoalPO = new SubGoalPO();
-        subGoalPO.setId(subGoalDTO.getId());
-        subGoalPO.setStageGoalId(stageGoalId);
-        subGoalPO.setUserId(subGoalDTO.getUserId());
-        subGoalPO.setTitle(subGoalDTO.getTitle());
-        subGoalPO.setContent(subGoalDTO.getContent());
-        subGoalPO.setLearnedHours(defaultZero(subGoalDTO.getLearnedHours()));
-        subGoalPO.setEstimatedHours(defaultZero(subGoalDTO.getEstimatedHours()));
-        return subGoalPO;
+        return DTOConvertToPO.subGoalDTOConvertToSubGoalPO(subGoalDTO, MyUtils.getPrimaryKey());
     }
 
     private BigDecimal defaultZero(BigDecimal value) {

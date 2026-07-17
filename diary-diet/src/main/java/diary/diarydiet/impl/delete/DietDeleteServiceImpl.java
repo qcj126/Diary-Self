@@ -26,11 +26,8 @@ public class DietDeleteServiceImpl implements DietDeleteService {
         }
 
         // 逻辑删除
-        DietRecordPO updatePO = new DietRecordPO();
-        updatePO.setId(id);
-        updatePO.setDeleted(true);
+        DietRecordPO updatePO = DietRecordPO.builder().id(id).deleted(true).build();
         dietMapper.updateById(updatePO);
-
         return ApiResponse.success("删除成功");
     }
 }

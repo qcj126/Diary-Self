@@ -28,10 +28,9 @@ public class GoalQueryServiceImpl implements GoalQueryService {
         if (stageGoalPO == null) {
             throw new ParamIllegalException("goal does not exist");
         }
-        return ApiResponse.success(POConvertToVO.convertToStageGoalVO(
-                stageGoalPO,
-                goalMapper.selectSubGoalsByStageGoalId(id)
-        ));
+        return ApiResponse.success(
+                POConvertToVO.convertToStageGoalVO(stageGoalPO, goalMapper.selectSubGoalsByStageGoalId(id))
+        );
     }
 
     @Override
