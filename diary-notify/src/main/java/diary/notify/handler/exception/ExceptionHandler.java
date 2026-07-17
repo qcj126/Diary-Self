@@ -2,7 +2,6 @@ package diary.notify.handler.exception;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-@Schema(description = "异常处理 Handler，作为 Pipeline 的最后一道防线")
 public class ExceptionHandler extends ChannelInboundHandlerAdapter {
 
     /**

@@ -1,9 +1,7 @@
 package diary.notify.handler.notify;
 
-import diary.notify.protocol.message.NotifyMessage;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +20,6 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-@Schema(description = "通知消息分发 Handler，根据消息类型进行分发处理")
 public class NotifyHandler extends ChannelInboundHandlerAdapter {
 
     // TODO: 注入 ChannelManager（用于获取用户连接信息）

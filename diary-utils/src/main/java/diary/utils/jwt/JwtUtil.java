@@ -36,13 +36,6 @@ public class JwtUtil {
         return generateToken(username, roles, "refresh", refreshTokenExpirationMs);
     }
 
-    /**
-     * Keep the old method compatible with existing callers.
-     */
-    public String generateToken(String username) {
-        return generateAccessToken(username, List.of("user"));
-    }
-
     private String generateToken(String username, List<String> roles, String tokenType, long expirationMs) {
         return Jwts.builder()
                 .setSubject(username)
@@ -106,5 +99,14 @@ public class JwtUtil {
 
     private Key signingKey() {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public String parseToken(String token) {
+        // 获取 token 中的 username
+        return Jwts.parserBuilder()
+                .setSigningKey(signingKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody().getSubject();
     }
 }

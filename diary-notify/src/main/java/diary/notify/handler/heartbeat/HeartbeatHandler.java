@@ -1,9 +1,12 @@
 package diary.notify.handler.heartbeat;
 
+import diary.notify.manager.channel.ChannelManager;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
-import io.swagger.v3.oas.annotations.media.Schema;
+import io.netty.util.AttributeKey;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -26,15 +29,21 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-@Schema(description = "心跳检测 Handler，配合 IdleStateHandler 实现连接存活检测")
+@RequiredArgsConstructor
 public class HeartbeatHandler extends ChannelInboundHandlerAdapter {
 
     /**
      * 最大连续未收到心跳次数
      * 超过此次数后，判定连接失效，主动关闭
      */
-    @Schema(description = "最大连续未收到心跳次数，超过后关闭连接", example = "3")
     private static final int MAX_IDLE_COUNT = 3;
+
+    /**
+     * Channel Attribute 中存储空闲计数的 Key
+     */
+    private static final AttributeKey<Integer> IDLE_COUNT_KEY = AttributeKey.valueOf("idleCount");
+
+    private final ChannelManager channelManager;
 
     /**
      * 处理用户事件
@@ -45,29 +54,33 @@ public class HeartbeatHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-        // TODO: 第一步：判断事件类型是否为 IdleStateEvent
-        //   - if (evt instanceof IdleStateEvent)
-        //   - IdleStateEvent 由前置的 IdleStateHandler 触发
-
-        // TODO: 第二步：判断空闲类型
-        //   - IdleStateEvent event = (IdleStateEvent) evt
-        //   - event.state() == IdleState.READER_IDLE 表示读空闲（未收到客户端消息）
-        //   - 本场景只关注 READER_IDLE，WRITER_IDLE 可由业务层处理
-
-        // TODO: 第三步：从 Channel 的 Attribute 中获取连续空闲次数
-        //   - 使用 AttributeKey<Integer> 存储空闲计数
-        //   - 如果 Attribute 不存在，初始化为 0
-
-        // TODO: 第四步：空闲次数 +1，判断是否超过阈值 MAX_IDLE_COUNT
-        //   - 如果未超过：记录日志，向客户端发送心跳探测（可选）
-        //   - 如果超过：执行第五步
-
-        // TODO: 第五步：关闭连接，清理资源
-        //   - 记录日志：心跳超时，关闭连接
-        //   - 调用 channelManager.removeChannel(userId) 清理 ChannelManager 中的映射
-        //   - ctx.close() 关闭连接
-
-        super.userEventTriggered(ctx, evt);
+        if (evt instanceof IdleStateEvent) {
+            IdleStateEvent event = (IdleStateEvent) evt;
+            if (event.state() == IdleState.READER_IDLE) {
+                // 从 Channel 的 Attribute 中获取连续空闲次数，不存在则初始化为 0
+                Integer idleCount = ctx.channel().attr(IDLE_COUNT_KEY).get();
+                if (idleCount == null) {
+                    idleCount = 0;
+                }
+                idleCount++;
+    
+                if (idleCount >= MAX_IDLE_COUNT) {
+                    // 超过阈值，关闭连接并清理资源
+                    Long userId = (Long) ctx.channel().attr(AttributeKey.valueOf("username")).get();
+                    log.warn("心跳超时，关闭连接: channelId={}, username={}, 连续空闲次数={}",
+                            ctx.channel().id(), userId, idleCount);
+                    if (userId != null) {
+                        channelManager.removeChannel(userId);
+                    }
+                    ctx.close();
+                } else {
+                    // 未超过阈值，更新计数并记录日志
+                    ctx.channel().attr(IDLE_COUNT_KEY).set(idleCount);
+                    log.info("检测到读空闲，当前连续空闲次数: channelId={}, idleCount={}/{}",
+                            ctx.channel().id(), idleCount, MAX_IDLE_COUNT);
+                }
+            }
+        }
     }
 
     /**
@@ -82,9 +95,7 @@ public class HeartbeatHandler extends ChannelInboundHandlerAdapter {
         // TODO: 第一步：记录异常日志，包含连接信息和异常原因
         log.error("心跳检测异常: channel={}, error={}", ctx.channel().id(), cause.getMessage());
 
-        // TODO: 第二步：关闭连接
-        //   - ctx.close()
-        //   - 心跳异常通常意味着连接已不可用，直接关闭
+        ctx.close();
 
         super.exceptionCaught(ctx, cause);
     }
