@@ -1,0 +1,15 @@
+server:
+  port: 8808
+
+
+
+
+
+
+
+
+netty:
+  port: 8888
+  boss-group-size: 2
+  worker-group-size: 5
+  tcp-conn-size: 32

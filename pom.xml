@@ -28,6 +28,7 @@
         <module>diary-diet</module>
         <module>diary-goal</module>
         <module>diary-AI</module>
+        <module>diary-notify</module>
     </modules>
     
     <properties>
@@ -50,6 +51,7 @@
         <xxl-sso.version>2.4.0</xxl-sso.version>
         <poi.version>5.3.0</poi.version>
         <openpdf.version>2.0.3</openpdf.version>
+        <netty.version>4.1.132.Final</netty.version>
     </properties>
     
     <dependencyManagement>
@@ -130,6 +132,12 @@
                 <groupId>com.github.librepdf</groupId>
                 <artifactId>openpdf</artifactId>
                 <version>${openpdf.version}</version>
+            </dependency>
+            <!-- Netty -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-all</artifactId>
+                <version>${netty.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
