@@ -9,6 +9,7 @@ import java.util.List;
 
 @Data
 public class RecipeReqDto {
+    private Long id;
     /** 创建者用户ID（Controller层从token获取后传入） */
     private Long authorId;
 

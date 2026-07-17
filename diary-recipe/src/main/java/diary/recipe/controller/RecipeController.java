@@ -2,7 +2,7 @@ package diary.recipe.controller;
 
 import diary.common.entity.recipe.dto.req.RecipePageReqDto;
 import diary.common.entity.recipe.dto.resp.PageRespDto;
-import diary.common.entity.recipe.dto.resp.RecipeRespDto;
+import diary.common.entity.recipe.vo.RecipeVO;
 import diary.common.result.ApiResponse;
 import diary.common.entity.recipe.dto.req.RecipeReqDto;
 import jakarta.annotation.Resource;
@@ -37,8 +37,8 @@ public class RecipeController {
 
     // 分页查询食谱
     @PostMapping("/query")
-    public ApiResponse<PageRespDto<RecipeRespDto>> pageQueryRecipe(@RequestBody RecipePageReqDto recipePageReqDto) {
-        PageRespDto<RecipeRespDto> pagedQueryRecipe = recipeQueryService.pageQueryRecipe(recipePageReqDto);
+    public ApiResponse<PageRespDto<RecipeVO>> pageQueryRecipe(@RequestBody RecipePageReqDto recipePageReqDto) {
+        PageRespDto<RecipeVO> pagedQueryRecipe = recipeQueryService.pageQueryRecipe(recipePageReqDto);
         return ApiResponse.success(pagedQueryRecipe);
     }
 

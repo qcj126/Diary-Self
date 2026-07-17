@@ -33,7 +33,8 @@ public class GoalAddServiceImpl implements GoalAddService {
         }
 
         Long stageGoalId = MyUtils.getPrimaryKey();
-        StageGoalPO stageGoalPO = DTOConvertToPO.stageGoalDTOConvertToStageGoalPO(stageGoalDTO, stageGoalId);
+        stageGoalDTO.setId(stageGoalId);
+        StageGoalPO stageGoalPO = DTOConvertToPO.stageGoalDTOConvertToStageGoalPO(stageGoalDTO);
         goalMapper.insertStageGoal(stageGoalPO);
 
         if (stageGoalDTO.getSubGoals() != null) {
@@ -41,8 +42,8 @@ public class GoalAddServiceImpl implements GoalAddService {
                 if (subGoalDTO == null || subGoalDTO.getTitle() == null) {
                     continue;
                 }
-                Long subGoalId = MyUtils.getPrimaryKey();
-                SubGoalPO subGoalPO = DTOConvertToPO.subGoalDTOConvertToSubGoalPO(subGoalDTO, subGoalId);
+                subGoalDTO.setId(MyUtils.getPrimaryKey());
+                SubGoalPO subGoalPO = DTOConvertToPO.subGoalDTOConvertToSubGoalPO(subGoalDTO);
                 goalMapper.insertSubGoal(subGoalPO);
             }
         }

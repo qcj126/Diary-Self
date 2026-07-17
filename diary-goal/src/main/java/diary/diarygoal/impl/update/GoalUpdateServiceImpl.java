@@ -35,7 +35,8 @@ public class GoalUpdateServiceImpl implements GoalUpdateService {
             throw new ParamIllegalException("goal does not exist");
         }
 
-        StageGoalPO stageGoalPO = DTOConvertToPO.stageGoalDTOConvertToStageGoalPO(stageGoalDTO, existGoal.getId());
+        stageGoalDTO.setId(existGoal.getId());
+        StageGoalPO stageGoalPO = DTOConvertToPO.stageGoalDTOConvertToStageGoalPO(stageGoalDTO);
         goalMapper.updateStageGoalById(stageGoalPO);
 
         if (stageGoalDTO.getSubGoals() != null) {
@@ -55,7 +56,8 @@ public class GoalUpdateServiceImpl implements GoalUpdateService {
     }
 
     private SubGoalPO buildNewSubGoalPO(StageGoalPO existGoal, StageGoalDTO stageGoalDTO, SubGoalDTO subGoalDTO) {
-        SubGoalPO subGoalPO = DTOConvertToPO.subGoalDTOConvertToSubGoalPO(subGoalDTO, MyUtils.getPrimaryKey());
+        subGoalDTO.setId(MyUtils.getPrimaryKey());
+        SubGoalPO subGoalPO = DTOConvertToPO.subGoalDTOConvertToSubGoalPO(subGoalDTO);
         subGoalPO.setId(MyUtils.getPrimaryKey());
         subGoalPO.setUserId(stageGoalDTO.getUserId() == null ? existGoal.getUserId() : stageGoalDTO.getUserId());
         subGoalPO.setDeleted(false);
@@ -63,7 +65,8 @@ public class GoalUpdateServiceImpl implements GoalUpdateService {
     }
 
     private SubGoalPO buildUpdateSubGoalPO(Long stageGoalId, SubGoalDTO subGoalDTO) {
-        return DTOConvertToPO.subGoalDTOConvertToSubGoalPO(subGoalDTO, MyUtils.getPrimaryKey());
+        subGoalDTO.setStageGoalId(stageGoalId);
+        return DTOConvertToPO.subGoalDTOConvertToSubGoalPO(subGoalDTO);
     }
 
     private BigDecimal defaultZero(BigDecimal value) {

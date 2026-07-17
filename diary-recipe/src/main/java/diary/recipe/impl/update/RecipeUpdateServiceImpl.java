@@ -39,10 +39,10 @@ public class RecipeUpdateServiceImpl implements RecipeUpdateService {
         }
         List<RecipeIngredientAO> ingredients = recipeReqDto.getIngredients();
         List<RecipeStepAO> steps = recipeReqDto.getSteps();
-        if (!ingredients.isEmpty() && ingredients != null) {
+        if (!ingredients.isEmpty()) {
             recipeIngredientMapper.batchUpdate(ingredients, recipePO.getId());
         }
-        if (!steps.isEmpty() && steps != null) {
+        if (!steps.isEmpty()) {
             recipeStepMapper.batchUpdate(steps, recipePO.getId());
         }
         recipeMapper.updateById(recipeReqDto, recipePO.getId());

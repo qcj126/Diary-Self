@@ -6,10 +6,10 @@ import diary.common.entity.recipe.po.RecipePO;
 import java.time.LocalDateTime;
 
 public class DtoConvertToPo {
-    public static RecipePO recipeReqDtoConvertToPO(RecipeReqDto recipeReqDto, long keyId) {
+    public static RecipePO recipeReqDtoConvertToPO(RecipeReqDto recipeReqDto) {
         RecipePO recipePO = new RecipePO();
         // 填充元素
-        recipePO.setId(keyId);
+        recipePO.setId(recipeReqDto.getId());
         recipePO.setUserId(recipeReqDto.getAuthorId());
         recipePO.setTitle(recipeReqDto.getTitle());
         recipePO.setCoverImg(recipeReqDto.getCoverImg());

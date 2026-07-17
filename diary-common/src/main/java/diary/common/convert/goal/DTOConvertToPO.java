@@ -6,9 +6,9 @@ import diary.common.entity.goal.po.StageGoalPO;
 import diary.common.entity.goal.po.SubGoalPO;
 
 public class DTOConvertToPO {
-    public static StageGoalPO stageGoalDTOConvertToStageGoalPO(StageGoalDTO stageGoalDTO, Long id) {
+    public static StageGoalPO stageGoalDTOConvertToStageGoalPO(StageGoalDTO stageGoalDTO) {
         return StageGoalPO.builder()
-                        .id(id)
+                        .id(stageGoalDTO.getId())
                         .userId(stageGoalDTO.getUserId())
                         .creator(stageGoalDTO.getCreator() == null ? String.valueOf(stageGoalDTO.getUserId()) : stageGoalDTO.getCreator())
                         .category(stageGoalDTO.getCategory())
@@ -18,9 +18,9 @@ public class DTOConvertToPO {
                         .build();
     }
 
-    public static SubGoalPO subGoalDTOConvertToSubGoalPO(SubGoalDTO subGoalDTO, Long id) {
+    public static SubGoalPO subGoalDTOConvertToSubGoalPO(SubGoalDTO subGoalDTO) {
         return SubGoalPO.builder()
-                .id(id)
+                .id(subGoalDTO.getId())
                 .stageGoalId(subGoalDTO.getStageGoalId())
                 .userId(subGoalDTO.getUserId())
                 .title(subGoalDTO.getTitle())
