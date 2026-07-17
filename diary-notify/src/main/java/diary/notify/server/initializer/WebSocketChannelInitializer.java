@@ -14,7 +14,6 @@ import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketServerCompressionHandler;
 import io.netty.handler.timeout.IdleStateHandler;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -43,7 +42,6 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Component
 @ChannelHandler.Sharable
-@Schema(description = "WebSocket Channel 初始化器，负责配置每个新连接的 Pipeline")
 public class WebSocketChannelInitializer extends ChannelInitializer<SocketChannel> {
 
     @Resource
@@ -66,63 +64,41 @@ public class WebSocketChannelInitializer extends ChannelInitializer<SocketChanne
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
         ChannelPipeline pipeline = ch.pipeline();
-
-        // TODO: 第一步：添加 HTTP 编解码器
         //   - HttpServerCodec：处理 HTTP 请求和响应的编解码
         //   - WebSocket 握手基于 HTTP 协议，必须先添加此 Handler
         pipeline.addLast(new HttpServerCodec());
-
-        // TODO: 第二步：添加 HTTP 消息聚合器
         //   - HttpObjectAggregator(65536)：将多个 HTTP 消息片段聚合为完整的 FullHttpRequest
         //   - 65536 为最大内容长度（64KB）
         pipeline.addLast(new HttpObjectAggregator(65536));
-
-        // TODO: 第三步：添加 WebSocket 压缩处理器（可选，提升传输效率）
         //   - WebSocketServerCompressionHandler：启用 permessage-deflate 扩展
-        //   - 对 WebSocket 消息进行压缩，减少网络传输量
-        pipeline.addLast(new WebSocketServerCompressionHandler());
-
-        // TODO: 第四步：添加 WebSocket 协议升级处理器
+        //   - 对 WebSocket 消息进行压缩，减少网络传输量，最大缓冲区为2048字节
+        pipeline.addLast(new WebSocketServerCompressionHandler(2048));
         //   - WebSocketServerProtocolHandler("/ws", null, true, 65536)
         //   - "/ws"：WebSocket 路径
         //   - null：子协议（可选）
         //   - true：允许扩展
         //   - 65536：最大帧大小
         pipeline.addLast(new WebSocketServerProtocolHandler("/ws", null, true, 65536));
-
-        // TODO: 第五步：添加空闲状态检测处理器（心跳基础）
         //   - IdleStateHandler(60, 0, 0, TimeUnit.SECONDS)
         //   - 第一个参数 60：读空闲时间（60秒未收到客户端消息触发）
         //   - 第二个参数 0：写空闲时间（0表示不检测）
         //   - 第三个参数 0：读写空闲时间（0表示不检测）
-        pipeline.addLast(new IdleStateHandler(60, 0, 0, TimeUnit.SECONDS));
-
-        // TODO: 第六步：添加 JWT 认证处理器
+        pipeline.addLast(new IdleStateHandler(600, 0, 0, TimeUnit.SECONDS));
         //   - jwtAuthHandler：在握手完成后验证用户身份
         //   - 必须放在协议升级之后，业务处理之前
         pipeline.addLast("jwtAuth", jwtAuthHandler);
-
-        // TODO: 第七步：添加心跳处理器
         //   - heartbeatHandler：处理 IdleStateHandler 触发的空闲事件
         //   - 检测连接存活，清理僵尸连接
         pipeline.addLast("heartbeat", heartbeatHandler);
-
-        // TODO: 第八步：添加消息编解码器
         //   - notifyMessageCodec：实现 NotifyMessage ↔ TextWebSocketFrame 双向转换
         //   - 编码：NotifyMessage → JSON → TextWebSocketFrame（出站）
         //   - 解码：TextWebSocketFrame → JSON → NotifyMessage（入站）
         pipeline.addLast("codec", notifyMessageCodec);
-
-        // TODO: 第九步：添加通知消息处理器
         //   - notifyHandler：处理业务消息的分发
         pipeline.addLast("notify", notifyHandler);
-
-        // TODO: 第十步：添加异常处理器（必须放在最后）
         //   - exceptionHandler：捕获 Pipeline 中所有前置 Handler 的异常
         //   - 作为最后一道防线，防止异常传播到 Netty 底层
         pipeline.addLast("exception", exceptionHandler);
-
-        // TODO: 第十一步：记录 Pipeline 初始化完成日志
         log.info("WebSocket Pipeline 初始化完成: channelId={}", ch.id());
     }
 }
