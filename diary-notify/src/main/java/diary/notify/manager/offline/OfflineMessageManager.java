@@ -1,7 +1,7 @@
 package diary.notify.manager.offline;
 
 import diary.notify.protocol.message.NotifyMessage;
-import io.swagger.v3.oas.annotations.media.Schema;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -28,7 +28,6 @@ import java.util.List;
  */
 @Slf4j
 @Component
-@Schema(description = "离线消息管理器，负责离线消息的存储与补推")
 public class OfflineMessageManager {
 
     // TODO: 注入 OfflineMessageMapper（离线消息持久层）

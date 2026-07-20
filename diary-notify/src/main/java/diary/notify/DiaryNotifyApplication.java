@@ -2,18 +2,13 @@ package diary.notify;
 
 import diary.notify.config.NotifyConfig;
 import diary.notify.server.NotifyWebSocketServer;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.info.Info;
-import io.swagger.v3.oas.annotations.info.Contact;
-import io.swagger.v3.oas.annotations.info.License;
 import lombok.extern.slf4j.Slf4j;
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.EnableConfigurationProperties;
 
 import jakarta.annotation.PreDestroy;
 import jakarta.annotation.Resource;
@@ -40,18 +35,9 @@ import jakarta.annotation.Resource;
  */
 @Slf4j
 @SpringBootApplication
-@ComponentScan(basePackages = {"diary.common", "diary.config", "diary.notify", "diary.utils"})
-@MapperScan("diary.notify.mapper")
+@ComponentScan(basePackages = {"diary.common", "diary.notify", "diary.utils"})
 @EnableConfigurationProperties(NotifyConfig.class)
-@OpenAPIDefinition(
-    info = @Info(
-        title = "Diary-Notify 通知服务 API",
-        version = "1.0.0",
-        description = "基于 Netty WebSocket 的实时通知推送服务",
-        contact = @Contact(name = "Diary-Self Team"),
-        license = @License(name = "MIT")
-    )
-)
+
 public class DiaryNotifyApplication {
 
     @Resource

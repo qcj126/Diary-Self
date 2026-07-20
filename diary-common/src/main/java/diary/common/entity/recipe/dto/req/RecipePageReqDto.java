@@ -15,9 +15,6 @@ public class RecipePageReqDto extends PageReqDto {
     // 可选：难度筛选（1-3）
     private Integer difficulty;
 
-    // 可选：是否纪念日专属（0-否 1-是）
-    private Integer isAnniversary;
-
     // 可选：标题关键词模糊搜索
     private String keyword;
 }

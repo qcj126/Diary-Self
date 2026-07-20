@@ -1,7 +1,6 @@
 package diary.notify.manager.channel;
 
 import io.netty.channel.Channel;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +28,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Slf4j
 @Component
-@Schema(description = "Channel 连接管理器，维护 userId ↔ Channel 映射关系")
 public class ChannelManager {
 
     /**
@@ -41,7 +39,6 @@ public class ChannelManager {
      *   - Netty 的 IO 线程和 Spring 的业务线程可能同时读写此 Map
      *   - ConcurrentHashMap 提供线程安全的读写操作，且性能优于 Hashtable
      */
-    @Schema(description = "用户 Channel 映射表，Key 为用户ID，Value 为 Netty Channel")
     private final Map<Long, Channel> userChannels = new ConcurrentHashMap<>();
 
     /**

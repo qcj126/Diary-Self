@@ -5,8 +5,8 @@
 
     <!-- 结果映射 -->
     <resultMap id="BaseResultMap" type="diary.common.entity.recipe.po.RecipePO">
-        <id column="recipe_id" property="recipeId"/>
-        <result column="author_id" property="authorId"/>
+        <id column="recipe_id" property="id"/>
+        <result column="author_id" property="userId"/>
         <result column="title" property="title"/>
         <result column="cover_img" property="coverImg"/>
         <result column="description" property="description"/>
@@ -15,25 +15,15 @@
         <result column="difficulty" property="difficulty"/>
         <result column="cooking_time" property="cookingTime"/>
         <result column="story" property="story"/>
-        <result column="status" property="status"/>
-        <result column="view_count" property="viewCount"/>
-        <result column="like_count" property="likeCount"/>
-        <result column="cook_count" property="cookCount"/>
-        <result column="is_anniversary" property="isAnniversary"/>
-        <result column="anniversary_date" property="anniversaryDate"/>
-        <result column="created_at" property="createdAt"/>
-        <result column="updated_at" property="updatedAt"/>
+        <result column="sort" property="sort"/>
+        <result column="deleted" property="deleted"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
     </resultMap>
 
     <!-- 通用查询条件（可复用） -->
     <sql id="where_condition">
         <where>
-            <!-- 数据隔离 -->
-            <if test="req.coupleId != null">
-                AND couple_id = #{req.coupleId}
-            </if>
-            <!-- 状态：已发布 -->
-            AND status = 1
             <!-- 分类筛选 -->
             <if test="req.category != null">
                 AND category = #{req.category}
@@ -46,42 +36,30 @@
             <if test="req.difficulty != null">
                 AND difficulty = #{req.difficulty}
             </if>
-            <!-- 是否纪念日专属 -->
-            <if test="req.isAnniversary != null">
-                AND is_anniversary = #{req.isAnniversary}
-            </if>
             <!-- 关键词模糊搜索 -->
             <if test="req.keyword != null and req.keyword != ''">
                 AND title LIKE CONCAT('%', #{req.keyword}, '%')
-            </if>
-            <!-- 时间范围 -->
-            <if test="req.startTime != null">
-                AND created_at >= #{req.startTime}
-            </if>
-            <if test="req.endTime != null">
-                AND created_at &lt;= #{req.endTime}
             </if>
         </where>
     </sql>
 
     <!-- 基础字段 -->
     <sql id="BaseColumns">
-        recipe_id, author_id, couple_id, title, cover_img, description,
-        category, meal_type, difficulty, cooking_time, story, status,
-        view_count, like_count, cook_count, is_anniversary, anniversary_date,
-        created_at, updated_at
+        recipe_id, author_id, title, cover_img, description,
+        category, meal_type, difficulty, cooking_time, story, sort, deleted,
+        create_time, update_time
     </sql>
 
     <!-- 插入 -->
     <insert id="insert" parameterType="diary.common.entity.recipe.po.RecipePO">
         INSERT INTO recipe (
             recipe_id, author_id, title, cover_img, description,
-            category, meal_type, difficulty, cooking_time, story, status,
-            is_anniversary, anniversary_date, created_at, updated_at
+            category, meal_type, difficulty, cooking_time, story, sort, deleted,
+            create_time, update_time
         ) VALUES (
-                     #{recipeId}, #{authorId}, #{title}, #{coverImg}, #{description},
-                     #{category}, #{mealType}, #{difficulty}, #{cookingTime}, #{story}, #{status},
-                     #{isAnniversary}, #{anniversaryDate}, NOW(), NOW()
+                     #{id}, #{userId}, #{title}, #{coverImg}, #{description},
+                     #{category}, #{mealType}, #{difficulty}, #{cookingTime}, #{story}, #{sort}, #{deleted},
+                     NOW(), NOW()
                  )
     </insert>
 
@@ -107,7 +85,7 @@
             <if test="story != null">story = #{story},</if>
             <if test="isAnniversary != null">is_anniversary = #{isAnniversary},</if>
             <if test="anniversaryDate != null">anniversary_date = #{anniversaryDate},</if>
-            updated_at = NOW()
+            update_time = NOW()
         </set>
         WHERE recipe_id = #{recipeId}
         AND status != 2
@@ -117,7 +95,7 @@
     <update id="updateStatus">
         UPDATE recipe
         SET status = #{status},
-            updated_at = NOW()
+            update_time = NOW()
         WHERE recipe_id = #{recipeId}
           AND author_id = #{operatorId}
     </update>
@@ -128,7 +106,7 @@
         FROM recipe
         WHERE author_id = #{authorId}
         AND status != 2
-        ORDER BY created_at DESC
+        ORDER BY create_time DESC
         LIMIT #{offset}, #{limit}
     </select>
 
@@ -143,7 +121,7 @@
         <if test="status == null">
             AND status != 2
         </if>
-        ORDER BY created_at DESC
+        ORDER BY create_time DESC
         LIMIT #{offset}, #{limit}
     </select>
 
@@ -168,7 +146,7 @@
         ORDER BY
         <choose>
             <when test="keyword != null and keyword != ''">view_count DESC</when>
-            <otherwise>created_at DESC</otherwise>
+            <otherwise>create_time DESC</otherwise>
         </choose>
         LIMIT #{offset}, #{limit}
     </select>
@@ -190,7 +168,7 @@
     <!-- 浏览量 +1 -->
     <update id="incrementViewCount">
         UPDATE recipe
-        SET view_count = view_count + 1, updated_at = NOW()
+        SET view_count = view_count + 1, update_time = NOW()
         WHERE recipe_id = #{recipeId}
     </update>
 
@@ -198,7 +176,7 @@
     <update id="batchUpdateLikeCount">
         <foreach collection="list" item="item" separator=";">
             UPDATE recipe
-            SET like_count = #{item.likeCount}, updated_at = NOW()
+            SET like_count = #{item.likeCount}, update_time = NOW()
             WHERE recipe_id = #{item.recipeId}
         </foreach>
     </update>
@@ -223,7 +201,7 @@
             AND is_anniversary = 1
             AND anniversary_date = #{date}
             AND status = 1
-        ORDER BY created_at DESC
+        ORDER BY create_time DESC
     </select>
 
     <select id="selectByAuthorTitle" resultType="diary.common.entity.recipe.po.RecipePO">
@@ -239,7 +217,7 @@
         SELECT <include refid="BaseColumns"/>
         FROM recipe
         <include refid="where_condition" />
-        ORDER BY created_at DESC, recipe_id DESC
+        ORDER BY create_time DESC, id DESC
     </select>
 
     <update id="batchUpdate">

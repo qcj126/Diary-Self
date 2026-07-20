@@ -1,18 +1,16 @@
 package diary.notify.consumer;
 
+import com.aliyun.core.annotation.Header;
 import com.rabbitmq.client.Channel;
 import diary.notify.manager.channel.ChannelManager;
 import diary.notify.manager.offline.OfflineMessageManager;
 import diary.notify.protocol.message.NotifyMessage;
-import io.netty.channel.ChannelFuture;
-import io.swagger.v3.oas.annotations.media.Schema;
+
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.annotation.Exchange;
-import org.springframework.amqp.rabbit.annotation.Queue;
+
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.AmqpHeaders;
-import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 
 /**
@@ -35,7 +33,6 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-@Schema(description = "MQ 通知消息消费者，从 RabbitMQ 消费并推送通知")
 public class NotifyMessageConsumer {
 
     @Resource
@@ -56,7 +53,7 @@ public class NotifyMessageConsumer {
         queues = "notify.queue",
         ackMode = "MANUAL"
     )
-    public void onMessage(NotifyMessage message, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long deliveryTag) {
+    public void onMessage(NotifyMessage message, Channel channel, long deliveryTag) {
         try {
             // TODO: 第一步：记录接收到的消息日志
             //   - 记录消息类型、通知类型、目标用户ID

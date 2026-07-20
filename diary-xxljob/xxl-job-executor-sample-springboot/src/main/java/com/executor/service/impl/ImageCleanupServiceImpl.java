@@ -45,7 +45,7 @@ public class ImageCleanupServiceImpl implements ImageCleanupService {
                 failedCount++;
                 Long imageId = image == null ? null : image.getId();
                 String objectKey = image == null ? null : image.getObjectKey();
-                log.error("Failed to cleanup image, id: {}, objectKey: {}", imageId, objectKey, e);
+//                log.error("Failed to cleanup image, id: {}, objectKey: {}", imageId, objectKey, e);
                 XxlJobHelper.log("图片清理失败，id: " + imageId + "，原因: " + e.getMessage());
             }
         }

@@ -30,7 +30,7 @@ public class PushService {
                 pushSms(targetId, message);
                 break;
             default:
-                log.warn("未知的推送类型：{}，目标：{}", pushType, targetId);
+//                log.warn("未知的推送类型：{}，目标：{}", pushType, targetId);
         }
     }
 
@@ -39,7 +39,7 @@ public class PushService {
      */
     private void pushWechat(String openId, String message) {
         // TODO: 对接微信公众号模板消息接口
-        log.info("[微信推送] openId={}, message={}", openId, message);
+//        log.info("[微信推送] openId={}, message={}", openId, message);
     }
 
     /**
@@ -47,7 +47,7 @@ public class PushService {
      */
     private void pushEmail(String email, String message) {
         // TODO: 对接 JavaMailSender 发送邮件
-        log.info("[邮件推送] email={}, message={}", email, message);
+//        log.info("[邮件推送] email={}, message={}", email, message);
     }
 
     /**
@@ -55,6 +55,6 @@ public class PushService {
      */
     private void pushSms(String phone, String message) {
         // TODO: 对接短信服务商 API 发送短信
-        log.info("[短信推送] phone={}, message={}", phone, message);
+//        log.info("[短信推送] phone={}, message={}", phone, message);
     }
 }

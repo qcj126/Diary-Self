@@ -2,7 +2,7 @@ package diary.notify.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import diary.notify.entity.OfflineMessage;
-import io.swagger.v3.oas.annotations.media.Schema;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -36,7 +36,6 @@ import java.util.List;
  *   - update_time：更新时间
  */
 @Mapper
-@Schema(description = "离线消息 Mapper，负责离线消息的持久化操作")
 public interface OfflineMessageMapper extends BaseMapper<OfflineMessage> {
 
     /**

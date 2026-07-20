@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 @SpringBootApplication
 @ComponentScan(basePackages = {"diary.common", "diary.config", "diary.file", "diary.utils"})
 public class DiaryFileApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(DiaryFileApplication.class, args);
         log.info("Diary File Service 应用已经启动成功");

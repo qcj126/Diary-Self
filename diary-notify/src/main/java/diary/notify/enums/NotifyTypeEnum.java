@@ -1,6 +1,6 @@
 package diary.notify.enums;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -19,7 +19,6 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-@Schema(description = "通知类型枚举，定义系统中所有的通知类型")
 public enum NotifyTypeEnum {
 
     // ========== 目标模块通知 ==========
@@ -28,7 +27,6 @@ public enum NotifyTypeEnum {
      * 来源模块：diary-goal
      * 场景：用户的阶段目标即将到期时触发
      */
-    @Schema(description = "阶段目标到期提醒")
     GOAL_DUE("GOAL_DUE", "阶段目标到期提醒"),
 
     /**
@@ -36,7 +34,6 @@ public enum NotifyTypeEnum {
      * 来源模块：diary-goal
      * 场景：目标进度低于预期时触发
      */
-    @Schema(description = "目标进度落后提醒")
     GOAL_PROGRESS("GOAL_PROGRESS", "目标进度落后提醒"),
 
     // ========== 饮食模块通知 ==========
@@ -45,7 +42,6 @@ public enum NotifyTypeEnum {
      * 来源模块：diary-diet
      * 场景：到达饭点时间或长时间未记录饮食时触发
      */
-    @Schema(description = "饭点提醒/饮食记录提醒")
     DIET_REMIND("DIET_REMIND", "饭点提醒/饮食记录提醒"),
 
     // ========== 定时任务通知 ==========
@@ -54,7 +50,6 @@ public enum NotifyTypeEnum {
      * 来源模块：diary-xxljob
      * 场景：XXL-Job 定时任务执行完成后通知
      */
-    @Schema(description = "定时任务完成通知")
     TASK_COMPLETE("TASK_COMPLETE", "定时任务完成通知"),
 
     // ========== AI 模块通知 ==========
@@ -63,7 +58,6 @@ public enum NotifyTypeEnum {
      * 来源模块：diary-AI
      * 场景：AI 分析报告生成完成后通知
      */
-    @Schema(description = "AI 分析完成通知")
     AI_COMPLETE("AI_COMPLETE", "AI 分析完成通知"),
 
     // ========== 文件模块通知 ==========
@@ -72,18 +66,15 @@ public enum NotifyTypeEnum {
      * 来源模块：diary-file
      * 场景：文件上传/处理完成后通知
      */
-    @Schema(description = "文件处理完成通知")
     FILE_READY("FILE_READY", "文件处理完成通知");
 
     /**
      * 通知类型编码（与 JSON 协议中的 notifyType 字段值一致）
      */
-    @Schema(description = "通知类型编码", example = "GOAL_DUE")
     private final String code;
 
     /**
      * 通知类型描述
      */
-    @Schema(description = "通知类型描述", example = "阶段目标到期提醒")
     private final String description;
 }

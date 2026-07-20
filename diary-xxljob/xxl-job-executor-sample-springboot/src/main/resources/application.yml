@@ -1,64 +1,15 @@
-# web port
-server:
-  port: 8891
-  # no web
-  # spring.main.web-environment=false
-
-# log config
-logging:
-  config: classpath:logback.xml
-
-# xxl-job configuration
-xxl:
-  job:
-    admin:
-      # xxl-job admin address list, such as "http://address" or "http://address01,http://address02"
-      addresses: http://127.0.0.1:8890/xxl-job-admin
-      # xxl-job access token
-      accessToken: default_token
-      # xxl-job timeout by second, default 3s
-      timeout: 3
-    executor:
-      # xxl-job executor enable, default true
-      enabled: true
-      # xxl-job executor appname
-      appname: weather_push_executor
-      # xxl-job executor registry-address: default use address to registry , otherwise use ip:port if address is null
-      address: ""
-      # xxl-job executor server-info
-      ip: 127.0.0.1
-      port: 9999
-      # xxl-job executor log-path
-      logpath: /data/applogs/xxl-job/jobhandler
-      # xxl-job executor log-retention-days
-      logretentiondays: 30
-      # xxl-job executor excluded package, will skip scan job. such as "org.package01" or "org.package01,org.package02"
-      excludedpackage: ""
-
-# Redis config (optional, weather cache)
 spring:
-  data:
-    redis:
-      host: 127.0.0.1
-      port: 6379
-      password: ""
-      timeout: 3000
-  # datasource config (for image cleanup job)
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3333/diary?useSSL=false&serverTimezone=UTC
-    username: root
-    password: root
-
-# mybatis config
-mybatis:
-  mapper-locations: classpath:mapper/*.xml
-
-# Aliyun OSS config (for image cleanup job)
-aliyun:
-  oss:
-    endpoint: your
-    access-key-id: your
-    access-key-secret: your
-    bucket-name: your
-    region: your
+  config:
+    import:
+      - optional:nacos:diary-executor.yaml?group=DEFAULT_GROUP&namespace=b78c8d52-3fc3-4276-9cbb-0f2efd326481
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.101.128:8848
+        namespace: b78c8d52-3fc3-4276-9cbb-0f2efd326481
+      config:
+        server-addr: 192.168.101.128:8848
+        namespace: b78c8d52-3fc3-4276-9cbb-0f2efd326481
+        group: DEFAULT_GROUP
+        file-extension: yaml
+        refresh-enabled: true

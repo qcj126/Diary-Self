@@ -1,15 +1,15 @@
-server:
-  port: 8808
-
-
-
-
-
-
-
-
-netty:
-  port: 8888
-  boss-group-size: 2
-  worker-group-size: 5
-  tcp-conn-size: 32
+spring:
+  config:
+    import:
+      - optional:nacos:diary-notify.yaml?group=DEFAULT_GROUP&namespace=b78c8d52-3fc3-4276-9cbb-0f2efd326481
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.101.128:8848
+        namespace: b78c8d52-3fc3-4276-9cbb-0f2efd326481
+      config:
+        server-addr: 192.168.101.128:8848
+        namespace: b78c8d52-3fc3-4276-9cbb-0f2efd326481
+        group: DEFAULT_GROUP
+        file-extension: yaml
+        refresh-enabled: true

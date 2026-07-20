@@ -29,7 +29,7 @@ public class SpareImageCleanUpJob {
                 result.getDeletedCount(),
                 result.getFailedCount()
         );
-        log.info(message);
+//        log.info(message);
         XxlJobHelper.log(message);
 
         if (result.getFailedCount() > 0) {

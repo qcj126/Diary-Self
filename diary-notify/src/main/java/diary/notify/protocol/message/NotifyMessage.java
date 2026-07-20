@@ -1,7 +1,7 @@
 package diary.notify.protocol.message;
 
 import diary.notify.enums.NotifyTypeEnum;
-import io.swagger.v3.oas.annotations.media.Schema;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -37,7 +37,6 @@ import java.util.Map;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "通知消息协议实体，定义 WebSocket 传输的统一消息格式")
 public class NotifyMessage implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -47,7 +46,6 @@ public class NotifyMessage implements Serializable {
      * 可选值：NOTIFICATION（通知）、HEARTBEAT（心跳）、ACK（确认）
      * 用于 NotifyHandler 中的消息分发判断
      */
-    @Schema(description = "消息类型：NOTIFICATION / HEARTBEAT / ACK", example = "NOTIFICATION")
     private String type;
 
     /**
@@ -55,21 +53,18 @@ public class NotifyMessage implements Serializable {
      * 对应 NotifyTypeEnum 枚举的 code 值
      * 用于区分不同的通知业务场景
      */
-    @Schema(description = "通知子类型，对应 NotifyTypeEnum", example = "GOAL_DUE")
     private String notifyType;
 
     /**
      * 通知内容
      * 推送给前端展示的文本内容
      */
-    @Schema(description = "通知文本内容", example = "阶段目标'减肥5kg'即将到期！")
     private String content;
 
     /**
      * 消息时间戳（毫秒级）
      * 消息创建时的系统时间，用于排序和展示
      */
-    @Schema(description = "消息时间戳（毫秒）", example = "1721136000000")
     private Long timestamp;
 
     /**
@@ -77,7 +72,6 @@ public class NotifyMessage implements Serializable {
      * 承载业务相关的附加信息，如目标ID、文件URL等
      * 前端可根据此数据进行页面跳转等操作
      */
-    @Schema(description = "扩展数据，承载业务附加信息")
     private Map<String, Object> extra;
 
     // ========== 消息类型常量 ==========
