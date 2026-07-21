@@ -1,39 +1,59 @@
-CREATE TABLE IF NOT EXISTS `user` (
-  `user_id` BIGINT NOT NULL COMMENT 'user id',
-  `username` VARCHAR(64) NOT NULL COMMENT 'username',
-  `email` VARCHAR(128) DEFAULT NULL COMMENT 'email',
-  `phone` VARCHAR(32) DEFAULT NULL COMMENT 'phone',
-  `password` VARCHAR(128) NOT NULL COMMENT 'BCrypt password',
-  `status` INT NOT NULL DEFAULT 1000 COMMENT '1000 enabled, 0 disabled',
-  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'created time',
-  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'updated time',
-  PRIMARY KEY (`user_id`),
-  UNIQUE KEY `uk_user_username` (`username`),
-  UNIQUE KEY `uk_user_email` (`email`),
-  UNIQUE KEY `uk_user_phone` (`phone`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='user table';
+-- auto-generated definition
+create table user
+(
+    user_id     bigint                             not null comment 'user id'
+        primary key,
+    username    varchar(64)                        not null comment 'username',
+    email       varchar(128)                       null comment 'email',
+    phone       varchar(32)                        null comment 'phone',
+    password    varchar(128)                       not null comment 'BCrypt password',
+    status      int      default 1000              not null comment '1000 enabled, 0 disabled',
+    create_time datetime default CURRENT_TIMESTAMP not null comment 'created time',
+    update_time datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment 'updated time',
+    constraint uk_user_email
+        unique (email),
+    constraint uk_user_phone
+        unique (phone),
+    constraint uk_user_username
+        unique (username)
+)
+    comment 'user table' charset = utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `role` (
-  `role_id` BIGINT NOT NULL COMMENT 'role id',
-  `role_code` VARCHAR(32) NOT NULL COMMENT 'role code: admin/user',
-  `role_name` VARCHAR(64) NOT NULL COMMENT 'role name',
-  `description` VARCHAR(255) DEFAULT NULL COMMENT 'description',
-  `status` INT NOT NULL DEFAULT 1000 COMMENT '1000 enabled, 0 disabled',
-  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'created time',
-  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'updated time',
-  PRIMARY KEY (`role_id`),
-  UNIQUE KEY `uk_role_code` (`role_code`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='role table';
+-- auto-generated definition
+create table role
+(
+    role_id     bigint                             not null comment 'role id'
+        primary key,
+    role_code   varchar(32)                        not null comment 'role code: admin/user',
+    role_name   varchar(64)                        not null comment 'role name',
+    description varchar(255)                       null comment 'description',
+    status      int      default 1000              not null comment '1000 enabled, 0 disabled',
+    create_time datetime default CURRENT_TIMESTAMP not null comment 'created time',
+    update_time datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment 'updated time',
+    constraint uk_role_code
+        unique (role_code)
+)
+    comment 'role table' charset = utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `user_role` (
-  `id` BIGINT NOT NULL COMMENT 'id',
-  `user_id` BIGINT NOT NULL COMMENT 'user id',
-  `role_id` BIGINT NOT NULL COMMENT 'role id',
-  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'created time',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_user_role` (`user_id`, `role_id`),
-  KEY `idx_user_role_role_id` (`role_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='user role relation table';
+
+
+-- auto-generated definition
+create table user_role
+(
+    id          bigint                             not null comment 'id'
+        primary key,
+    user_id     bigint                             not null comment 'user id',
+    role_id     bigint                             not null comment 'role id',
+    create_time datetime default CURRENT_TIMESTAMP not null comment 'created time',
+    constraint uk_user_role
+        unique (user_id, role_id)
+)
+    comment 'user role relation table' charset = utf8mb4;
+
+create index idx_user_role_role_id
+    on user_role (role_id);
+
+
 
 INSERT INTO `role` (`role_id`, `role_code`, `role_name`, `description`)
 VALUES
