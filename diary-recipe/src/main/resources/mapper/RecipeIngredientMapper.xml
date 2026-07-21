@@ -4,80 +4,82 @@
 <mapper namespace="diary.recipe.mapper.RecipeIngredientMapper">
 
     <resultMap id="BaseResultMap" type="diary.common.entity.recipe.po.RecipeIngredientPO">
-        <id column="ingredient_id" property="ingredientId"/>
+        <id column="id" property="id"/>
         <result column="recipe_id" property="recipeId"/>
+        <result column="user_id" property="userId"/>
         <result column="name" property="name"/>
         <result column="quantity" property="quantity"/>
         <result column="is_main" property="isMain"/>
-        <result column="sort_order" property="sortOrder"/>
+        <result column="sort" property="sort"/>
+        <result column="deleted" property="deleted"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
     </resultMap>
 
     <sql id="BaseColumns">
-        ingredient_id, recipe_id, name, quantity, is_main, sort_order
+        id, recipe_id, user_id, name, quantity, is_main, sort, deleted, create_time, update_time
     </sql>
 
-    <!-- 批量插入 -->
     <insert id="batchInsert">
-        INSERT INTO recipe_ingredient (ingredient_id, recipe_id, name, quantity, is_main, sort_order)
-        VALUES
+        INSERT INTO recipe_ingredient (
+            id, recipe_id, user_id, name, quantity, is_main, sort, deleted, create_time, update_time
+        ) VALUES
         <foreach collection="list" item="item" separator=",">
-            (#{item.ingredientId}, #{item.recipeId}, #{item.name},
-            #{item.quantity}, #{item.isMain}, #{item.sortOrder})
+            (#{item.id}, #{item.recipeId}, #{item.userId}, #{item.name}, #{item.quantity}, #{item.isMain},
+             #{item.sort}, #{item.deleted}, #{item.createTime}, #{item.updateTime})
         </foreach>
     </insert>
 
-    <!-- 根据食谱ID查询 -->
     <select id="selectByRecipeId" resultMap="BaseResultMap">
         SELECT <include refid="BaseColumns"/>
         FROM recipe_ingredient
         WHERE recipe_id = #{recipeId}
-        ORDER BY sort_order ASC
+          AND deleted = 0
+        ORDER BY sort ASC, id ASC
     </select>
 
-    <!-- 根据食谱ID列表批量查询 -->
     <select id="selectByRecipeIds" resultMap="BaseResultMap">
         SELECT <include refid="BaseColumns"/>
         FROM recipe_ingredient
-        WHERE recipe_id IN
+        WHERE deleted = 0
+          AND recipe_id IN
         <foreach collection="recipeIds" item="id" open="(" separator="," close=")">
             #{id}
         </foreach>
-        ORDER BY recipe_id, sort_order ASC
+        ORDER BY recipe_id ASC, sort ASC, id ASC
     </select>
 
-    <!-- 根据食谱ID删除 -->
-    <delete id="deleteByRecipeId">
-        DELETE FROM recipe_ingredient
+    <update id="deleteByRecipeId">
+        UPDATE recipe_ingredient
+        SET deleted = 1,
+            update_time = NOW()
         WHERE recipe_id = #{recipeId}
-    </delete>
+          AND deleted = 0
+    </update>
 
-    <!-- 根据ID列表删除 -->
-    <delete id="deleteByIds">
-        DELETE FROM recipe_ingredient
-        WHERE ingredient_id IN
+    <update id="deleteByIds">
+        UPDATE recipe_ingredient
+        SET deleted = 1,
+            update_time = NOW()
+        WHERE deleted = 0
+          AND id IN
         <foreach collection="ids" item="id" open="(" separator="," close=")">
             #{id}
         </foreach>
-    </delete>
+    </update>
 
     <update id="batchUpdate">
-        <foreach collection="ingredients" item="ingredient" separator=";">
+        <foreach collection="list" item="item" separator=";">
             UPDATE recipe_ingredient
             <set>
-                <if test="ingredient.name != null and ingredient.name != ''">
-                    name = #{ingredient.name},
-                </if>
-                <if test="ingredient.quantity != null and ingredient.quantity != ''">
-                    quantity = #{ingredient.quantity},
-                </if>
-                <if test="ingredient.isMain != null">
-                    is_main = #{ingredient.isMain},
-                </if>
-                <if test="ingredient.sortOrder != null">
-                    sort_order = #{ingredient.sortOrder},
-                </if>
+                <if test="item.name != null and item.name != ''">name = #{item.name},</if>
+                <if test="item.quantity != null and item.quantity != ''">quantity = #{item.quantity},</if>
+                <if test="item.isMain != null">is_main = #{item.isMain},</if>
+                <if test="item.sort != null">sort = #{item.sort},</if>
+                update_time = NOW()
             </set>
-            WHERE recipe_id = #{recipeId} AND sort_order = #{ingredient.sortOrder}
+            WHERE id = #{item.id}
+              AND deleted = 0
         </foreach>
     </update>
 </mapper>

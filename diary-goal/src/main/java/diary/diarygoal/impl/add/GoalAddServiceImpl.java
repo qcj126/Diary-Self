@@ -14,8 +14,6 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-
 @Service
 public class GoalAddServiceImpl implements GoalAddService {
     @Resource
@@ -24,13 +22,7 @@ public class GoalAddServiceImpl implements GoalAddService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ApiResponse<String> addGoal(StageGoalDTO stageGoalDTO) {
-        if (stageGoalDTO == null) throw new ParamIllegalException("request body is empty");
-        if (stageGoalDTO.getUserId() == null
-                || stageGoalDTO.getCategory() == null
-                || stageGoalDTO.getTitle() == null
-                || stageGoalDTO.getDescription() == null) {
-            throw new ParamIllegalException("required parameters cannot be empty");
-        }
+        validateStageGoal(stageGoalDTO);
 
         Long stageGoalId = MyUtils.getPrimaryKey();
         stageGoalDTO.setId(stageGoalId);
@@ -39,15 +31,31 @@ public class GoalAddServiceImpl implements GoalAddService {
 
         if (stageGoalDTO.getSubGoals() != null) {
             for (SubGoalDTO subGoalDTO : stageGoalDTO.getSubGoals()) {
-                if (subGoalDTO == null || subGoalDTO.getTitle() == null) {
+                if (subGoalDTO == null || isBlank(subGoalDTO.getTitle())) {
                     continue;
                 }
                 subGoalDTO.setId(MyUtils.getPrimaryKey());
+                subGoalDTO.setStageGoalId(stageGoalId);
+                subGoalDTO.setUserId(stageGoalDTO.getUserId());
                 SubGoalPO subGoalPO = DTOConvertToPO.subGoalDTOConvertToSubGoalPO(subGoalDTO);
                 goalMapper.insertSubGoal(subGoalPO);
             }
         }
 
         return ApiResponse.success("新增目标成功");
+    }
+
+    private void validateStageGoal(StageGoalDTO stageGoalDTO) {
+        if (stageGoalDTO == null) {
+            throw new ParamIllegalException("request body is empty");
+        }
+        if (stageGoalDTO.getUserId() == null || isBlank(stageGoalDTO.getCategory())
+                || isBlank(stageGoalDTO.getTitle()) || isBlank(stageGoalDTO.getDescription())) {
+            throw new ParamIllegalException("required parameters cannot be empty");
+        }
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
     }
 }

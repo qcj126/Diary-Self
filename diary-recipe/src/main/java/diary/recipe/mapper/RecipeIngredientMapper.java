@@ -1,6 +1,5 @@
 package diary.recipe.mapper;
 
-import diary.common.entity.recipe.ao.RecipeIngredientAO;
 import diary.common.entity.recipe.po.RecipeIngredientPO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -25,14 +24,14 @@ public interface RecipeIngredientMapper {
     List<RecipeIngredientPO> selectByRecipeIds(@Param("recipeIds") List<Long> recipeIds);
 
     /**
-     * 根据食谱ID删除所有食材
+     * 根据食谱ID逻辑删除所有食材
      */
     void deleteByRecipeId(@Param("recipeId") Long recipeId);
 
     /**
-     * 根据食谱ID和食材ID批量删除（更新时差额删除用）
+     * 根据ID列表逻辑删除
      */
     int deleteByIds(@Param("ids") List<Long> ids);
 
-    void batchUpdate(List<RecipeIngredientAO> ingredients, Long recipeId);
+    void batchUpdate(@Param("list") List<RecipeIngredientPO> ingredients);
 }

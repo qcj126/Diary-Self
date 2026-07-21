@@ -3,12 +3,11 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="diary.recipe.mapper.RecipeMapper">
 
-    <!-- 结果映射 -->
     <resultMap id="BaseResultMap" type="diary.common.entity.recipe.po.RecipePO">
-        <id column="recipe_id" property="id"/>
-        <result column="author_id" property="userId"/>
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
         <result column="title" property="title"/>
-        <result column="cover_img" property="coverImg"/>
+        <result column="image_id" property="imageId"/>
         <result column="description" property="description"/>
         <result column="category" property="category"/>
         <result column="meal_type" property="mealType"/>
@@ -21,206 +20,152 @@
         <result column="update_time" property="updateTime"/>
     </resultMap>
 
-    <!-- 通用查询条件（可复用） -->
-    <sql id="where_condition">
+    <sql id="BaseColumns">
+        id, user_id, title, image_id, description, category, meal_type,
+        difficulty, cooking_time, story, sort, deleted, create_time, update_time
+    </sql>
+
+    <sql id="PageWhereCondition">
         <where>
-            <!-- 分类筛选 -->
+            deleted = 0
             <if test="req.category != null">
                 AND category = #{req.category}
             </if>
-            <!-- 餐别筛选 -->
             <if test="req.mealType != null">
                 AND meal_type = #{req.mealType}
             </if>
-            <!-- 难度筛选 -->
             <if test="req.difficulty != null">
                 AND difficulty = #{req.difficulty}
             </if>
-            <!-- 关键词模糊搜索 -->
             <if test="req.keyword != null and req.keyword != ''">
-                AND title LIKE CONCAT('%', #{req.keyword}, '%')
+                AND (title LIKE CONCAT('%', #{req.keyword}, '%')
+                     OR description LIKE CONCAT('%', #{req.keyword}, '%'))
             </if>
         </where>
     </sql>
 
-    <!-- 基础字段 -->
-    <sql id="BaseColumns">
-        recipe_id, author_id, title, cover_img, description,
-        category, meal_type, difficulty, cooking_time, story, sort, deleted,
-        create_time, update_time
-    </sql>
-
-    <!-- 插入 -->
     <insert id="insert" parameterType="diary.common.entity.recipe.po.RecipePO">
         INSERT INTO recipe (
-            recipe_id, author_id, title, cover_img, description,
-            category, meal_type, difficulty, cooking_time, story, sort, deleted,
-            create_time, update_time
+            id, user_id, title, image_id, description, category, meal_type,
+            difficulty, cooking_time, story, sort, deleted, create_time, update_time
         ) VALUES (
-                     #{id}, #{userId}, #{title}, #{coverImg}, #{description},
-                     #{category}, #{mealType}, #{difficulty}, #{cookingTime}, #{story}, #{sort}, #{deleted},
-                     NOW(), NOW()
-                 )
+            #{id}, #{userId}, #{title}, #{imageId}, #{description}, #{category}, #{mealType},
+            #{difficulty}, #{cookingTime}, #{story}, #{sort}, #{deleted}, #{createTime}, #{updateTime}
+        )
     </insert>
 
-    <!-- 根据ID查询 -->
     <select id="selectById" resultMap="BaseResultMap">
         SELECT <include refid="BaseColumns"/>
         FROM recipe
-        WHERE recipe_id = #{recipeId}
-        AND status != 2
+        WHERE id = #{recipeId}
+          AND deleted = 0
     </select>
 
-    <!-- 根据ID更新（动态SQL） -->
-    <update id="updateById" parameterType="diary.common.entity.recipe.dto.req.RecipeReqDto">
+    <update id="updateById">
         UPDATE recipe
         <set>
-            <if test="title != null">title = #{title},</if>
-            <if test="coverImg != null">cover_img = #{coverImg},</if>
-            <if test="description != null">description = #{description},</if>
-            <if test="category != null">category = #{category},</if>
-            <if test="mealType != null">meal_type = #{mealType},</if>
-            <if test="difficulty != null">difficulty = #{difficulty},</if>
-            <if test="cookingTime != null">cooking_time = #{cookingTime},</if>
-            <if test="story != null">story = #{story},</if>
-            <if test="isAnniversary != null">is_anniversary = #{isAnniversary},</if>
-            <if test="anniversaryDate != null">anniversary_date = #{anniversaryDate},</if>
+            <if test="req.title != null and req.title != ''">title = #{req.title},</if>
+            <if test="req.description != null and req.description != ''">description = #{req.description},</if>
+            <if test="req.category != null">category = #{req.category},</if>
+            <if test="req.mealType != null">meal_type = #{req.mealType},</if>
+            <if test="req.difficulty != null">difficulty = #{req.difficulty},</if>
+            <if test="req.cookingTime != null">cooking_time = #{req.cookingTime},</if>
+            <if test="req.story != null">story = #{req.story},</if>
             update_time = NOW()
         </set>
-        WHERE recipe_id = #{recipeId}
-        AND status != 2
+        WHERE id = #{recipeId}
+          AND deleted = 0
     </update>
 
-    <!-- 逻辑删除 -->
     <update id="updateStatus">
         UPDATE recipe
-        SET status = #{status},
+        SET deleted = #{status},
             update_time = NOW()
-        WHERE recipe_id = #{recipeId}
-          AND author_id = #{operatorId}
+        WHERE id = #{recipeId}
+          AND user_id = #{operatorId}
+          AND deleted = 0
     </update>
 
-    <!-- 查询用户创建的食谱 -->
     <select id="selectByAuthor" resultMap="BaseResultMap">
         SELECT <include refid="BaseColumns"/>
         FROM recipe
-        WHERE author_id = #{authorId}
-        AND status != 2
-        ORDER BY create_time DESC
+        WHERE user_id = #{authorId}
+          AND deleted = 0
+        ORDER BY sort ASC, create_time DESC
         LIMIT #{offset}, #{limit}
     </select>
 
-    <!-- 查询情侣空间食谱 -->
-    <select id="selectByCouple" resultMap="BaseResultMap">
-        SELECT <include refid="BaseColumns"/>
-        FROM recipe
-        WHERE couple_id = #{coupleId}
-        <if test="status != null">
-            AND status = #{status}
-        </if>
-        <if test="status == null">
-            AND status != 2
-        </if>
-        ORDER BY create_time DESC
-        LIMIT #{offset}, #{limit}
-    </select>
-
-    <!-- 条件搜索 -->
     <select id="search" resultMap="BaseResultMap">
         SELECT <include refid="BaseColumns"/>
         FROM recipe
-        WHERE status = 1
+        WHERE deleted = 0
         <if test="keyword != null and keyword != ''">
             AND (title LIKE CONCAT('%', #{keyword}, '%')
-            OR description LIKE CONCAT('%', #{keyword}, '%'))
+                 OR description LIKE CONCAT('%', #{keyword}, '%'))
         </if>
-        <if test="category != null">
-            AND category = #{category}
-        </if>
-        <if test="mealType != null">
-            AND meal_type = #{mealType}
-        </if>
-        <if test="difficulty != null">
-            AND difficulty = #{difficulty}
-        </if>
-        ORDER BY
-        <choose>
-            <when test="keyword != null and keyword != ''">view_count DESC</when>
-            <otherwise>create_time DESC</otherwise>
-        </choose>
+        <if test="category != null">AND category = #{category}</if>
+        <if test="mealType != null">AND meal_type = #{mealType}</if>
+        <if test="difficulty != null">AND difficulty = #{difficulty}</if>
+        ORDER BY sort ASC, create_time DESC
         LIMIT #{offset}, #{limit}
     </select>
 
-    <!-- 条件搜索总数 -->
     <select id="countSearch" resultType="int">
         SELECT COUNT(*)
         FROM recipe
-        WHERE status = 1
+        WHERE deleted = 0
         <if test="keyword != null and keyword != ''">
             AND (title LIKE CONCAT('%', #{keyword}, '%')
-            OR description LIKE CONCAT('%', #{keyword}, '%'))
+                 OR description LIKE CONCAT('%', #{keyword}, '%'))
         </if>
         <if test="category != null">AND category = #{category}</if>
         <if test="mealType != null">AND meal_type = #{mealType}</if>
         <if test="difficulty != null">AND difficulty = #{difficulty}</if>
     </select>
 
-    <!-- 浏览量 +1 -->
-    <update id="incrementViewCount">
-        UPDATE recipe
-        SET view_count = view_count + 1, update_time = NOW()
-        WHERE recipe_id = #{recipeId}
-    </update>
-
-    <!-- 批量更新点赞数 -->
-    <update id="batchUpdateLikeCount">
+    <update id="batchUpdate">
         <foreach collection="list" item="item" separator=";">
             UPDATE recipe
-            SET like_count = #{item.likeCount}, update_time = NOW()
-            WHERE recipe_id = #{item.recipeId}
+            <set>
+                <if test="item.title != null and item.title != ''">title = #{item.title},</if>
+                <if test="item.description != null and item.description != ''">description = #{item.description},</if>
+                <if test="item.category != null">category = #{item.category},</if>
+                <if test="item.mealType != null">meal_type = #{item.mealType},</if>
+                <if test="item.difficulty != null">difficulty = #{item.difficulty},</if>
+                <if test="item.cookingTime != null">cooking_time = #{item.cookingTime},</if>
+                <if test="item.story != null">story = #{item.story},</if>
+                <if test="item.sort != null">sort = #{item.sort},</if>
+                update_time = NOW()
+            </set>
+            WHERE id = #{item.id}
+              AND deleted = 0
         </foreach>
     </update>
 
-    <!-- 根据ID列表查询 -->
     <select id="selectByIds" resultMap="BaseResultMap">
         SELECT <include refid="BaseColumns"/>
         FROM recipe
-        WHERE recipe_id IN
+        WHERE deleted = 0
+          AND id IN
         <foreach collection="ids" item="id" open="(" separator="," close=")">
             #{id}
         </foreach>
-        AND status != 2
     </select>
 
-    <!-- 根据纪念日查询 -->
-    <select id="selectByAnniversary" resultMap="BaseResultMap">
-        SELECT
-        <include refid="BaseColumns"/>
-        FROM recipe
-        WHERE couple_id = #{coupleId}
-            AND is_anniversary = 1
-            AND anniversary_date = #{date}
-            AND status = 1
-        ORDER BY create_time DESC
-    </select>
-
-    <select id="selectByAuthorTitle" resultType="diary.common.entity.recipe.po.RecipePO">
+    <select id="selectByAuthorTitle" resultMap="BaseResultMap">
         SELECT <include refid="BaseColumns"/>
         FROM recipe
-        WHERE author_id = #{authorId}
-            AND title = #{title}
-            AND meal_type = #{mealType}
-            AND status != 2
+        WHERE user_id = #{authorId}
+          AND title = #{title}
+          AND meal_type = #{mealType}
+          AND deleted = 0
+        LIMIT 1
     </select>
 
     <select id="qryPage" resultMap="BaseResultMap">
         SELECT <include refid="BaseColumns"/>
         FROM recipe
-        <include refid="where_condition" />
-        ORDER BY create_time DESC, id DESC
+        <include refid="PageWhereCondition" />
+        ORDER BY sort ASC, create_time DESC, id DESC
     </select>
-
-    <update id="batchUpdate">
-
-    </update>
 </mapper>

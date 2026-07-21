@@ -7,23 +7,22 @@ import java.time.LocalDateTime;
 
 public class DtoConvertToPo {
     public static RecipePO recipeReqDtoConvertToPO(RecipeReqDto recipeReqDto) {
+        LocalDateTime now = LocalDateTime.now();
         RecipePO recipePO = new RecipePO();
-        // 填充元素
         recipePO.setId(recipeReqDto.getId());
         recipePO.setUserId(recipeReqDto.getAuthorId());
         recipePO.setTitle(recipeReqDto.getTitle());
-        recipePO.setCoverImg(recipeReqDto.getCoverImg());
+        recipePO.setImageId(recipeReqDto.getImageId());
         recipePO.setDescription(recipeReqDto.getDescription());
         recipePO.setCategory(recipeReqDto.getCategory());
         recipePO.setMealType(recipeReqDto.getMealType());
         recipePO.setDifficulty(recipeReqDto.getDifficulty());
         recipePO.setCookingTime(recipeReqDto.getCookingTime());
-        recipePO.setStory(recipeReqDto.getStory());
-        recipePO.setCategory(recipeReqDto.getCategory());
+        recipePO.setStory(recipeReqDto.getStory() == null ? "" : recipeReqDto.getStory());
         recipePO.setSort(0);
         recipePO.setDeleted(0);
-        recipePO.setCreateTime(LocalDateTime.now());
-        recipePO.setUpdateTime(LocalDateTime.now());
+        recipePO.setCreateTime(now);
+        recipePO.setUpdateTime(now);
         return recipePO;
     }
 }

@@ -2,7 +2,6 @@ CREATE TABLE recipe(
     id                      BIGINT UNSIGNED         NOT NULL COMMENT '主键',
     user_id                 BIGINT UNSIGNED         NOT NULL COMMENT '创建者用户ID',
     title                   VARCHAR(90)             NOT NULL COMMENT '标题',
-    cover_img               VARCHAR(255)            NOT NULL COMMENT '封面图URL',
     description             VARCHAR(300)            NOT NULL COMMENT '简介',
     category                TINYINT                 NOT NULL COMMENT '分类：0-家常 1-西餐 2-甜点 3-汤粥 4-其他',
     meal_type               TINYINT                 NOT NULL COMMENT '餐别：1-早餐 2-午餐 3-晚餐 4-夜宵',

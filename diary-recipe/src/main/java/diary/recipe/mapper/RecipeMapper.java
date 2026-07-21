@@ -22,7 +22,7 @@ public interface RecipeMapper {
     RecipePO selectById(@Param("recipeId") Long recipeId);
 
     /**
-     * 逻辑删除（修改status）
+     * 逻辑删除
      */
     int updateStatus(@Param("recipeId") Long recipeId,
                      @Param("status") Integer status,
@@ -32,14 +32,6 @@ public interface RecipeMapper {
      * 分页查询用户创建的食谱
      */
     List<RecipePO> selectByAuthor(@Param("authorId") Long authorId,
-                                  @Param("offset") Integer offset,
-                                  @Param("limit") Integer limit);
-
-    /**
-     * 分页查询情侣空间食谱
-     */
-    List<RecipePO> selectByCouple(@Param("coupleId") Long coupleId,
-                                  @Param("status") Integer status,
                                   @Param("offset") Integer offset,
                                   @Param("limit") Integer limit);
 
@@ -64,12 +56,7 @@ public interface RecipeMapper {
                     @Param("status") Integer status);
 
     /**
-     * 更新浏览量 +1
-     */
-    int incrementViewCount(@Param("recipeId") Long recipeId);
-
-    /**
-     * 批量更新点赞数（异步汇总用）
+     * 批量更新
      */
     int batchUpdate(@Param("list") List<RecipePO> list);
 
@@ -78,15 +65,11 @@ public interface RecipeMapper {
      */
     List<RecipePO> selectByIds(@Param("ids") List<Long> ids);
 
-    /**
-     * 根据纪念日查询食谱
-     */
-    List<RecipePO> selectByAnniversary(@Param("coupleId") Long coupleId,
-                                       @Param("date") String date);
-
-    RecipePO selectByAuthorTitle(Long authorId, String title, Integer mealType);
+    RecipePO selectByAuthorTitle(@Param("authorId") Long authorId,
+                                 @Param("title") String title,
+                                 @Param("mealType") Integer mealType);
 
     IPage<RecipePO> qryPage(IPage<RecipePO> page, @Param("req") RecipePageReqDto recipePageReqDto);
 
-    void updateById(RecipeReqDto recipeReqDto, Long recipeId);
+    void updateById(@Param("req") RecipeReqDto recipeReqDto, @Param("recipeId") Long recipeId);
 }

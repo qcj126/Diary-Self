@@ -4,78 +4,84 @@
 <mapper namespace="diary.recipe.mapper.RecipeStepMapper">
 
     <resultMap id="BaseResultMap" type="diary.common.entity.recipe.po.RecipeStepPO">
-        <id column="step_id" property="stepId"/>
+        <id column="id" property="id"/>
         <result column="recipe_id" property="recipeId"/>
+        <result column="user_id" property="userId"/>
         <result column="step_number" property="stepNumber"/>
         <result column="description" property="description"/>
-        <result column="image_url" property="imageUrl"/>
-        <result column="timer_min" property="timerMin"/>
-        <result column="sort_order" property="sortOrder"/>
+        <result column="timer_minute" property="timerMinute"/>
+        <result column="sort" property="sort"/>
+        <result column="deleted" property="deleted"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
     </resultMap>
 
     <sql id="BaseColumns">
-        step_id, recipe_id, step_number, description, image_url, timer_min, sort_order
+        id, recipe_id, user_id, step_number, description, timer_minute,
+        sort, deleted, create_time, update_time
     </sql>
 
-    <!-- 批量插入 -->
     <insert id="batchInsert">
-        INSERT INTO recipe_step (step_id, recipe_id, step_number, description, image_url, timer_min, sort_order)
-        VALUES
+        INSERT INTO recipe_step (
+            id, recipe_id, user_id, step_number, description, timer_minute,
+            sort, deleted, create_time, update_time
+        ) VALUES
         <foreach collection="list" item="item" separator=",">
-            (#{item.stepId}, #{item.recipeId}, #{item.stepNumber}, #{item.description},
-            #{item.imageUrl}, #{item.timerMin}, #{item.sortOrder})
+            (#{item.id}, #{item.recipeId}, #{item.userId}, #{item.stepNumber}, #{item.description},
+             #{item.timerMinute}, #{item.sort}, #{item.deleted}, #{item.createTime}, #{item.updateTime})
         </foreach>
     </insert>
 
-    <!-- 根据食谱ID查询 -->
     <select id="selectByRecipeId" resultMap="BaseResultMap">
         SELECT <include refid="BaseColumns"/>
         FROM recipe_step
         WHERE recipe_id = #{recipeId}
-        ORDER BY sort_order ASC
+          AND deleted = 0
+        ORDER BY sort ASC, step_number ASC, id ASC
     </select>
 
-    <!-- 根据食谱ID列表批量查询 -->
     <select id="selectByRecipeIds" resultMap="BaseResultMap">
         SELECT <include refid="BaseColumns"/>
         FROM recipe_step
-        WHERE recipe_id IN
+        WHERE deleted = 0
+          AND recipe_id IN
         <foreach collection="recipeIds" item="id" open="(" separator="," close=")">
             #{id}
         </foreach>
-        ORDER BY recipe_id, sort_order ASC
+        ORDER BY recipe_id ASC, sort ASC, step_number ASC, id ASC
     </select>
 
-    <!-- 根据食谱ID删除 -->
-    <delete id="deleteByRecipeId">
-        DELETE FROM recipe_step
+    <update id="deleteByRecipeId">
+        UPDATE recipe_step
+        SET deleted = 1,
+            update_time = NOW()
         WHERE recipe_id = #{recipeId}
-    </delete>
+          AND deleted = 0
+    </update>
 
-    <!-- 根据ID列表删除 -->
-    <delete id="deleteByIds">
-        DELETE FROM recipe_step
-        WHERE step_id IN
+    <update id="deleteByIds">
+        UPDATE recipe_step
+        SET deleted = 1,
+            update_time = NOW()
+        WHERE deleted = 0
+          AND id IN
         <foreach collection="ids" item="id" open="(" separator="," close=")">
             #{id}
         </foreach>
-    </delete>
+    </update>
 
     <update id="batchUpdate">
-        <foreach collection="steps" item="step" separator=";">
+        <foreach collection="list" item="item" separator=";">
             UPDATE recipe_step
             <set>
-                <if test="step.description != null and step.description != ''">
-                    description = #{item.description},
-                </if>
-                <if test="step.imageUrl != null and step.imageUrl != ''">
-                    image_url = #{item.imageUrl},
-                </if>
-                <if test="step.timerMin != null">
-                    timer_min = #{item.timerMin},
-                </if>
+                <if test="item.stepNumber != null">step_number = #{item.stepNumber},</if>
+                <if test="item.description != null and item.description != ''">description = #{item.description},</if>
+                <if test="item.timerMinute != null">timer_minute = #{item.timerMinute},</if>
+                <if test="item.sort != null">sort = #{item.sort},</if>
+                update_time = NOW()
             </set>
-            WHERE recipe_id = #{recipeId} AND sort_order = #{item.sortOrder}
+            WHERE id = #{item.id}
+              AND deleted = 0
         </foreach>
     </update>
 </mapper>

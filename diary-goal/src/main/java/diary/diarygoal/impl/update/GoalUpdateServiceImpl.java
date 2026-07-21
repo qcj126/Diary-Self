@@ -14,8 +14,6 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-
 @Service
 public class GoalUpdateServiceImpl implements GoalUpdateService {
     @Resource
@@ -35,7 +33,7 @@ public class GoalUpdateServiceImpl implements GoalUpdateService {
             throw new ParamIllegalException("goal does not exist");
         }
 
-        stageGoalDTO.setId(existGoal.getId());
+        fillStageGoalDefaults(stageGoalDTO, existGoal);
         StageGoalPO stageGoalPO = DTOConvertToPO.stageGoalDTOConvertToStageGoalPO(stageGoalDTO);
         goalMapper.updateStageGoalById(stageGoalPO);
 
@@ -44,10 +42,13 @@ public class GoalUpdateServiceImpl implements GoalUpdateService {
                 if (subGoalDTO == null || isBlank(subGoalDTO.getTitle())) {
                     continue;
                 }
+                subGoalDTO.setStageGoalId(existGoal.getId());
+                subGoalDTO.setUserId(stageGoalDTO.getUserId());
                 if (subGoalDTO.getId() == null) {
-                    goalMapper.insertSubGoal(buildNewSubGoalPO(existGoal, stageGoalDTO, subGoalDTO));
+                    subGoalDTO.setId(MyUtils.getPrimaryKey());
+                    goalMapper.insertSubGoal(DTOConvertToPO.subGoalDTOConvertToSubGoalPO(subGoalDTO));
                 } else {
-                    goalMapper.updateSubGoalById(buildUpdateSubGoalPO(stageGoalDTO.getId(), subGoalDTO));
+                    goalMapper.updateSubGoalById(buildUpdateSubGoalPO(subGoalDTO));
                 }
             }
         }
@@ -55,22 +56,36 @@ public class GoalUpdateServiceImpl implements GoalUpdateService {
         return ApiResponse.success("goal updated successfully");
     }
 
-    private SubGoalPO buildNewSubGoalPO(StageGoalPO existGoal, StageGoalDTO stageGoalDTO, SubGoalDTO subGoalDTO) {
-        subGoalDTO.setId(MyUtils.getPrimaryKey());
-        SubGoalPO subGoalPO = DTOConvertToPO.subGoalDTOConvertToSubGoalPO(subGoalDTO);
-        subGoalPO.setId(MyUtils.getPrimaryKey());
-        subGoalPO.setUserId(stageGoalDTO.getUserId() == null ? existGoal.getUserId() : stageGoalDTO.getUserId());
-        subGoalPO.setDeleted(false);
-        return subGoalPO;
+    private void fillStageGoalDefaults(StageGoalDTO stageGoalDTO, StageGoalPO existGoal) {
+        stageGoalDTO.setId(existGoal.getId());
+        if (stageGoalDTO.getUserId() == null) {
+            stageGoalDTO.setUserId(existGoal.getUserId());
+        }
+        if (isBlank(stageGoalDTO.getCreator())) {
+            stageGoalDTO.setCreator(existGoal.getCreator());
+        }
+        if (isBlank(stageGoalDTO.getCategory())) {
+            stageGoalDTO.setCategory(existGoal.getCategory());
+        }
+        if (isBlank(stageGoalDTO.getTitle())) {
+            stageGoalDTO.setTitle(existGoal.getTitle());
+        }
+        if (stageGoalDTO.getDescription() == null) {
+            stageGoalDTO.setDescription(existGoal.getDescription());
+        }
     }
 
-    private SubGoalPO buildUpdateSubGoalPO(Long stageGoalId, SubGoalDTO subGoalDTO) {
-        subGoalDTO.setStageGoalId(stageGoalId);
-        return DTOConvertToPO.subGoalDTOConvertToSubGoalPO(subGoalDTO);
-    }
-
-    private BigDecimal defaultZero(BigDecimal value) {
-        return value == null ? BigDecimal.ZERO : value;
+    private SubGoalPO buildUpdateSubGoalPO(SubGoalDTO subGoalDTO) {
+        return SubGoalPO.builder()
+                .id(subGoalDTO.getId())
+                .stageGoalId(subGoalDTO.getStageGoalId())
+                .userId(subGoalDTO.getUserId())
+                .title(subGoalDTO.getTitle())
+                .content(subGoalDTO.getContent())
+                .learnedHours(subGoalDTO.getLearnedHours())
+                .estimatedHours(subGoalDTO.getEstimatedHours())
+                .deleted(false)
+                .build();
     }
 
     private boolean isBlank(String value) {

@@ -17,7 +17,7 @@ public class RecipeReqDto {
     private String title;
 
     /** 封面图 */
-    private String coverImg;
+    private Long imageId;
 
     /** 简介 */
     private String description;
@@ -36,15 +36,6 @@ public class RecipeReqDto {
 
     /** 情感故事 */
     private String story;
-
-    /** 是否纪念日专属 */
-    private Integer isAnniversary;
-
-    /** 纪念日 */
-    private LocalDate anniversaryDate;
-
-    /** 状态 0-草稿 1-上架 2-下架 */
-    private Integer status;
 
     /** 食材列表 */
     private List<RecipeIngredientAO> ingredients;

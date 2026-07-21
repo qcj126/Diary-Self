@@ -15,14 +15,11 @@ public class RecipeVO {
     /** 作者信息 */
     private AuthorInfoAO author;
 
-    /** 情侣空间ID */
-    private Long coupleId;
-
     /** 标题 */
     private String title;
 
     /** 封面图 */
-    private String coverImg;
+    private Long imageId;
 
     /** 简介 */
     private String description;
@@ -47,27 +44,6 @@ public class RecipeVO {
 
     /** 情感故事 */
     private String story;
-
-    /** 是否纪念日专属 */
-    private Integer isAnniversary;
-
-    /** 纪念日 */
-    private LocalDate anniversaryDate;
-
-    /** 浏览量 */
-    private Integer viewCount;
-
-    /** 点赞数 */
-    private Integer likeCount;
-
-    /** 做过的人数 */
-    private Integer cookCount;
-
-    /** 当前用户是否已点赞 */
-    private Boolean isLiked;
-
-    /** 当前用户是否已收藏 */
-    private Boolean isFavorited;
 
     /** 食材列表 */
     private List<IngredientVO> ingredients;

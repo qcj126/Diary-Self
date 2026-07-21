@@ -15,7 +15,7 @@ public class RecipePO {
     @NotNull
     private String title;                   // 标题
     @NotNull
-    private String coverImg;               // 封面图URL
+    private Long imageId;                 // 图片ID
     @NotNull
     private String description;           // 简介
     @NotNull

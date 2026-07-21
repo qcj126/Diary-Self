@@ -7,5 +7,5 @@ public class RecipeIngredientAO {
     private String name;
     private String quantity;
     private Integer isMain;
-    private Integer sortOrder;
+    private Integer sort;
 }

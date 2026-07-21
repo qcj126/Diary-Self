@@ -1,21 +1,19 @@
 package diary.recipe.controller;
 
 import diary.common.entity.recipe.dto.req.RecipePageReqDto;
+import diary.common.entity.recipe.dto.req.RecipeReqDto;
 import diary.common.entity.recipe.dto.resp.PageRespDto;
 import diary.common.entity.recipe.vo.RecipeVO;
 import diary.common.result.ApiResponse;
-import diary.common.entity.recipe.dto.req.RecipeReqDto;
+import diary.recipe.service.add.RecipeAddService;
+import diary.recipe.service.delete.RecipeDeleteService;
+import diary.recipe.service.query.RecipeQueryService;
+import diary.recipe.service.update.RecipeUpdateService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import diary.recipe.service.add.RecipeAddService;
-import diary.recipe.service.delete.RecipeDeleteService;
-import diary.recipe.service.query.RecipeQueryService;
-import diary.recipe.service.update.RecipeUpdateService;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/recipe")
@@ -47,6 +45,7 @@ public class RecipeController {
     public ApiResponse<String> updateRecipe(@RequestBody RecipeReqDto recipeReqDto) {
         return recipeUpdateService.updateRecipe(recipeReqDto);
     }
+
     // 删除食谱
     @PostMapping("/delete")
     public ApiResponse<String> deleteRecipe(@RequestBody RecipeReqDto recipeReqDto) {

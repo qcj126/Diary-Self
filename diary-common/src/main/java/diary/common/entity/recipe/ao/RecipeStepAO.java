@@ -6,7 +6,6 @@ import lombok.Data;
 public class RecipeStepAO {
     private Integer stepNumber;
     private String description;
-    private String imageUrl;
     private Integer timerMin;
-    private Integer sortOrder;
+    private Integer sort;
 }
