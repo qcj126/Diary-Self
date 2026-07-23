@@ -23,7 +23,6 @@ create table sub_goal
     content         varchar(255)                             null comment '详细内容描述',
     learned_hours   decimal(10, 2) default 0.00              null comment '已学时长(小时)',
     estimated_hours decimal(10, 2) default 0.00              null comment '预计总用时(小时)',
-    is_deleted      tinyint(1)     default 0                 null comment '软删除标记',
     create_time     datetime       default CURRENT_TIMESTAMP null comment '创建时间',
     update_time     datetime       default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP comment '修改时间'
 )

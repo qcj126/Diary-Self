@@ -2,6 +2,7 @@ package diary.diarygoal.controller;
 
 import diary.common.entity.goal.dto.GoalQueryDTO;
 import diary.common.entity.goal.dto.StageGoalDTO;
+import diary.common.entity.goal.dto.SubGoalDTO;
 import diary.common.entity.goal.vo.StageGoalVO;
 import diary.common.result.ApiResponse;
 
@@ -38,6 +39,11 @@ public class GoalController {
     @PostMapping("/add")
     public ApiResponse<String> addGoal(@RequestBody StageGoalDTO stageGoalDTO) {
         return goalAddService.addGoal(stageGoalDTO);
+    }
+
+    @PostMapping("/batch/addSubGoal")
+    public ApiResponse<String> batchAddSubGoal(@RequestBody List<SubGoalDTO> subGoalDTOList) {
+        return goalAddService.batchAddSubGoal(subGoalDTOList);
     }
 
     @PostMapping("/delete/{id}")

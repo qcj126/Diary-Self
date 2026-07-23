@@ -14,6 +14,9 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class GoalAddServiceImpl implements GoalAddService {
     @Resource
@@ -35,7 +38,7 @@ public class GoalAddServiceImpl implements GoalAddService {
                     continue;
                 }
                 subGoalDTO.setId(MyUtils.getPrimaryKey());
-                subGoalDTO.setStageGoalId(stageGoalId);
+                subGoalDTO.setStageId(stageGoalId);
                 subGoalDTO.setUserId(stageGoalDTO.getUserId());
                 SubGoalPO subGoalPO = DTOConvertToPO.subGoalDTOConvertToSubGoalPO(subGoalDTO);
                 goalMapper.insertSubGoal(subGoalPO);
@@ -43,6 +46,19 @@ public class GoalAddServiceImpl implements GoalAddService {
         }
 
         return ApiResponse.success("新增目标成功");
+    }
+
+    @Override
+    public ApiResponse<String> batchAddSubGoal(List<SubGoalDTO> subGoalDTOList) {
+        List<SubGoalPO> subGoalPOS = new ArrayList<>();
+        for (SubGoalDTO subGoalDTO : subGoalDTOList) {
+            SubGoalPO subGoalPO = DTOConvertToPO.subGoalDTOConvertToSubGoalPO(subGoalDTO);
+            subGoalPO.setId(MyUtils.getPrimaryKey());
+            subGoalPO.setUserId(10000L);
+            subGoalPOS.add(subGoalPO);
+        }
+        goalMapper.batchInsertSubGoal(subGoalPOS);
+        return ApiResponse.success("批量新增小目标成功");
     }
 
     private void validateStageGoal(StageGoalDTO stageGoalDTO) {

@@ -10,11 +10,9 @@ import java.time.LocalDateTime;
 public class StageGoalPO {
     private Long id;
     private Long userId;
-    private String creator;
     private String category;
     private String title;
     private String description;
-    private Boolean deleted;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 }

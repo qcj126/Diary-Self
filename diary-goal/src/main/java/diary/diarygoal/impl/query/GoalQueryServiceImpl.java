@@ -31,24 +31,22 @@ public class GoalQueryServiceImpl implements GoalQueryService {
             throw new ParamIllegalException("goal does not exist");
         }
         return ApiResponse.success(
-                POConvertToVO.convertToStageGoalVO(stageGoalPO, goalMapper.selectSubGoalsByStageGoalId(id))
+                POConvertToVO.convertToStageGoalVO(stageGoalPO, goalMapper.selectSubGoalsByStageId(id))
         );
     }
 
     @Override
     public ApiResponse<List<StageGoalVO>> queryGoals(GoalQueryDTO goalQueryDTO) {
-        GoalQueryDTO queryDTO = goalQueryDTO == null ? new GoalQueryDTO() : goalQueryDTO;
-        List<StageGoalPO> stageGoalPOList = goalMapper.selectStageGoals(queryDTO);
-        List<Long> stageGoalIds = stageGoalPOList.stream().map(StageGoalPO::getId).toList();
-        Map<Long, List<SubGoalPO>> subGoalMap = stageGoalIds.isEmpty()
+        List<StageGoalPO> stageGoalPOList = goalMapper.selectStageGoals();
+        List<Long> stageIds = stageGoalPOList.stream().map(StageGoalPO::getId).toList();
+        Map<Long, List<SubGoalPO>> subGoalMap = stageIds.isEmpty()
                 ? Map.of()
-                : goalMapper.selectSubGoalsByStageGoalIds(stageGoalIds).stream()
-                .collect(Collectors.groupingBy(SubGoalPO::getStageGoalId));
+                : goalMapper.selectSubGoalsByStageIds(stageIds).stream()
+                .collect(Collectors.groupingBy(SubGoalPO::getStageId));
 
         List<StageGoalVO> stageGoalVOList = stageGoalPOList.stream()
                 .map(stageGoalPO -> POConvertToVO.convertToStageGoalVO(
-                        stageGoalPO,
-                        subGoalMap.getOrDefault(stageGoalPO.getId(), List.of())
+                        stageGoalPO, subGoalMap.getOrDefault(stageGoalPO.getId(), List.of())
                 ))
                 .toList();
         return ApiResponse.success(stageGoalVOList);

@@ -10,13 +10,12 @@ import java.time.LocalDateTime;
 @Builder
 public class SubGoalPO {
     private Long id;
-    private Long stageGoalId;
+    private Long stageId;
     private Long userId;
     private String title;
     private String content;
     private BigDecimal learnedHours;
     private BigDecimal estimatedHours;
-    private Boolean deleted;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 }

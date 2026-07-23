@@ -21,8 +21,8 @@ public class DTOConvertToPO {
                 .location(dietRecordDTO.getLocation())
                 .note(dietRecordDTO.getNote())
                 .deleted(false)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .createTime(LocalDateTime.now())
+                .updateTime(LocalDateTime.now())
                 .build();
     }
 }

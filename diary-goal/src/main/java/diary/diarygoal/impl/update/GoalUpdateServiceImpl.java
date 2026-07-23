@@ -42,7 +42,7 @@ public class GoalUpdateServiceImpl implements GoalUpdateService {
                 if (subGoalDTO == null || isBlank(subGoalDTO.getTitle())) {
                     continue;
                 }
-                subGoalDTO.setStageGoalId(existGoal.getId());
+                subGoalDTO.setStageId(existGoal.getId());
                 subGoalDTO.setUserId(stageGoalDTO.getUserId());
                 if (subGoalDTO.getId() == null) {
                     subGoalDTO.setId(MyUtils.getPrimaryKey());
@@ -61,9 +61,6 @@ public class GoalUpdateServiceImpl implements GoalUpdateService {
         if (stageGoalDTO.getUserId() == null) {
             stageGoalDTO.setUserId(existGoal.getUserId());
         }
-        if (isBlank(stageGoalDTO.getCreator())) {
-            stageGoalDTO.setCreator(existGoal.getCreator());
-        }
         if (isBlank(stageGoalDTO.getCategory())) {
             stageGoalDTO.setCategory(existGoal.getCategory());
         }
@@ -78,13 +75,12 @@ public class GoalUpdateServiceImpl implements GoalUpdateService {
     private SubGoalPO buildUpdateSubGoalPO(SubGoalDTO subGoalDTO) {
         return SubGoalPO.builder()
                 .id(subGoalDTO.getId())
-                .stageGoalId(subGoalDTO.getStageGoalId())
+                .stageId(subGoalDTO.getStageId())
                 .userId(subGoalDTO.getUserId())
                 .title(subGoalDTO.getTitle())
                 .content(subGoalDTO.getContent())
                 .learnedHours(subGoalDTO.getLearnedHours())
                 .estimatedHours(subGoalDTO.getEstimatedHours())
-                .deleted(false)
                 .build();
     }
 

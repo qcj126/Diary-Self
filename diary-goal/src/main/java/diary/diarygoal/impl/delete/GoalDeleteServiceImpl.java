@@ -25,7 +25,7 @@ public class GoalDeleteServiceImpl implements GoalDeleteService {
             throw new ParamIllegalException("goal does not exist");
         }
         goalMapper.deleteStageGoalById(id);
-        goalMapper.deleteSubGoalsByStageGoalId(id);
+        goalMapper.deleteSubGoalsByStageId(id);
         return ApiResponse.success("deleted successfully");
     }
 }

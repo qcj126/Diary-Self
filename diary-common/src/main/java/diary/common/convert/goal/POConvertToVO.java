@@ -30,7 +30,6 @@ public class POConvertToVO {
         return StageGoalVO.builder()
                 .id(po.getId())
                 .userId(po.getUserId())
-                .creator(po.getCreator())
                 .category(po.getCategory())
                 .title(po.getTitle())
                 .description(po.getDescription())
@@ -53,7 +52,7 @@ public class POConvertToVO {
         BigDecimal estimatedHours = zeroIfNull(po.getEstimatedHours());
         return SubGoalVO.builder()
                 .id(po.getId())
-                .stageGoalId(po.getStageGoalId())
+                .stageGoalId(po.getStageId())
                 .userId(po.getUserId())
                 .title(po.getTitle())
                 .content(po.getContent())

@@ -8,20 +8,18 @@
         <result column="category" property="category"/>
         <result column="title" property="title"/>
         <result column="description" property="description"/>
-        <result column="is_deleted" property="deleted"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
     </resultMap>
 
     <resultMap id="SubGoalResultMap" type="diary.common.entity.goal.po.SubGoalPO">
         <id column="id" property="id"/>
-        <result column="stage_goal_id" property="stageGoalId"/>
+        <result column="stage_id" property="stageId"/>
         <result column="user_id" property="userId"/>
         <result column="title" property="title"/>
         <result column="content" property="content"/>
         <result column="learned_hours" property="learnedHours"/>
         <result column="estimated_hours" property="estimatedHours"/>
-        <result column="is_deleted" property="deleted"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
     </resultMap>
@@ -31,19 +29,19 @@
     </sql>
 
     <sql id="SubGoalColumns">
-        id, stage_goal_id, user_id, title, content, learned_hours, estimated_hours, is_deleted, create_time, update_time
+        id, stage_id, user_id, title, content, learned_hours, estimated_hours, create_time, update_time
     </sql>
 
     <insert id="insertStageGoal" parameterType="diary.common.entity.goal.po.StageGoalPO">
-        INSERT INTO stage_goal (id, user_id, category, title, description, is_deleted, create_time, update_time)
-        VALUES (#{id}, #{userId},    #{category}, #{title}, #{description}, #{deleted}, #{createTime}, #{updateTime})
+        INSERT INTO stage_goal (id, user_id, category, title, description, create_time, update_time)
+        VALUES (#{id}, #{userId}, #{category}, #{title}, #{description}, #{createTime}, #{updateTime})
     </insert>
 
     <insert id="insertSubGoal" parameterType="diary.common.entity.goal.po.SubGoalPO">
         INSERT INTO sub_goal (
-            id, stage_goal_id, user_id, title, content, learned_hours, estimated_hours, is_deleted, create_time, update_time
+            id, stage_id, user_id, title, content, learned_hours, estimated_hours, create_time, update_time
         ) VALUES (
-            #{id}, #{stageGoalId}, #{userId}, #{title}, #{content}, #{learnedHours}, #{estimatedHours}, #{deleted}, #{createTime}, #{updateTime}
+            #{id}, #{stageId}, #{userId}, #{title}, #{content}, #{learnedHours}, #{estimatedHours}, #{createTime}, #{updateTime}
         )
     </insert>
 
@@ -51,44 +49,29 @@
         SELECT <include refid="StageGoalColumns"/>
         FROM stage_goal
         WHERE id = #{id}
-          AND is_deleted = 0
     </select>
 
-    <select id="selectSubGoalsByStageGoalId" resultMap="SubGoalResultMap">
+    <select id="selectSubGoalsByStageId" resultMap="SubGoalResultMap">
         SELECT <include refid="SubGoalColumns"/>
         FROM sub_goal
-        WHERE stage_goal_id = #{stageGoalId}
-          AND is_deleted = 0
+        WHERE stage_id = #{stageId}
         ORDER BY create_time ASC, id ASC
     </select>
 
-    <select id="selectSubGoalsByStageGoalIds" resultMap="SubGoalResultMap">
+    <select id="selectSubGoalsByStageIds" resultMap="SubGoalResultMap">
         SELECT <include refid="SubGoalColumns"/>
         FROM sub_goal
-        WHERE is_deleted = 0
-          AND stage_goal_id IN
-        <foreach collection="stageGoalIds" item="id" open="(" separator="," close=")">
+        WHERE
+          stage_id IN
+        <foreach collection="stageIds" item="id" open="(" separator="," close=")">
             #{id}
         </foreach>
-        ORDER BY stage_goal_id ASC, create_time ASC, id ASC
+        ORDER BY stage_id ASC, create_time ASC, id ASC
     </select>
 
     <select id="selectStageGoals" resultMap="StageGoalResultMap">
         SELECT <include refid="StageGoalColumns"/>
         FROM stage_goal
-        WHERE
-        <if test="query.userId != null">
-            AND user_id = #{query.userId}
-        </if>
-        <if test="query.category != null and query.category != ''">
-            AND category = #{query.category}
-        </if>
-        <if test="query.title != null and query.title != ''">
-            AND title LIKE CONCAT('%', #{query.title}, '%')
-        </if>
-        <if test="query.recentDays != null">
-            AND update_time &gt;= DATE_SUB(NOW(), INTERVAL #{query.recentDays} DAY)
-        </if>
         ORDER BY update_time DESC, create_time DESC, id DESC
     </select>
 
@@ -99,58 +82,42 @@
             <if test="category != null and category != ''">category = #{category},</if>
             <if test="title != null and title != ''">title = #{title},</if>
             <if test="description != null">description = #{description},</if>
-            <if test="deleted != null">is_deleted = #{deleted},</if>
             update_time = NOW()
         </set>
         WHERE id = #{id}
-          AND is_deleted = 0
     </update>
 
     <update id="updateSubGoalById" parameterType="diary.common.entity.goal.po.SubGoalPO">
         UPDATE sub_goal
         <set>
-            <if test="stageGoalId != null">stage_goal_id = #{stageGoalId},</if>
+            <if test="stageId != null">stage_id = #{stageId},</if>
             <if test="userId != null">user_id = #{userId},</if>
             <if test="title != null and title != ''">title = #{title},</if>
             <if test="content != null">content = #{content},</if>
             <if test="learnedHours != null">learned_hours = #{learnedHours},</if>
             <if test="estimatedHours != null">estimated_hours = #{estimatedHours},</if>
-            <if test="deleted != null">is_deleted = #{deleted},</if>
             update_time = NOW()
         </set>
         WHERE id = #{id}
-          AND stage_goal_id = #{stageGoalId}
-          AND is_deleted = 0
+          AND stage_id = #{stageId}
     </update>
 
     <update id="deleteStageGoalById">
-        UPDATE stage_goal
-        SET is_deleted = 1,
-            update_time = NOW()
-        WHERE id = #{id}
-          AND is_deleted = 0
+        delete from stage_goal WHERE id = #{id}
     </update>
 
-    <update id="deleteSubGoalsByStageGoalId">
-        UPDATE sub_goal
-        SET is_deleted = 1,
-            update_time = NOW()
-        WHERE stage_goal_id = #{stageGoalId}
-          AND is_deleted = 0
+    <update id="deleteSubGoalsByStageId">
+        delete from sub_goal WHERE stage_id = #{stageId}
     </update>
 
     <update id="deleteSubGoalById">
-        UPDATE sub_goal
-        SET is_deleted = 1,
-            update_time = NOW()
-        WHERE id = #{id}
-          AND is_deleted = 0
+        delete from sub_goal WHERE id = #{id}
     </update>
 
     <select id="queryGoalData" resultMap="StageGoalResultMap">
         SELECT <include refid="StageGoalColumns"/>
         FROM stage_goal
-        WHERE is_deleted = 0
+        WHERE 1=1
         <if test="lastDays != null">
             AND update_time &gt;= DATE_SUB(NOW(), INTERVAL #{lastDays} DAY)
         </if>
@@ -159,4 +126,19 @@
             LIMIT #{exportSize}
         </if>
     </select>
+
+    <insert id="batchInsertSubGoal">
+        INSERT INTO sub_goal (
+        id, stage_id, user_id, title, content,
+        learned_hours, estimated_hours, create_time, update_time
+        ) VALUES
+        <foreach collection="subGoalPOS" item="subGoal" separator=",">
+            (
+            #{subGoal.id}, #{subGoal.stageId}, #{subGoal.userId},
+            #{subGoal.title}, #{subGoal.content},
+            #{subGoal.learnedHours}, #{subGoal.estimatedHours},
+            #{subGoal.createTime}, #{subGoal.updateTime}
+            )
+        </foreach>
+    </insert>
 </mapper>

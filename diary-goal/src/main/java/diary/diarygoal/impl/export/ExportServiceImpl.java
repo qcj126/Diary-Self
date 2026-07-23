@@ -30,7 +30,7 @@ public class ExportServiceImpl implements ExportService {
             throw new ParamIllegalException("no goal data to export");
         }
         StageGoalPO stageGoalPO = stageGoalPOList.get(0);
-        StageGoalDTO stageGoalDTO = convertToDTO(stageGoalPO, goalMapper.selectSubGoalsByStageGoalId(stageGoalPO.getId()));
+        StageGoalDTO stageGoalDTO = convertToDTO(stageGoalPO, goalMapper.selectSubGoalsByStageId(stageGoalPO.getId()));
         Exporter exporter = exporterFactory.getExporter(exportType);
         ByteArrayOutputStream exportDataStream = exporter.export(stageGoalDTO);
     }
@@ -39,7 +39,6 @@ public class ExportServiceImpl implements ExportService {
         StageGoalDTO dto = new StageGoalDTO();
         dto.setId(stageGoalPO.getId());
         dto.setUserId(stageGoalPO.getUserId());
-        dto.setCreator(stageGoalPO.getCreator());
         dto.setCategory(stageGoalPO.getCategory());
         dto.setTitle(stageGoalPO.getTitle());
         dto.setDescription(stageGoalPO.getDescription());
@@ -50,7 +49,7 @@ public class ExportServiceImpl implements ExportService {
     private SubGoalDTO convertToDTO(SubGoalPO subGoalPO) {
         SubGoalDTO dto = new SubGoalDTO();
         dto.setId(subGoalPO.getId());
-        dto.setStageGoalId(subGoalPO.getStageGoalId());
+        dto.setStageId(subGoalPO.getStageId());
         dto.setUserId(subGoalPO.getUserId());
         dto.setTitle(subGoalPO.getTitle());
         dto.setContent(subGoalPO.getContent());
