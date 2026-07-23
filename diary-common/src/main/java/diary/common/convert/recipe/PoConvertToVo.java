@@ -26,8 +26,8 @@ public class PoConvertToVo {
         vo.setDifficulty(po.getDifficulty());
         vo.setCookingTime(po.getCookingTime());
         vo.setStory(po.getStory());
-        vo.setCreatedAt(po.getCreateTime());
-        vo.setUpdatedAt(po.getUpdateTime());
+        vo.setCreateTime(po.getCreateTime());
+        vo.setUpdateTime(po.getUpdateTime());
         return vo;
     }
 

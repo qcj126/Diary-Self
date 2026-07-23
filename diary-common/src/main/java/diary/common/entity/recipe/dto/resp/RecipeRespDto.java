@@ -32,7 +32,7 @@ public class RecipeRespDto {
     private Integer cookCount;
     private Integer isAnniversary;
     private LocalDate anniversaryDate;
-    private LocalDateTime createdAt;
+    private LocalDateTime createTime;
 
     /**
      * 实体转 DTO

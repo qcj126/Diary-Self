@@ -24,8 +24,8 @@ public class POConvertToVO {
                 .fullnessScore(po.getFullnessScore())
                 .location(po.getLocation())
                 .note(po.getNote())
-                .createdAt(po.getCreatedAt())
-                .updatedAt(po.getUpdatedAt())
+                .createTime(po.getCreatedAt())
+                .updateTime(po.getUpdatedAt())
                 .build();
     }
 }
