@@ -1,10 +1,12 @@
 package diary.diarygoal.impl.add;
 
 import diary.common.convert.goal.DTOConvertToPO;
+import diary.common.convert.goal.POConvertToVO;
 import diary.common.entity.goal.dto.StageGoalDTO;
 import diary.common.entity.goal.dto.SubGoalDTO;
 import diary.common.entity.goal.po.StageGoalPO;
 import diary.common.entity.goal.po.SubGoalPO;
+import diary.common.entity.goal.vo.SubGoalVO;
 import diary.common.exception.ParamIllegalException;
 import diary.common.result.ApiResponse;
 import diary.diarygoal.mapper.GoalMapper;
@@ -14,6 +16,7 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,26 +28,36 @@ public class GoalAddServiceImpl implements GoalAddService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ApiResponse<String> addGoal(StageGoalDTO stageGoalDTO) {
-        validateStageGoal(stageGoalDTO);
-
+        if (stageGoalDTO == null || stageGoalDTO.getTitle() == null || stageGoalDTO.getTitle().isEmpty()
+                || stageGoalDTO.getCategory() == null || stageGoalDTO.getCategory().isEmpty()
+                || stageGoalDTO.getDescription() == null || stageGoalDTO.getDescription().isEmpty()) {
+            throw new ParamIllegalException("参数不能为空");
+        }
         Long stageGoalId = MyUtils.getPrimaryKey();
-        stageGoalDTO.setId(stageGoalId);
         StageGoalPO stageGoalPO = DTOConvertToPO.stageGoalDTOConvertToStageGoalPO(stageGoalDTO);
+        stageGoalPO.setId(stageGoalId);
+        stageGoalPO.setUserId(10000L);
         goalMapper.insertStageGoal(stageGoalPO);
 
         if (stageGoalDTO.getSubGoals() != null) {
-            for (SubGoalDTO subGoalDTO : stageGoalDTO.getSubGoals()) {
-                if (subGoalDTO == null || isBlank(subGoalDTO.getTitle())) {
-                    continue;
-                }
-                subGoalDTO.setId(MyUtils.getPrimaryKey());
-                subGoalDTO.setStageId(stageGoalId);
-                subGoalDTO.setUserId(stageGoalDTO.getUserId());
-                SubGoalPO subGoalPO = DTOConvertToPO.subGoalDTOConvertToSubGoalPO(subGoalDTO);
-                goalMapper.insertSubGoal(subGoalPO);
+            List<SubGoalDTO> subGoals = stageGoalDTO.getSubGoals();
+            if (subGoals.stream().anyMatch(subGoalDTO ->
+                    (subGoalDTO.getTitle() == null || subGoalDTO.getTitle().trim().isEmpty())
+                            || subGoalDTO.getContent() == null || subGoalDTO.getContent().trim().isEmpty()
+                            || subGoalDTO.getEstimatedHours() == null || subGoalDTO.getEstimatedHours().compareTo(BigDecimal.ZERO) <= 0
+            )) {
+                throw new ParamIllegalException("小目标标题、内容和估计小时数不能为空");
             }
+            List<SubGoalPO> subGoalPOS = new ArrayList<>();
+            for (SubGoalDTO subGoal : subGoals) {
+                SubGoalPO subGoalPO = DTOConvertToPO.subGoalDTOConvertToSubGoalPO(subGoal);
+                subGoalPO.setId(MyUtils.getPrimaryKey());
+                subGoalPO.setStageId(stageGoalId);
+                subGoalPO.setUserId(10000L);
+                subGoalPOS.add(subGoalPO);
+            }
+            goalMapper.batchInsertSubGoal(subGoalPOS);
         }
-
         return ApiResponse.success("新增目标成功");
     }
 
@@ -59,19 +72,5 @@ public class GoalAddServiceImpl implements GoalAddService {
         }
         goalMapper.batchInsertSubGoal(subGoalPOS);
         return ApiResponse.success("批量新增小目标成功");
-    }
-
-    private void validateStageGoal(StageGoalDTO stageGoalDTO) {
-        if (stageGoalDTO == null) {
-            throw new ParamIllegalException("request body is empty");
-        }
-        if (stageGoalDTO.getUserId() == null || isBlank(stageGoalDTO.getCategory())
-                || isBlank(stageGoalDTO.getTitle()) || isBlank(stageGoalDTO.getDescription())) {
-            throw new ParamIllegalException("required parameters cannot be empty");
-        }
-    }
-
-    private boolean isBlank(String value) {
-        return value == null || value.trim().isEmpty();
     }
 }

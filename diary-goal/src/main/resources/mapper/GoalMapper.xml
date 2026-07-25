@@ -33,16 +33,25 @@
     </sql>
 
     <insert id="insertStageGoal" parameterType="diary.common.entity.goal.po.StageGoalPO">
-        INSERT INTO stage_goal (id, user_id, category, title, description, create_time, update_time)
-        VALUES (#{id}, #{userId}, #{category}, #{title}, #{description}, #{createTime}, #{updateTime})
-    </insert>
-
-    <insert id="insertSubGoal" parameterType="diary.common.entity.goal.po.SubGoalPO">
-        INSERT INTO sub_goal (
-            id, stage_id, user_id, title, content, learned_hours, estimated_hours, create_time, update_time
-        ) VALUES (
-            #{id}, #{stageId}, #{userId}, #{title}, #{content}, #{learnedHours}, #{estimatedHours}, #{createTime}, #{updateTime}
-        )
+        INSERT INTO stage_goal
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="category != null">category,</if>
+            <if test="title != null">title,</if>
+            <if test="description != null">description,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="category != null">#{category},</if>
+            <if test="title != null">#{title},</if>
+            <if test="description != null">#{description},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
     </insert>
 
     <select id="selectStageGoalById" resultMap="StageGoalResultMap">
@@ -128,17 +137,88 @@
     </select>
 
     <insert id="batchInsertSubGoal">
-        INSERT INTO sub_goal (
-        id, stage_id, user_id, title, content,
-        learned_hours, estimated_hours, create_time, update_time
-        ) VALUES
+        INSERT INTO sub_goal
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="subGoalPOS[0].id != null">id,</if>
+            <if test="subGoalPOS[0].stageId != null">stage_id,</if>
+            <if test="subGoalPOS[0].userId != null">user_id,</if>
+            <if test="subGoalPOS[0].title != null and subGoalPOS[0].title != ''">title,</if>
+            <if test="subGoalPOS[0].content != null and subGoalPOS[0].content != ''">content,</if>
+            <if test="subGoalPOS[0].learnedHours != null">learned_hours,</if>
+            <if test="subGoalPOS[0].estimatedHours != null">estimated_hours,</if>
+            <if test="subGoalPOS[0].createTime != null">create_time,</if>
+            <if test="subGoalPOS[0].updateTime != null">update_time,</if>
+        </trim>
+        VALUES
         <foreach collection="subGoalPOS" item="subGoal" separator=",">
-            (
-            #{subGoal.id}, #{subGoal.stageId}, #{subGoal.userId},
-            #{subGoal.title}, #{subGoal.content},
-            #{subGoal.learnedHours}, #{subGoal.estimatedHours},
-            #{subGoal.createTime}, #{subGoal.updateTime}
-            )
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="subGoal.id != null">#{subGoal.id},</if>
+                <if test="subGoal.stageId != null">#{subGoal.stageId},</if>
+                <if test="subGoal.userId != null">#{subGoal.userId},</if>
+                <if test="subGoal.title != null and subGoal.title != ''">#{subGoal.title},</if>
+                <if test="subGoal.content != null and subGoal.content != ''">#{subGoal.content},</if>
+                <if test="subGoal.learnedHours != null">#{subGoal.learnedHours},</if>
+                <if test="subGoal.estimatedHours != null">#{subGoal.estimatedHours},</if>
+                <if test="subGoal.createTime != null">#{subGoal.createTime},</if>
+                <if test="subGoal.updateTime != null">#{subGoal.updateTime},</if>
+            </trim>
         </foreach>
     </insert>
+
+    <update id="batchUpdateSubGoals">
+        UPDATE sub_goal
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="subGoalPOS[0].stageId != null">
+                stage_id = CASE id
+                <foreach collection="subGoalPOS" item="subGoal">
+                    WHEN #{subGoal.id} THEN #{subGoal.stageId}
+                </foreach>
+                END,
+            </if>
+            <if test="subGoalPOS[0].userId != null">
+                user_id = CASE id
+                <foreach collection="subGoalPOS" item="subGoal">
+                    WHEN #{subGoal.id} THEN #{subGoal.userId}
+                </foreach>
+                END,
+            </if>
+            <if test="subGoalPOS[0].title != null and subGoalPOS[0].title != ''">
+                title = CASE id
+                <foreach collection="subGoalPOS" item="subGoal">
+                    WHEN #{subGoal.id} THEN #{subGoal.title}
+                </foreach>
+                END,
+            </if>
+            <if test="subGoalPOS[0].content != null and subGoalPOS[0].content != ''">
+                content = CASE id
+                <foreach collection="subGoalPOS" item="subGoal">
+                    WHEN #{subGoal.id} THEN #{subGoal.content}
+                </foreach>
+                END,
+            </if>
+            <if test="subGoalPOS[0].learnedHours != null">
+                learned_hours = CASE id
+                <foreach collection="subGoalPOS" item="subGoal">
+                    WHEN #{subGoal.id} THEN #{subGoal.learnedHours}
+                </foreach>
+                END,
+            </if>
+            <if test="subGoalPOS[0].estimatedHours != null">
+                estimated_hours = CASE id
+                <foreach collection="subGoalPOS" item="subGoal">
+                    WHEN #{subGoal.id} THEN #{subGoal.estimatedHours}
+                </foreach>
+                END,
+            </if>
+            update_time = NOW()
+        </trim>
+        WHERE id IN
+        <foreach collection="subGoalPOS" item="subGoal" open="(" separator="," close=")">
+            #{subGoal.id}
+        </foreach>
+        AND stage_id IN
+        <foreach collection="subGoalPOS" item="subGoal" open="(" separator="," close=")">
+            #{subGoal.stageId}
+        </foreach>
+    </update>
 </mapper>

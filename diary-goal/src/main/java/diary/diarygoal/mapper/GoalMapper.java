@@ -11,8 +11,6 @@ import java.util.List;
 public interface GoalMapper {
     int insertStageGoal(StageGoalPO stageGoalPO);
 
-    int insertSubGoal(SubGoalPO subGoalPO);
-
     StageGoalPO selectStageGoalById(@Param("id") Long id);
 
     List<SubGoalPO> selectSubGoalsByStageId(@Param("stageId") Long stageId);
@@ -23,16 +21,13 @@ public interface GoalMapper {
 
     int updateStageGoalById(StageGoalPO stageGoalPO);
 
-    int updateSubGoalById(SubGoalPO subGoalPO);
-
     int deleteStageGoalById(@Param("id") Long id);
 
     int deleteSubGoalsByStageId(@Param("stageId") Long stageId);
-
-    int deleteSubGoalById(@Param("id") Long id);
 
     List<StageGoalPO> queryGoalData(@Param("lastDays") Integer lastDays, @Param("exportSize") Integer exportSize);
 
     int batchInsertSubGoal(List<SubGoalPO> subGoalPOS);
 
+    void batchUpdateSubGoals(List<SubGoalPO> subGoalPOS);
 }

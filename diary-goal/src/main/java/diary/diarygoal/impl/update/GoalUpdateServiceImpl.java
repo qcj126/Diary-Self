@@ -14,6 +14,10 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class GoalUpdateServiceImpl implements GoalUpdateService {
     @Resource
@@ -33,58 +37,23 @@ public class GoalUpdateServiceImpl implements GoalUpdateService {
             throw new ParamIllegalException("goal does not exist");
         }
 
-        fillStageGoalDefaults(stageGoalDTO, existGoal);
         StageGoalPO stageGoalPO = DTOConvertToPO.stageGoalDTOConvertToStageGoalPO(stageGoalDTO);
         goalMapper.updateStageGoalById(stageGoalPO);
 
         if (stageGoalDTO.getSubGoals() != null) {
-            for (SubGoalDTO subGoalDTO : stageGoalDTO.getSubGoals()) {
-                if (subGoalDTO == null || isBlank(subGoalDTO.getTitle())) {
-                    continue;
-                }
-                subGoalDTO.setStageId(existGoal.getId());
-                subGoalDTO.setUserId(stageGoalDTO.getUserId());
-                if (subGoalDTO.getId() == null) {
-                    subGoalDTO.setId(MyUtils.getPrimaryKey());
-                    goalMapper.insertSubGoal(DTOConvertToPO.subGoalDTOConvertToSubGoalPO(subGoalDTO));
-                } else {
-                    goalMapper.updateSubGoalById(buildUpdateSubGoalPO(subGoalDTO));
-                }
+            List<SubGoalDTO> subGoalsDTO = stageGoalDTO.getSubGoals();
+            if (subGoalsDTO.stream().anyMatch(subGoalDTO ->
+                    (subGoalDTO.getTitle() == null || subGoalDTO.getTitle().trim().isEmpty())
+                            || subGoalDTO.getContent() == null || subGoalDTO.getContent().trim().isEmpty()
+                            || subGoalDTO.getEstimatedHours() == null || subGoalDTO.getEstimatedHours().compareTo(BigDecimal.ZERO) <= 0
+            )) {
+                throw new ParamIllegalException("小目标标题、内容和估计小时数不能为空");
             }
+            List<SubGoalPO> subGoalPOS = new ArrayList<>();
+            subGoalsDTO.forEach(subGoal -> subGoalPOS.add(DTOConvertToPO.subGoalDTOConvertToSubGoalPO(subGoal)));
+            goalMapper.batchUpdateSubGoals(subGoalPOS);
         }
 
         return ApiResponse.success("goal updated successfully");
-    }
-
-    private void fillStageGoalDefaults(StageGoalDTO stageGoalDTO, StageGoalPO existGoal) {
-        stageGoalDTO.setId(existGoal.getId());
-        if (stageGoalDTO.getUserId() == null) {
-            stageGoalDTO.setUserId(existGoal.getUserId());
-        }
-        if (isBlank(stageGoalDTO.getCategory())) {
-            stageGoalDTO.setCategory(existGoal.getCategory());
-        }
-        if (isBlank(stageGoalDTO.getTitle())) {
-            stageGoalDTO.setTitle(existGoal.getTitle());
-        }
-        if (stageGoalDTO.getDescription() == null) {
-            stageGoalDTO.setDescription(existGoal.getDescription());
-        }
-    }
-
-    private SubGoalPO buildUpdateSubGoalPO(SubGoalDTO subGoalDTO) {
-        return SubGoalPO.builder()
-                .id(subGoalDTO.getId())
-                .stageId(subGoalDTO.getStageId())
-                .userId(subGoalDTO.getUserId())
-                .title(subGoalDTO.getTitle())
-                .content(subGoalDTO.getContent())
-                .learnedHours(subGoalDTO.getLearnedHours())
-                .estimatedHours(subGoalDTO.getEstimatedHours())
-                .build();
-    }
-
-    private boolean isBlank(String value) {
-        return value == null || value.trim().isEmpty();
     }
 }
