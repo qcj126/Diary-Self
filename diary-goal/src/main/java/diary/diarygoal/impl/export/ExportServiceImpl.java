@@ -29,7 +29,7 @@ public class ExportServiceImpl implements ExportService {
         if (stageGoalPOList == null || stageGoalPOList.isEmpty()) {
             throw new ParamIllegalException("no goal data to export");
         }
-        StageGoalPO stageGoalPO = stageGoalPOList.get(0);
+        StageGoalPO stageGoalPO = stageGoalPOList.getFirst();
         StageGoalDTO stageGoalDTO = convertToDTO(stageGoalPO, goalMapper.selectSubGoalsByStageId(stageGoalPO.getId()));
         Exporter exporter = exporterFactory.getExporter(exportType);
         ByteArrayOutputStream exportDataStream = exporter.export(stageGoalDTO);
