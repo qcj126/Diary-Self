@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.FileNotFoundException;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/ai")
@@ -17,7 +19,7 @@ public class DiaryAIController {
     private final CallAIService callAIService;
 
     @PostMapping("/invoke")
-    public ApiResponse<String> invokeAI (@RequestBody AIInvokeDTO aiInvokeDTO) {
+    public ApiResponse<String> invokeAI (@RequestBody AIInvokeDTO aiInvokeDTO) throws FileNotFoundException {
         callAIService.callAI(aiInvokeDTO);
         return ApiResponse.success("调用AI成功，数据已处理");
     }
