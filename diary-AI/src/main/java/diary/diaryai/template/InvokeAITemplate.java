@@ -9,7 +9,6 @@ import com.alibaba.dashscope.common.Role;
 import com.alibaba.dashscope.protocol.Protocol;
 import diary.common.exception.CustomException;
 import diary.diaryai.properties.AliCloudProperty;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -27,7 +26,7 @@ public abstract class InvokeAITemplate {
     }
 
     // 构建提示词
-    public abstract String buildPrompt();
+    public abstract String buildPrompt(Object data);
 
     // 构建调用请求体
     public GenerationResult constructRequest(String prompt, String model) {
@@ -40,7 +39,7 @@ public abstract class InvokeAITemplate {
             Generation generation = new Generation(Protocol.HTTP.getValue(), url);
             Message systemMsg = Message.builder()
                     .role(Role.SYSTEM.getValue())
-                    .content("You are a helpful assistant.")
+                    .content("你是一个营养分析专家，专门帮顾客分析食物的营养成分和健康价值。")
                     .build();
             Message userMsg = Message.builder()
                     .role(Role.USER.getValue())

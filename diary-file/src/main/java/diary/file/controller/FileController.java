@@ -1,5 +1,6 @@
 package diary.file.controller;
 
+import diary.common.entity.ai.ao.ImageIdUrl;
 import diary.common.entity.image.dto.ImageDTO;
 import diary.common.entity.image.vo.ImageVO;
 import diary.common.result.ApiResponse;
@@ -72,9 +73,9 @@ public class FileController {
     }
 
     @PostMapping("/download/image")
-    public ApiResponse download(@RequestParam("ossUrls") List<String> ossUrls) {
+    public ApiResponse download(@RequestBody List<ImageIdUrl> imageIdUrls) {
         // 批量下载图片
-        Map<String, Object> result = downloadService.batchDownloadPhotos(ossUrls);
+        Map<String, Object> result = downloadService.batchDownloadPhotos(imageIdUrls);
         return ApiResponse.success(result);
     }
 

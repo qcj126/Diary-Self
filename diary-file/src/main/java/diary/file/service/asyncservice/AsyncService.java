@@ -1,5 +1,6 @@
 package diary.file.service.asyncservice;
 
+import diary.common.entity.ai.ao.ImageIdUrl;
 import diary.common.entity.image.dto.ImageDTO;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,11 +21,11 @@ public interface AsyncService {
 
     /**
      * 异步下载单个图片
-     * @param ossUrl OSS图片URL
+     * @param imageIdUrl OSS图片URL和id
      * @param savePath 保存路径
      * @return 下载结果
      */
-    CompletableFuture<Map<String, Object>> downloadImageAsync(String ossUrl, String savePath);
+    CompletableFuture<Map<String, String>> downloadImageAsync(ImageIdUrl imageIdUrl, String savePath);
 
     /**
      * 异步上传单个文件到OSS并发送消息

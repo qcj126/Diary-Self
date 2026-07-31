@@ -1,6 +1,5 @@
 package diary.diaryai.strategy.impl;
 
-import com.alibaba.dashscope.aigc.generation.GenerationParam;
 import com.alibaba.dashscope.aigc.generation.GenerationResult;
 import diary.common.enums.aienum.AIEnum;
 import diary.diaryai.properties.AliCloudProperty;
@@ -22,11 +21,11 @@ public class InvokeQwen extends InvokeAITemplate implements InvokeAIService {
     }
 
     @Override
-    public Object invokeAI(Object data) {
+    public void invokeAI(Object data) {
         String model = aliCloudProperty.getQwenPlusModel();
-        String prompt = buildPrompt();
+        String prompt = buildPrompt(data);
         GenerationResult aiResult = constructRequest(prompt, model);
-        return extractResult(aiResult);
+        extractResult(aiResult);
     }
 
     @Override
@@ -35,7 +34,7 @@ public class InvokeQwen extends InvokeAITemplate implements InvokeAIService {
     }
 
     @Override
-    public String buildPrompt() {
+    public String buildPrompt(Object data) {
         return null;
     }
 

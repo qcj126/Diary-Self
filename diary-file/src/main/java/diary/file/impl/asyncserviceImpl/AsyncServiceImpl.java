@@ -8,6 +8,7 @@ import com.aliyun.oss.model.InitiateMultipartUploadResult;
 import com.aliyun.oss.model.PartETag;
 import com.aliyun.oss.model.UploadPartRequest;
 import com.aliyun.oss.model.UploadPartResult;
+import diary.common.entity.ai.ao.ImageIdUrl;
 import diary.common.entity.file.po.OssUploadSuccessMsg;
 import diary.common.entity.image.dto.ImageDTO;
 import diary.common.entity.image.po.ImagePO;
@@ -145,13 +146,13 @@ public class AsyncServiceImpl implements AsyncService {
 
     @Async("ossDownloadExecutor")
     @Override
-    public CompletableFuture<Map<String, Object>> downloadImageAsync(String ossUrl, String savePath) {
-        Map<String, Object> result = new HashMap<>();
-        result.put("ossUrl", ossUrl);
-
+    public CompletableFuture<Map<String, String>> downloadImageAsync(ImageIdUrl imageIdUrl, String savePath) {
+        Map<String, String> result = new HashMap<>();
+        result.put("ossUrl", imageIdUrl.getOssUrl());
+        result.put("imageId", imageIdUrl.getId().toString());
         try {
             // 生成签名URL（有效期5分钟）
-            String signedUrl = ossUtil.generateSignedUrlByKey(ossUrl);
+            String signedUrl = ossUtil.generateSignedUrlByKey(imageIdUrl.getOssUrl());
             log.info("生成签名URL: {}", signedUrl);
 
             // 从签名URL中提取文件名
@@ -184,7 +185,7 @@ public class AsyncServiceImpl implements AsyncService {
             log.info("图片下载成功: {}", fullPath);
 
         } catch (Exception e) {
-            log.error("图片下载失败, URL: {}", ossUrl, e);
+            log.error("图片下载失败, URL: {}", imageIdUrl.getOssUrl(), e);
             result.put("status", "failed");
             result.put("message", "下载失败: " + e.getMessage());
         }

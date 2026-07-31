@@ -21,11 +21,11 @@ public class InvokeDeepSeek extends InvokeAITemplate implements InvokeAIService 
     }
 
     @Override
-    public Object invokeAI(Object data) {
+    public void invokeAI(Object data) {
         String model = aliCloudProperty.getDeepSeekModel();
-        String prompt = buildPrompt();
+        String prompt = buildPrompt(data);
         GenerationResult aiResult = constructRequest(prompt, model);
-        return extractResult(aiResult);
+        extractResult(aiResult);
     }
 
     @Override
@@ -34,8 +34,10 @@ public class InvokeDeepSeek extends InvokeAITemplate implements InvokeAIService 
     }
 
     @Override
-    public String buildPrompt() {
-        return null;
+    public String buildPrompt(Object data) {
+        return "这是我的一餐，请你帮我分析其中的营养成分，只分析糖类、蛋白质、脂肪、碳水化合物的含量，并给出每种营养成分的含量和总热量。" +
+                "我的图片文件流数据，是map格式，键为图片id，值为文件流：" + data +
+                "请以JSON格式返回结果，格式如下：{\"calories\": \"xx kcal\", \"protein\": \"xx g\", \"fat\": \"xx g\", \"carbohydrates\": \"xx g\"}。";
     }
 
     @Override

@@ -1,5 +1,6 @@
 package diary.file.impl.downloadserviceImpl;
 
+import diary.common.entity.ai.ao.ImageIdUrl;
 import diary.file.service.asyncservice.AsyncService;
 import diary.file.service.downloadservice.DownloadService;
 import jakarta.annotation.Resource;
@@ -28,8 +29,8 @@ public class DownloadServiceImpl implements DownloadService {
     private AsyncService asyncService;
 
     @Override
-    public Map<String, Object> batchDownloadPhotos(List<String> ossUrls) {
-        if (ossUrls == null || ossUrls.isEmpty()) {
+    public Map<String, Object> batchDownloadPhotos(List<ImageIdUrl> imageIdUrls) {
+        if (imageIdUrls == null || imageIdUrls.isEmpty()) {
             return Map.of("code", 500, "message", "URL列表为空", "data", "null");
         }
 
@@ -46,15 +47,15 @@ public class DownloadServiceImpl implements DownloadService {
         }
 
         // 用于存储所有下载任务的结果
-        List<CompletableFuture<Map<String, Object>>> futures = new ArrayList<>();
+        List<CompletableFuture<Map<String, String>>> futures = new ArrayList<>();
 
         // 并发计数器
         AtomicInteger successCount = new AtomicInteger(0);
         AtomicInteger failCount = new AtomicInteger(0);
 
         // 提交所有下载任务
-        for (String ossUrl : ossUrls) {
-            CompletableFuture<Map<String, Object>> future = asyncService.downloadImageAsync(ossUrl, defaultDownloadPath)
+        for (ImageIdUrl imageIdUrl : imageIdUrls) {
+            CompletableFuture<Map<String, String>> future = asyncService.downloadImageAsync(imageIdUrl, defaultDownloadPath)
                     .thenApply(result -> {
                         if ("success".equals(result.get("status"))) {
                             successCount.incrementAndGet();
@@ -75,15 +76,14 @@ public class DownloadServiceImpl implements DownloadService {
             // 阻塞等待所有任务完成
             allFutures.join();
 
-            List<String> successFiles = new ArrayList<>();
             List<String> failedFiles = new ArrayList<>();
+            Map<Long, String> downloadfilePathIdMap = new HashMap<>();
+            for (CompletableFuture<Map<String, String>> future : futures) {
+                Map<String, String> result = future.get();
 
-            for (CompletableFuture<Map<String, Object>> future : futures) {
-                Map<String, Object> result = future.get();
-
-                String ossUrl = (String) result.get("ossUrl");
+                String ossUrl = result.get("ossUrl");
                 if ("success".equals(result.get("status"))) {
-                    successFiles.add((String) result.get("filePath"));
+                    downloadfilePathIdMap.put(Long.valueOf(result.get("imageId")), result.get("filePath"));
                 } else {
                     failedFiles.add(ossUrl + ": " + result.get("message"));
                 }
@@ -92,15 +92,15 @@ public class DownloadServiceImpl implements DownloadService {
             Map<String, Object> response = new HashMap<>();
             response.put("code", 200);
             response.put("message", String.format("下载完成，成功: %d, 失败: %d", successCount.get(), failCount.get()));
-            response.put("total", ossUrls.size());
+            response.put("total", imageIdUrls.size());
             response.put("successCount", successCount.get());
             response.put("failCount", failCount.get());
-            response.put("successFiles", successFiles);
+            response.put("successFiles", downloadfilePathIdMap);
             if (!failedFiles.isEmpty()) {
                 response.put("failedFiles", failedFiles);
             }
 
-            log.info("批量下载完成，总数: {}, 成功: {}, 失败: {}", ossUrls.size(), successCount.get(), failCount.get());
+            log.info("批量下载完成，总数: {}, 成功: {}, 失败: {}", imageIdUrls.size(), successCount.get(), failCount.get());
 
             return response;
         } catch (Exception e) {
