@@ -26,7 +26,7 @@ public class AIFactory {
             for (InvokeAIService exporter : this.aiServiceList) {
                 Integer type = exporter.getCode();
                 aiServiceCache.put(type, exporter);
-                log.info("注册导出策略: {} -> {}", type, exporter.getClass().getSimpleName());
+                log.info("注册AI: {} -> {}", type, exporter.getClass().getSimpleName());
             }
         } else {
             log.warn("aiServiceList is null in AIFactory@PostConstruct");
@@ -34,7 +34,7 @@ public class AIFactory {
     }
 
     /**
-     * 根据类型代码获取导出策略
+     * 根据类型获取AI实现类
      */
     public InvokeAIService getAIService(Integer typeCode) {
         InvokeAIService exporter = aiServiceCache.get(typeCode);

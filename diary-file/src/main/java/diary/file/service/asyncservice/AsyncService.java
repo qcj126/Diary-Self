@@ -1,5 +1,6 @@
 package diary.file.service.asyncservice;
 
+import com.rabbitmq.client.LongString;
 import diary.common.entity.ai.ao.ImageIdUrl;
 import diary.common.entity.image.dto.ImageDTO;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,11 +22,12 @@ public interface AsyncService {
 
     /**
      * 异步下载单个图片
-     * @param imageIdUrl OSS图片URL和id
+     * @param imageId OSS图片id
+     * @param url OSS图片url
      * @param savePath 保存路径
      * @return 下载结果
      */
-    CompletableFuture<Map<String, String>> downloadImageAsync(ImageIdUrl imageIdUrl, String savePath);
+    CompletableFuture<Map<String, Object>> downloadImageAsync(Long imageId, String url, String savePath);
 
     /**
      * 异步上传单个文件到OSS并发送消息

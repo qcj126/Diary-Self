@@ -11,5 +11,5 @@ public interface DownloadService {
      * @param imageIdUrls OSS图片URL列表和id列表
      * @return 下载结果
      */
-    Map<String, Object> batchDownloadPhotos(List<ImageIdUrl> imageIdUrls);
+    Map<String, Object> batchDownloadPhotos(Map<Long, String> imageIdUrls);
 }

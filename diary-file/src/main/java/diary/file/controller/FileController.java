@@ -73,7 +73,7 @@ public class FileController {
     }
 
     @PostMapping("/download/image")
-    public ApiResponse download(@RequestBody List<ImageIdUrl> imageIdUrls) {
+    public ApiResponse download(@RequestBody Map<Long, String> imageIdUrls) {
         // 批量下载图片
         Map<String, Object> result = downloadService.batchDownloadPhotos(imageIdUrls);
         return ApiResponse.success(result);

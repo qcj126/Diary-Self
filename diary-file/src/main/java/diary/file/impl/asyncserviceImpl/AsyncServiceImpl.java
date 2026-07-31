@@ -146,13 +146,13 @@ public class AsyncServiceImpl implements AsyncService {
 
     @Async("ossDownloadExecutor")
     @Override
-    public CompletableFuture<Map<String, String>> downloadImageAsync(ImageIdUrl imageIdUrl, String savePath) {
-        Map<String, String> result = new HashMap<>();
-        result.put("ossUrl", imageIdUrl.getOssUrl());
-        result.put("imageId", imageIdUrl.getId().toString());
+    public CompletableFuture<Map<String, Object>> downloadImageAsync(Long imageId, String url, String savePath) {
+        Map<String, Object> result = new HashMap<>();
+        result.put("ossUrl", url);
+        result.put("imageId", imageId);
         try {
             // 生成签名URL（有效期5分钟）
-            String signedUrl = ossUtil.generateSignedUrlByKey(imageIdUrl.getOssUrl());
+            String signedUrl = ossUtil.generateSignedUrlByKey(url);
             log.info("生成签名URL: {}", signedUrl);
 
             // 从签名URL中提取文件名
@@ -185,7 +185,7 @@ public class AsyncServiceImpl implements AsyncService {
             log.info("图片下载成功: {}", fullPath);
 
         } catch (Exception e) {
-            log.error("图片下载失败, URL: {}", imageIdUrl.getOssUrl(), e);
+            log.error("图片下载失败, URL: {}", url, e);
             result.put("status", "failed");
             result.put("message", "下载失败: " + e.getMessage());
         }

@@ -7,6 +7,7 @@ import com.alibaba.dashscope.aigc.generation.GenerationResult;
 import com.alibaba.dashscope.common.Message;
 import com.alibaba.dashscope.common.Role;
 import com.alibaba.dashscope.protocol.Protocol;
+import com.alibaba.dashscope.utils.Constants;
 import diary.common.exception.CustomException;
 import diary.diaryai.properties.AliCloudProperty;
 import org.springframework.stereotype.Component;
@@ -20,23 +21,25 @@ import java.util.Arrays;
 public abstract class InvokeAITemplate {
 
     private final AliCloudProperty aliCloudProperty;
+    private final static Generation generation = new Generation();
 
     protected InvokeAITemplate(AliCloudProperty aliCloudProperty) {
         this.aliCloudProperty = aliCloudProperty;
     }
-
+    static {
+        Constants.baseHttpApiUrl="https://llm-wdfzfqz3o6y5lf9d.cn-beijing.maas.aliyuncs.com/api/v1";
+    }
     // 构建提示词
     public abstract String buildPrompt(Object data);
 
     // 构建调用请求体
     public GenerationResult constructRequest(String prompt, String model) {
         try {
-            String url = aliCloudProperty.getUrl();
+//            String url = aliCloudProperty.getUrl();
             String apiKey = aliCloudProperty.getApiKey();
             Double temperature = aliCloudProperty.getTemperature();
 
             // 通过阿里云百炼平台调用api
-            Generation generation = new Generation(Protocol.HTTP.getValue(), url);
             Message systemMsg = Message.builder()
                     .role(Role.SYSTEM.getValue())
                     .content("你是一个营养分析专家，专门帮顾客分析食物的营养成分和健康价值。")
@@ -46,7 +49,7 @@ public abstract class InvokeAITemplate {
                     .content(prompt)
                     .build();
             GenerationParam param = GenerationParam.builder()
-                    .apiKey(System.getenv(apiKey))
+                    .apiKey(apiKey)
                     .model(model)
                     .temperature(temperature.floatValue())
                     .messages(Arrays.asList(systemMsg, userMsg))

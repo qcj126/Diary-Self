@@ -24,12 +24,12 @@ import java.util.Map;
 @Slf4j
 @Component
 @Order(1)
-public class InvokeDeepSeek extends InvokeAITemplate implements InvokeAIService {
+public class InvokeQwenMax extends InvokeAITemplate implements InvokeAIService {
     private final AliCloudProperty aliCloudProperty;
     private final PromptContext promptContext;
     private final DiaryAIMapper diaryAIMapper;
 
-    public InvokeDeepSeek(AliCloudProperty aliCloudProperty,
+    public InvokeQwenMax(AliCloudProperty aliCloudProperty,
                           PromptContext promptContext,
                           DiaryAIMapper diaryAIMapper) {
         super(aliCloudProperty);
@@ -40,7 +40,7 @@ public class InvokeDeepSeek extends InvokeAITemplate implements InvokeAIService 
 
     @Override
     public void invokeAI(Object data, Integer aiApplication, Integer aiType) {
-        String model = aliCloudProperty.getDeepSeekModel();
+        String model = aliCloudProperty.getQwenMaxModel();
         String prompt = buildPrompt(data);
         AiInfoPO aiInfoPO = AiInfoPO.builder()
                 .id(MyUtils.getPrimaryKey())
@@ -74,7 +74,7 @@ public class InvokeDeepSeek extends InvokeAITemplate implements InvokeAIService 
 
     @Override
     public Integer getCode() {
-        return AIEnum.DEEPSEEK.getCode();
+        return AIEnum.QWENMAX.getCode();
     }
 
     @Override
