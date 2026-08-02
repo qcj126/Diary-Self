@@ -19,8 +19,13 @@ public class RedisUtil {
     public void setString(String key, String value) {
         diaryRedisTemplate.opsForValue().set(key, value);
     }
-    public String getString(String key) {
-        return (String) diaryRedisTemplate.opsForValue().get(key);
+
+    public void setString(String key, Long value) {
+        diaryRedisTemplate.opsForValue().set(key, value);
+    }
+
+    public Object getString(String key) {
+        return diaryRedisTemplate.opsForValue().get(key);
     }
     public void deleteString(String key) {
         diaryRedisTemplate.delete(key);
