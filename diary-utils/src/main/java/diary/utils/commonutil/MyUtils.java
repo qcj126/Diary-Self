@@ -3,6 +3,9 @@ package diary.utils.commonutil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+import java.util.Objects;
+
 public class MyUtils {
     // 创建ObjectMapper实例，用于JSON转换
     private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -66,6 +69,13 @@ public class MyUtils {
         public Checker notEmpty(String value, String fieldName) {
             if (value == null || value.trim().isEmpty()) {
                 throw new IllegalArgumentException(fieldName + " 不能为空字符串");
+            }
+            return this;
+        }
+
+        public Checker listNotContainsEmpty(List<?> value, String fieldName) {
+            if (value.stream().anyMatch(Objects::isNull)) {
+                throw new IllegalArgumentException(fieldName + " 不能包含空值");
             }
             return this;
         }

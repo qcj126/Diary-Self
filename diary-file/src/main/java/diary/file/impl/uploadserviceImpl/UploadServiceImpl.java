@@ -21,6 +21,8 @@ import javax.imageio.ImageIO;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static diary.utils.commonutil.MyUtils.isEmpty;
 import static diary.utils.commonutil.MyUtils.isFileEmpty;
@@ -37,7 +39,26 @@ public class UploadServiceImpl implements UploadService {
 
     @Override
     public List<Long> addImagesToDb(List<MultipartFile> files, Integer code) {
-        MyUtils.check().notNull(files, "文件列表").notNull(code, "图片类别");
+        // 拦截参数为空的数据
+        MyUtils.check().notNull(files, "文件列表").listNotContainsEmpty(files, "文件列表").notNull(code, "图片类别");
+
+        // 过滤非图片文件
+        files = files.stream()
+                .filter(file -> {
+                    MyUtils.check().notEmpty(file.getContentType(), "文件类型");
+                    return file.getContentType().equals("image");
+                })
+                .filter(file -> {
+                    try {
+                        return ImageIO.read(file.getInputStream()) != null;
+                    } catch (Exception e) {
+                        return false;
+                    }
+                }).toList();
+
+        ImageDTO imageDTO = new ImageDTO();
+        imageDTO.setUserId(10000L);
+        imageDTO.setCode(code);
 
         List<ImagePO> imageList = new ArrayList<>();
         List<String> failedFiles = new ArrayList<>();
@@ -45,24 +66,6 @@ public class UploadServiceImpl implements UploadService {
         // 第一步：验证所有文件并构建Photo对象列表
         for (MultipartFile file : files) {
             try {
-                if (isFileEmpty(file)) {
-                    failedFiles.add(file.getOriginalFilename() + ": 文件为空");
-                    continue;
-                }
-
-                // 验证是否为图片类型
-                String imageFormat = file.getContentType();
-                if (isEmpty(imageFormat) || !imageFormat.startsWith("image")) {
-                    try {
-                        if (ImageIO.read(file.getInputStream()) == null) {
-                            failedFiles.add(file.getOriginalFilename() + ": 文件不是图片类型");
-                        }
-                    } catch (Exception e) {
-                        failedFiles.add(file.getOriginalFilename() + ": 文件读取失败");
-                    }
-                    continue;
-                }
-
                 Integer type = TypeEnum.getCode(imageDTO.getCode());
                 String typeName = TypeEnum.getType(imageDTO.getCode());
                 String originalFilename = file.getOriginalFilename();
@@ -135,9 +138,7 @@ public class UploadServiceImpl implements UploadService {
         }
         // 异步上传图片到OSS成功后，发送消息给mq
         List<File> tempFiles = fileUtil.copyToTempFiles(files);
-        List<String> originalNames = files.stream()
-                .map(MultipartFile::getOriginalFilename)
-                .toList();
+        List<String> originalNames = files.stream().map(MultipartFile::getOriginalFilename).toList();
         asyncService.uploadAndSendMsgAsync(imageIds, tempFiles, originalNames, imageDTO);
         return imageIds;
     }
