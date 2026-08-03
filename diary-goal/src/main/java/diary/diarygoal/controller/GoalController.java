@@ -36,36 +36,80 @@ public class GoalController {
     @Resource
     private ExportService exportService;
 
+    /**
+     * 添加目标
+     *
+     * @param stageGoalDTO
+     * @return
+     */
     @PostMapping("/add")
     public ApiResponse<String> addGoal(@RequestBody StageGoalDTO stageGoalDTO) {
         return goalAddService.addGoal(stageGoalDTO);
     }
 
+    /**
+     * 批量添加子目标
+     *
+     * @param subGoalDTOList
+     * @return
+     */
     @PostMapping("/batch/addSubGoal")
     public ApiResponse<String> batchAddSubGoal(@RequestBody List<SubGoalDTO> subGoalDTOList) {
         return goalAddService.batchAddSubGoal(subGoalDTOList);
     }
 
+    /**
+     * 删除目标
+     *
+     * @param id
+     * @return
+     */
     @PostMapping("/delete/{id}")
     public ApiResponse<String> deleteGoal(@PathVariable Long id) {
         return goalDeleteService.deleteGoal(id);
     }
 
+    /**
+     * 修改目标
+     *
+     * @param stageGoalDTO
+     * @return
+     */
     @PostMapping("/update")
     public ApiResponse<String> updateGoal(@RequestBody StageGoalDTO stageGoalDTO) {
         return goalUpdateService.updateGoal(stageGoalDTO);
     }
 
+    /**
+     * 查询目标
+     *
+     * @param goalQueryDTO
+     * @return
+     */
     @PostMapping("/query")
     public ApiResponse<List<StageGoalVO>> queryGoals(@RequestBody(required = false) GoalQueryDTO goalQueryDTO) {
         return goalQueryService.queryGoals(goalQueryDTO);
     }
 
+    /**
+     * 查询目标
+     *
+     * @param id
+     * @return
+     */
     @GetMapping("/query/{id}")
     public ApiResponse<StageGoalVO> getGoalById(@PathVariable Long id) {
         return goalQueryService.getGoalById(id);
     }
 
+    /**
+     * 导出目标
+     *
+     * @param exportType
+     * @param lastDays
+     * @param exportSize
+     * @return
+     */
     @PostMapping("/export")
     public ApiResponse<String> exportGoal(
             @RequestParam(defaultValue = "1") Integer exportType,
