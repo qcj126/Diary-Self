@@ -48,11 +48,9 @@ public class FileController {
     @PostMapping("/upload/images")
     public ApiResponse<List<Long>> upload(@RequestParam("files") List<MultipartFile> files,
                                           @RequestParam("code") Integer code) {
-        ImageDTO imageDTO = new ImageDTO();
-        imageDTO.setCode(code);
-        imageDTO.setUserId(10000L);
+
         // 直接先插入数据
-        List<Long> result = uploadService.addImagesToDb(files, imageDTO);
+        List<Long> result = uploadService.addImagesToDb(files, code);
 
         return ApiResponse.success(result);
     }

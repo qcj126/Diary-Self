@@ -35,23 +35,9 @@ public class UploadServiceImpl implements UploadService {
 
     private final AsyncService asyncService;
 
-    public UploadServiceImpl(
-            ImageMapper imageMapper,
-            FileUtil fileUtil,
-            AsyncService asyncService
-    ) {
-        this.imagMapper = imageMapper;
-        this.fileUtil = fileUtil;
-        this.asyncService = asyncService;
-    }
-
     @Override
-    public List<Long> addImagesToDb(List<MultipartFile> files, ImageDTO imageDTO) {
-        MyUtils.check()
-                .notNull(files, "文件列表")
-                .notNull(imageDTO, "图片信息")
-                .notNull(imageDTO.getCode(), "图片类别")
-                .notNull(imageDTO.getUserId(), "用户ID");
+    public List<Long> addImagesToDb(List<MultipartFile> files, Integer code) {
+        MyUtils.check().notNull(files, "文件列表").notNull(code, "图片类别");
 
         List<ImagePO> imageList = new ArrayList<>();
         List<String> failedFiles = new ArrayList<>();

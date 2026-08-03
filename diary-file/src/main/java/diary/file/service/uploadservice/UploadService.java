@@ -12,8 +12,8 @@ public interface UploadService {
      * 批量添加文件信息到数据库
      *
      * @param files  文件列表
-     * @param imageDTO
+     * @param code   分类代码
      * @return 数据库插入结果
      */
-    List<Long> addImagesToDb(List<MultipartFile> files, ImageDTO imageDTO);
+    List<Long> addImagesToDb(List<MultipartFile> files, Integer code);
 }
