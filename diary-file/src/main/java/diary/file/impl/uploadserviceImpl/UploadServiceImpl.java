@@ -1,19 +1,18 @@
 package diary.file.impl.uploadserviceImpl;
 
 import diary.common.consts.PhotoStatusConst;
-import diary.common.consts.PhotoTypeConst;
 import diary.common.entity.image.dto.ImageDTO;
 import diary.common.entity.image.po.ImagePO;
 import diary.common.enums.typeenum.TypeEnum;
 import diary.common.exception.ParamIllegalException;
 import diary.file.mapper.ImageMapper;
-import diary.file.service.RedisService;
 import diary.file.service.asyncservice.AsyncService;
 import diary.file.service.uploadservice.UploadService;
 
 import diary.utils.commonutil.MyUtils;
 import diary.utils.file.FileUtil;
 import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,30 +20,38 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static diary.utils.commonutil.MyUtils.isEmpty;
 import static diary.utils.commonutil.MyUtils.isFileEmpty;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class UploadServiceImpl implements UploadService {
-    @Resource
-    private ImageMapper imagMapper;
+    private final ImageMapper imagMapper;
 
-    @Resource
-    private FileUtil fileUtil;
+    private final FileUtil fileUtil;
 
-    @Resource
-    private AsyncService asyncService;
+    private final AsyncService asyncService;
+
+    public UploadServiceImpl(
+            ImageMapper imageMapper,
+            FileUtil fileUtil,
+            AsyncService asyncService
+    ) {
+        this.imagMapper = imageMapper;
+        this.fileUtil = fileUtil;
+        this.asyncService = asyncService;
+    }
 
     @Override
     public List<Long> addImagesToDb(List<MultipartFile> files, ImageDTO imageDTO) {
-        if (files == null || files.isEmpty() || imageDTO == null || imageDTO.getUserId() == null || imageDTO.getCode() == null) {
-            throw new ParamIllegalException("文件列表或用户ID或图片类别为空");
-        }
+        MyUtils.check()
+                .notNull(files, "文件列表")
+                .notNull(imageDTO, "图片信息")
+                .notNull(imageDTO.getCode(), "图片类别")
+                .notNull(imageDTO.getUserId(), "用户ID");
 
         List<ImagePO> imageList = new ArrayList<>();
         List<String> failedFiles = new ArrayList<>();

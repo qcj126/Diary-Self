@@ -1,78 +1,73 @@
 package diary.utils.commonutil;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import diary.utils.snowflake.SnowflakeIdUtil;
 import org.springframework.web.multipart.MultipartFile;
 
 public class MyUtils {
     // 创建ObjectMapper实例，用于JSON转换
     private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static long lastTimestamp = -1L;
+    private static long sequence = 0L;
+    private static final long START_TIMESTAMP = 1704038400000L; // 2024-01-01
 
+    public static synchronized long nextId() {
+        long timestamp = System.currentTimeMillis();
+
+        if (timestamp < lastTimestamp) {
+            throw new RuntimeException("时钟回拨了");
+        }
+
+        if (timestamp == lastTimestamp) {
+            sequence = (sequence + 1) & 4095; // 12位序列号，最大值4095
+            if (sequence == 0) {
+                while (timestamp <= lastTimestamp) {
+                    timestamp = System.currentTimeMillis();
+                }
+            }
+        } else {
+            sequence = 0L;
+        }
+
+        lastTimestamp = timestamp;
+
+        return ((timestamp - START_TIMESTAMP) << 22)  // 时间戳左移22位
+                | (sequence);                          // 序列号
+    }
+    // 生成雪花算法主键id
     public static long getPrimaryKey() {
         // 使用雪花算法
-        return SnowflakeIdUtil.nextId();
+        return nextId();
     }
-    
+
+    // 判断字符串为空或空串
     public static boolean isEmpty(String str) {
         return str == null || str.trim().isEmpty();
     }
 
-    public static boolean isObjEmpty(Object obj) {
-        return obj == null;
-    }
-
+    // 判断文件为空
     public static boolean isFileEmpty(MultipartFile file) {
         return file == null || file.isEmpty();
     }
 
-    /**
-     * 对象转JSON字符串
-     *
-     * @param obj 待转换的对象
-     * @return JSON字符串，如果转换失败返回null
-     */
-    public static String objectToJson(Object obj) {
-        if (obj == null) {
-            return null;
-        }
-        try {
-            return objectMapper.writeValueAsString(obj);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return null;
-        }
+    // 添加这个静态方法，调用更简洁
+    public static Checker check() {
+        return new Checker();
     }
 
-    /**
-     * JSON字符串转对象
-     *
-     * @param json JSON字符串
-     * @param clazz 目标对象类型
-     * @return 转换后的对象，如果转换失败返回null
-     */
-    public static <T> T jsonToObject(String json, Class<T> clazz) {
-        if (isEmpty(json) || clazz == null) {
-            return null;
+    // 判断入参是否为空
+    public static class Checker {
+        public Checker notNull(Object value, String fieldName) {
+            if (value == null) {
+                throw new IllegalArgumentException(fieldName + " 不能为 null");
+            }
+            return this;
         }
-        try {
-            return objectMapper.readValue(json, clazz);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 
-    /**
-     * 对象转字符串（调用toString方法，处理null情况）
-     *
-     * @param obj 待转换的对象
-     * @return 对象的字符串表示，如果对象为null返回""
-     */
-    public static String objectToString(Object obj) {
-        if (obj == null) {
-            return "";
+        public Checker notEmpty(String value, String fieldName) {
+            if (value == null || value.trim().isEmpty()) {
+                throw new IllegalArgumentException(fieldName + " 不能为空字符串");
+            }
+            return this;
         }
-        return obj.toString();
     }
 }
