@@ -3,6 +3,7 @@ package diary.file.impl.downloadserviceImpl;
 import diary.common.entity.ai.ao.ImageIdUrl;
 import diary.file.service.asyncservice.AsyncService;
 import diary.file.service.downloadservice.DownloadService;
+import diary.utils.commonutil.MyUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,9 +31,7 @@ public class DownloadServiceImpl implements DownloadService {
 
     @Override
     public Map<String, Object> batchDownloadPhotos(Map<Long, String>  imageIdUrls) {
-        if (imageIdUrls == null || imageIdUrls.isEmpty()) {
-            return Map.of("code", 500, "message", "URL列表为空", "data", "null");
-        }
+        MyUtils.check().mapNotContainsEmpty(imageIdUrls, "图片id或url").notNull(imageIdUrls, "imageIdUrls");
 
         // 确保下载目录存在
         Path downloadDir = Paths.get(defaultDownloadPath);
@@ -43,7 +42,7 @@ public class DownloadServiceImpl implements DownloadService {
             }
         } catch (IOException e) {
             log.error("创建下载目录失败: {}", defaultDownloadPath, e);
-            return Map.of("code", 500, "message", "创建下载目录失败: " + e.getMessage(), "data", "null");
+            return new HashMap<>();
         }
 
         // 用于存储所有下载任务的结果
@@ -67,11 +66,8 @@ public class DownloadServiceImpl implements DownloadService {
                     });
             futures.add(future);
         }
-
-        // 等待所有任务完成
-        CompletableFuture<Void> allFutures = CompletableFuture.allOf(
-                futures.toArray(new CompletableFuture[0])
-        );
+        // 将任务加入allFutures中，阻塞等待所有任务完成
+        CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])); // 等待所有任务完成，传入一个初始长度为 0 的数组，JVM 会优化并直接分配一个大小刚好的新数组
 
         try {
             // 阻塞等待所有任务完成
@@ -109,6 +105,4 @@ public class DownloadServiceImpl implements DownloadService {
             return Map.of("code", 500, "message", "批量下载异常: " + e.getMessage(), "data", "null");
         }
     }
-
-
 }

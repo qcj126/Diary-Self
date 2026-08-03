@@ -6,6 +6,7 @@ import diary.common.exception.ParamIllegalException;
 import diary.file.mapper.ImageMapper;
 import diary.file.service.queryurlservice.QueryUrlService;
 import diary.utils.OSS.OssUtil;
+import diary.utils.commonutil.MyUtils;
 import diary.utils.redis.RedisUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -29,15 +30,13 @@ public class QueryUrlServiceImpl implements QueryUrlService {
     private RedisUtil redisUtil;
 
     public List<ImageVO> queryImageUrls(List<Long> imageIds) {
-        if (imageIds.stream().anyMatch(Objects::isNull)) {
-            throw new ParamIllegalException("imageIds 不能为空");
-        }
+        MyUtils.check().listNotContainsEmpty(imageIds, "图片ID列表");
         List<ImageVO> imageVOS = new ArrayList<>();
         // 先走缓存
         for (Long imageId : imageIds) {
             String url = redisUtil.getStringWithExpire("imageUrls:" + imageId);
             ImageVO imageVO = new ImageVO();
-            if (url == null) {
+            if (MyUtils.isEmpty(url)) {
                 // 1. 从数据库查询 object_key
                 ImagePO imagePO = imageMapper.selectImageById(imageId);
 

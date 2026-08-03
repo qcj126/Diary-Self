@@ -48,33 +48,26 @@ public class FileController {
     @PostMapping("/upload/images")
     public ApiResponse<List<Long>> upload(@RequestParam("files") List<MultipartFile> files,
                                           @RequestParam("code") Integer code) {
-
-        // 直接先插入数据
-        List<Long> result = uploadService.addImagesToDb(files, code);
-
-        return ApiResponse.success(result);
+        return ApiResponse.success(uploadService.addImagesToDb(files, code));
     }
 
     @PostMapping("/query/images/urls")
     public ApiResponse<List<ImageVO>> queryImageUrls(@RequestBody List<Long> imageIds) {
         // 根据 imageIds 查询图片，并动态生成签名 URL（有效期5分钟）
         // 前端每次加载日记时都应调用此接口获取最新的签名 URL
-        List<ImageVO> result = queryUrlService.queryImageUrls(imageIds);
-        return ApiResponse.success(result);
+        return ApiResponse.success(queryUrlService.queryImageUrls(imageIds));
     }
 
     @PostMapping("/query/images/carousel")
     public ApiResponse<List<ImageVO>> queryCarouselImages() {
         // 查询轮播图图片  规则：查看每个分类的最新2张图片
-        List<ImageVO> result = queryUrlService.queryCarouselImages();
-        return ApiResponse.success(result);
+        return ApiResponse.success(queryUrlService.queryCarouselImages());
     }
 
     @PostMapping("/download/image")
     public ApiResponse download(@RequestBody Map<Long, String> imageIdUrls) {
         // 批量下载图片
-        Map<String, Object> result = downloadService.batchDownloadPhotos(imageIdUrls);
-        return ApiResponse.success(result);
+        return ApiResponse.success(downloadService.batchDownloadPhotos(imageIdUrls));
     }
 
     @PostMapping("/upload/video")

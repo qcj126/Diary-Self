@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class MyUtils {
@@ -59,13 +60,6 @@ public class MyUtils {
 
     // 判断入参是否为空
     public static class Checker {
-        public Checker notNull(Object value, String fieldName) {
-            if (value == null) {
-                throw new IllegalArgumentException(fieldName + " 不能为 null");
-            }
-            return this;
-        }
-
         public Checker notEmpty(String value, String fieldName) {
             if (value == null || value.trim().isEmpty()) {
                 throw new IllegalArgumentException(fieldName + " 不能为空字符串");
@@ -76,6 +70,21 @@ public class MyUtils {
         public Checker listNotContainsEmpty(List<?> value, String fieldName) {
             if (value.stream().anyMatch(Objects::isNull)) {
                 throw new IllegalArgumentException(fieldName + " 不能包含空值");
+            }
+            return this;
+        }
+
+        public Checker mapNotContainsEmpty(Map<Long, String> imageIdUrls, String fieldName) {
+            for (Map.Entry<Long, String> entry : imageIdUrls.entrySet()) {
+                if (entry.getKey() == null || entry.getValue() == null || entry.getValue().trim().isEmpty()) {
+                    throw new IllegalArgumentException(fieldName + " 不能包含空值");
+                }
+            }
+            return this;
+        }
+        public Checker notNull(Object value, String fieldName) {
+            if (value == null) {
+                throw new IllegalArgumentException(fieldName + " 不能为 null");
             }
             return this;
         }

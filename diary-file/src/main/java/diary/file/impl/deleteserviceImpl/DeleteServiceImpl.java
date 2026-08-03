@@ -35,6 +35,7 @@ public class DeleteServiceImpl implements DeleteService {
         if (null == imagePO) throw new NullResultException("图片不存在");
         // 删除图片：先删OSS，再删数据库
         String objectKey = imagePO.getObjectKey();
+        // 修改重试机制，最多重试3次，当前重试机制有问题
         for (int attempt = 1; attempt <= 3; attempt++) {
             try {
                 ossClient.deleteObject(bucketName, objectKey);
