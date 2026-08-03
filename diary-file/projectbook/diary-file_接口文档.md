@@ -1,204 +1,83 @@
-# diary-file 模块接口文档
+# diary-file 接口文档
 
 ## 模块说明
 
-**模块名称**: diary-file  
-**服务端口**: 8802  
-**基础路径**: /file  
-**网关路径**: http://gateway:10000/file/**
+- 模块名称：`diary-file`
+- 基础路径：`/file`
+- 网关路径：`http://gateway:10000/file/**`
+- 主要职责：图片上传、图片签名 URL 查询、轮播图查询、图片下载、视频上传和文件删除。
+
+## 通用约定
+
+所有业务接口默认返回 `ApiResponse<T>`：
+
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {}
+}
+```
+
+失败时返回：
+
+```json
+{
+  "code": 500,
+  "message": "错误信息",
+  "data": null
+}
+```
 
 ## 接口列表
 
-### 1. 批量上传图片
+| 序号 | 方法 | 路径 | Content-Type | 说明 |
+|---:|---|---|---|---|
+| 1 | POST | `/file/upload/images` | `multipart/form-data` | 批量上传图片 |
+| 2 | POST | `/file/query/images/urls` | `application/json` | 根据图片 ID 列表查询签名 URL |
+| 3 | POST | `/file/query/images/carousel` | `application/json` | 查询轮播图图片 |
+| 4 | POST | `/file/download/image` | `application/json` | 批量下载图片 |
+| 5 | POST | `/file/upload/video` | `multipart/form-data` | 上传视频 |
+| 6 | POST | `/file/delete/{id}` | `application/json` | 删除图片文件记录 |
 
-**接口地址**: POST `/file/upload/images`
+## 参数说明
 
-**接口描述**: 批量上传图片文件
+### 上传图片
 
-**权限要求**: 需要认证
+| 参数 | 类型 | 位置 | 说明 |
+|---|---|---|---|
+| files | List<MultipartFile> | form-data | 图片文件列表 |
+| code | Integer | form-data | 图片类型编码 |
 
-**请求参数**:
-- files: 图片文件列表（MultipartFile）
-- code: 图片类型（Integer）
-- userId: 用户ID（Long）
+响应 `data` 为 `List<Long>`，表示已入库图片 ID。
 
-**参数说明**:
-| 参数名 | 类型 | 必填 | 说明 |
-|--------|------|------|------|
-| files | List<MultipartFile> | 是 | 图片文件列表 |
-| code | Integer | 是 | 图片类型 |
-| userId | Long | 是 | 用户ID |
+### 查询图片 URL
 
-**响应示例**:
+请求体为图片 ID 数组：
+
+```json
+[1, 2, 3]
+```
+
+响应 `data` 为 `List<ImageVO>`，字段为 `id`、`url`。
+
+### 下载图片
+
+请求体为图片 ID 到 URL 的映射：
+
 ```json
 {
-  "code": 200,
-  "message": "success",
-  "data": [123456, 123457, 123458],
-  "timestamp": 1234567890
+  "1": "https://example.com/a.jpg",
+  "2": "https://example.com/b.jpg"
 }
 ```
 
-**请求示例**:
-```bash
-curl -X POST http://localhost:10000/file/upload/images \
-  -H "Authorization: Bearer {token}" \
-  -F "files=@image1.jpg" \
-  -F "files=@image2.jpg" \
-  -F "code=1" \
-  -F "userId=123456"
-```
+响应 `data` 为下载结果 Map。
 
----
+### 上传视频
 
-### 2. 查询图片URL
+| 参数 | 类型 | 位置 | 说明 |
+|---|---|---|---|
+| file | MultipartFile | form-data | 视频文件 |
 
-**接口地址**: POST `/file/query/images/urls`
-
-**接口描述**: 根据图片ID批量查询图片URL
-
-**权限要求**: 需要认证
-
-**请求参数**:
-```json
-[123456, 123457, 123458]
-```
-
-**参数说明**:
-| 参数名 | 类型 | 必填 | 说明 |
-|--------|------|------|------|
-| imageIds | List<Long> | 是 | 图片ID列表 |
-
-**响应示例**:
-```json
-{
-  "code": 200,
-  "message": "success",
-  "data": [
-    {
-      "id": 123456,
-      "url": "https://bucket.oss-cn-chengdu.aliyuncs.com/image1.jpg"
-    },
-    {
-      "id": 123457,
-      "url": "https://bucket.oss-cn-chengdu.aliyuncs.com/image2.jpg"
-    }
-  ],
-  "timestamp": 1234567890
-}
-```
-
-**请求示例**:
-```bash
-curl -X POST http://localhost:10000/file/query/images/urls \
-  -H "Authorization: Bearer {token}" \
-  -H "Content-Type: application/json" \
-  -d '[123456, 123457, 123458]'
-```
-
----
-
-### 3. 批量下载图片
-
-**接口地址**: POST `/file/download/image`
-
-**接口描述**: 批量下载图片到本地
-
-**权限要求**: 需要认证
-
-**请求参数**:
-```json
-{
-  "ossUrls": ["https://...", "https://..."]
-}
-```
-
-**参数说明**:
-| 参数名 | 类型 | 必填 | 说明 |
-|--------|------|------|------|
-| ossUrls | List<String> | 是 | OSS URL列表 |
-
-**响应示例**:
-```json
-{
-  "code": 200,
-  "message": "success",
-  "data": {
-    "downloadPath": "C:\\Users\\QCJ\\Pictures\\Saved Pictures",
-    "successCount": 2,
-    "failCount": 0
-  },
-  "timestamp": 1234567890
-}
-```
-
-**请求示例**:
-```bash
-curl -X POST http://localhost:10000/file/download/image \
-  -H "Authorization: Bearer {token}" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "ossUrls": [
-      "https://bucket.oss-cn-chengdu.aliyuncs.com/image1.jpg",
-      "https://bucket.oss-cn-chengdu.aliyuncs.com/image2.jpg"
-    ]
-  }'
-```
-
----
-
-### 4. 上传视频
-
-**接口地址**: POST `/file/upload/video`
-
-**接口描述**: 上传视频文件
-
-**权限要求**: 需要认证
-
-**请求参数**:
-- file: 视频文件（MultipartFile）
-
-**参数说明**:
-| 参数名 | 类型 | 必填 | 说明 |
-|--------|------|------|------|
-| file | MultipartFile | 是 | 视频文件 |
-
-**响应示例**:
-```json
-{
-  "code": 200,
-  "message": "success",
-  "data": {
-    "videoId": 123456,
-    "fileName": "video.mp4",
-    "fileSize": 10485760
-  },
-  "timestamp": 1234567890
-}
-```
-
-**请求示例**:
-```bash
-curl -X POST http://localhost:10000/file/upload/video \
-  -H "Authorization: Bearer {token}" \
-  -F "file=@video.mp4"
-```
-
-## 注意事项
-
-1. **文件大小限制**
-   - 单个文件最大10MB
-   - 请求最大20MB
-
-2. **文件类型**
-   - 图片：jpg, jpeg, png, gif, webp
-   - 视频：mp4, avi, mov
-
-3. **异步处理**
-   - 上传接口先返回ID
-   - 实际上传到OSS是异步的
-   - 可通过查询接口确认上传状态
-
-4. **签名URL**
-   - URL有效期5分钟
-   - 过期后需重新获取
+视频接口会先入库，再异步上传 OSS 并发送 MQ 消息。

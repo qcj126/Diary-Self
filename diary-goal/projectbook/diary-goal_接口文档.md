@@ -1,220 +1,103 @@
-# diary-goal 模块接口文档
+# diary-goal 接口文档
 
 ## 模块说明
 
-**模块名称**: diary-goal  
-**服务端口**: 通过网关访问（网关端口: 10000）  
-**基础路径**: /goal  
-**网关路径**: http://gateway:10000/goal/**
+- 模块名称：diary-goal
+- 基础路径：/goal
+- 网关路径：http://gateway:10000/goal/**
+- 主要职责：阶段目标、子目标的新增、批量新增、删除、修改、查询与导出。
+
+## 通用约定
+
+所有业务接口默认返回 `ApiResponse<T>`：
+
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {}
+}
+```
+
+失败时返回：
+
+```json
+{
+  "code": 500,
+  "message": "错误信息",
+  "data": null
+}
+```
+
+除登录、注册、验证码、重置密码、Token 刷新等公开接口外，业务接口通常应通过网关携带认证信息访问。
 
 ## 接口列表
 
-### 1. 新增阶段目标
+| 序号 | 方法 | 路径 | 说明 |
+|---:|---|---|---|
+| 1 | POST | /goal/add | 新增阶段目标，可携带子目标列表 |
+| 2 | POST | /goal/batch/addSubGoal | 批量新增子目标 |
+| 3 | POST | /goal/delete/{id} | 根据目标 ID 删除阶段目标 |
+| 4 | POST | /goal/update | 修改阶段目标 |
+| 5 | POST | /goal/query | 条件查询阶段目标列表 |
+| 6 | GET | /goal/query/{id} | 根据 ID 查询阶段目标详情 |
+| 7 | POST | /goal/export?exportType=1&lastDays=7&exportSize=10 | 导出目标数据 |
 
-**接口地址**: POST `/goal/add`
+## 数据结构
 
-**接口描述**: 新增一个阶段目标（包含子目标列表）
+### StageGoalDTO
 
-**权限要求**: 需要认证
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| id | Long | 阶段目标 ID，更新时必传 |
+| userId | Long | 用户 ID |
+| creator | String | 创建者显示名 |
+| category | String | 目标分类 |
+| title | String | 目标标题 |
+| description | String | 目标描述 |
+| subGoals | List<SubGoalDTO> | 子目标列表 |
 
-**请求参数**:
-```json
+### SubGoalDTO
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| id | Long | 子目标 ID |
+| stageId | Long | 所属阶段目标 ID |
+| userId | Long | 用户 ID |
+| title | String | 子目标标题 |
+| content | String | 子目标内容 |
+| learnedHours | BigDecimal | 已学习/投入小时数 |
+| estimatedHours | BigDecimal | 预估小时数 |
+
+### GoalQueryDTO
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| userId | Long | 用户 ID |
+| category | String | 分类筛选 |
+| title | String | 标题关键字 |
+| recentDays | Integer | 查询最近 N 天更新的数据 |
+
+## 示例
+
+```http
+POST /goal/add
+Content-Type: application/json
+
 {
-  "userId": 123,
-  "creator": "张三",
+  "userId": 10000,
+  "creator": "demo",
   "category": "学习",
   "title": "掌握算法",
-  "description": "三个月内完成算法训练营",
+  "description": "三个月完成算法训练",
   "subGoals": [
-    { "title": "第1周：入门", "content": "刷题 5 道" }
+    {
+      "title": "数组与链表",
+      "content": "完成基础题",
+      "estimatedHours": 12
+    }
   ]
 }
 ```
 
-**参数说明**:
-| 参数名 | 类型 | 必填 | 说明 |
-|--------|------|------|------|
-| userId | Long | 否 | 用户ID（可从token获取） |
-| creator | String | 否 | 创建者显示名 |
-| category | String | 否 | 目标分类 |
-| title | String | 是 | 阶段目标标题 |
-| description | String | 否 | 目标描述 |
-| subGoals | List<SubGoalDTO> | 否 | 子目标列表（每项包含 title, content, estimatedHours 等） |
-
-**响应示例**:
-```json
-{
-  "code": 200,
-  "message": "success",
-  "data": "新增成功",
-  "timestamp": 1234567890
-}
-```
-
----
-
-### 2. 删除阶段目标
-
-**接口地址**: POST `/goal/delete/{id}`
-
-**接口描述**: 根据 ID 删除阶段目标
-
-**权限要求**: 需要认证
-
-**路径参数**:
-| 参数名 | 类型 | 必填 | 说明 |
-|--------|------|------|------|
-| id | Long | 是 | 阶段目标ID |
-
-**响应示例**:
-```json
-{
-  "code": 200,
-  "message": "success",
-  "data": "删除成功",
-  "timestamp": 1234567890
-}
-```
-
----
-
-### 3. 更新阶段目标
-
-**接口地址**: POST `/goal/update`
-
-**接口描述**: 修改阶段目标信息（带 id 表示更新已有记录）
-
-**权限要求**: 需要认证
-
-**请求参数**: 同新增接口，但需要包含 `id` 表示要更新的目标
-
-**响应示例**:
-```json
-{
-  "code": 200,
-  "message": "success",
-  "data": "修改成功",
-  "timestamp": 1234567890
-}
-```
-
----
-
-### 4. 查询阶段目标列表
-
-**接口地址**: POST `/goal/query`
-
-**接口描述**: 条件查询阶段目标列表（可为空，返回全部/最近项）
-
-**权限要求**: 需要认证
-
-**请求参数**:
-```json
-{
-  "userId": 123,
-  "creator": "张三",
-  "category": "学习",
-  "title": "算法",
-  "recentDays": 30
-}
-```
-
-**参数说明**:
-| 参数名 | 类型 | 必填 | 说明 |
-|--------|------|------|------|
-| userId | Long | 否 | 用户ID |
-| creator | String | 否 | 创建者 |
-| category | String | 否 | 分类 |
-| title | String | 否 | 标题关键词 |
-| recentDays | Integer | 否 | 最近更新天数（过滤） |
-
-**响应示例**:
-```json
-{
-  "code": 200,
-  "message": "success",
-  "data": [
-    {
-      "id": 1,
-      "userId": 123,
-      "creator": "张三",
-      "category": "学习",
-      "title": "掌握算法",
-      "description": "三个月内完成算法训练营",
-      "learnedHours": 10.5,
-      "estimatedHours": 120.0,
-      "remainingHours": 109.5,
-      "progress": 8,
-      "createTime": "2026-07-01T12:00:00",
-      "updateTime": "2026-07-10T12:00:00",
-      "daysSinceUpdate": 11,
-      "subGoals": [
-        { "id": 11, "stageGoalId": 1, "title": "第1周：入门", "content": "刷题 5 道", "learnedHours": 1.0 }
-      ]
-    }
-  ],
-  "timestamp": 1234567890
-}
-```
-
----
-
-### 5. 根据 ID 查询阶段目标
-
-**接口地址**: GET `/goal/query/{id}`
-
-**接口描述**: 获取单个阶段目标详情（含子目标）
-
-**权限要求**: 需要认证
-
-**路径参数**:
-| 参数名 | 类型 | 必填 | 说明 |
-|--------|------|------|------|
-| id | Long | 是 | 阶段目标ID |
-
-**响应示例**: 同 查询阶段目标列表 中单个记录的 data 项
-
----
-
-### 6. 导出阶段目标
-
-**接口地址**: POST `/goal/export`
-
-**接口描述**: 导出目标数据（支持导出类型、时间范围、导出条数）
-
-**权限要求**: 需要认证
-
-**请求参数（Query）**:
-| 参数名 | 类型 | 默认 | 说明 |
-|--------|------|------|------|
-| exportType | Integer | 1 | 导出类型（1=PDF,2=图片,3=Excel 等） |
-| lastDays | Integer | 7 | 最近多少天的数据 |
-| exportSize | Integer | 10 | 最大导出条数 |
-
-**响应示例**:
-```json
-{
-  "code": 200,
-  "message": "success",
-  "data": "Export successful",
-  "timestamp": 1234567890
-}
-```
-
-## 常用请求示例
-
-### 新增
-```bash
-curl -X POST http://localhost:10000/goal/add \
-  -H "Authorization: Bearer {token}" \
-  -H "Content-Type: application/json" \
-  -d '{ "title": "掌握算法", "description": "三个月" }'
-```
-
-### 查询
-```bash
-curl -X POST http://localhost:10000/goal/query \
-  -H "Authorization: Bearer {token}" \
-  -H "Content-Type: application/json" \
-  -d '{ "userId": 123 }'
-```
+/goal/query 的请求体可为空；响应 data 为 List<StageGoalVO>，每个阶段目标包含 subGoals。
