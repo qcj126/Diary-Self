@@ -38,7 +38,7 @@ public class UploadServiceImpl implements UploadService {
     private final AsyncService asyncService;
 
     @Override
-    public List<Long> addImagesToDb(List<MultipartFile> files, Integer code) {
+    public List<Long> uploadImagesAndInsert(List<MultipartFile> files, Integer code) {
         // 拦截参数为空的数据
         MyUtils.check().notNull(files, "文件列表").listNotContainsEmpty(files, "文件列表").notNull(code, "图片类别");
 

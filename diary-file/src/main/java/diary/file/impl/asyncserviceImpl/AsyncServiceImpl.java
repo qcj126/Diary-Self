@@ -57,7 +57,7 @@ public class AsyncServiceImpl implements AsyncService {
     private static final long LARGE_FILE_THRESHOLD = 100 * 1024 * 1024L;
 
     @Resource
-    private OSS ossClient;
+    private OSS diaryOssClient;
 
     @Value("${aliyun.oss.bucket-name}")
     private String bucketName;
@@ -102,7 +102,7 @@ public class AsyncServiceImpl implements AsyncService {
                 String fileName = imagePO.getObjectKey();
 
                 // 1. 上传文件到 OSS（V4 客户端会自动使用 V4 签名）
-                ossClient.putObject(bucketName, fileName, file);
+                diaryOssClient.putObject(bucketName, fileName, file);
 
                 // 2. 构建消息对象，存储 object_key 而非签名 URL
                 OssUploadSuccessMsg msg = new OssUploadSuccessMsg(
@@ -253,21 +253,20 @@ public class AsyncServiceImpl implements AsyncService {
      */
     private String simpleUpload(MultipartFile file, String fileName) throws IOException {
         // 上传文件到OSS
-        ossClient.putObject(bucketName, fileName, file.getInputStream());
-
+        diaryOssClient.putObject(bucketName, fileName, file.getInputStream());
         // 返回 object_key 而非签名 URL
         return fileName;
     }
 
     /**
-     * 分片上传（适用于大文件，支持断点续传）
+     * 分片上传（适用于大文件，支持断点续传）手动控制分片（精细控制）
      */
     private String multipartUpload(MultipartFile file, String fileName) throws IOException {
         String uploadId = null;
         try {
             // 1. 初始化分片上传
             InitiateMultipartUploadRequest initiateRequest = new InitiateMultipartUploadRequest(bucketName, fileName);
-            InitiateMultipartUploadResult initiateResult = ossClient.initiateMultipartUpload(initiateRequest);
+            InitiateMultipartUploadResult initiateResult = diaryOssClient.initiateMultipartUpload(initiateRequest);
             uploadId = initiateResult.getUploadId();
 
             // 2. 计算分片数量
@@ -295,7 +294,7 @@ public class AsyncServiceImpl implements AsyncService {
                     uploadPartRequest.setPartNumber(i + 1);
 
                     // 上传分片
-                    UploadPartResult uploadPartResult = ossClient.uploadPart(uploadPartRequest);
+                    UploadPartResult uploadPartResult = diaryOssClient.uploadPart(uploadPartRequest);
                     partETags.add(uploadPartResult.getPartETag());
 
                     log.debug("视频分片上传成功，fileName: {}, partNumber: {}/{}", fileName, i + 1, partCount);
@@ -305,7 +304,7 @@ public class AsyncServiceImpl implements AsyncService {
             // 4. 完成分片上传
             CompleteMultipartUploadRequest completeRequest = new CompleteMultipartUploadRequest(
                     bucketName, fileName, uploadId, partETags);
-            ossClient.completeMultipartUpload(completeRequest);
+            diaryOssClient.completeMultipartUpload(completeRequest);
 
             // 5. 返回 object_key 而非签名 URL
             return fileName;
@@ -315,7 +314,7 @@ public class AsyncServiceImpl implements AsyncService {
                 try {
                     AbortMultipartUploadRequest abortRequest = new AbortMultipartUploadRequest(
                             bucketName, fileName, uploadId);
-                    ossClient.abortMultipartUpload(abortRequest);
+                    diaryOssClient.abortMultipartUpload(abortRequest);
                     log.warn("取消分片上传，fileName: {}, uploadId: {}", fileName, uploadId);
                 } catch (Exception abortEx) {
                     log.error("取消分片上传失败，fileName: {}, uploadId: {}", fileName, uploadId, abortEx);

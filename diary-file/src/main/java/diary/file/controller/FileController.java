@@ -1,16 +1,13 @@
 package diary.file.controller;
 
-import diary.common.entity.ai.ao.ImageIdUrl;
-import diary.common.entity.image.dto.ImageDTO;
 import diary.common.entity.image.vo.ImageVO;
 import diary.common.result.ApiResponse;
 import diary.file.service.VideoFileService;
-import diary.file.service.asyncservice.AsyncService;
 import diary.file.service.deleteservice.DeleteService;
 import diary.file.service.downloadservice.DownloadService;
 import diary.file.service.queryurlservice.QueryUrlService;
 import diary.file.service.uploadservice.UploadService;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,36 +16,27 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/file")
+@RequiredArgsConstructor
 public class FileController {
-    @Resource
-    private UploadService uploadService;
+    private final UploadService uploadService;
 
-    @Resource
-    private DownloadService downloadService;
+    private final DownloadService downloadService;
 
-    @Resource
-    private VideoFileService videoFileService;
+    private final VideoFileService videoFileService;
 
-    @Resource
-    private QueryUrlService queryUrlService;
+    private final QueryUrlService queryUrlService;
 
-    @Resource
-    private DeleteService deleteService;
+    private final DeleteService deleteService;
 
     @PostMapping("/upload/images")
     public ApiResponse<List<Long>> upload(@RequestParam("files") List<MultipartFile> files,
                                           @RequestParam("code") Integer code) {
-        return ApiResponse.success(uploadService.addImagesToDb(files, code));
+        return ApiResponse.success(uploadService.uploadImagesAndInsert(files, code));
     }
 
     @PostMapping("/query/images/urls")
@@ -65,13 +53,13 @@ public class FileController {
     }
 
     @PostMapping("/download/image")
-    public ApiResponse download(@RequestBody Map<Long, String> imageIdUrls) {
+    public ApiResponse<Map<String, Object>> download(@RequestBody Map<Long, String> imageIdUrls) {
         // 批量下载图片
         return ApiResponse.success(downloadService.batchDownloadPhotos(imageIdUrls));
     }
 
     @PostMapping("/upload/video")
-    public ApiResponse uploadVideo(@RequestParam("file") MultipartFile file) {
+    public ApiResponse<Map<String, Object>> uploadVideo(@RequestParam("file") MultipartFile file) {
         // 直接先插入数据
         Map<String, Object> result = videoFileService.addVideoToDb(file);
         // 异步上传视频到OSS成功后，发送消息给mq

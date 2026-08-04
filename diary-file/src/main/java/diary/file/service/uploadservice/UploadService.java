@@ -15,5 +15,5 @@ public interface UploadService {
      * @param code   分类代码
      * @return 数据库插入结果
      */
-    List<Long> addImagesToDb(List<MultipartFile> files, Integer code);
+    List<Long> uploadImagesAndInsert(List<MultipartFile> files, Integer code);
 }

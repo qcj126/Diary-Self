@@ -35,7 +35,7 @@ public class OssConfig {
     private String region;
 
     @Bean
-    public OSS ossClient() {
+    public OSS diaryOssClient() {
         // 1. 创建凭证提供者
         CredentialsProvider alicredentialsProvider =
                 new DefaultCredentialProvider(accessKeyId, accessKeySecret);
