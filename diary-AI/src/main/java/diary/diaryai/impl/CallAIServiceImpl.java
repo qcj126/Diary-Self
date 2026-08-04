@@ -8,6 +8,7 @@ import diary.diaryai.mapper.DiaryAIMapper;
 import diary.diaryai.service.CallAIService;
 import diary.diaryai.strategy.service.InvokeAIService;
 import diary.file.service.downloadservice.DownloadService;
+import diary.utils.commonutil.MyUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,9 +29,14 @@ public class CallAIServiceImpl implements CallAIService {
     private final AIFactory aiFactory;
     @Override
     public void callAI(AIInvokeDTO aiInvokeDTO) throws FileNotFoundException {
-        if (aiInvokeDTO.getAiType() == null || aiInvokeDTO.getImageIdUrls() == null || aiInvokeDTO.getImageIdUrls().isEmpty()) throw new ParamIllegalException("参数不能为空");
+        MyUtils.check()
+                .notNull(aiInvokeDTO.getAiType(), "AI类型")
+                .notNull(aiInvokeDTO.getAiApplication(), "AI应用场景")
+                .notNull(aiInvokeDTO.getFlag(), "AI调用标识")
+                .notNull(aiInvokeDTO.getMaterials(), "食材列表")
+                .listNotContainsEmpty(aiInvokeDTO.getMaterials(), "食材列表");
         // 对data进行过滤处理，先获取工厂的AI实现类，然后调用AI
         InvokeAIService aiService = aiFactory.getAIService(aiInvokeDTO.getAiType());
-        aiService.getAiResultAndSave(aiInvokeDTO.getImageIdUrls(), aiInvokeDTO.getAiApplication(), aiInvokeDTO.getAiType());
+        aiService.getAiResultAndSave(aiInvokeDTO.getMaterials(), aiInvokeDTO.getAiApplication(), aiInvokeDTO.getAiType(), aiInvokeDTO.getFlag());
     }
 }

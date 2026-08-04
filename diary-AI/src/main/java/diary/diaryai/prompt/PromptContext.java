@@ -51,8 +51,4 @@ public class PromptContext {
                 以下是我的数据组：""" + data));
         return contentList;
     }
-
-    public String getNutrientContentByModelDeepSeek(Object data) {
-        return null;
-    }
 }

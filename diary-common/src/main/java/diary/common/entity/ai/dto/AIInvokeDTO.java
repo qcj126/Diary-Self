@@ -9,6 +9,7 @@ import java.util.Map;
 @Data
 public class AIInvokeDTO {
     private Integer aiType;                       // 调用AI的枚举值：1-deepseek, 2-通义千问, 3-豆包, 4-元宝
-    private Map<Long, String> imageIdUrls;       // 图片的ossUrl，用于下载图片到本地
-    private Integer aiApplication;                       // AI用途
+    private List<Map<String, String>> materials;  // 食材列表
+    private Integer aiApplication;                // AI用途
+    private String flag;                          // 标记: 饮食或食谱，对应id为universalId
 }

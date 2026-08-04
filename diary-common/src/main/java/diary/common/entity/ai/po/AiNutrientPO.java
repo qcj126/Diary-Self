@@ -23,9 +23,9 @@ public class AiNutrientPO {
     private Long userId;
 
     /**
-     * 图片ID
+     * 通用ID
      */
-    private Long imageId;
+    private Long universalId;
 
     /**
      * ai结果表主键
@@ -61,6 +61,11 @@ public class AiNutrientPO {
      * 钠含量
      */
     private String sodium;
+
+    /**
+     * 标志：饮食或食谱，对应id为universalId
+     */
+    private String flag;
 
     /**
      * 创建时间

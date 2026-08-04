@@ -1,9 +1,8 @@
-package diary.diaryai.strategy.impl;
+package diary.diaryai.strategy.nutrientanlalyze;
 
 import com.alibaba.dashscope.aigc.generation.Generation;
 import com.alibaba.dashscope.aigc.generation.GenerationParam;
 import com.alibaba.dashscope.aigc.generation.GenerationResult;
-import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationResult;
 import com.alibaba.dashscope.common.Message;
 import com.alibaba.dashscope.common.Role;
 import com.alibaba.dashscope.utils.Constants;
@@ -34,14 +33,14 @@ import java.util.Map;
 @Component
 @Order(1)
 @RequiredArgsConstructor
-public class InvokeDeepSeekV4Pro extends InvokeAITemplate implements InvokeAIService {
+public class InvokeDeepSeekV4Flash extends InvokeAITemplate implements InvokeAIService {
     private final AliCloudProperty aliCloudProperty;
     private final PromptContext promptContext;
     private final DiaryAIMapper diaryAIMapper;
     private final Generation generation = new Generation();
 
     @Override
-    public void getAiResultAndSave(Object data, Integer aiApplication, Integer aiType) {
+    public void getAiResultAndSave(Object data, Integer aiApplication, Integer aiType, String flag) {
         String model = aliCloudProperty.getDeepSeekV4FlashModel();
         Object prompt = buildPrompt(data);
         AiInfoPO aiInfoPO = AiInfoPO.builder()
@@ -61,7 +60,7 @@ public class InvokeDeepSeekV4Pro extends InvokeAITemplate implements InvokeAISer
             aiNutrientPOS.add(AiNutrientPO.builder()
                     .id(MyUtils.getPrimaryKey())
                     .userId(10000L)
-                    .imageId(Long.parseLong(result.get("imageId")))
+                    .universalId(null)
                     .aiInfoId(aiInfoPO.getId())
                     .calory(result.get("卡路里"))
                     .protein(result.get("蛋白质"))
@@ -69,6 +68,7 @@ public class InvokeDeepSeekV4Pro extends InvokeAITemplate implements InvokeAISer
                     .carbohydrate(result.get("碳水化合物"))
                     .sugar(result.get("糖"))
                     .sodium(result.get("钠"))
+                    .flag(flag)
                     .build());
         }
         diaryAIMapper.insertAiNutrient(aiNutrientPOS);
@@ -81,7 +81,7 @@ public class InvokeDeepSeekV4Pro extends InvokeAITemplate implements InvokeAISer
 
     @Override
     public String buildPrompt(Object data) {
-        return promptContext.getNutrientContentByModelDeepSeek(data);
+        return promptContext.getUniversalNutrientContent(data);
     }
 
     @Override
