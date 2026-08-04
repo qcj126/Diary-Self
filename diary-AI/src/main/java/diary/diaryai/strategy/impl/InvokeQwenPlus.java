@@ -20,6 +20,7 @@ import diary.diaryai.template.InvokeAITemplate;
 import diary.file.mapper.ImageMapper;
 import diary.utils.commonutil.MyUtils;
 import diary.utils.redis.RedisUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -36,22 +37,13 @@ import java.util.Map;
 @Slf4j
 @Component
 @Order(1)
+@RequiredArgsConstructor
 public class InvokeQwenPlus extends InvokeAITemplate implements InvokeAIService {
     private final AliCloudProperty aliCloudProperty;
     private final PromptContext promptContext;
     private final DiaryAIMapper diaryAIMapper;
     private final RedisUtil redisUtil;
     private final MultiModalConversation conv = new MultiModalConversation();
-
-    public InvokeQwenPlus(AliCloudProperty aliCloudProperty,
-                          PromptContext promptContext,
-                          DiaryAIMapper diaryAIMapper,
-                          RedisUtil redisUtil) {
-        this.promptContext = promptContext;
-        this.aliCloudProperty = aliCloudProperty;
-        this.diaryAIMapper = diaryAIMapper;
-        this.redisUtil = redisUtil;
-    }
 
     @Override
     public void getAiResultAndSave(Object data, Integer aiApplication, Integer aiType) {
@@ -108,7 +100,7 @@ public class InvokeQwenPlus extends InvokeAITemplate implements InvokeAIService 
 
     @Override
     public List<Map<String, Object>> buildPrompt(Object data) {
-        return promptContext.getNutrientContentByModelQwenPlus(data);
+        return promptContext.getNutrientContentByModelQwenPlusAndFlash(data);
     }
 
     @Override

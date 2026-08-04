@@ -11,7 +11,8 @@ import org.springframework.stereotype.Component;
 public class AliCloudProperty{
     private String apiKey;
     private String url;
-    private String deepSeekModel;
+    private String deepSeekV4FlashModel;
+    private String deepSeekV4ProModel;
     private String qwenPlusModel;
     private String qwenMaxModel;
     private Double temperature;

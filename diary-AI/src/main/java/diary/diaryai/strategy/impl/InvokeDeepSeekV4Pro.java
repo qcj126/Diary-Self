@@ -3,6 +3,7 @@ package diary.diaryai.strategy.impl;
 import com.alibaba.dashscope.aigc.generation.Generation;
 import com.alibaba.dashscope.aigc.generation.GenerationParam;
 import com.alibaba.dashscope.aigc.generation.GenerationResult;
+import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationResult;
 import com.alibaba.dashscope.common.Message;
 import com.alibaba.dashscope.common.Role;
 import com.alibaba.dashscope.utils.Constants;
@@ -26,7 +27,6 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +34,7 @@ import java.util.Map;
 @Component
 @Order(1)
 @RequiredArgsConstructor
-public class InvokeQwenMax extends InvokeAITemplate implements InvokeAIService {
+public class InvokeDeepSeekV4Pro extends InvokeAITemplate implements InvokeAIService {
     private final AliCloudProperty aliCloudProperty;
     private final PromptContext promptContext;
     private final DiaryAIMapper diaryAIMapper;
@@ -42,7 +42,7 @@ public class InvokeQwenMax extends InvokeAITemplate implements InvokeAIService {
 
     @Override
     public void getAiResultAndSave(Object data, Integer aiApplication, Integer aiType) {
-        String model = aliCloudProperty.getQwenMaxModel();
+        String model = aliCloudProperty.getDeepSeekV4FlashModel();
         Object prompt = buildPrompt(data);
         AiInfoPO aiInfoPO = AiInfoPO.builder()
                 .id(MyUtils.getPrimaryKey())
@@ -55,7 +55,6 @@ public class InvokeQwenMax extends InvokeAITemplate implements InvokeAIService {
         diaryAIMapper.insertAiInfo(aiInfoPO);
         GenerationResult aiResult = invokeAi(prompt, model);
         List<Map<String, String>> resultList = extractResult(aiResult, model, prompt);
-
         log.info("AI返回的结果列表： {}", resultList);
         List<AiNutrientPO> aiNutrientPOS = new ArrayList<>();
         for (Map<String, String> result : resultList) {
@@ -77,12 +76,12 @@ public class InvokeQwenMax extends InvokeAITemplate implements InvokeAIService {
 
     @Override
     public Integer getCode() {
-        return AIEnum.QWENMAX.getCode();
+        return AIEnum.DEEPSEEK.getCode();
     }
 
     @Override
     public String buildPrompt(Object data) {
-        return promptContext.getUniversalNutrientContent(data);
+        return promptContext.getNutrientContentByModelDeepSeek(data);
     }
 
     @Override
