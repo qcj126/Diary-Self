@@ -1,29 +1,37 @@
-create table time_category
+create table if not exists time_category
 (
-    id            bigint unsigned                        not null comment '主键'
+    id            bigint unsigned not null comment 'primary key'
         primary key,
-    user_id       bigint unsigned                        not null comment '用户ID',
-    category_name varchar(20)                            not null comment '分类名称',
-    category_num  int unsigned                           not null comment '分类编号 1100, 1200, 1300...',
-    sort          int unsigned default '0'               not null comment '排序',
-    deleted       tinyint(1)   default 0                 not null comment '是否删除：0-否 1-是',
-    create_time   datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
-    update_time   datetime     default CURRENT_TIMESTAMP not null comment '更新时间'
-)
-    comment '时光机分类表' charset = utf8mb4;
+    user_id       bigint unsigned not null comment 'user id',
+    category_name varchar(32) not null comment 'category name',
+    category_num  int unsigned not null comment 'category number',
+    sort          int unsigned default 0 not null comment 'sort value',
+    deleted       tinyint(1) default 0 not null comment '0 normal, 1 deleted',
+    create_time   datetime default CURRENT_TIMESTAMP not null comment 'created time',
+    update_time   datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment 'updated time',
+    constraint uk_time_category_user_num
+        unique (user_id, category_num)
+) engine = InnoDB default charset = utf8mb4 comment = 'time machine category table';
 
-create table time_card
+create table if not exists time_card
 (
-    id           bigint unsigned                      not null comment '主键'
+    id           bigint unsigned not null comment 'primary key'
         primary key,
-    user_id      bigint unsigned                      not null comment '用户ID',
-    image_id     bigint unsigned                      not null comment '图片ID',
-    category_id  bigint unsigned                      not null comment '分类ID',
-    card_title   varchar(50)                          not null comment '卡片标题',
-    card_content varchar(300)                         not null comment '卡片内容',
-    record_time  datetime                             not null comment '记录此事的时间',
-    deleted      tinyint(1) default 0                 not null comment '是否删除：0-否 1-是',
-    create_time  datetime   default CURRENT_TIMESTAMP not null comment '创建时间',
-    update_time  datetime   default CURRENT_TIMESTAMP not null comment '更新时间'
-)
-    comment '时间机分类卡片表' charset = utf8mb4;
+    user_id      bigint unsigned not null comment 'user id',
+    image_id     bigint unsigned null comment 'image id',
+    category_id  bigint unsigned not null comment 'category id',
+    card_title   varchar(80) not null comment 'card title',
+    card_content varchar(1000) not null comment 'card content',
+    record_time  datetime not null comment 'record time',
+    open_time    datetime null comment 'time capsule open time',
+    status       tinyint default 1000 not null comment '1000 normal, 1100 sealed, 1200 opened',
+    deleted      tinyint(1) default 0 not null comment '0 normal, 1 deleted',
+    create_time  datetime default CURRENT_TIMESTAMP not null comment 'created time',
+    update_time  datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment 'updated time'
+) engine = InnoDB default charset = utf8mb4 comment = 'time machine card table';
+
+create index idx_time_card_user_record
+    on time_card (user_id, record_time, deleted);
+
+create index idx_time_card_category
+    on time_card (category_id, deleted);

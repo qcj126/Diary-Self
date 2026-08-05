@@ -1,66 +1,63 @@
--- auto-generated definition
-create table recipe
+create table if not exists recipe
 (
-    id           bigint unsigned                        not null comment '主键'
+    id           bigint unsigned not null comment 'primary key'
         primary key,
-    user_id      bigint unsigned                        not null comment '创建者用户ID',
-    title        varchar(90)                            not null comment '标题',
-    image_id     bigint unsigned                        not null comment '封面图ID',
-    description  varchar(300)                           not null comment '简介',
-    category     tinyint                                not null comment '分类：0-家常 1-西餐 2-甜点 3-汤粥 4-其他',
-    meal_type    tinyint                                not null comment '餐别：1-早餐 2-午餐 3-晚餐 4-夜宵',
-    difficulty   tinyint                                not null comment '难度：1-5',
-    cooking_time tinyint                                not null comment '烹饪时长（分钟）',
-    story        varchar(300)                           not null comment '情感故事/备注',
-    sort         int unsigned default '0'               not null comment '排序',
-    deleted      tinyint(1)   default 0                 not null comment '是否删除：0-否 1-是',
-    create_time  datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
-    update_time  datetime     default CURRENT_TIMESTAMP not null comment '更新时间',
-    constraint idx_recipe_title
-        unique (title) comment '标题唯一索引'
-)
-    comment '食谱主表' charset = utf8mb4;
+    user_id      bigint unsigned not null comment 'creator user id',
+    title        varchar(90) not null comment 'recipe title',
+    image_id     bigint unsigned null comment 'cover image id',
+    description  varchar(300) null comment 'description',
+    category     tinyint not null comment 'recipe category',
+    meal_type    tinyint not null comment '1 breakfast, 2 lunch, 3 dinner, 4 snack',
+    difficulty   tinyint not null comment 'difficulty 1-5',
+    cooking_time tinyint not null comment 'cooking minutes',
+    story        varchar(300) null comment 'story or note',
+    view_count   int unsigned default 0 not null comment 'view count',
+    like_count   int unsigned default 0 not null comment 'like count',
+    collect_count int unsigned default 0 not null comment 'collect count',
+    sort         int unsigned default 0 not null comment 'sort value',
+    deleted      tinyint(1) default 0 not null comment '0 normal, 1 deleted',
+    create_time  datetime default CURRENT_TIMESTAMP not null comment 'created time',
+    update_time  datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment 'updated time',
+    constraint uk_recipe_title_user
+        unique (user_id, title)
+) engine = InnoDB default charset = utf8mb4 comment = 'recipe table';
 
+create index idx_recipe_category
+    on recipe (category, meal_type, deleted);
 
--- auto-generated definition
-create table recipe_ingredient
+create table if not exists recipe_ingredient
 (
-    id          bigint unsigned                        not null comment '主键'
+    id          bigint unsigned not null comment 'primary key'
         primary key,
-    recipe_id   bigint unsigned                        not null comment '食谱ID',
-    user_id     bigint unsigned                        not null comment '创建者用户ID',
-    name        varchar(255)                           not null comment '食材名称',
-    quantity    varchar(255)                           not null comment '食材数量',
-    is_main     tinyint                                not null comment '是否主料：0-否 1-是',
-    sort        int unsigned default '0'               not null comment '排序',
-    deleted     tinyint(1)   default 0                 not null comment '是否删除：0-否 1-是',
-    create_time datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
-    update_time datetime     default CURRENT_TIMESTAMP not null comment '更新时间'
-)
-    comment '食谱食材表' charset = utf8mb4;
+    recipe_id   bigint unsigned not null comment 'recipe id',
+    user_id     bigint unsigned not null comment 'creator user id',
+    name        varchar(255) not null comment 'ingredient name',
+    quantity    varchar(255) not null comment 'ingredient quantity',
+    is_main     tinyint not null comment '0 no, 1 yes',
+    sort        int unsigned default 0 not null comment 'sort value',
+    deleted     tinyint(1) default 0 not null comment '0 normal, 1 deleted',
+    create_time datetime default CURRENT_TIMESTAMP not null comment 'created time',
+    update_time datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment 'updated time'
+) engine = InnoDB default charset = utf8mb4 comment = 'recipe ingredient table';
 
 create index idx_recipe_ingredient_recipe_id
-    on recipe_ingredient (recipe_id)
-    comment '食谱ID索引';
+    on recipe_ingredient (recipe_id, deleted);
 
--- auto-generated definition
-create table recipe_step
+create table if not exists recipe_step
 (
-    id           bigint unsigned                        not null comment '主键'
+    id           bigint unsigned not null comment 'primary key'
         primary key,
-    recipe_id    bigint unsigned                        not null comment '食谱ID',
-    user_id      bigint unsigned                        not null comment '创建者用户ID',
-    step_number  tinyint                                not null comment '步骤编号',
-    description  varchar(300)                           not null comment '步骤描述',
-    timer_minute tinyint                                not null comment '步骤计时（分钟）',
-    sort         int unsigned default '0'               not null comment '排序',
-    deleted      tinyint(1)   default 0                 not null comment '是否删除：0-否 1-是',
-    create_time  datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
-    update_time  datetime     default CURRENT_TIMESTAMP not null comment '更新时间'
-)
-    comment '食谱步骤表' charset = utf8mb4;
+    recipe_id    bigint unsigned not null comment 'recipe id',
+    user_id      bigint unsigned not null comment 'creator user id',
+    step_number  tinyint not null comment 'step number',
+    description  varchar(300) not null comment 'step description',
+    timer_minute tinyint default 0 not null comment 'timer minutes',
+    image_id      bigint unsigned null comment 'step image id',
+    sort         int unsigned default 0 not null comment 'sort value',
+    deleted      tinyint(1) default 0 not null comment '0 normal, 1 deleted',
+    create_time  datetime default CURRENT_TIMESTAMP not null comment 'created time',
+    update_time  datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment 'updated time'
+) engine = InnoDB default charset = utf8mb4 comment = 'recipe step table';
 
 create index idx_recipe_step_recipe_id
-    on recipe_step (recipe_id)
-    comment '食谱ID索引';
-
+    on recipe_step (recipe_id, deleted);
