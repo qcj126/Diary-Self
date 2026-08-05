@@ -13,6 +13,7 @@ public class StageGoalPO {
     private String category;
     private String title;
     private String description;
+    private LocalDateTime endTime;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 }

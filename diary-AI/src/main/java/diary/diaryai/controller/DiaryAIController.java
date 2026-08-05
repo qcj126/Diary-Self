@@ -20,7 +20,7 @@ public class DiaryAIController {
     private final CallAIService callAIService;
 
     @PostMapping("/invoke")
-    public ApiResponse<String> invokeAI (@RequestBody AIInvokeDTO aiInvokeDTO) throws FileNotFoundException {
+    public ApiResponse<String> invokeAI (@RequestBody AIInvokeDTO aiInvokeDTO) {
         callAIService.callAI(aiInvokeDTO);
         return ApiResponse.success("调用AI成功，数据已处理");
     }

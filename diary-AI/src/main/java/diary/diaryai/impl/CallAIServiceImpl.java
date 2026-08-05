@@ -28,7 +28,7 @@ public class CallAIServiceImpl implements CallAIService {
     private final DownloadService downloadService;
     private final AIFactory aiFactory;
     @Override
-    public void callAI(AIInvokeDTO aiInvokeDTO) throws FileNotFoundException {
+    public void callAI(AIInvokeDTO aiInvokeDTO) {
         MyUtils.check()
                 .notNull(aiInvokeDTO.getAiType(), "AI类型")
                 .notNull(aiInvokeDTO.getAiApplication(), "AI应用场景")

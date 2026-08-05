@@ -15,7 +15,7 @@
     <resultMap id="AiNutrientResultMap" type="diary.common.entity.ai.po.AiNutrientPO">
         <id column="id" property="id" jdbcType="BIGINT"/>
         <result column="user_id" property="userId" jdbcType="BIGINT"/>
-        <result column="image_id" property="imageId" jdbcType="BIGINT"/>
+        <result column="universal_id" property="universalId" jdbcType="BIGINT"/>
         <result column="ai_info_id" property="aiInfoId" jdbcType="BIGINT"/>
         <result column="calory" property="calory" jdbcType="VARCHAR"/>
         <result column="protein" property="protein" jdbcType="VARCHAR"/>
@@ -28,10 +28,10 @@
     </resultMap>
 
     <insert id="insertAiNutrient">
-        INSERT INTO ai_nutrient (id, user_id, image_id, ai_info_id, calory, protein, fat, carbohydrate, sugar, sodium)
+        INSERT INTO ai_nutrient (id, user_id, universal_id, ai_info_id, calory, protein, fat, carbohydrate, sugar, sodium)
         VALUES
         <foreach collection="aiNutrientPOs" item="item" separator=",">
-            (#{item.id}, #{item.userId}, #{item.imageId}, #{item.aiInfoId}, #{item.calory}, #{item.protein}, #{item.fat}, #{item.carbohydrate}, #{item.sugar}, #{item.sodium})
+            (#{item.id}, #{item.userId}, #{item.universalId}, #{item.aiInfoId}, #{item.calory}, #{item.protein}, #{item.fat}, #{item.carbohydrate}, #{item.sugar}, #{item.sodium})
         </foreach>
     </insert>
 

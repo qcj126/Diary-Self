@@ -60,7 +60,7 @@ public class InvokeDeepSeekV4Pro extends InvokeAITemplate implements InvokeAISer
             aiNutrientPOS.add(AiNutrientPO.builder()
                     .id(MyUtils.getPrimaryKey())
                     .userId(10000L)
-                    .imageId(Long.parseLong(result.get("imageId")))
+                    .universalId(Long.parseLong(result.get("imageId")))
                     .aiInfoId(aiInfoPO.getId())
                     .calory(result.get("卡路里"))
                     .protein(result.get("蛋白质"))
@@ -80,7 +80,7 @@ public class InvokeDeepSeekV4Pro extends InvokeAITemplate implements InvokeAISer
 
     @Override
     public String buildPrompt(Object data) {
-        return promptContext.getNutrientContentByModelDeepSeek(data);
+        return promptContext.getUniversalNutrientContent(data);
     }
 
     @Override

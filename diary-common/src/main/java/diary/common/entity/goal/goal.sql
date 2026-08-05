@@ -1,13 +1,16 @@
 -- auto-generated definition
 create table stage_goal
 (
-    id          bigint unsigned                    not null comment '主键',
-    user_id     bigint unsigned                    not null comment '用户ID',
-    category    varchar(20)                        not null comment '分类',
-    title       varchar(64)                        not null comment '目标标题',
-    description varchar(255)                       not null comment '目标描述',
-    create_time datetime default CURRENT_TIMESTAMP not null comment '创建时间',
-    update_time datetime default CURRENT_TIMESTAMP not null comment '更新时间'
+    id              bigint unsigned                     not null comment '主键',
+    user_id         bigint unsigned                     not null comment '用户ID',
+    category        varchar(20)                         not null comment '分类',
+    title           varchar(64)                         not null comment '目标标题',
+    description     varchar(255)                        not null comment '目标描述',
+    learned_hours   decimal(10, 2) default 0.00         null comment '已学时长(小时)',
+    estimated_hours decimal(10, 2) default 0.00         null comment '预计总用时(小时)',
+    end_time        datetime                            not null comment '目标结束时间',
+    create_time     datetime default CURRENT_TIMESTAMP  not null comment '创建时间',
+    update_time     datetime default CURRENT_TIMESTAMP  not null comment '更新时间'
 )
     comment '阶段目标表' charset = utf8mb4;
 
@@ -23,6 +26,7 @@ create table sub_goal
     content         varchar(255)                             null comment '详细内容描述',
     learned_hours   decimal(10, 2) default 0.00              null comment '已学时长(小时)',
     estimated_hours decimal(10, 2) default 0.00              null comment '预计总用时(小时)',
+    end_time        datetime                                 not null comment '子目标结束时间',
     create_time     datetime       default CURRENT_TIMESTAMP null comment '创建时间',
     update_time     datetime       default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP comment '修改时间'
 )
