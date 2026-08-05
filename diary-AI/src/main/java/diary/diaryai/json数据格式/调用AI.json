@@ -1,0 +1,17 @@
+{
+  "aiType": 1,
+  "aiapplication": 1,
+  "flag": "diet",
+  "materials": [
+    {
+      "pork": "300g",
+      "chicken": "200g",
+      "beef": "150g",
+      "fish": "100g",
+      "vegetables": "200g",
+      "fruits": "150g",
+      "grains": "100g",
+      "cookWay": "爆炒"
+    }
+  ]
+}
