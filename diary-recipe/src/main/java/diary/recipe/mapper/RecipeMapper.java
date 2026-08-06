@@ -1,8 +1,8 @@
 package diary.recipe.mapper;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import diary.common.entity.recipe.dto.req.RecipePageReqDto;
-import diary.common.entity.recipe.dto.req.RecipeReqDto;
+import diary.common.entity.recipe.dto.RecipePageReqDto;
+import diary.common.entity.recipe.dto.RecipeReqDto;
 import diary.common.entity.recipe.po.RecipePO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

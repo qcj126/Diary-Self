@@ -1,0 +1,11 @@
+{
+  "code": 200,
+  "message": "Success",
+  "data": {
+    "id": 1,
+    "userId": 1,
+    "categoryName": "Work",
+    "categoryIcon": "https://i.imgur.com/xJnpFa.png",
+    "sort": 1
+  }
+}

@@ -1,6 +1,8 @@
 package diary.common.convert.recipe;
 
-import diary.common.entity.recipe.dto.req.RecipeReqDto;
+import diary.common.entity.recipe.dto.RecipeReqDto;
+import diary.common.entity.recipe.dto.RecipeCategoryDto;
+import diary.common.entity.recipe.po.RecipeCategoryPO;
 import diary.common.entity.recipe.po.RecipePO;
 
 import java.time.LocalDateTime;
@@ -24,5 +26,15 @@ public class DtoConvertToPo {
         recipePO.setCreateTime(now);
         recipePO.setUpdateTime(now);
         return recipePO;
+    }
+
+    public static RecipeCategoryPO recipeCategoryDtoConvertToPO(RecipeCategoryDto recipeCategoryDto) {
+        return RecipeCategoryPO.builder()
+                .id(recipeCategoryDto.getId())
+                .userId(recipeCategoryDto.getUserId())
+                .categoryName(recipeCategoryDto.getCategoryName())
+                .categoryNum(recipeCategoryDto.getCategoryNum())
+                .categoryIcon(recipeCategoryDto.getCategoryIcon())
+                .build();
     }
 }

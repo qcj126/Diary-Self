@@ -2,13 +2,16 @@ package diary.recipe.impl.add;
 
 import diary.common.convert.recipe.AoConvertToPo;
 import diary.common.convert.recipe.DtoConvertToPo;
-import diary.common.entity.recipe.dto.req.RecipeReqDto;
+import diary.common.entity.recipe.dto.RecipeCategoryDto;
+import diary.common.entity.recipe.dto.RecipeReqDto;
+import diary.common.entity.recipe.po.RecipeCategoryPO;
 import diary.common.entity.recipe.po.RecipeIngredientPO;
 import diary.common.entity.recipe.po.RecipePO;
 import diary.common.entity.recipe.po.RecipeStepPO;
 import diary.common.exception.ParamIllegalException;
 import diary.common.exception.SameDataException;
 import diary.common.result.ApiResponse;
+import diary.recipe.mapper.RecipeCategoryMapper;
 import diary.recipe.mapper.RecipeIngredientMapper;
 import diary.recipe.mapper.RecipeMapper;
 import diary.recipe.mapper.RecipeStepMapper;
@@ -30,6 +33,9 @@ public class RecipeAddServiceImpl implements RecipeAddService {
 
     @Resource
     private RecipeStepMapper recipeStepMapper;
+
+    @Resource
+    private RecipeCategoryMapper recipeCategoryMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -57,6 +63,27 @@ public class RecipeAddServiceImpl implements RecipeAddService {
         recipeStepMapper.batchInsert(stepPOs);
 
         return ApiResponse.success("食谱添加成功");
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ApiResponse<String> addCategory(RecipeCategoryDto recipeCategoryDto) {
+        MyUtils.check()
+                .notNull(recipeCategoryDto, "食谱分类")
+                .notEmpty(recipeCategoryDto.getCategoryName(), "食谱分类名称")
+                .notEmpty(recipeCategoryDto.getCategoryIcon(), "食谱分类图标");
+
+        Integer maxCategoryNum = recipeCategoryMapper.selectMaxCategoryNum();
+        Integer categoryNum = maxCategoryNum == null ? 1000 : maxCategoryNum + 100;
+        recipeCategoryDto.setId(MyUtils.getPrimaryKey());
+        recipeCategoryDto.setUserId(10000L);
+        recipeCategoryDto.setCategoryNum(categoryNum);
+        RecipeCategoryPO recipeCategoryPO = DtoConvertToPo.recipeCategoryDtoConvertToPO(recipeCategoryDto);
+        Integer cnt = recipeCategoryMapper.insert(recipeCategoryPO);
+        if (cnt != null && cnt > 0) {
+            return ApiResponse.success("食谱分类添加成功");
+        }
+        return ApiResponse.addFail();
     }
 
     private void validateRecipe(RecipeReqDto recipeReqDto) {

@@ -1,7 +1,7 @@
 package diary.recipe.impl.update;
 
 import diary.common.convert.recipe.AoConvertToPo;
-import diary.common.entity.recipe.dto.req.RecipeReqDto;
+import diary.common.entity.recipe.dto.RecipeReqDto;
 import diary.common.entity.recipe.po.RecipeIngredientPO;
 import diary.common.entity.recipe.po.RecipePO;
 import diary.common.entity.recipe.po.RecipeStepPO;

@@ -61,7 +61,7 @@ public class InvokeQwenMax extends InvokeAITemplate implements InvokeAIService {
             aiNutrientPOS.add(AiNutrientPO.builder()
                     .id(MyUtils.getPrimaryKey())
                     .userId(10000L)
-                    .imageId(Long.parseLong(result.get("imageId")))
+                    .universalId(Long.parseLong(result.get("imageId")))
                     .aiInfoId(aiInfoPO.getId())
                     .calory(result.get("卡路里"))
                     .protein(result.get("蛋白质"))

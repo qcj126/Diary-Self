@@ -88,5 +88,11 @@ public class MyUtils {
             }
             return this;
         }
+        public Checker listNotEmpty(List<?> value, String fieldName) {
+            if (value.isEmpty()) {
+                throw new IllegalArgumentException(fieldName + " 不能为空");
+            }
+            return this;
+        }
     }
 }

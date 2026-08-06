@@ -1,10 +1,9 @@
-package diary.common.entity.recipe.dto.req;
+package diary.common.entity.recipe.dto;
 
 import diary.common.entity.recipe.ao.RecipeIngredientAO;
 import diary.common.entity.recipe.ao.RecipeStepAO;
 import lombok.Data;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Data

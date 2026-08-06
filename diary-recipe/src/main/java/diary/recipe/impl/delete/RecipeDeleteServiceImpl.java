@@ -1,13 +1,16 @@
 package diary.recipe.impl.delete;
 
-import diary.common.entity.recipe.dto.req.RecipeReqDto;
+import diary.common.entity.recipe.dto.RecipeCategoryDto;
+import diary.common.entity.recipe.dto.RecipeReqDto;
 import diary.common.entity.recipe.po.RecipePO;
 import diary.common.exception.ParamIllegalException;
 import diary.common.result.ApiResponse;
+import diary.recipe.mapper.RecipeCategoryMapper;
 import diary.recipe.mapper.RecipeIngredientMapper;
 import diary.recipe.mapper.RecipeMapper;
 import diary.recipe.mapper.RecipeStepMapper;
 import diary.recipe.service.delete.RecipeDeleteService;
+import diary.utils.commonutil.MyUtils;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +25,9 @@ public class RecipeDeleteServiceImpl implements RecipeDeleteService {
 
     @Resource
     private RecipeIngredientMapper recipeIngredientMapper;
+
+    @Resource
+    private RecipeCategoryMapper recipeCategoryMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -40,6 +46,19 @@ public class RecipeDeleteServiceImpl implements RecipeDeleteService {
         recipeStepMapper.deleteByRecipeId(recipePO.getId());
 
         return ApiResponse.success("删除成功");
+    }
+
+    @Override
+    public ApiResponse<String> deleteCategory(RecipeCategoryDto recipeCategoryDto) {
+        MyUtils.check()
+                .notNull(recipeCategoryDto, "食谱分类ids")
+                .listNotContainsEmpty(recipeCategoryDto.getIds(), "食谱分类ids")
+                .listNotEmpty(recipeCategoryDto.getIds(), "食谱分类ids");
+        Integer i = recipeCategoryMapper.deleteByIds(recipeCategoryDto.getIds());
+        if (i != null && i > 0) {
+            return ApiResponse.success("删除成功");
+        }
+        return ApiResponse.delFail();
     }
 
     private RecipePO getRecipe(RecipeReqDto recipeReqDto) {
