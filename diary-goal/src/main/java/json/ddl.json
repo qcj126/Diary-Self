@@ -1,0 +1,38 @@
+{
+  "code": 200,
+  "message": "success",
+  "data": [
+    {
+      "id": 339426502682607616,
+      "userId": 10000,
+      "creator": null,
+      "category": "技术",
+      "title": "java",
+      "description": "学习Java",
+      "learnedHours": 3.00,
+      "estimatedHours": 6.00,
+      "remainingHours": 3.00,
+      "progress": 50,
+      "createTime": "2026-07-25T23:06:23",
+      "updateTime": "2026-08-05T19:41:35",
+      "daysSinceUpdate": 0,
+      "ddl": "2026-08-10T23:59:59",
+      "subGoals": [
+        {
+          "id": 339426502850379776,
+          "stageGoalId": 339426502682607616,
+          "userId": 10000,
+          "title": "基本类型",
+          "content": "学习基本类型",
+          "learnedHours": 1.00,
+          "estimatedHours": 1.00,
+          "remainingHours": 0.00,
+          "progress": 100,
+          "ddl": "2026-08-10T23:59:59",
+          "createTime": "2026-07-25T23:06:23",
+          "updateTime": "2026-08-05T19:41:35"
+        }
+      ]
+    }
+  ]
+}
