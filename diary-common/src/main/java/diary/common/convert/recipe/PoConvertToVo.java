@@ -1,11 +1,9 @@
 package diary.common.convert.recipe;
 
-import diary.common.entity.recipe.po.RecipeCategoryPO;
 import diary.common.entity.recipe.po.RecipeIngredientPO;
 import diary.common.entity.recipe.po.RecipePO;
 import diary.common.entity.recipe.po.RecipeStepPO;
 import diary.common.entity.recipe.vo.IngredientVO;
-import diary.common.entity.recipe.vo.RecipeCategoryVO;
 import diary.common.entity.recipe.vo.RecipeVO;
 import diary.common.entity.recipe.vo.StepVO;
 
@@ -52,15 +50,5 @@ public class PoConvertToVo {
         vo.setDescription(po.getDescription());
         vo.setTimerMin(po.getTimerMinute());
         return vo;
-    }
-
-    public static RecipeCategoryVO convertToRecipeCategoryVO(RecipeCategoryPO po) {
-        return RecipeCategoryVO.builder()
-                        .id(po.getId())
-                        .userId(po.getUserId())
-                        .categoryName(po.getCategoryName())
-                        .categoryIcon(po.getCategoryIcon())
-                        .sort(po.getSort())
-                        .build();
     }
 }
