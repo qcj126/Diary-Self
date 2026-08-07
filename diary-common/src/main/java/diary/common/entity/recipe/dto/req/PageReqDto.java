@@ -1,4 +1,4 @@
-package diary.common.entity.recipe.dto;
+package diary.common.entity.recipe.dto.req;
 
 import lombok.Data;
 

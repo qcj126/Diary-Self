@@ -1,8 +1,8 @@
 package diary.recipe.mapper;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import diary.common.entity.recipe.dto.RecipePageReqDto;
-import diary.common.entity.recipe.dto.RecipeReqDto;
+import diary.common.entity.recipe.dto.req.RecipePageReqDto;
+import diary.common.entity.recipe.dto.req.RecipeReqDto;
 import diary.common.entity.recipe.po.RecipePO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -14,7 +14,7 @@ public interface RecipeMapper {
     /**
      * 插入食谱
      */
-    void insert(RecipePO recipe);
+    Integer insert(RecipePO recipe);
 
     /**
      * 根据ID查询
@@ -71,5 +71,5 @@ public interface RecipeMapper {
 
     IPage<RecipePO> qryPage(IPage<RecipePO> page, @Param("req") RecipePageReqDto recipePageReqDto);
 
-    void updateById(@Param("req") RecipeReqDto recipeReqDto, @Param("recipeId") Long recipeId);
+    Integer updateById(@Param("req") RecipeReqDto recipeReqDto, @Param("recipeId") Long recipeId);
 }

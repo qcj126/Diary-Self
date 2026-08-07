@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="diary.file.mapper.IconMapper">
+
+    <resultMap id="IconResultMap" type="diary.common.entity.file.po.IconPO">
+        <id property="id" column="id"/>
+        <result property="iconName" column="icon_name"/>
+        <result property="iconType" column="icon_type"/>
+        <result property="iconPath" column="icon_path"/>
+        <result property="iconSize" column="icon_size"/>
+        <result property="iconPixel" column="icon_pixel"/>
+        <result property="userId" column="user_id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <insert id="insertIcon" parameterType="diary.common.entity.file.po.IconPO"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO icon (
+            icon_name,
+            icon_type,
+            icon_path,
+            icon_size,
+            icon_pixel,
+            user_id
+        ) VALUES (
+            #{iconName},
+            #{iconType},
+            #{iconPath},
+            #{iconSize},
+            #{iconPixel},
+            #{userId}
+        )
+    </insert>
+
+    <select id="selectIcons" resultMap="IconResultMap">
+        SELECT
+            id,
+            icon_name,
+            icon_type,
+            icon_path,
+            icon_size,
+            icon_pixel,
+            user_id,
+            create_time,
+            update_time
+        FROM icon
+        <where>
+            <if test="id != null">
+                AND id = #{id}
+            </if>
+            <if test="iconName != null and iconName != ''">
+                AND icon_name LIKE CONCAT('%', #{iconName}, '%')
+            </if>
+            <if test="iconType != null">
+                AND icon_type = #{iconType}
+            </if>
+            <if test="userId != null">
+                AND user_id = #{userId}
+            </if>
+        </where>
+        ORDER BY update_time DESC, id DESC
+    </select>
+
+    <select id="selectIconById" resultMap="IconResultMap">
+        SELECT
+            id,
+            icon_name,
+            icon_type,
+            icon_path,
+            icon_size,
+            icon_pixel,
+            user_id,
+            create_time,
+            update_time
+        FROM icon
+        WHERE id = #{id}
+    </select>
+
+    <update id="updateIcon" parameterType="diary.common.entity.file.po.IconPO">
+        UPDATE icon
+        <set>
+            <if test="iconName != null and iconName != ''">
+                icon_name = #{iconName},
+            </if>
+            <if test="iconType != null">
+                icon_type = #{iconType},
+            </if>
+            <if test="iconPath != null and iconPath != ''">
+                icon_path = #{iconPath},
+            </if>
+            <if test="iconSize != null">
+                icon_size = #{iconSize},
+            </if>
+            <if test="iconPixel != null">
+                icon_pixel = #{iconPixel},
+            </if>
+        </set>
+        WHERE id = #{id}
+        <if test="userId != null">
+            AND user_id = #{userId}
+        </if>
+    </update>
+
+    <delete id="deleteIcon">
+        DELETE FROM icon
+        WHERE id = #{id}
+        <if test="userId != null">
+            AND user_id = #{userId}
+        </if>
+    </delete>
+</mapper>

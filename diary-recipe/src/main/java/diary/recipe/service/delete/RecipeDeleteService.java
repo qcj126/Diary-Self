@@ -1,7 +1,7 @@
 package diary.recipe.service.delete;
 
-import diary.common.entity.recipe.dto.RecipeCategoryDto;
-import diary.common.entity.recipe.dto.RecipeReqDto;
+import diary.common.entity.recipe.dto.req.RecipeCategoryDto;
+import diary.common.entity.recipe.dto.req.RecipeReqDto;
 import diary.common.result.ApiResponse;
 
 public interface RecipeDeleteService {

@@ -1,7 +1,7 @@
 package diary.common.convert.recipe;
 
-import diary.common.entity.recipe.dto.RecipeReqDto;
-import diary.common.entity.recipe.dto.RecipeCategoryDto;
+import diary.common.entity.recipe.dto.req.RecipeReqDto;
+import diary.common.entity.recipe.dto.req.RecipeCategoryDto;
 import diary.common.entity.recipe.po.RecipeCategoryPO;
 import diary.common.entity.recipe.po.RecipePO;
 
@@ -30,11 +30,10 @@ public class DtoConvertToPo {
 
     public static RecipeCategoryPO recipeCategoryDtoConvertToPO(RecipeCategoryDto recipeCategoryDto) {
         return RecipeCategoryPO.builder()
-                .id(recipeCategoryDto.getId())
+                .id(recipeCategoryDto.getCategoryId())
                 .userId(recipeCategoryDto.getUserId())
                 .categoryName(recipeCategoryDto.getCategoryName())
                 .categoryNum(recipeCategoryDto.getCategoryNum())
-                .categoryIcon(recipeCategoryDto.getCategoryIcon())
                 .build();
     }
 }

@@ -7,18 +7,27 @@
         <result property="userId" column="user_id"/>
         <result property="categoryName" column="category_name"/>
         <result property="categoryNum" column="category_num"/>
-        <result property="categoryIcon" column="category_icon"/>
         <result property="sort" column="sort"/>
+        <result property="iconId" column="icon_id"/>
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
     </resultMap>
 
     <sql id="BaseColumns">
-        id, user_id, category_name, category_num, category_icon, sort, create_time, update_time
+        id, user_id, category_name, category_num, sort, icon_id, create_time, update_time
     </sql>
 
-    <select id="queryRecipeCategory" resultMap="recipeCategoryMap">
-        SELECT <include refid="BaseColumns"/> FROM recipe_category
+    <select id="queryRecipeCategory" resultType="diary.common.entity.recipe.dto.db.RecipeCategoryIconDto">
+        SELECT
+        a.id as categoryId,
+        a.category_name as categoryName,
+        b.id as iconId,
+        b.icon_path as iconPath,
+        a.user_id as userId,
+        a.sort as sort,
+        b.icon_name as iconName,
+        b.icon_pixel as iconpixel
+        FROM recipe_category a inner join icon b on a.icon_id = b.id
     </select>
 
     <select id="selectMaxCategoryNum" resultType="java.lang.Integer">
@@ -32,8 +41,8 @@
             <if test="userId != null">user_id,</if>
             <if test="categoryName != null and categoryName != ''">category_name,</if>
             <if test="categoryNum != null">category_num,</if>
-            <if test="categoryIcon != null and categoryIcon != ''">category_icon,</if>
             <if test="sort != null">sort,</if>
+            <if test="iconId != null">icon_id,</if>
             <if test="createTime != null">create_time,</if>
             <if test="updateTime != null">update_time,</if>
         </trim>
@@ -42,8 +51,8 @@
             <if test="userId != null">#{userId},</if>
             <if test="categoryName != null and categoryName != ''">#{categoryName},</if>
             <if test="categoryNum != null">#{categoryNum},</if>
-            <if test="categoryIcon != null and categoryIcon != ''">#{categoryIcon},</if>
             <if test="sort != null">#{sort},</if>
+            <if test="iconId != null">#{iconId},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="updateTime != null">#{updateTime},</if>
         </trim>
@@ -55,4 +64,32 @@
             #{id}
         </foreach>
     </delete>
+
+    <update id="updateCategoryById" parameterType="diary.common.entity.recipe.po.RecipeCategoryPO">
+        UPDATE recipe_category
+        <set>
+            <if test="userId != null">
+                user_id = #{userId},
+            </if>
+            <if test="categoryName != null and categoryName != ''">
+                category_name = #{categoryName},
+            </if>
+            <if test="categoryNum != null">
+                category_num = #{categoryNum},
+            </if>
+            <if test="sort != null">
+                sort = #{sort},
+            </if>
+            <if test="iconId != null">
+                icon_id = #{iconId},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
 </mapper>

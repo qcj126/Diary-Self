@@ -12,8 +12,8 @@ public class RecipeCategoryPO {
     private Long userId;
     private String categoryName;
     private Integer categoryNum;
-    private String categoryIcon;
     private Integer sort;
+    private Long iconId;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 }

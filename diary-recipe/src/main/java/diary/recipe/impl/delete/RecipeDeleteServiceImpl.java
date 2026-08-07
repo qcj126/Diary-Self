@@ -1,9 +1,8 @@
 package diary.recipe.impl.delete;
 
-import diary.common.entity.recipe.dto.RecipeCategoryDto;
-import diary.common.entity.recipe.dto.RecipeReqDto;
+import diary.common.entity.recipe.dto.req.RecipeCategoryDto;
+import diary.common.entity.recipe.dto.req.RecipeReqDto;
 import diary.common.entity.recipe.po.RecipePO;
-import diary.common.exception.ParamIllegalException;
 import diary.common.result.ApiResponse;
 import diary.recipe.mapper.RecipeCategoryMapper;
 import diary.recipe.mapper.RecipeIngredientMapper;
@@ -32,16 +31,17 @@ public class RecipeDeleteServiceImpl implements RecipeDeleteService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ApiResponse<String> deleteRecipe(RecipeReqDto recipeReqDto) {
-        if (recipeReqDto == null || recipeReqDto.getAuthorId() == null) {
-            throw new ParamIllegalException("入参或作者ID为空");
-        }
+        validateRecipeQueryParam(recipeReqDto);
 
         RecipePO recipePO = getRecipe(recipeReqDto);
         if (recipePO == null) {
-            throw new ParamIllegalException("未找到食谱，无法执行删除操作");
+            return ApiResponse.delFail();
         }
 
-        recipeMapper.updateStatus(recipePO.getId(), 1, recipeReqDto.getAuthorId());
+        int cnt = recipeMapper.updateStatus(recipePO.getId(), 1, recipeReqDto.getAuthorId());
+        if (cnt <= 0) {
+            return ApiResponse.delFail();
+        }
         recipeIngredientMapper.deleteByRecipeId(recipePO.getId());
         recipeStepMapper.deleteByRecipeId(recipePO.getId());
 
@@ -51,14 +51,26 @@ public class RecipeDeleteServiceImpl implements RecipeDeleteService {
     @Override
     public ApiResponse<String> deleteCategory(RecipeCategoryDto recipeCategoryDto) {
         MyUtils.check()
-                .notNull(recipeCategoryDto, "食谱分类ids")
-                .listNotContainsEmpty(recipeCategoryDto.getIds(), "食谱分类ids")
-                .listNotEmpty(recipeCategoryDto.getIds(), "食谱分类ids");
-        Integer i = recipeCategoryMapper.deleteByIds(recipeCategoryDto.getIds());
+                .notNull(recipeCategoryDto, "食谱分类编号列表")
+                .notNull(recipeCategoryDto.getCategoryIds(), "食谱分类编号列表")
+                .listNotEmpty(recipeCategoryDto.getCategoryIds(), "食谱分类编号列表")
+                .listNotContainsEmpty(recipeCategoryDto.getCategoryIds(), "食谱分类编号列表");
+        Integer i = recipeCategoryMapper.deleteByIds(recipeCategoryDto.getCategoryIds());
         if (i != null && i > 0) {
             return ApiResponse.success("删除成功");
         }
         return ApiResponse.delFail();
+    }
+
+    private void validateRecipeQueryParam(RecipeReqDto recipeReqDto) {
+        MyUtils.check()
+                .notNull(recipeReqDto, "食谱")
+                .notNull(recipeReqDto.getAuthorId(), "食谱作者编号");
+        if (recipeReqDto.getId() == null) {
+            MyUtils.check()
+                    .notEmpty(recipeReqDto.getTitle(), "食谱标题")
+                    .notNull(recipeReqDto.getMealType(), "餐别");
+        }
     }
 
     private RecipePO getRecipe(RecipeReqDto recipeReqDto) {
@@ -68,9 +80,6 @@ public class RecipeDeleteServiceImpl implements RecipeDeleteService {
                 return recipePO;
             }
             return null;
-        }
-        if (recipeReqDto.getTitle() == null || recipeReqDto.getTitle().isBlank() || recipeReqDto.getMealType() == null) {
-            throw new ParamIllegalException("食谱ID为空时，作者ID、标题、餐别不能为空");
         }
         return recipeMapper.selectByAuthorTitle(recipeReqDto.getAuthorId(), recipeReqDto.getTitle(), recipeReqDto.getMealType());
     }

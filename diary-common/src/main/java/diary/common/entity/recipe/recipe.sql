@@ -67,8 +67,8 @@ create table recipe_category(
                                 user_id                   BIGINT UNSIGNED         NOT NULL COMMENT '创建者用户ID',
                                 category_name             TINYINT UNIQUE          NOT NULL COMMENT '分类名称',
                                 category_num              TINYINT UNIQUE          NOT NULL COMMENT '分类编号',
-                                category_icon             varchar(255)            not null comment '分类图标',
                                 sort                      INT UNSIGNED            NOT NULL DEFAULT 0 COMMENT '排序',
+                                icon_id                   bigint unsigned         not null comment '图标ID',
                                 create_time               DATETIME                NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
                                 update_time               DATETIME                NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
                                 PRIMARY KEY (id)

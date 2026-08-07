@@ -1,8 +1,8 @@
 package diary.recipe.controller;
 
-import diary.common.entity.recipe.dto.RecipeCategoryDto;
-import diary.common.entity.recipe.dto.RecipePageReqDto;
-import diary.common.entity.recipe.dto.RecipeReqDto;
+import diary.common.entity.recipe.dto.req.RecipeCategoryDto;
+import diary.common.entity.recipe.dto.req.RecipePageReqDto;
+import diary.common.entity.recipe.dto.req.RecipeReqDto;
 import diary.common.entity.recipe.vo.PageRecipeVO;
 import diary.common.entity.recipe.vo.RecipeCategoryVO;
 import diary.common.entity.recipe.vo.RecipeVO;
@@ -40,8 +40,7 @@ public class RecipeController {
     // 分页查询食谱
     @PostMapping("/query")
     public ApiResponse<PageRecipeVO<RecipeVO>> pageQueryRecipe(@RequestBody RecipePageReqDto recipePageReqDto) {
-        PageRecipeVO<RecipeVO> pagedQueryRecipe = recipeQueryService.pageQueryRecipe(recipePageReqDto);
-        return ApiResponse.success(pagedQueryRecipe);
+        return recipeQueryService.pageQueryRecipe(recipePageReqDto);
     }
 
     // 修改食谱
@@ -72,5 +71,11 @@ public class RecipeController {
     @PostMapping("/add/category")
     public ApiResponse<String> addCategory(@RequestBody RecipeCategoryDto recipeCategoryDto) {
         return recipeAddService.addCategory(recipeCategoryDto);
+    }
+
+    // 修改食谱分类
+    @PostMapping("/update/category")
+    public ApiResponse<String> updateCategory(@RequestBody RecipeCategoryDto recipeCategoryDto) {
+        return recipeUpdateService.updateCategory(recipeCategoryDto);
     }
 }

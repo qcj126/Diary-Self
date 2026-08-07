@@ -1,4 +1,4 @@
-package diary.common.entity.recipe.dto;
+package diary.common.entity.recipe.dto.req;
 
 import lombok.Builder;
 import lombok.Data;
@@ -9,14 +9,14 @@ import java.util.List;
 @Builder
 public class RecipeCategoryDto {
     // 删除
-    private List<Long> ids;
+    private List<Long> categoryIds;
 
     // 添加
     private String categoryName;
     private String categoryIcon;
 
     // 赋值并转换
-    private Long id;
+    private Long categoryId;
     private Long userId;
     private Integer categoryNum;
 }

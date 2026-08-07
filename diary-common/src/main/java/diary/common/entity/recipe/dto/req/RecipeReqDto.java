@@ -1,4 +1,4 @@
-package diary.common.entity.recipe.dto;
+package diary.common.entity.recipe.dto.req;
 
 import diary.common.entity.recipe.ao.RecipeIngredientAO;
 import diary.common.entity.recipe.ao.RecipeStepAO;
