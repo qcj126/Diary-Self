@@ -1,8 +1,7 @@
-package diary.file.impl.queryurlserviceImpl;
+package diary.file.impl.queryserviceImpl;
 
 import diary.common.entity.image.po.ImagePO;
 import diary.common.entity.image.vo.ImageVO;
-import diary.common.exception.ParamIllegalException;
 import diary.file.mapper.ImageMapper;
 import diary.file.service.queryurlservice.QueryUrlService;
 import diary.utils.OSS.OssUtil;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @Slf4j
 @Service

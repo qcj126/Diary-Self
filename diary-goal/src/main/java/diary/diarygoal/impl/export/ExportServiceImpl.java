@@ -42,6 +42,7 @@ public class ExportServiceImpl implements ExportService {
         dto.setCategory(stageGoalPO.getCategory());
         dto.setTitle(stageGoalPO.getTitle());
         dto.setDescription(stageGoalPO.getDescription());
+        dto.setDdl(stageGoalPO.getEndTime());
         dto.setSubGoals(subGoalPOList == null ? List.of() : subGoalPOList.stream().map(this::convertToDTO).toList());
         return dto;
     }
@@ -55,6 +56,7 @@ public class ExportServiceImpl implements ExportService {
         dto.setContent(subGoalPO.getContent());
         dto.setLearnedHours(subGoalPO.getLearnedHours());
         dto.setEstimatedHours(subGoalPO.getEstimatedHours());
+        dto.setDdl(subGoalPO.getEndTime());
         return dto;
     }
 }

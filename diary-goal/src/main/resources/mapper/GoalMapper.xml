@@ -8,6 +8,7 @@
         <result column="category" property="category"/>
         <result column="title" property="title"/>
         <result column="description" property="description"/>
+        <result column="end_time" property="endTime"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
     </resultMap>
@@ -20,16 +21,17 @@
         <result column="content" property="content"/>
         <result column="learned_hours" property="learnedHours"/>
         <result column="estimated_hours" property="estimatedHours"/>
+        <result column="end_time" property="endTime"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
     </resultMap>
 
     <sql id="StageGoalColumns">
-        id, user_id, category, title, description, create_time, update_time
+        id, user_id, category, title, description, end_time, create_time, update_time
     </sql>
 
     <sql id="SubGoalColumns">
-        id, stage_id, user_id, title, content, learned_hours, estimated_hours, create_time, update_time
+        id, stage_id, user_id, title, content, learned_hours, estimated_hours, end_time, create_time, update_time
     </sql>
 
     <insert id="insertStageGoal" parameterType="diary.common.entity.goal.po.StageGoalPO">
@@ -40,6 +42,7 @@
             <if test="category != null">category,</if>
             <if test="title != null">title,</if>
             <if test="description != null">description,</if>
+            <if test="endTime != null">end_time,</if>
             <if test="createTime != null">create_time,</if>
             <if test="updateTime != null">update_time,</if>
         </trim>
@@ -49,6 +52,7 @@
             <if test="category != null">#{category},</if>
             <if test="title != null">#{title},</if>
             <if test="description != null">#{description},</if>
+            <if test="endTime != null">#{endTime},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="updateTime != null">#{updateTime},</if>
         </trim>
@@ -78,9 +82,35 @@
         ORDER BY stage_id ASC, create_time ASC, id ASC
     </select>
 
-    <select id="selectStageGoals" resultMap="StageGoalResultMap">
+    <select id="selectStageGoals" resultMap="StageGoalResultMap" parameterType="diary.common.entity.goal.dto.GoalQueryDTO">
         SELECT <include refid="StageGoalColumns"/>
         FROM stage_goal
+        WHERE 1=1
+        <if test="userId != null">
+            AND user_id = #{userId}
+        </if>
+        <if test="category != null and category != '' and category != '1'">
+            AND category = #{category}
+        </if>
+        <if test="title != null and title != ''">
+            AND title LIKE CONCAT('%', #{title}, '%')
+        </if>
+        <if test="recentDays != null and recentDays &gt; 0">
+            AND update_time &gt;= DATE_SUB(NOW(), INTERVAL #{recentDays} DAY)
+        </if>
+        <if test="exactDate != null and exactDate != ''">
+            AND DATE(end_time) = DATE(#{exactDate})
+        </if>
+        <if test="ddl != null and ddl == 2">
+            AND end_time &gt;= DATE_ADD(NOW(), INTERVAL 3 DAY)
+        </if>
+        <if test="ddl != null and ddl == 3">
+            AND end_time &gt;= NOW()
+            AND end_time &lt; DATE_ADD(NOW(), INTERVAL 3 DAY)
+        </if>
+        <if test="ddl != null and ddl == 4">
+            AND end_time &lt; NOW()
+        </if>
         ORDER BY update_time DESC, create_time DESC, id DESC
     </select>
 
@@ -91,6 +121,7 @@
             <if test="category != null and category != ''">category = #{category},</if>
             <if test="title != null and title != ''">title = #{title},</if>
             <if test="description != null">description = #{description},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
             update_time = NOW()
         </set>
         WHERE id = #{id}
@@ -138,30 +169,11 @@
 
     <insert id="batchInsertSubGoal">
         INSERT INTO sub_goal
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="subGoalPOS[0].id != null">id,</if>
-            <if test="subGoalPOS[0].stageId != null">stage_id,</if>
-            <if test="subGoalPOS[0].userId != null">user_id,</if>
-            <if test="subGoalPOS[0].title != null and subGoalPOS[0].title != ''">title,</if>
-            <if test="subGoalPOS[0].content != null and subGoalPOS[0].content != ''">content,</if>
-            <if test="subGoalPOS[0].learnedHours != null">learned_hours,</if>
-            <if test="subGoalPOS[0].estimatedHours != null">estimated_hours,</if>
-            <if test="subGoalPOS[0].createTime != null">create_time,</if>
-            <if test="subGoalPOS[0].updateTime != null">update_time,</if>
-        </trim>
+        (id, stage_id, user_id, title, content, learned_hours, estimated_hours, end_time)
         VALUES
         <foreach collection="subGoalPOS" item="subGoal" separator=",">
-            <trim prefix="(" suffix=")" suffixOverrides=",">
-                <if test="subGoal.id != null">#{subGoal.id},</if>
-                <if test="subGoal.stageId != null">#{subGoal.stageId},</if>
-                <if test="subGoal.userId != null">#{subGoal.userId},</if>
-                <if test="subGoal.title != null and subGoal.title != ''">#{subGoal.title},</if>
-                <if test="subGoal.content != null and subGoal.content != ''">#{subGoal.content},</if>
-                <if test="subGoal.learnedHours != null">#{subGoal.learnedHours},</if>
-                <if test="subGoal.estimatedHours != null">#{subGoal.estimatedHours},</if>
-                <if test="subGoal.createTime != null">#{subGoal.createTime},</if>
-                <if test="subGoal.updateTime != null">#{subGoal.updateTime},</if>
-            </trim>
+            (#{subGoal.id}, #{subGoal.stageId}, #{subGoal.userId}, #{subGoal.title}, #{subGoal.content},
+             #{subGoal.learnedHours}, #{subGoal.estimatedHours}, #{subGoal.endTime})
         </foreach>
     </insert>
 

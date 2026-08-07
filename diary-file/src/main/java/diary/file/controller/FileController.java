@@ -1,13 +1,16 @@
 package diary.file.controller;
 
+import diary.common.entity.file.dto.IconDTO;
 import diary.common.entity.image.vo.ImageVO;
 import diary.common.result.ApiResponse;
+import diary.file.service.IconService;
 import diary.file.service.VideoFileService;
 import diary.file.service.deleteservice.DeleteService;
 import diary.file.service.downloadservice.DownloadService;
 import diary.file.service.queryurlservice.QueryUrlService;
 import diary.file.service.uploadservice.UploadService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,6 +35,8 @@ public class FileController {
     private final QueryUrlService queryUrlService;
 
     private final DeleteService deleteService;
+
+    private final IconService iconService;
 
     @PostMapping("/upload/images")
     public ApiResponse<List<Long>> upload(@RequestParam("files") List<MultipartFile> files,
@@ -71,5 +76,27 @@ public class FileController {
     public ApiResponse<String> deleteFile(@PathVariable Long id) {
         // Implementation for deleting a file
         return ApiResponse.success(deleteService.deleteImage(id));
+    }
+
+    @PostMapping("/icon/add")
+    public ApiResponse<?> addIcon(@RequestParam("file") MultipartFile file,
+                                  @ModelAttribute IconDTO iconDTO) {
+        return iconService.addIcon(file, iconDTO);
+    }
+
+    @PostMapping("/icon/query")
+    public ApiResponse<?> queryIcons(@RequestBody(required = false) IconDTO iconDTO) {
+        return iconService.queryIcons(iconDTO);
+    }
+
+    @PostMapping("/icon/update")
+    public ApiResponse<?> updateIcon(@RequestParam(value = "file", required = false) MultipartFile file,
+                                     @ModelAttribute IconDTO iconDTO) {
+        return iconService.updateIcon(file, iconDTO);
+    }
+
+    @PostMapping("/icon/delete")
+    public ApiResponse<?> deleteIcon(@RequestBody IconDTO iconDTO) {
+        return iconService.deleteIcon(iconDTO);
     }
 }

@@ -37,6 +37,7 @@ public class POConvertToVO {
                 .estimatedHours(estimatedHours)
                 .remainingHours(nonNegative(estimatedHours.subtract(learnedHours)))
                 .progress(calcProgress(learnedHours, estimatedHours))
+                .ddl(po.getEndTime())
                 .createTime(po.getCreateTime())
                 .updateTime(po.getUpdateTime())
                 .daysSinceUpdate(calcDaysSinceUpdate(po.getUpdateTime()))
@@ -60,6 +61,7 @@ public class POConvertToVO {
                 .estimatedHours(estimatedHours)
                 .remainingHours(nonNegative(estimatedHours.subtract(learnedHours)))
                 .progress(calcProgress(learnedHours, estimatedHours))
+                .ddl(po.getEndTime())
                 .createTime(po.getCreateTime())
                 .updateTime(po.getUpdateTime())
                 .build();

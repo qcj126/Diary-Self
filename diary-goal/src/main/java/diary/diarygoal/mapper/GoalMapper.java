@@ -2,6 +2,7 @@ package diary.diarygoal.mapper;
 
 import diary.common.entity.goal.po.StageGoalPO;
 import diary.common.entity.goal.po.SubGoalPO;
+import diary.common.entity.goal.dto.GoalQueryDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -17,9 +18,11 @@ public interface GoalMapper {
 
     List<SubGoalPO> selectSubGoalsByStageIds(@Param("stageIds") List<Long> stageIds);
 
-    List<StageGoalPO> selectStageGoals();
+    List<StageGoalPO> selectStageGoals(GoalQueryDTO goalQueryDTO);
 
     int updateStageGoalById(StageGoalPO stageGoalPO);
+
+    int updateSubGoalById(SubGoalPO subGoalPO);
 
     int deleteStageGoalById(@Param("id") Long id);
 
@@ -27,7 +30,7 @@ public interface GoalMapper {
 
     List<StageGoalPO> queryGoalData(@Param("lastDays") Integer lastDays, @Param("exportSize") Integer exportSize);
 
-    int batchInsertSubGoal(List<SubGoalPO> subGoalPOS);
+    int batchInsertSubGoal(@Param("subGoalPOS") List<SubGoalPO> subGoalPOS);
 
-    void batchUpdateSubGoals(List<SubGoalPO> subGoalPOS);
+    int batchUpdateSubGoals(@Param("subGoalPOS") List<SubGoalPO> subGoalPOS);
 }

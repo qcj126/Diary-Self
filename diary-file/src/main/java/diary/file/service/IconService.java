@@ -1,20 +1,15 @@
 package diary.file.service;
 
-import diary.common.entity.file.dto.IconAddDTO;
-import diary.common.entity.file.dto.IconDeleteDTO;
-import diary.common.entity.file.dto.IconQueryDTO;
-import diary.common.entity.file.dto.IconUpdateDTO;
-import diary.common.entity.file.vo.IconVO;
+import diary.common.entity.file.dto.IconDTO;
+import diary.common.result.ApiResponse;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
 public interface IconService {
-    IconVO addIcon(MultipartFile file, IconAddDTO iconAddDTO);
+    ApiResponse<?> addIcon(MultipartFile file, IconDTO iconDTO);
 
-    List<IconVO> queryIcons(IconQueryDTO queryDTO);
+    ApiResponse<?> queryIcons(IconDTO iconDTO);
 
-    Boolean updateIcon(MultipartFile file, IconUpdateDTO iconUpdateDTO);
+    ApiResponse<?> updateIcon(MultipartFile file, IconDTO iconDTO);
 
-    Boolean deleteIcon(IconDeleteDTO deleteDTO);
+    ApiResponse<?> deleteIcon(IconDTO iconDTO);
 }

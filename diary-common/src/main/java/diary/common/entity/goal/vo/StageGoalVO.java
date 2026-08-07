@@ -24,6 +24,7 @@ public class StageGoalVO {
     private BigDecimal estimatedHours;
     private BigDecimal remainingHours;
     private Integer progress;
+    private LocalDateTime ddl;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
     private Long daysSinceUpdate;
