@@ -14,6 +14,8 @@ import diary.utils.commonutil.MyUtils;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 public class TimeMachineUpdateServiceImpl implements TimeMachineUpdateService {
     @Resource
@@ -27,6 +29,7 @@ public class TimeMachineUpdateServiceImpl implements TimeMachineUpdateService {
     @Override
     public String cardUpdate(TimeCardDTO cardDTO) {
         if (cardDTO == null) throw new ParamIllegalException("入参不能为空");
+        cardDTO.setUpdateTime(LocalDateTime.now());
         Integer i = timeMachineMapper.updateCard(cardDTO);
         if (i > 0) {
             return "时光卡片更新成功";

@@ -14,6 +14,9 @@ public class TimeCardDTO {
     private String cardTitle;               // 卡片 标题
     private String cardContent;             // 卡片 内容
     private Date recordTime;                // 记录此事的时间
+    private Integer deleted;                // 分类是否删除
+    private LocalDateTime updateTime;
     private Integer pageSize;
     private Integer pageNum;
+    private String exactDate;        // 2026-08-09
 }

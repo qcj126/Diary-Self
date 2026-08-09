@@ -8,6 +8,7 @@ import diary.common.entity.timemachine.po.TimeCategoryPO;
 import diary.common.entity.timemachine.vo.TimeCardVO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -24,7 +25,7 @@ public interface TimeMachineMapper {
 
     Integer selectSameCard(Long categoryId, String cardTitle);
 
-    IPage<TimeCardVO> selectCardPage(IPage<TimeCardVO> page, Long categoryId);
+    IPage<TimeCardVO> selectCardPage(IPage<TimeCardVO> page, Long categoryId, String exactDate);
 
     Integer deleteCard(Long id);
 

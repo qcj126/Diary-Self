@@ -14,6 +14,7 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,8 +38,9 @@ public class TimeMachineQueryServiceImpl implements TimeMachineQueryService {
     public IPage<TimeCardVO> cardQuery(TimeCardDTO cardDTO) {
         Integer pageIndex = cardDTO.getPageNum();
         Integer pageSize = cardDTO.getPageSize();
-        Page<TimeCardVO> page = new Page<>((pageIndex == null ? 1 : pageIndex), (pageSize == null ? 30 : pageSize));
+        Page<TimeCardVO> page = new Page<>((pageIndex == null ? 0 : pageIndex), (pageSize == null ? 30 : pageSize));
         Long categoryId = cardDTO.getCategoryId(); // 有值查分类、无值查全部
-        return timeMachineMapper.selectCardPage(page, categoryId);
+        String exactDate = cardDTO.getExactDate();
+        return timeMachineMapper.selectCardPage(page, categoryId, exactDate);
     }
 }

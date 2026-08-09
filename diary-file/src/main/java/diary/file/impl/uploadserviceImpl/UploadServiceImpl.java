@@ -55,6 +55,7 @@ public class UploadServiceImpl implements UploadService {
 
         List<ImagePO> imageList = new ArrayList<>();
         List<String> failedFiles = new ArrayList<>();
+        List<Long> imageIds = new ArrayList<>();
 
         // 第一步：验证所有文件并构建Photo对象列表
         for (MultipartFile file : files) {
@@ -65,9 +66,10 @@ public class UploadServiceImpl implements UploadService {
                 String objectKey = fileUtil.getFileName(typeName, originalFilename);
 
                 // 查看同一图片所属类别下是否有相同名称的图片
-                Integer isExist = imagMapper.selectImageByTypeAndName(type, originalFilename);
-                if (isExist != null && isExist > 0) {
-                    failedFiles.add(originalFilename + ": 图片已存在");
+                Long isExist = imagMapper.selectImageByTypeAndName(type, originalFilename);
+                if (isExist != null) {
+                    log.info("图片已存在");
+                    imageIds.add(isExist);
                     continue;
                 }
 
@@ -89,7 +91,6 @@ public class UploadServiceImpl implements UploadService {
         }
 
         // 第二步：分批插入数据库，每批最多20条
-        List<Long> imageIds = new ArrayList<>();
         int batchSize = 20;
         int totalSize = imageList.size();
 

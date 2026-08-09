@@ -127,6 +127,9 @@
         <if test="categoryId != null">
             and category_id = #{categoryId}
         </if>
+        <if test="exactDate != null and exactDate != ''">
+            and date_format(a.record_time, '%Y-%m-%d') = #{exactDate}
+        </if>
         order by create_time desc
     </select>
 
@@ -138,6 +141,7 @@
         update time_card
         <set>
             <if test="cardTitle != null">card_title = #{cardTitle},</if>
+            <if test="imageId != null">image_id = #{imageId},</if>
             <if test="cardContent != null">card_content = #{cardContent},</if>
             <if test="recordTime != null">record_time = #{recordTime},</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>

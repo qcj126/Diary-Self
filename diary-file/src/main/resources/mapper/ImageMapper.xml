@@ -32,8 +32,8 @@
         update image set object_key = #{objectKey}, status = #{status} where id = #{id}
     </update>
 
-    <select id="selectImageByTypeAndName" resultType="java.lang.Integer">
-        select 1 from image where type = #{type} and original_name = #{originalFilename}
+    <select id="selectImageByTypeAndName" resultType="java.lang.Long">
+        select id from image where type = #{type} and original_name = #{originalFilename}
     </select>
 
     <insert id="batchAddImageToDb" parameterType="list">
@@ -70,20 +70,11 @@
     </insert>
 
     <select id="selectLatestTwoImagesForCarousel" resultMap="ImageResultMap">
-        WITH ranked_images AS (
-            SELECT
-                i.id, i.user_id, i.original_name, i.type, c.category_id,
-                ROW_NUMBER() OVER (
-            PARTITION BY c.category_id
-            ORDER BY i.create_time DESC, i.id DESC
-        ) AS rn
-            FROM image i INNER JOIN time_card c ON i.id = c.image_id
-        )
-        SELECT
-            ri.id
-        FROM ranked_images ri
-                 INNER JOIN time_category cat ON ri.category_id = cat.id
-        WHERE ri.rn in (1, 2)
+        select distinct a.id
+        from image a
+                 inner join time_card b on a.id = b.image_id
+                 inner join time_category c on b.category_id = c.id
+        group by c.id limit 20
     </select>
 
     <delete id="deleteImageById">

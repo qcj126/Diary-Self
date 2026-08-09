@@ -13,7 +13,6 @@ public class TimeCardVO {
     private String cardTitle;
     private String cardContent;
     private Date recordTime;
-    private Integer deleted;
     private Date createTime;
     private Date updateTime;
 }

@@ -10,7 +10,7 @@ import java.util.List;
 public interface ImageMapper {
     Integer batchAddImageToDb(@Param("imageList") List<ImagePO> imageList);
 
-    Integer selectImageByTypeAndName(Integer type, String originalFilename);
+    Long selectImageByTypeAndName(Integer type, String originalFilename);
 
     Integer updateImageStatusById(Long id, String objectKey, int status);
 
