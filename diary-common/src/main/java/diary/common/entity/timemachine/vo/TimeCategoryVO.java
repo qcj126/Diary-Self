@@ -13,11 +13,9 @@ import java.util.Date;
 @Builder
 public class TimeCategoryVO {
     private Long id;
-    private String userId;
+    private Long userId;
     private String categoryName;
-    private Integer categoryNum;
-    private Integer status;
-    private String createName;
-    private Date createTime;
     private Integer sort;
+    private String iconName;
+    private String iconPath;
 }

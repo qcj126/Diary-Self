@@ -37,7 +37,7 @@ public class QueryUrlServiceImpl implements QueryUrlService {
             if (MyUtils.isEmpty(url)) {
                 // 1. 从数据库查询 object_key
                 ImagePO imagePO = imageMapper.selectImageById(imageId);
-
+                if (imagePO == null) continue;
                 // 2. 提取所有 object_key
                 String objectKey = imagePO.getObjectKey();
 

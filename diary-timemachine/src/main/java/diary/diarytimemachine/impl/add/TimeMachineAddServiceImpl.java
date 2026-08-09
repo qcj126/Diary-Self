@@ -20,7 +20,7 @@ public class TimeMachineAddServiceImpl implements TimeMachineAddService {
 
     @Override
     public Integer categoryAdd(TimeCategoryDTO categoryDTO) {
-        if (categoryDTO == null || categoryDTO.getCategoryName() == null || categoryDTO.getUserId() == null) {
+        if (categoryDTO == null || categoryDTO.getCategoryName() == null || categoryDTO.getUserId() == null || categoryDTO.getIconId() == null) {
             throw new ParamIllegalException("分类名称或用户ID为空");
         }
 
@@ -32,9 +32,9 @@ public class TimeMachineAddServiceImpl implements TimeMachineAddService {
         TimeCategoryPO timeCategoryPO = DtoConvertToPo.convertToPO(categoryDTO);
         timeCategoryPO.setId(MyUtils.getPrimaryKey());
         TimeCategoryPO lastCategoryNum = timeMachineMapper.selectLastCategoryNum();
-        timeCategoryPO.setCategoryNum(lastCategoryNum.getCategoryNum() == null ? 1000 : lastCategoryNum.getCategoryNum() + 1);
+        timeCategoryPO.setCategoryNum((lastCategoryNum == null || lastCategoryNum.getCategoryNum() == null) ? 1000 : lastCategoryNum.getCategoryNum() + 1);
         TimeCategoryPO lastCategorySort = timeMachineMapper.selectLastCategorySort();
-        timeCategoryPO.setSort(lastCategorySort.getSort() == null ? 1 : lastCategorySort.getSort() + 1);
+        timeCategoryPO.setSort((lastCategorySort == null || lastCategorySort.getSort() == null) ? 1 : lastCategorySort.getSort() + 1);
         return timeMachineMapper.categoryAdd(timeCategoryPO);
     }
 

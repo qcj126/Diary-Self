@@ -20,7 +20,6 @@
         <result property="cardTitle" column="card_title"/>
         <result property="cardContent" column="card_content"/>
         <result property="recordTime" column="record_time"/>
-        <result property="deleted" column="deleted"/>
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
     </resultMap>
@@ -29,7 +28,6 @@
         <id property="id" column="id"/>
         <result property="cardContent" column="card_content"/>
         <result property="recordTime" column="record_time"/>
-        <result property="deleted" column="deleted"/>
         <result property="cardTitle" column="card_title"/>
         <result property="categoryId" column="category_id"/>
         <result property="createTime" column="create_time"/>
@@ -38,11 +36,29 @@
         <result property="imageId" column="image_id"/>
     </resultMap>
 
+    <resultMap id="CategoryIconResultMap" type="diary.common.entity.timemachine.dto.TimeCategoryIconDTO">
+        <id property="categoryId" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="iconId" column="icon_id"/>
+        <result property="categoryName" column="category_name"/>
+        <result property="categoryNum" column="category_num"/>
+        <result property="sort" column="sort"/>
+        <result property="deleted" column="deleted"/>
+        <result property="categoryCreateTime" column="create_time"/>
+        <result property="categoryUpdateTime" column="update_time"/>
+        <result property="iconName" column="icon_name"/>
+        <result property="iconType" column="icon_type"/>
+        <result property="iconPath" column="icon_path"/>
+        <result property="iconSize" column="icon_size"/>
+        <result property="iconPixel" column="icon_pixel"/>
+    </resultMap>
+
     <insert id="categoryAdd" parameterType="diary.common.entity.timemachine.po.TimeCategoryPO">
         insert into time_category
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
             <if test="userId != null">user_id,</if>
+            <if test="iconId != null">icon_id,</if>
             <if test="categoryName != null">category_name,</if>
             <if test="categoryNum != null">category_num,</if>
             <if test="sort != null">sort,</if>
@@ -53,6 +69,7 @@
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id},</if>
             <if test="userId != null">#{userId},</if>
+            <if test="iconId != null">#{iconId},</if>
             <if test="categoryName != null">#{categoryName},</if>
             <if test="categoryNum != null">#{categoryNum},</if>
             <if test="sort != null">#{sort},</if>
@@ -72,7 +89,6 @@
             <if test="cardTitle != null">card_title,</if>
             <if test="cardContent != null">card_content,</if>
             <if test="recordTime != null">record_time,</if>
-            <if test="deleted != null">deleted,</if>
             <if test="createTime != null">create_time,</if>
             <if test="updateTime != null">update_time,</if>
         </trim>
@@ -84,7 +100,6 @@
             <if test="cardTitle != null">#{cardTitle},</if>
             <if test="cardContent != null">#{cardContent},</if>
             <if test="recordTime != null">#{recordTime},</if>
-            <if test="deleted != null">#{deleted},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="updateTime != null">#{updateTime},</if>
         </trim>
@@ -103,16 +118,20 @@
     </select>
 
     <select id="selectSameCard" resultType="java.lang.Integer">
-        select count(*) from time_card where category_id = #{categoryId} and card_title = #{cardTitle} and deleted = 0;
+        select count(*) from time_card where category_id = #{categoryId} and card_title = #{cardTitle};
     </select>
 
     <select id="selectCardPage" resultMap="TimeCardVOResultMap">
-        select a.id, a.user_id, a.image_id, a.category_id, a.card_title, a.card_content, a.record_time, a.deleted, a.create_time, a.update_time
-        from time_card a where deleted = 0 order by create_time desc
+        select a.id, a.user_id, a.image_id, a.category_id, a.card_title, a.card_content, a.record_time, a.create_time, a.update_time
+        from time_card a where 1=1
+        <if test="categoryId != null">
+            and category_id = #{categoryId}
+        </if>
+        order by create_time desc
     </select>
 
-    <update id="logicallyDeleteCard">
-        update time_card set deleted = 1 where id = #{id};
+    <update id="deleteCard">
+        delete from time_card where id = #{id};
     </update>
 
     <update id="updateCard">
@@ -130,7 +149,11 @@
         update time_category set deleted = 1 where id = #{id};
     </delete>
 
-    <select id="selectCategory" resultType="diary.common.entity.timemachine.vo.TimeCategoryVO">
-
+    <select id="selectCategory" resultMap="CategoryIconResultMap">
+        select
+            aa.id, aa.user_id, aa.icon_id, aa.category_name, aa.category_num, aa.sort, aa.deleted,
+            aa.create_time, aa.update_time, bb.icon_name, bb.icon_type, bb.icon_path, bb.icon_size, bb.icon_pixel
+        from time_category aa inner join icon bb on aa.icon_id = bb.id
+        where aa.deleted = 0
     </select>
 </mapper>

@@ -4,7 +4,6 @@ import diary.common.convert.file.DtoConvertToPo;
 import diary.common.entity.file.dto.IconDTO;
 import diary.common.entity.file.po.IconPO;
 import diary.common.result.ApiResponse;
-import diary.file.impl.IconFileSupport;
 import diary.file.mapper.IconMapper;
 import diary.file.service.updateservice.IconUpdateService;
 import diary.utils.commonutil.MyUtils;
@@ -19,11 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class IconUpdateServiceImpl implements IconUpdateService {
     private final IconMapper iconMapper;
 
-    private final IconFileSupport iconFileSupport;
-
     @Override
     public ApiResponse<?> updateIcon(MultipartFile file, IconDTO iconDTO) {
-        IconFileSupport.SavedIconFile savedIconFile = null;
         try {
             MyUtils.check()
                     .notNull(iconDTO, "图标信息")
@@ -44,31 +40,30 @@ public class IconUpdateServiceImpl implements IconUpdateService {
             }
 
             IconPO iconPO = DtoConvertToPo.iconDtoConvertToPO(iconDTO);
-            if (hasFile) {
-                Integer iconType = iconDTO.getIconType() == null ? iconFileSupport.getIconType(file) : iconDTO.getIconType();
-                Integer iconSize = iconFileSupport.toIntFileSize(file.getSize());
-                Integer iconPixel = iconFileSupport.resolveIconPixel(file, iconDTO.getIconPixel());
-                savedIconFile = iconFileSupport.saveIconFile(file);
-                iconPO.setIconPath(savedIconFile.path());
-                iconPO.setIconSize(iconSize);
-                iconPO.setIconType(iconType);
-                iconPO.setIconPixel(iconPixel);
-            }
+//            if (hasFile) {
+//                Integer iconType = iconDTO.getIconType() == null ? iconFileSupport.getIconType(file) : iconDTO.getIconType();
+//                Integer iconSize = iconFileSupport.toIntFileSize(file.getSize());
+//                Integer iconPixel = iconFileSupport.resolveIconPixel(file, iconDTO.getIconPixel());
+//                savedIconFile = iconFileSupport.saveIconFile(file);
+//                iconPO.setIconPath(savedIconFile.path());
+//                iconPO.setIconSize(iconSize);
+//                iconPO.setIconType(iconType);
+//                iconPO.setIconPixel(iconPixel);
+//            }
 
-            Integer count = iconMapper.updateIcon(iconPO);
-            if (count == null || count <= 0) {
-                if (savedIconFile != null) {
-                    iconFileSupport.deleteFileQuietly(savedIconFile.path());
-                }
-                return ApiResponse.updateFail();
-            }
-
-            if (savedIconFile != null) {
-                iconFileSupport.deleteFileQuietly(oldIcon.getIconPath());
-            }
+//            Integer count = iconMapper.updateIcon(iconPO);
+//            if (count == null || count <= 0) {
+//                if (savedIconFile != null) {
+//                    iconFileSupport.deleteFileQuietly(savedIconFile.path());
+//                }
+//                return ApiResponse.updateFail();
+//            }
+//
+//            if (savedIconFile != null) {
+//                iconFileSupport.deleteFileQuietly(oldIcon.getIconPath());
+//            }
             return ApiResponse.success("修改成功");
         } catch (RuntimeException e) {
-            iconFileSupport.deleteFileQuietly(savedIconFile == null ? null : savedIconFile.path());
             log.error("修改图标失败", e);
             return ApiResponse.updateFail();
         }

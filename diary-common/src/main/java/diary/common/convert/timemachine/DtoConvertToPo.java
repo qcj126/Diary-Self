@@ -12,6 +12,7 @@ public class DtoConvertToPo {
         TimeCategoryPO timeCategoryPO = new TimeCategoryPO();
         timeCategoryPO.setId(dto.getId());
         timeCategoryPO.setUserId(dto.getUserId());
+        timeCategoryPO.setIconId(dto.getIconId());
         timeCategoryPO.setCategoryName(dto.getCategoryName());
         return timeCategoryPO;
     }

@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 public class TimeCategoryPO {
     private Long id;                            // ID
     private Long userId;                        // 用户ID
+    private Long iconId;                        // 图标ID
     private String categoryName;                // 分类名
     private Integer categoryNum;                // 分类编号
     private Integer sort;                       // 排序

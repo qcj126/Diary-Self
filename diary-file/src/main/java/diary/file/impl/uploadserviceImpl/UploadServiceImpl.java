@@ -46,14 +46,7 @@ public class UploadServiceImpl implements UploadService {
         files = files.stream()
                 .filter(file -> {
                     MyUtils.check().notEmpty(file.getContentType(), "文件类型");
-                    return file.getContentType().equals("image");
-                })
-                .filter(file -> {
-                    try {
-                        return ImageIO.read(file.getInputStream()) != null;
-                    } catch (Exception e) {
-                        return false;
-                    }
+                    return file.getContentType().equals("image/png") || file.getContentType().equals("image/jepg");
                 }).toList();
 
         ImageDTO imageDTO = new ImageDTO();

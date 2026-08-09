@@ -30,7 +30,7 @@ public class TimeMachineDeleteServiceImpl implements TimeMachineDeleteService {
 
     @Override
     public String cardDelete(TimeCardDTO cardDTO) {
-        Integer i = timeMachineMapper.logicallyDeleteCard(cardDTO.getId());
+        Integer i = timeMachineMapper.deleteCard(cardDTO.getId());
         if (i > 0) {
             return "时光卡片删除成功";
         }

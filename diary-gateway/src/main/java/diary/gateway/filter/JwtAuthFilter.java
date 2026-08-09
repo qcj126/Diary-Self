@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
@@ -20,6 +21,7 @@ import java.util.List;
 
 @Component
 public class JwtAuthFilter implements GlobalFilter, Ordered {
+    private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
 
     @Resource
     private JwtUtil jwtUtil;
@@ -86,7 +88,7 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
 
     private boolean shouldSkipAuth(String path) {
         return authProperties.getExcludePaths().stream().anyMatch(excludePath ->
-                path.equals(excludePath) || path.startsWith(excludePath + "/"));
+                PATH_MATCHER.match(excludePath, path) || path.equals(excludePath) || path.startsWith(excludePath + "/"));
     }
 
     private boolean requiresAdmin(String path) {

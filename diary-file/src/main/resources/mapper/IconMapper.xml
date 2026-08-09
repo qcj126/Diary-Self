@@ -14,9 +14,9 @@
         <result property="updateTime" column="update_time"/>
     </resultMap>
 
-    <insert id="insertIcon" parameterType="diary.common.entity.file.po.IconPO"
-            useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertIcon" parameterType="diary.common.entity.file.po.IconPO">
         INSERT INTO icon (
+            id,
             icon_name,
             icon_type,
             icon_path,
@@ -24,6 +24,7 @@
             icon_pixel,
             user_id
         ) VALUES (
+            #{id},
             #{iconName},
             #{iconType},
             #{iconPath},

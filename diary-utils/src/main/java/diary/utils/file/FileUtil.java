@@ -1,6 +1,7 @@
 package diary.utils.file;
 
 import diary.common.exception.CustomException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,6 +35,7 @@ import static diary.common.consts.FileTypeConst.TRAVEL_IMAGE_PATH;
 import static diary.common.consts.FileTypeConst.WALK_IMAGE;
 import static diary.common.consts.FileTypeConst.WALK_IMAGE_PATH;
 
+@Slf4j
 @Component
 public class FileUtil {
     public String getFileName(String type, String originalFilename) {
@@ -72,5 +74,35 @@ public class FileUtil {
             }
         }
         return tempFiles;
+    }
+
+    /**
+     * 删除文件
+     * @param filePath 文件完整路径
+     * @return true-删除成功 false-删除失败
+     */
+    public boolean deleteFile(String filePath) {
+        try {
+            File file = new File(filePath);
+            // 检查文件是否存在
+            if (!file.exists()) {
+                log.warn("文件不存在，路径: {}", filePath);
+                return false;
+            }
+            // 删除文件
+            boolean deleted = file.delete();
+            if (deleted) {
+                log.info("文件删除成功: {}", filePath);
+            } else {
+                log.error("文件删除失败: {}", filePath);
+            }
+            return deleted;
+        } catch (SecurityException e) {
+            log.error("文件删除权限异常，路径: {}, 错误: {}", filePath, e.getMessage());
+            return false;
+        } catch (Exception e) {
+            log.error("文件删除异常，路径: {}, 错误: {}", filePath, e.getMessage());
+            return false;
+        }
     }
 }

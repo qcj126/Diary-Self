@@ -12,6 +12,7 @@ import java.util.Date;
 public class TimeCategoryDTO {
     private Long id;
     private Long userId;
+    private Long iconId;
     private String categoryName;
     private Integer deleted;
     private Integer sort;

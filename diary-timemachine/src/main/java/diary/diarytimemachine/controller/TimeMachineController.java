@@ -71,8 +71,7 @@ public class TimeMachineController {
     }
 
     @PostMapping("/card/query")
-    public ApiResponse<IPage<TimeCardVO>> queryCard(@RequestParam(defaultValue = "1") Integer pageIndex,
-                                                    @RequestParam(defaultValue = "25") Integer pageSize) {
-        return ApiResponse.success(timeMachineQueryService.cardQuery(pageIndex, pageSize));
+    public ApiResponse<IPage<TimeCardVO>> queryCard(@RequestBody TimeCardDTO cardDTO) {
+        return ApiResponse.success(timeMachineQueryService.cardQuery(cardDTO));
     }
 }
