@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import diary.common.entity.recipe.dto.req.RecipePageReqDto;
 import diary.common.entity.recipe.dto.req.RecipeReqDto;
 import diary.common.entity.recipe.po.RecipePO;
+import jakarta.validation.constraints.NotNull;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -20,13 +21,6 @@ public interface RecipeMapper {
      * 根据ID查询
      */
     RecipePO selectById(@Param("recipeId") Long recipeId);
-
-    /**
-     * 逻辑删除
-     */
-    int updateStatus(@Param("recipeId") Long recipeId,
-                     @Param("status") Integer status,
-                     @Param("operatorId") Long operatorId);
 
     /**
      * 分页查询用户创建的食谱
@@ -65,11 +59,12 @@ public interface RecipeMapper {
      */
     List<RecipePO> selectByIds(@Param("ids") List<Long> ids);
 
-    RecipePO selectByAuthorTitle(@Param("authorId") Long authorId,
-                                 @Param("title") String title,
+    RecipePO selectByAuthorTitle(@Param("title") String title,
                                  @Param("mealType") Integer mealType);
 
     IPage<RecipePO> qryPage(IPage<RecipePO> page, @Param("req") RecipePageReqDto recipePageReqDto);
 
     Integer updateById(@Param("req") RecipeReqDto recipeReqDto, @Param("recipeId") Long recipeId);
+
+    int deleteRecipeById(@NotNull Long id);
 }

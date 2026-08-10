@@ -9,33 +9,34 @@
         <result column="title" property="title"/>
         <result column="image_id" property="imageId"/>
         <result column="description" property="description"/>
-        <result column="category" property="category"/>
+        <result column="category_num" property="categoryNum"/>
         <result column="meal_type" property="mealType"/>
         <result column="difficulty" property="difficulty"/>
         <result column="cooking_time" property="cookingTime"/>
         <result column="story" property="story"/>
         <result column="sort" property="sort"/>
-        <result column="deleted" property="deleted"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
     </resultMap>
 
     <sql id="BaseColumns">
-        id, user_id, title, image_id, description, category, meal_type,
-        difficulty, cooking_time, story, sort, deleted, create_time, update_time
+        id, user_id, title, image_id, description, category_num, meal_type,
+        difficulty, cooking_time, story, sort, create_time, update_time
     </sql>
 
     <sql id="PageWhereCondition">
         <where>
-            deleted = 0
-            <if test="req.category != null">
-                AND category = #{req.category}
+            <if test="req.categoryNum != null">
+                AND category_num = #{req.categoryNum}
             </if>
             <if test="req.mealType != null">
                 AND meal_type = #{req.mealType}
             </if>
             <if test="req.difficulty != null">
                 AND difficulty = #{req.difficulty}
+            </if>
+            <if test="req.redHeart != null">
+                AND red_heart = #{req.redHeart}
             </if>
             <if test="req.keyword != null and req.keyword != ''">
                 AND (title LIKE CONCAT('%', #{req.keyword}, '%')
@@ -46,11 +47,11 @@
 
     <insert id="insert" parameterType="diary.common.entity.recipe.po.RecipePO">
         INSERT INTO recipe (
-            id, user_id, title, image_id, description, category, meal_type,
-            difficulty, cooking_time, story, sort, deleted, create_time, update_time
+            id, user_id, title, image_id, description, category_num, meal_type,
+            difficulty, cooking_time, story, sort, family_member, create_time, update_time
         ) VALUES (
-            #{id}, #{userId}, #{title}, #{imageId}, #{description}, #{category}, #{mealType},
-            #{difficulty}, #{cookingTime}, #{story}, #{sort}, #{deleted}, #{createTime}, #{updateTime}
+            #{id}, #{userId}, #{title}, #{imageId}, #{description}, #{categoryNum}, #{mealType},
+            #{difficulty}, #{cookingTime}, #{story}, #{sort}, #{familyMember}, #{createTime}, #{updateTime}
         )
     </insert>
 
@@ -58,7 +59,6 @@
         SELECT <include refid="BaseColumns"/>
         FROM recipe
         WHERE id = #{recipeId}
-          AND deleted = 0
     </select>
 
     <update id="updateById">
@@ -66,7 +66,7 @@
         <set>
             <if test="req.title != null and req.title != ''">title = #{req.title},</if>
             <if test="req.description != null and req.description != ''">description = #{req.description},</if>
-            <if test="req.category != null">category = #{req.category},</if>
+            <if test="req.categoryNum != null">category_num = #{req.categoryNum},</if>
             <if test="req.mealType != null">meal_type = #{req.mealType},</if>
             <if test="req.difficulty != null">difficulty = #{req.difficulty},</if>
             <if test="req.cookingTime != null">cooking_time = #{req.cookingTime},</if>
@@ -74,23 +74,12 @@
             update_time = NOW()
         </set>
         WHERE id = #{recipeId}
-          AND deleted = 0
-    </update>
-
-    <update id="updateStatus">
-        UPDATE recipe
-        SET deleted = #{status},
-            update_time = NOW()
-        WHERE id = #{recipeId}
-          AND user_id = #{operatorId}
-          AND deleted = 0
     </update>
 
     <select id="selectByAuthor" resultMap="BaseResultMap">
         SELECT <include refid="BaseColumns"/>
         FROM recipe
         WHERE user_id = #{authorId}
-          AND deleted = 0
         ORDER BY sort ASC, create_time DESC
         LIMIT #{offset}, #{limit}
     </select>
@@ -98,12 +87,11 @@
     <select id="search" resultMap="BaseResultMap">
         SELECT <include refid="BaseColumns"/>
         FROM recipe
-        WHERE deleted = 0
         <if test="keyword != null and keyword != ''">
             AND (title LIKE CONCAT('%', #{keyword}, '%')
                  OR description LIKE CONCAT('%', #{keyword}, '%'))
         </if>
-        <if test="category != null">AND category = #{category}</if>
+        <if test="categoryNum != null">AND category_num = #{categoryNum}</if>
         <if test="mealType != null">AND meal_type = #{mealType}</if>
         <if test="difficulty != null">AND difficulty = #{difficulty}</if>
         ORDER BY sort ASC, create_time DESC
@@ -113,12 +101,11 @@
     <select id="countSearch" resultType="int">
         SELECT COUNT(*)
         FROM recipe
-        WHERE deleted = 0
         <if test="keyword != null and keyword != ''">
             AND (title LIKE CONCAT('%', #{keyword}, '%')
                  OR description LIKE CONCAT('%', #{keyword}, '%'))
         </if>
-        <if test="category != null">AND category = #{category}</if>
+        <if test="categoryNum != null">AND category_num = #{categoryNum}</if>
         <if test="mealType != null">AND meal_type = #{mealType}</if>
         <if test="difficulty != null">AND difficulty = #{difficulty}</if>
     </select>
@@ -129,7 +116,7 @@
             <set>
                 <if test="item.title != null and item.title != ''">title = #{item.title},</if>
                 <if test="item.description != null and item.description != ''">description = #{item.description},</if>
-                <if test="item.category != null">category = #{item.category},</if>
+                <if test="item.categoryNum != null">category_num = #{item.categoryNum},</if>
                 <if test="item.mealType != null">meal_type = #{item.mealType},</if>
                 <if test="item.difficulty != null">difficulty = #{item.difficulty},</if>
                 <if test="item.cookingTime != null">cooking_time = #{item.cookingTime},</if>
@@ -138,15 +125,13 @@
                 update_time = NOW()
             </set>
             WHERE id = #{item.id}
-              AND deleted = 0
         </foreach>
     </update>
 
     <select id="selectByIds" resultMap="BaseResultMap">
         SELECT <include refid="BaseColumns"/>
         FROM recipe
-        WHERE deleted = 0
-          AND id IN
+        WHERE id IN
         <foreach collection="ids" item="id" open="(" separator="," close=")">
             #{id}
         </foreach>
@@ -155,10 +140,8 @@
     <select id="selectByAuthorTitle" resultMap="BaseResultMap">
         SELECT <include refid="BaseColumns"/>
         FROM recipe
-        WHERE user_id = #{authorId}
-          AND title = #{title}
+        WHERE title = #{title}
           AND meal_type = #{mealType}
-          AND deleted = 0
         LIMIT 1
     </select>
 
@@ -168,4 +151,8 @@
         <include refid="PageWhereCondition" />
         ORDER BY sort ASC, create_time DESC, id DESC
     </select>
+
+    <delete id="deleteRecipeById">
+        DELETE FROM recipe WHERE id = #{recipeId}
+    </delete>
 </mapper>

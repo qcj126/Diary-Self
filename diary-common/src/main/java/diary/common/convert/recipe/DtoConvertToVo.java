@@ -11,6 +11,7 @@ public class DtoConvertToVo {
                 .id(dto.getCategoryId())
                 .userId(dto.getUserId())
                 .categoryName(dto.getCategoryName())
+                .categoryNum(dto.getCategoryNum())
                 .iconId(dto.getIconId())
                 .iconPath(dto.getIconPath())
                 .sort(dto.getSort())

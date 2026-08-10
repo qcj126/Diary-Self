@@ -19,7 +19,7 @@ public class RecipePO {
     @NotNull
     private String description;           // 简介
     @NotNull
-    private Integer category;            // 分类：0-家常 1-西餐 2-甜点 3-汤粥 4-其他
+    private Integer categoryNum;            // 分类：0-家常 1-西餐 2-甜点 3-汤粥 4-其他
     @NotNull
     private Integer mealType;            // 餐别：1-早餐 2-午餐 3-晚餐 4-夜宵
     @NotNull
@@ -30,7 +30,7 @@ public class RecipePO {
     @NotNull
     private Integer sort;                    // 排序
     @NotNull
-    private Integer deleted;                 // 是否删除：0-否 1-是
+    private Integer familyMember;          // 家庭成员人数
     @NotNull
     private LocalDateTime createTime;      // 创建时间
     @NotNull

@@ -21,6 +21,7 @@
         SELECT
         a.id as categoryId,
         a.category_name as categoryName,
+        a.category_num as categoryNum,
         b.id as iconId,
         b.icon_path as iconPath,
         a.user_id as userId,

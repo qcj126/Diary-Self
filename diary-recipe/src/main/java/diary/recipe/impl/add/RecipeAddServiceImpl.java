@@ -42,14 +42,14 @@ public class RecipeAddServiceImpl implements RecipeAddService {
     public ApiResponse<String> addRecipe(RecipeReqDto recipeReqDto) {
         validateRecipe(recipeReqDto);
 
-        if (recipeMapper.selectByAuthorTitle(recipeReqDto.getAuthorId(), recipeReqDto.getTitle(), recipeReqDto.getMealType()) != null) {
+        if (recipeMapper.selectByAuthorTitle(recipeReqDto.getTitle(), recipeReqDto.getMealType()) != null) {
             throw new SameDataException("该餐别下已存在同名食谱");
         }
 
         validateIngredients(recipeReqDto);
         validateSteps(recipeReqDto);
 
-        recipeReqDto.setId(MyUtils.getPrimaryKey());
+        recipeReqDto.setRecipeId(MyUtils.getPrimaryKey());
         RecipePO recipePO = DtoConvertToPo.recipeReqDtoConvertToPO(recipeReqDto);
         List<RecipeIngredientPO> ingredientPOs = recipeReqDto.getIngredients().stream()
                 .map(ao -> AoConvertToPo.convertToPO(ao, recipePO.getId(), recipePO.getUserId(), MyUtils.getPrimaryKey()))
@@ -74,7 +74,7 @@ public class RecipeAddServiceImpl implements RecipeAddService {
         MyUtils.check()
                 .notNull(recipeCategoryDto, "食谱分类")
                 .notEmpty(recipeCategoryDto.getCategoryName(), "食谱分类名称")
-                .notEmpty(recipeCategoryDto.getCategoryIcon(), "食谱分类图标");
+                .notNull(recipeCategoryDto.getIconId(), "食谱分类图标id");
 
         Integer maxCategoryNum = recipeCategoryMapper.selectMaxCategoryNum();
         Integer categoryNum = maxCategoryNum == null ? 1000 : maxCategoryNum + 100;
@@ -97,7 +97,7 @@ public class RecipeAddServiceImpl implements RecipeAddService {
                 .notEmpty(recipeReqDto.getTitle(), "食谱标题")
                 .notNull(recipeReqDto.getImageId(), "食谱封面")
                 .notEmpty(recipeReqDto.getDescription(), "食谱简介")
-                .notNull(recipeReqDto.getCategory(), "食谱分类")
+                .notNull(recipeReqDto.getCategoryNum(), "食谱分类编号")
                 .notNull(recipeReqDto.getMealType(), "餐别")
                 .notNull(recipeReqDto.getDifficulty(), "难度")
                 .notNull(recipeReqDto.getCookingTime(), "烹饪时长")

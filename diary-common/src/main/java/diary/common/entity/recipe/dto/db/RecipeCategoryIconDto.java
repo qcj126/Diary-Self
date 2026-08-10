@@ -6,6 +6,7 @@ import lombok.Data;
 public class RecipeCategoryIconDto {
     private Long categoryId;
     private String categoryName;
+    private Integer categoryNum;
     private Long iconId;
     private String iconPath;
     private Long userId;

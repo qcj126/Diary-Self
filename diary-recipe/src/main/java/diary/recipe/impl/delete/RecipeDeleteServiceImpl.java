@@ -33,12 +33,12 @@ public class RecipeDeleteServiceImpl implements RecipeDeleteService {
     public ApiResponse<String> deleteRecipe(RecipeReqDto recipeReqDto) {
         validateRecipeQueryParam(recipeReqDto);
 
-        RecipePO recipePO = getRecipe(recipeReqDto);
+        RecipePO recipePO = recipeMapper.selectById(recipeReqDto.getRecipeId());
         if (recipePO == null) {
             return ApiResponse.delFail();
         }
 
-        int cnt = recipeMapper.updateStatus(recipePO.getId(), 1, recipeReqDto.getAuthorId());
+        int cnt = recipeMapper.deleteRecipeById(recipePO.getId());
         if (cnt <= 0) {
             return ApiResponse.delFail();
         }
@@ -65,22 +65,6 @@ public class RecipeDeleteServiceImpl implements RecipeDeleteService {
     private void validateRecipeQueryParam(RecipeReqDto recipeReqDto) {
         MyUtils.check()
                 .notNull(recipeReqDto, "食谱")
-                .notNull(recipeReqDto.getAuthorId(), "食谱作者编号");
-        if (recipeReqDto.getId() == null) {
-            MyUtils.check()
-                    .notEmpty(recipeReqDto.getTitle(), "食谱标题")
-                    .notNull(recipeReqDto.getMealType(), "餐别");
-        }
-    }
-
-    private RecipePO getRecipe(RecipeReqDto recipeReqDto) {
-        if (recipeReqDto.getId() != null) {
-            RecipePO recipePO = recipeMapper.selectById(recipeReqDto.getId());
-            if (recipePO != null && recipeReqDto.getAuthorId().equals(recipePO.getUserId())) {
-                return recipePO;
-            }
-            return null;
-        }
-        return recipeMapper.selectByAuthorTitle(recipeReqDto.getAuthorId(), recipeReqDto.getTitle(), recipeReqDto.getMealType());
+                .notNull(recipeReqDto.getRecipeId(), "食谱id");
     }
 }

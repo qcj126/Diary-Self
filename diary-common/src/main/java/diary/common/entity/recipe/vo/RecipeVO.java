@@ -25,7 +25,7 @@ public class RecipeVO {
     private String description;
 
     /** 分类 */
-    private Integer category;
+    private Integer categoryNum;
 
     /** 分类文本（如"家常"） */
     private String categoryText;

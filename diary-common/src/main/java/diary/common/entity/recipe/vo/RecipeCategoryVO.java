@@ -14,4 +14,5 @@ public class RecipeCategoryVO {
     private Long iconId;
     private String iconPath;
     private Integer sort;
+    private Integer categoryNum;
 }

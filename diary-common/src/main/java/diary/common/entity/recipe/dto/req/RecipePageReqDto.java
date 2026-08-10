@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 @Data
 public class RecipePageReqDto extends PageReqDto {
     // 可选：分类筛选（0-家常 1-西餐 2-甜点 3-汤粥 4-其他）
-    private Integer category;
+    private Integer categoryNum;
 
     // 可选：餐别筛选（1-早餐 2-午餐 3-晚餐 4-夜宵）
     private Integer mealType;
@@ -17,4 +17,7 @@ public class RecipePageReqDto extends PageReqDto {
 
     // 可选：标题关键词模糊搜索
     private String keyword;
+
+    // 是否红心   0：否  1：是
+    private Integer redHeart;
 }

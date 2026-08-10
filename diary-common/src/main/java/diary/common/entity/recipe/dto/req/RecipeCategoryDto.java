@@ -13,7 +13,7 @@ public class RecipeCategoryDto {
 
     // 添加
     private String categoryName;
-    private String categoryIcon;
+    private Long iconId;
 
     // 赋值并转换
     private Long categoryId;

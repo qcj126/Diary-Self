@@ -62,7 +62,7 @@ public class RecipeUpdateServiceImpl implements RecipeUpdateService {
                 .notNull(recipeCategoryDto, "食谱分类")
                 .notNull(recipeCategoryDto.getCategoryId(), "食谱分类编号")
                 .notEmpty(recipeCategoryDto.getCategoryName(), "食谱分类名称")
-                .notEmpty(recipeCategoryDto.getCategoryIcon(), "食谱分类图标");
+                .notNull(recipeCategoryDto.getIconId(), "食谱分类图标id");
         RecipeCategoryPO recipeCategoryPO = DtoConvertToPo.recipeCategoryDtoConvertToPO(recipeCategoryDto);
         recipeCategoryPO.setUpdateTime(LocalDateTime.now());
         int cnt = recipeCategoryMapper.updateCategoryById(recipeCategoryPO);
@@ -76,7 +76,7 @@ public class RecipeUpdateServiceImpl implements RecipeUpdateService {
         MyUtils.check()
                 .notNull(recipeReqDto, "食谱")
                 .notNull(recipeReqDto.getAuthorId(), "食谱作者编号");
-        if (recipeReqDto.getId() == null) {
+        if (recipeReqDto.getRecipeId() == null) {
             MyUtils.check()
                     .notEmpty(recipeReqDto.getTitle(), "食谱标题")
                     .notNull(recipeReqDto.getMealType(), "餐别");
@@ -84,14 +84,14 @@ public class RecipeUpdateServiceImpl implements RecipeUpdateService {
     }
 
     private RecipePO getRecipe(RecipeReqDto recipeReqDto) {
-        if (recipeReqDto.getId() != null) {
-            RecipePO recipePO = recipeMapper.selectById(recipeReqDto.getId());
+        if (recipeReqDto.getRecipeId() != null) {
+            RecipePO recipePO = recipeMapper.selectById(recipeReqDto.getRecipeId());
             if (recipePO != null && recipeReqDto.getAuthorId().equals(recipePO.getUserId())) {
                 return recipePO;
             }
             return null;
         }
-        return recipeMapper.selectByAuthorTitle(recipeReqDto.getAuthorId(), recipeReqDto.getTitle(), recipeReqDto.getMealType());
+        return recipeMapper.selectByAuthorTitle(recipeReqDto.getTitle(), recipeReqDto.getMealType());
     }
 
     private void replaceIngredients(RecipeReqDto recipeReqDto, RecipePO recipePO) {

@@ -18,7 +18,7 @@ public class PoConvertToVo {
         vo.setTitle(po.getTitle());
         vo.setImageId(po.getImageId());
         vo.setDescription(po.getDescription());
-        vo.setCategory(po.getCategory());
+        vo.setCategoryNum(po.getCategoryNum());
         vo.setMealType(po.getMealType());
         vo.setDifficulty(po.getDifficulty());
         vo.setCookingTime(po.getCookingTime());

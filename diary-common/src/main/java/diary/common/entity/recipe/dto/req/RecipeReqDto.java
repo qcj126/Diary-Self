@@ -8,7 +8,7 @@ import java.util.List;
 
 @Data
 public class RecipeReqDto {
-    private Long id;
+    private Long recipeId;
     /** 创建者用户ID（Controller层从token获取后传入） */
     private Long authorId;
 
@@ -22,7 +22,7 @@ public class RecipeReqDto {
     private String description;
 
     /** 分类 */
-    private Integer category;
+    private Integer categoryNum;
 
     /** 餐别 */
     private Integer mealType;
@@ -35,6 +35,9 @@ public class RecipeReqDto {
 
     /** 情感故事 */
     private String story;
+
+    /** 家庭用餐人数 */
+    private Integer familyMember;
 
     /** 食材列表 */
     private List<RecipeIngredientAO> ingredients;
