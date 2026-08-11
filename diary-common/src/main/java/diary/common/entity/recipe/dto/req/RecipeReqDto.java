@@ -39,6 +39,9 @@ public class RecipeReqDto {
     /** 家庭用餐人数 */
     private Integer familyMember;
 
+    /** 是否红心 */
+    private Integer redHeart;
+
     /** 食材列表 */
     private List<RecipeIngredientAO> ingredients;
 

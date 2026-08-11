@@ -45,6 +45,9 @@ public class RecipeVO {
     /** 情感故事 */
     private String story;
 
+    /** 家庭人数 */
+    private Integer familyMember;
+
     /** 食材列表 */
     private List<IngredientVO> ingredients;
 

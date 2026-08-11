@@ -21,7 +21,7 @@
 
     <sql id="BaseColumns">
         id, user_id, title, image_id, description, category_num, meal_type,
-        difficulty, cooking_time, story, sort, create_time, update_time
+        difficulty, cooking_time, story, sort, family_member, create_time, update_time
     </sql>
 
     <sql id="PageWhereCondition">
@@ -71,6 +71,8 @@
             <if test="req.difficulty != null">difficulty = #{req.difficulty},</if>
             <if test="req.cookingTime != null">cooking_time = #{req.cookingTime},</if>
             <if test="req.story != null">story = #{req.story},</if>
+            <if test="req.familyMember != null">family_member = #{req.familyMember},</if>
+            <if test="req.redHeart != null">red_heart = #{req.redHeart},</if>
             update_time = NOW()
         </set>
         WHERE id = #{recipeId}

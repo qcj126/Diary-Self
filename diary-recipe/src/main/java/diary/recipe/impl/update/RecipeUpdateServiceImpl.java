@@ -42,7 +42,7 @@ public class RecipeUpdateServiceImpl implements RecipeUpdateService {
     public ApiResponse<String> updateRecipe(RecipeReqDto recipeReqDto) {
         validateRecipeQueryParam(recipeReqDto);
 
-        RecipePO recipePO = getRecipe(recipeReqDto);
+        RecipePO recipePO = recipeMapper.selectById(recipeReqDto.getRecipeId());
         if (recipePO == null) {
             return ApiResponse.updateFail();
         }
@@ -75,23 +75,9 @@ public class RecipeUpdateServiceImpl implements RecipeUpdateService {
     private void validateRecipeQueryParam(RecipeReqDto recipeReqDto) {
         MyUtils.check()
                 .notNull(recipeReqDto, "食谱")
-                .notNull(recipeReqDto.getAuthorId(), "食谱作者编号");
-        if (recipeReqDto.getRecipeId() == null) {
-            MyUtils.check()
-                    .notEmpty(recipeReqDto.getTitle(), "食谱标题")
-                    .notNull(recipeReqDto.getMealType(), "餐别");
-        }
-    }
-
-    private RecipePO getRecipe(RecipeReqDto recipeReqDto) {
-        if (recipeReqDto.getRecipeId() != null) {
-            RecipePO recipePO = recipeMapper.selectById(recipeReqDto.getRecipeId());
-            if (recipePO != null && recipeReqDto.getAuthorId().equals(recipePO.getUserId())) {
-                return recipePO;
-            }
-            return null;
-        }
-        return recipeMapper.selectByAuthorTitle(recipeReqDto.getTitle(), recipeReqDto.getMealType());
+                .notEmpty(recipeReqDto.getTitle(), "食谱标题")
+                .notNull(recipeReqDto.getMealType(), "餐别")
+                .notNull(recipeReqDto.getCategoryNum(), "分类编号");
     }
 
     private void replaceIngredients(RecipeReqDto recipeReqDto, RecipePO recipePO) {
