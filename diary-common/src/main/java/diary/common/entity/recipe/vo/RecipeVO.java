@@ -48,6 +48,9 @@ public class RecipeVO {
     /** 家庭人数 */
     private Integer familyMember;
 
+    /** 是否红心   0：否  1：是*/
+    private Integer redHeart;
+
     /** 食材列表 */
     private List<IngredientVO> ingredients;
 

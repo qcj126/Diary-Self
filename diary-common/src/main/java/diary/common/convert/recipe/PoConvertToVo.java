@@ -24,6 +24,7 @@ public class PoConvertToVo {
         vo.setCookingTime(po.getCookingTime());
         vo.setStory(po.getStory());
         vo.setFamilyMember(po.getFamilyMember());
+        vo.setRedHeart(po.getRedHeart());
         vo.setCreateTime(po.getCreateTime());
         vo.setUpdateTime(po.getUpdateTime());
         return vo;
