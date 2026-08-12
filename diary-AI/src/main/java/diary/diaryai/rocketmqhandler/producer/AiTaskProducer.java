@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 public class AiTaskProducer implements AiTaskMessageProducer {
     private final RocketMQClientTemplate rocketMQClientTemplate;
     private final ObjectMapper objectMapper;
-    private final DiaryAIMapper diaryAIMapper;
 
     @Override
     public SendReceipt send(AiTaskMessageDto aiTaskMessageDto) {
@@ -31,7 +30,7 @@ public class AiTaskProducer implements AiTaskMessageProducer {
                     .build();
             String destination = "diary-ai-task:QWEN_PLUS_NUTRIENT";
             return rocketMQClientTemplate.syncSendNormalMessage(destination, message);
-        } catch (JsonProcessingException e) {
+        } catch (JsonProcessingException | RuntimeException e) {
             throw new RuntimeException(e);
         }
     }

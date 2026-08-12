@@ -14,7 +14,7 @@ import diary.utils.commonutil.MyUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.apis.message.MessageId;
 import org.apache.rocketmq.client.apis.producer.SendReceipt;
-import org.apache.rocketmq.shaded.org.slf4j.MDC;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -35,10 +35,13 @@ public class AiTaskApplicationServiceImpl implements AiTaskApplicationService {
         MyUtils.check()
                 .notNull(aiInvokeDTO, "aiInvokeDTO")
                 .notNull(aiInvokeDTO.getClientRequestId(), "clientRequestId")
+                .notEmpty(aiInvokeDTO.getClientRequestId(), "clientRequestId")
                 .notNull(aiInvokeDTO.getAiType(), "aiType")
                 .notNull(aiInvokeDTO.getAiApplication(), "aiApplication")
                 .notNull(aiInvokeDTO.getFlag(), "flag")
+                .notEmpty(aiInvokeDTO.getFlag(), "flag")
                 .notNull(aiInvokeDTO.getMaterials(), "materials")
+                .stringKeyMapNotContainsEmpty(aiInvokeDTO.getMaterials(), "materials")
                 .notNull(aiInvokeDTO.getUniversalId(), "universalId");
 
         Long taskId = MyUtils.getPrimaryKey();
@@ -46,23 +49,19 @@ public class AiTaskApplicationServiceImpl implements AiTaskApplicationService {
             String inputSnapshot = objectMapper.writeValueAsString(aiInvokeDTO);
             // 根据taskId创建任务
             AiTaskPO aiTaskPO = AiTaskPO.builder()
-                    .taskId(taskId)
+                    .id(taskId)
                     .userId(10000L)
-                    .clientId(aiInvokeDTO.getClientRequestId())
+                    .clientRequestId(aiInvokeDTO.getClientRequestId())
                     .taskType("QWEN_PLUS_NUTRIENT")
-                    .aiType(aiInvokeDTO.getAiType())
-                    .aiApplication(aiInvokeDTO.getAiApplication())
-                    .flag(aiInvokeDTO.getFlag())
-                    .model(aliCloudProperty.getQwenPlusModel())
                     .status("PENDING")
                     .inputSnapshot(inputSnapshot)
                     .attemptCount(0)
                     .maxAttempts(3)
-                    .workerId("")
-                    .leaseUntil("")
-                    .aiInfoId("")
-                    .errorCode("")
-                    .errorMessage("")
+                    .workerId(null)
+                    .leaseUntil(null)
+                    .aiInfoId(null)
+                    .errorCode(null)
+                    .errorMessage(null)
                     .createTime(LocalDateTime.now())
                     .queueTime(null)
                     .startTime(null)
@@ -105,8 +104,8 @@ public class AiTaskApplicationServiceImpl implements AiTaskApplicationService {
              * 最大模型调用次数
              * 永久错误与可重试错误分类
              */
-        } catch (JsonProcessingException e) {
-            diaryAIMapper.updateAiTaskStatus(taskId, "FAILED", null);
+        } catch (JsonProcessingException | RuntimeException e) {
+            diaryAIMapper.updateAiTaskStatus(taskId, "PENDING", null);
             throw new RuntimeException(e);
         }
     }

@@ -30,7 +30,7 @@ public class DownloadServiceImpl implements DownloadService {
 
     @Override
     public Map<String, Object> batchDownloadPhotos(Map<Long, String>  imageIdUrls) {
-        MyUtils.check().mapNotContainsEmpty(imageIdUrls, "图片id或url").notNull(imageIdUrls, "imageIdUrls");
+        MyUtils.check().longKeyMapNotContainsEmpty(imageIdUrls, "图片id或url").notNull(imageIdUrls, "imageIdUrls");
 
         // 确保下载目录存在
         Path downloadDir = Paths.get(defaultDownloadPath);

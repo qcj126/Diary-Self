@@ -74,14 +74,24 @@ public class MyUtils {
             return this;
         }
 
-        public Checker mapNotContainsEmpty(Map<Long, String> imageIdUrls, String fieldName) {
-            for (Map.Entry<Long, String> entry : imageIdUrls.entrySet()) {
+        public Checker stringKeyMapNotContainsEmpty(Map<String, String> map, String fieldName) {
+            for (Map.Entry<String, String> entry : map.entrySet()) {
                 if (entry.getKey() == null || entry.getValue() == null || entry.getValue().trim().isEmpty()) {
                     throw new IllegalArgumentException(fieldName + " 不能包含空值");
                 }
             }
             return this;
         }
+
+        public Checker longKeyMapNotContainsEmpty(Map<Long, String> map, String fieldName) {
+            for (Map.Entry<Long, String> entry : map.entrySet()) {
+                if (entry.getKey() == null || entry.getValue() == null || entry.getValue().trim().isEmpty()) {
+                    throw new IllegalArgumentException(fieldName + " 不能包含空值");
+                }
+            }
+            return this;
+        }
+
         public Checker notNull(Object value, String fieldName) {
             if (value == null) {
                 throw new IllegalArgumentException(fieldName + " 不能为 null");

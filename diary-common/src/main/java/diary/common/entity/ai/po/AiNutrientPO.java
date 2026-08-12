@@ -33,6 +33,11 @@ public class AiNutrientPO {
     private Long aiInfoId;
 
     /**
+     * ai任务表主键
+     */
+    private Long aiTaskId;
+
+    /**
      * 热量 卡路里
      */
     private String calory;
