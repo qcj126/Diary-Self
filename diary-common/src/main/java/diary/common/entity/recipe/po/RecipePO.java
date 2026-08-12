@@ -32,6 +32,9 @@ public class RecipePO {
     @NotNull
     private Integer familyMember;          // 家庭成员人数
     @NotNull
+    private Integer redHeart;              // 是否红心：0-否 1-是
+
+    @NotNull
     private LocalDateTime createTime;      // 创建时间
     @NotNull
     private LocalDateTime updateTime;      // 更新时间

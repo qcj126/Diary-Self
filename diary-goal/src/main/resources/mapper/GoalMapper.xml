@@ -89,7 +89,7 @@
         <if test="userId != null">
             AND user_id = #{userId}
         </if>
-        <if test="category != null and category != '' and category != '1'">
+        <if test="category != null and category != ''">
             AND category = #{category}
         </if>
         <if test="title != null and title != ''">
@@ -99,7 +99,7 @@
             AND update_time &gt;= DATE_SUB(NOW(), INTERVAL #{recentDays} DAY)
         </if>
         <if test="exactDate != null and exactDate != ''">
-            AND DATE(end_time) = DATE(#{exactDate})
+            AND DATE(create_time) = DATE(#{exactDate})
         </if>
         <if test="ddl != null and ddl == 2">
             AND end_time &gt;= DATE_ADD(NOW(), INTERVAL 3 DAY)

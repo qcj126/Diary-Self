@@ -21,7 +21,7 @@
 
     <sql id="BaseColumns">
         id, user_id, title, image_id, description, category_num, meal_type,
-        difficulty, cooking_time, story, sort, family_member, create_time, update_time
+        difficulty, cooking_time, story, sort, red_heart, family_member, create_time, update_time
     </sql>
 
     <sql id="PageWhereCondition">
