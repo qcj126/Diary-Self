@@ -1,9 +1,7 @@
 package diary.diaryai.service;
 
-import diary.common.entity.ai.dto.AIInvokeDTO;
-
-import java.io.FileNotFoundException;
+import diary.common.entity.ai.dto.AiInvokeDTO;
 
 public interface CallAIService {
-    void callAI(AIInvokeDTO aiInvokeDTO);
+    void callAI(AiInvokeDTO aiInvokeDTO);
 }

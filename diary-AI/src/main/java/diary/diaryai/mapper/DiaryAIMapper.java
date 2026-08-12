@@ -2,14 +2,18 @@ package diary.diaryai.mapper;
 
 import diary.common.entity.ai.po.AiInfoPO;
 import diary.common.entity.ai.po.AiNutrientPO;
+import diary.common.entity.ai.po.AiTaskPO;
 import org.apache.ibatis.annotations.Mapper;
-
-import java.util.List;
-import java.util.Map;
 
 @Mapper
 public interface DiaryAIMapper {
-    void insertAiNutrient(List<AiNutrientPO> aiNutrientPOs);
+    void insertAiNutrient(AiNutrientPO aiNutrientPO);
 
     void insertAiInfo(AiInfoPO aiInfoPO);
+
+    int updateAiTaskStatus(Long taskId, String success, Long id);
+
+    void insertAiTask(AiTaskPO aiTaskPO);
+
+    AiTaskPO selectAiTaskByTaskId(Long taskId);
 }

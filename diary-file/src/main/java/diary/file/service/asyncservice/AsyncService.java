@@ -1,7 +1,5 @@
 package diary.file.service.asyncservice;
 
-import com.rabbitmq.client.LongString;
-import diary.common.entity.ai.ao.ImageIdUrl;
 import diary.common.entity.image.dto.ImageDTO;
 import org.springframework.web.multipart.MultipartFile;
 

@@ -28,15 +28,24 @@
     </resultMap>
 
     <insert id="insertAiNutrient">
-        INSERT INTO ai_nutrient (id, user_id, universal_id, ai_info_id, calory, protein, fat, carbohydrate, sugar, sodium)
-        VALUES
-        <foreach collection="aiNutrientPOs" item="item" separator=",">
-            (#{item.id}, #{item.userId}, #{item.universalId}, #{item.aiInfoId}, #{item.calory}, #{item.protein}, #{item.fat}, #{item.carbohydrate}, #{item.sugar}, #{item.sodium})
-        </foreach>
+        INSERT INTO ai_nutrient (id, user_id, universal_id, flag, ai_info_id, calory, protein, fat, carbohydrate, sugar, sodium)
+        VALUES (#{id}, #{userId}, #{universalId}, #{flag}, #{aiInfoId}, #{calory}, #{protein}, #{fat}, #{carbohydrate}, #{sugar}, #{sodium})
     </insert>
 
     <insert id="insertAiInfo">
         insert into ai_info(id, user_id, model, temperature, ai_type, ai_application)
         values (#{id}, #{userId}, #{model}, #{temperature}, #{aiType}, #{aiApplication})
     </insert>
+
+    <update id="updateAiTaskStatus">
+
+    </update>
+
+    <insert id="insertAiTask">
+
+    </insert>
+
+    <select id="selectAiTaskByTaskId" resultType="diary.common.entity.ai.po.AiTaskPO">
+
+    </select>
 </mapper>

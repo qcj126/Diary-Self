@@ -40,7 +40,7 @@ public class InvokeDeepSeekV4Flash extends InvokeAITemplate implements InvokeAIS
     private final Generation generation = new Generation();
 
     @Override
-    public void getAiResultAndSave(Object data, Integer aiApplication, Integer aiType, String flag) {
+    public void getAiResultAndSave(Object data, Integer aiApplication, Integer aiType, String flag, Long taskId, Long universalId) {
         String model = aliCloudProperty.getDeepSeekV4FlashModel();
         Object prompt = buildPrompt(data);
         AiInfoPO aiInfoPO = AiInfoPO.builder()

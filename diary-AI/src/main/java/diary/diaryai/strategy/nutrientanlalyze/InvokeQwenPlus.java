@@ -23,10 +23,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Type;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -40,25 +39,51 @@ public class InvokeQwenPlus extends InvokeAITemplate implements InvokeAIService 
     private final AliCloudProperty aliCloudProperty;
     private final PromptContext promptContext;
     private final DiaryAIMapper diaryAIMapper;
-    private final RedisUtil redisUtil;
     private final MultiModalConversation conv = new MultiModalConversation();
 
     @Override
-    public void getAiResultAndSave(Object data, Integer aiApplication, Integer aiType, String flag) {
+    public void getAiResultAndSave(Object data, Integer aiApplication, Integer aiType, String flag, Long taskId, Long universalId) {
         String model = aliCloudProperty.getQwenPlusModel();
-        Map<Long, String> dataMap = (Map<Long, String>) data;
-        for (Map.Entry<Long, String> entry : dataMap.entrySet()) {
-            Long imageId = entry.getKey();
-            String imageUrl = entry.getValue();
-            try {
-                URI uri = new URI(imageUrl);
-                String objectKey = uri.getPath().substring(1);
-                redisUtil.setString(objectKey, imageId);
-            } catch (URISyntaxException e) {
-                throw new CustomException("图片URL格式错误");
-            }
-        }
         Object prompt = buildPrompt(data);
+        MultiModalConversationResult aiResult = invokeAi(prompt, model);
+        Map<String, String> result = extractResult(aiResult, model, prompt);
+        log.info("AI返回的结果： {}", result);
+        processData(aiApplication, aiType, flag, taskId, universalId, model, result);
+    }
+
+    /**
+     * @Transactional 当前不会生效
+     * [InvokeQwenPlus.java (line 54)](E:/Diary-Self/diary-AI/src/main/java/diary/diaryai/strategy/nutrientanlalyze/InvokeQwenPlus.java:54) 的 processData() 是 private，而且由同一个类内部调用。
+     * Spring 事务依赖代理，私有方法和类内自调用都不会经过代理。因此目前：
+     * insertAiInfo
+     * insertAiNutrient
+     * update SUCCESS
+     * 仍然不是一个事务。
+     * 建议把落库部分拆到独立 Bean：
+     * @Service
+     * @RequiredArgsConstructor
+     * public class AiResultPersistenceService {
+     *
+     *     private final DiaryAIMapper diaryAIMapper;
+     *
+     *     @Transactional(rollbackFor = Exception.class)
+     *     public void saveResult(...) {
+     *         // insertAiInfo
+     *         // insertAiNutrient
+     *         // update task SUCCESS
+     *     }
+     * }
+     * 然后由 InvokeQwenPlus 调用这个 Bean。
+     * @param aiApplication
+     * @param aiType
+     * @param flag
+     * @param taskId
+     * @param universalId
+     * @param model
+     * @param result
+     */
+    @Transactional(rollbackFor = Exception.class)
+    private void processData(Integer aiApplication, Integer aiType, String flag, Long taskId, Long universalId, String model, Map<String, String> result) {
         AiInfoPO aiInfoPO = AiInfoPO.builder()
                 .id(MyUtils.getPrimaryKey())
                 .userId(10000L)
@@ -68,27 +93,22 @@ public class InvokeQwenPlus extends InvokeAITemplate implements InvokeAIService 
                 .aiApplication(aiApplication)
                 .build();
         diaryAIMapper.insertAiInfo(aiInfoPO);
-        MultiModalConversationResult aiResult = invokeAi(prompt, model);
-        List<Map<String, String>> resultList = extractResult(aiResult, model, prompt);
-        log.info("AI返回的结果列表： {}", resultList);
-        List<AiNutrientPO> aiNutrientPOS = new ArrayList<>();
-        for (Map<String, String> result : resultList) {
-            Object imageId = redisUtil.getString(result.get("objectKey"));
-            aiNutrientPOS.add(AiNutrientPO.builder()
-                    .id(MyUtils.getPrimaryKey())
-                    .userId(10000L)
-                    .universalId(Long.parseLong(imageId.toString()))
-                    .aiInfoId(aiInfoPO.getId())
-                    .calory(result.get("卡路里"))
-                    .protein(result.get("蛋白质"))
-                    .fat(result.get("脂肪"))
-                    .carbohydrate(result.get("碳水化合物"))
-                    .sugar(result.get("糖"))
-                    .sodium(result.get("钠"))
-                    .build());
-            redisUtil.deleteString(result.get("objectKey"));
-        }
-        diaryAIMapper.insertAiNutrient(aiNutrientPOS);
+        AiNutrientPO aiNutrientPO = AiNutrientPO.builder()
+                .id(MyUtils.getPrimaryKey())
+                .userId(10000L)
+                .universalId(universalId)
+                .aiInfoId(aiInfoPO.getId())
+                .calory(result.get("卡路里"))
+                .protein(result.get("蛋白质"))
+                .fat(result.get("脂肪"))
+                .carbohydrate(result.get("碳水化合物"))
+                .sugar(result.get("糖"))
+                .sodium(result.get("钠"))
+                .flag(flag)
+                .build();
+
+        diaryAIMapper.insertAiNutrient(aiNutrientPO);
+        diaryAIMapper.updateAiTaskStatus(taskId, "SUCCESS", aiInfoPO.getId());
     }
 
     @Override
@@ -103,6 +123,10 @@ public class InvokeQwenPlus extends InvokeAITemplate implements InvokeAIService 
 
     @Override
     public MultiModalConversationResult invokeAi(Object prompt, String model) {
+        /**
+         * 纯文本任务仍使用多模态调用类
+         * 当前没有图片输入，仍使用 MultiModalConversation。如果 Qwen Plus 的普通文本接口满足需求，建议换成文本 Generation API；暂时继续使用也能接受，但命名和 Prompt 不应再体现图片或多模态业务。
+         */
         Constants.baseHttpApiUrl = aliCloudProperty.getUrl();
         String apiKey = aliCloudProperty.getApiKey();
         Double temperature = aliCloudProperty.getTemperature();
@@ -113,7 +137,7 @@ public class InvokeQwenPlus extends InvokeAITemplate implements InvokeAIService 
 
             MultiModalConversationParam param = MultiModalConversationParam.builder()
                     .apiKey(apiKey)
-                    .model("qwen3.7-plus")
+                    .model(model)
                     .temperature(temperature.floatValue())
                     .messages(Collections.singletonList(userMessage))
                     .build();
@@ -124,10 +148,10 @@ public class InvokeQwenPlus extends InvokeAITemplate implements InvokeAIService 
     }
 
     @Override
-    public List<Map<String, String>> extractResult(Object aiResult, String model, Object prompt) {
+    public Map<String, String> extractResult(Object aiResult, String model, Object prompt) {
         String aiContent = ((MultiModalConversationResult) aiResult).getOutput().getChoices().getFirst().getMessage().getContent().getFirst().get("text").toString();
         Gson gson = new Gson();
-        Type type = new TypeToken<List<Map<String, String>>>(){}.getType();
+        Type type = new TypeToken<Map<String, String>>(){}.getType();
         return gson.fromJson(aiContent, type);
     }
 }

@@ -1,9 +1,10 @@
 {
+  "clientRequestId": "web-20260812-000001",
   "aiType": 1,
-  "aiapplication": 1,
-  "flag": "diet",
-  "materials": [
-    {
+  "aiApplication": 1,
+  "flag": "DIET",
+  "universalId": 1234567890,
+  "materials": {
       "pork": "300g",
       "chicken": "200g",
       "beef": "150g",
@@ -12,6 +13,5 @@
       "fruits": "150g",
       "grains": "100g",
       "cookWay": "爆炒"
-    }
-  ]
+  }
 }

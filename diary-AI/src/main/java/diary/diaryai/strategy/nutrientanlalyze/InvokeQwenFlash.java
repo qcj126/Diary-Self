@@ -44,7 +44,7 @@ public class InvokeQwenFlash extends InvokeAITemplate implements InvokeAIService
     private final MultiModalConversation conv = new MultiModalConversation();
 
     @Override
-    public void getAiResultAndSave(Object data, Integer aiApplication, Integer aiType, String flag) {
+    public void getAiResultAndSave(Object data, Integer aiApplication, Integer aiType, String flag, Long taskId, Long universalId) {
         String model = aliCloudProperty.getQwenPlusModel();
         Map<Long, String> dataMap = (Map<Long, String>) data;
         for (Map.Entry<Long, String> entry : dataMap.entrySet()) {

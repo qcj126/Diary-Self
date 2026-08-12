@@ -8,7 +8,6 @@ import com.aliyun.oss.model.InitiateMultipartUploadResult;
 import com.aliyun.oss.model.PartETag;
 import com.aliyun.oss.model.UploadPartRequest;
 import com.aliyun.oss.model.UploadPartResult;
-import diary.common.entity.ai.ao.ImageIdUrl;
 import diary.common.entity.file.po.OssUploadSuccessMsg;
 import diary.common.entity.image.dto.ImageDTO;
 import diary.common.entity.image.po.ImagePO;

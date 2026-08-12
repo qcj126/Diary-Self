@@ -1,8 +1,5 @@
 package diary.file.service.downloadservice;
 
-import diary.common.entity.ai.ao.ImageIdUrl;
-
-import java.util.List;
 import java.util.Map;
 
 public interface DownloadService {

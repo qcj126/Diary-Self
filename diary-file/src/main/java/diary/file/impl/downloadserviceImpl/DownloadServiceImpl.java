@@ -1,6 +1,5 @@
 package diary.file.impl.downloadserviceImpl;
 
-import diary.common.entity.ai.ao.ImageIdUrl;
 import diary.file.service.asyncservice.AsyncService;
 import diary.file.service.downloadservice.DownloadService;
 import diary.utils.commonutil.MyUtils;

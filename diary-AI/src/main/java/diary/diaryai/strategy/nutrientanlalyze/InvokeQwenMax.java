@@ -40,7 +40,7 @@ public class InvokeQwenMax extends InvokeAITemplate implements InvokeAIService {
     private final Generation generation = new Generation();
 
     @Override
-    public void getAiResultAndSave(Object data, Integer aiApplication, Integer aiType, String flag) {
+    public void getAiResultAndSave(Object data, Integer aiApplication, Integer aiType, String flag, Long taskId, Long universalId) {
         String model = aliCloudProperty.getQwenMaxModel();
         Object prompt = buildPrompt(data);
         AiInfoPO aiInfoPO = AiInfoPO.builder()
