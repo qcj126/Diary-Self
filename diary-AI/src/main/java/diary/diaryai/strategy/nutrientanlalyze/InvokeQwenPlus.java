@@ -8,26 +8,19 @@ import com.alibaba.dashscope.common.Role;
 import com.alibaba.dashscope.utils.Constants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import diary.common.entity.ai.po.AiInfoPO;
-import diary.common.entity.ai.po.AiNutrientPO;
 import diary.common.enums.aienum.AIEnum;
 import diary.common.exception.CustomException;
-import diary.diaryai.mapper.DiaryAIMapper;
 import diary.diaryai.prompt.PromptContext;
 import diary.diaryai.properties.AliCloudProperty;
 import diary.diaryai.repository.DatabaseServiceImpl;
 import diary.diaryai.strategy.service.InvokeAIService;
 import diary.diaryai.template.InvokeAITemplate;
-import diary.utils.commonutil.MyUtils;
-import diary.utils.redis.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -42,13 +35,14 @@ public class InvokeQwenPlus extends InvokeAITemplate implements InvokeAIService 
     private final MultiModalConversation conv = new MultiModalConversation();
     private final DatabaseServiceImpl databaseServiceImpl;
     @Override
-    public void getAiResultAndSave(Object data, Integer aiApplication, Integer aiType, String flag, Long taskId, Long universalId) {
+    public void getAiResultAndSave(Object data, Long taskId, Long userId) {
         String model = aliCloudProperty.getQwenPlusModel();
+        Double temperature = aliCloudProperty.getTemperature();
         Object prompt = buildPrompt(data);
         MultiModalConversationResult aiResult = invokeAi(prompt, model);
         Map<String, String> result = extractResult(aiResult, model, prompt);
         log.info("AI返回的结果： {}", result);
-        databaseServiceImpl.processData(aiApplication, aiType, flag, taskId, universalId, model, result, aliCloudProperty.getTemperature());
+        databaseServiceImpl.processData(taskId, data, model, result, temperature, userId);
     }
 
     @Override

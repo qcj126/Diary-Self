@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AiTaskMessageDto {
+    private String clientRequestId;
     private String eventId;
     private Long taskId;
     private Long userId;

@@ -3,7 +3,6 @@ package diary.diaryai.rocketmqhandler.producer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import diary.common.entity.ai.dto.AiTaskMessageDto;
-import diary.diaryai.mapper.DiaryAIMapper;
 import diary.diaryai.service.AiTaskMessageProducer;
 import lombok.RequiredArgsConstructor;
 import org.apache.rocketmq.client.apis.producer.SendReceipt;

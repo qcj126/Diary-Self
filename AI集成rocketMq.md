@@ -27,7 +27,7 @@ update ai_task SUCCESS
 @RequiredArgsConstructor
 public class AiResultPersistenceService {
 
-    private final DiaryAIMapper diaryAIMapper;
+    private final DiaryAiMapper diaryAiMapper;
 
     @Transactional(rollbackFor = Exception.class)
     public void saveResult(/* 所需参数 */) {
@@ -142,11 +142,11 @@ org.slf4j.MDC
 | `errorCode` | `String` 空串 | 保留 String，无错误时使用 `null` |
 | `errorMessage` | `String` 空串 | 保留 String，无错误时使用 `null` |
 
-`DiaryAIMapper.updateAiTaskStatus()` 已经使用 `Long aiInfoId`，因此 PO 中也应保持一致。
+`DiaryAiMapper.updateAiTaskStatus()` 已经使用 `Long aiInfoId`，因此 PO 中也应保持一致。
 
 ### 2.9 其他简短问题
 
-- `AiTaskProducer` 中的 `DiaryAIMapper` 已没有用途，可删除。
+- `AiTaskProducer` 中的 `DiaryAiMapper` 已没有用途，可删除。
 - RocketMQ Message Key 建议显式使用 `taskId.toString()`。
 - `AiNutrientPO` 建议增加 `taskId`，便于建立结果幂等唯一约束。
 - 生产环境不建议完整打印 AI 返回结果和用户的全部食谱内容。
@@ -241,7 +241,7 @@ public AiTaskSubmitVo submitTask(AiInvokeDTO request) {
     final String clientRequestId = request.getClientRequestId().trim();
 
     // 快速路径：大部分重复请求可以在这里直接返回。
-    AiTaskPO existing = diaryAIMapper
+    AiTaskPO existing = DiaryAiMapper
             .selectByUserIdAndClientRequestId(userId, clientRequestId);
     if (existing != null) {
         return toSubmitVo(existing, "该请求已提交");
@@ -258,10 +258,10 @@ public AiTaskSubmitVo submitTask(AiInvokeDTO request) {
     );
 
     try {
-        diaryAIMapper.insertAiTask(task);
+        DiaryAiMapper.insertAiTask(task);
     } catch (DuplicateKeyException e) {
         // 并发窗口：另一个请求已先插入相同幂等键。
-        AiTaskPO concurrentTask = diaryAIMapper
+        AiTaskPO concurrentTask = DiaryAiMapper
                 .selectByUserIdAndClientRequestId(userId, clientRequestId);
         if (concurrentTask == null) {
             throw e;
@@ -273,7 +273,7 @@ public AiTaskSubmitVo submitTask(AiInvokeDTO request) {
     AiTaskMessageDto message = buildTaskMessage(task);
     try {
         SendReceipt receipt = rocketMqHandlerService.send(message);
-        int updated = diaryAIMapper.markQueuedIfPending(
+        int updated = DiaryAiMapper.markQueuedIfPending(
                 taskId,
                 receipt.getMessageId().toString(),
                 LocalDateTime.now()
@@ -281,7 +281,7 @@ public AiTaskSubmitVo submitTask(AiInvokeDTO request) {
 
         // Consumer 可能已经把任务更新为 RUNNING/SUCCESS。
         // updated == 0 不一定是异常，重新查询当前状态即可。
-        AiTaskPO current = diaryAIMapper.selectAiTaskByTaskId(taskId);
+        AiTaskPO current = DiaryAiMapper.selectAiTaskByTaskId(taskId);
         return toSubmitVo(current, "AI分析任务正在处理中");
     } catch (RuntimeException sendException) {
         log.error("AI task message send failed, taskId={}, eventId={}",

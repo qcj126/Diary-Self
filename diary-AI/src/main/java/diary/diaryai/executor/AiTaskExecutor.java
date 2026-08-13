@@ -6,7 +6,7 @@ import diary.common.entity.ai.dto.AiInvokeDTO;
 import diary.common.entity.ai.dto.AiTaskMessageDto;
 import diary.common.entity.ai.po.AiTaskPO;
 import diary.diaryai.factory.AIFactory;
-import diary.diaryai.mapper.DiaryAIMapper;
+import diary.diaryai.mapper.DiaryAiMapper;
 import diary.diaryai.strategy.service.InvokeAIService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,13 +16,13 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class AiTaskExecutor {
-    private final DiaryAIMapper diaryAIMapper;
+    private final DiaryAiMapper diaryAiMapper;
     private final AIFactory aiFactory;
     private final ObjectMapper objectMapper;
     public void execute(AiTaskMessageDto message) {
         // 校验message信息
 
-        AiTaskPO aiTaskPO = diaryAIMapper.selectAiTaskByTaskId(message.getTaskId());
+        AiTaskPO aiTaskPO = diaryAiMapper.selectAiTaskByTaskId(message.getTaskId());
         if (aiTaskPO == null) {
             throw new RuntimeException("任务不存在: " + message.getTaskId());
         }
@@ -44,7 +44,7 @@ public class AiTaskExecutor {
          *   AND attempt_count < max_attempts
          * 同时更新 workerId、leaseUntil、attemptCount 和版本号。
          */
-        int cnt = diaryAIMapper.updateAiTaskStatus(message.getTaskId(), "RUNNING", null);
+        int cnt = diaryAiMapper.updateAiTaskStatus(message.getTaskId(), "RUNNING", null, message.getUserId(), message.getClientRequestId());
         if (cnt < 1) {
             log.info("更新任务状态为RUNNING失败: {}", message.getTaskId());
             return;
@@ -54,7 +54,7 @@ public class AiTaskExecutor {
         try {
             AiInvokeDTO aiInvokeDTO = objectMapper.readValue(aiTaskPO.getInputSnapshot(), AiInvokeDTO.class);
             InvokeAIService aiService = aiFactory.getAIService(aiInvokeDTO.getAiType());
-            aiService.getAiResultAndSave(aiInvokeDTO.getMaterials(), aiInvokeDTO.getAiApplication(), aiInvokeDTO.getAiType(), aiInvokeDTO.getFlag(), message.getTaskId(), aiInvokeDTO.getUniversalId());
+            aiService.getAiResultAndSave(aiInvokeDTO, message.getTaskId(), message.getUserId());
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

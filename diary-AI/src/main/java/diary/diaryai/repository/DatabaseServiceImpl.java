@@ -1,9 +1,9 @@
 package diary.diaryai.repository;
 
+import diary.common.entity.ai.dto.AiInvokeDTO;
 import diary.common.entity.ai.po.AiInfoPO;
 import diary.common.entity.ai.po.AiNutrientPO;
-import diary.diaryai.mapper.DiaryAIMapper;
-import diary.diaryai.properties.AliCloudProperty;
+import diary.diaryai.mapper.DiaryAiMapper;
 import diary.utils.commonutil.MyUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,33 +17,31 @@ import java.util.Map;
 @Slf4j
 @RequiredArgsConstructor
 public class DatabaseServiceImpl {
-    private final DiaryAIMapper diaryAIMapper;
+    private final DiaryAiMapper diaryAiMapper;
 
     /**
-     * @param aiApplication
-     * @param aiType
-     * @param flag
      * @param taskId
-     * @param universalId
      * @param model
      * @param result
      * @param temperature
+     * @param userId
      */
     @Transactional(rollbackFor = Exception.class)
-    public void processData(Integer aiApplication, Integer aiType, String flag, Long taskId, Long universalId, String model, Map<String, String> result, Double temperature) {
+    public void processData(Long taskId, Object data, String model, Map<String, String> result, Double temperature, Long userId) {
+        AiInvokeDTO aiInvokeDTO = (AiInvokeDTO) data;
         AiInfoPO aiInfoPO = AiInfoPO.builder()
                 .id(MyUtils.getPrimaryKey())
                 .userId(10000L)
                 .temperature(String.valueOf(temperature))
                 .model(model)
-                .aiType(aiType)
-                .aiApplication(aiApplication)
+                .aiType(aiInvokeDTO.getAiType())
+                .aiApplication(aiInvokeDTO.getAiApplication())
                 .build();
-        diaryAIMapper.insertAiInfo(aiInfoPO);
+        diaryAiMapper.insertAiInfo(aiInfoPO);
         AiNutrientPO aiNutrientPO = AiNutrientPO.builder()
                 .id(MyUtils.getPrimaryKey())
                 .userId(10000L)
-                .universalId(universalId)
+                .universalId(aiInvokeDTO.getUniversalId())
                 .aiInfoId(aiInfoPO.getId())
                 .calory(result.get("卡路里"))
                 .protein(result.get("蛋白质"))
@@ -51,11 +49,10 @@ public class DatabaseServiceImpl {
                 .carbohydrate(result.get("碳水化合物"))
                 .sugar(result.get("糖"))
                 .sodium(result.get("钠"))
-                .flag(flag)
+                .flag(aiInvokeDTO.getFlag())
                 .build();
 
-        diaryAIMapper.insertAiNutrient(aiNutrientPO);
-        diaryAIMapper.updateAiTaskStatus(taskId, "SUCCESS", aiInfoPO.getId());
+        diaryAiMapper.insertAiNutrient(aiNutrientPO);
+        DiaryAiMapper.updateAiTaskStatus(taskId, "SUCCESS", aiInfoPO.getId(), userId, aiInvokeDTO.getClientRequestId());
     }
-
 }

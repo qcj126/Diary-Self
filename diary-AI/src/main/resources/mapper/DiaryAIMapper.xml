@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="diary.diaryai.mapper.DiaryAIMapper">
+<mapper namespace="diary.diaryai.mapper.DiaryAiMapper">
     <resultMap id="AiInfoResultMap" type="diary.common.entity.ai.po.AiInfoPO">
         <id column="id" property="id" jdbcType="BIGINT"/>
         <result column="user_id" property="userId" jdbcType="BIGINT"/>
@@ -37,12 +37,145 @@
         values (#{id}, #{userId}, #{model}, #{temperature}, #{aiType}, #{aiApplication})
     </insert>
 
-    <update id="updateAiTaskStatus">
-
+    <update id="updateAiTaskStatus" parameterType="diary.common.entity.ai.dto.AiTaskProcessDto">
+        UPDATE ai_task
+        <set>
+            <if test="userId != null">user_id = #{userId, jdbcType=BIGINT},</if>
+            <if test="clientRequestId != null and clientRequestId != ''">client_request_id = #{clientRequestId, jdbcType=VARCHAR},</if>
+            <if test="taskType != null and taskType != ''">task_type = #{taskType, jdbcType=VARCHAR},</if>
+            <if test="status != null and status != ''">status = #{status, jdbcType=VARCHAR},</if>
+            <if test="inputSnapshot != null and inputSnapshot != ''">input_snapshot = #{inputSnapshot, jdbcType=VARCHAR},</if>
+            <if test="attemptCount != null">attempt_count = #{attemptCount, jdbcType=INTEGER},</if>
+            <if test="maxAttempts != null">max_attempts = #{maxAttempts, jdbcType=INTEGER},</if>
+            <if test="workerId != null and workerId != ''">worker_id = #{workerId, jdbcType=VARCHAR},</if>
+            <if test="leaseUntil != null">lease_until = #{leaseUntil, jdbcType=TIMESTAMP},</if>
+            <if test="aiInfoId != null">ai_info_id = #{aiInfoId, jdbcType=BIGINT},</if>
+            <if test="errorCode != null and errorCode != ''">error_code = #{errorCode, jdbcType=VARCHAR},</if>
+            <if test="errorMessage != null and errorMessage != ''">error_message = #{errorMessage, jdbcType=VARCHAR},</if>
+            <if test="createTime != null">create_time = #{createTime, jdbcType=TIMESTAMP},</if>
+            <if test="queueTime != null">queue_time = #{queueTime, jdbcType=TIMESTAMP},</if>
+            <if test="startTime != null">start_time = #{startTime, jdbcType=TIMESTAMP},</if>
+            <if test="finishTime != null">finish_time = #{finishTime, jdbcType=TIMESTAMP},</if>
+            <if test="versionId != null">version_id = #{versionId, jdbcType=INTEGER},</if>
+        </set>
+        WHERE id = #{taskId} and user_id = #{userId} and client_request_id = #{clientRequestId} and max_attempts > #{attemptCount}
     </update>
 
-    <insert id="insertAiTask">
-
+    <insert id="insertAiTask" parameterType="diary.common.entity.ai.po.AiTaskPO">
+            INSERT INTO ai_task
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="id != null">
+                    id,
+                </if>
+                <if test="userId != null">
+                    user_id,
+                </if>
+                <if test="clientRequestId != null and clientRequestId != ''">
+                    client_request_id,
+                </if>
+                <if test="taskType != null and taskType != ''">
+                    task_type,
+                </if>
+                <if test="status != null and status != ''">
+                    status,
+                </if>
+                <if test="inputSnapshot != null and inputSnapshot != ''">
+                    input_snapshot,
+                </if>
+                <if test="attemptCount != null">
+                    attempt_count,
+                </if>
+                <if test="maxAttempts != null">
+                    max_attempts,
+                </if>
+                <if test="workerId != null and workerId != ''">
+                    worker_id,
+                </if>
+                <if test="leaseUntil != null">
+                    lease_until,
+                </if>
+                <if test="aiInfoId != null">
+                    ai_info_id,
+                </if>
+                <if test="errorCode != null and errorCode != ''">
+                    error_code,
+                </if>
+                <if test="errorMessage != null and errorMessage != ''">
+                    error_message,
+                </if>
+                <if test="createTime != null">
+                    create_time,
+                </if>
+                <if test="queueTime != null">
+                    queue_time,
+                </if>
+                <if test="startTime != null">
+                    start_time,
+                </if>
+                <if test="finishTime != null">
+                    finish_time,
+                </if>
+                <if test="versionId != null">
+                    version_id,
+                </if>
+            </trim>
+            VALUES
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="taskId != null">
+                    #{id},
+                </if>
+                <if test="userId != null">
+                    #{userId, jdbcType=BIGINT},
+                </if>
+                <if test="clientRequestId != null and clientRequestId != ''">
+                    #{clientRequestId, jdbcType=VARCHAR},
+                </if>
+                <if test="taskType != null and taskType != ''">
+                    #{taskType, jdbcType=VARCHAR},
+                </if>
+                <if test="status != null and status != ''">
+                    #{status, jdbcType=VARCHAR},
+                </if>
+                <if test="inputSnapshot != null and inputSnapshot != ''">
+                    #{inputSnapshot, jdbcType=VARCHAR},
+                </if>
+                <if test="attemptCount != null">
+                    #{attemptCount, jdbcType=INTEGER},
+                </if>
+                <if test="maxAttempts != null">
+                    #{maxAttempts, jdbcType=INTEGER},
+                </if>
+                <if test="workerId != null and workerId != ''">
+                    #{workerId, jdbcType=VARCHAR},
+                </if>
+                <if test="leaseUntil != null">
+                    #{leaseUntil, jdbcType=TIMESTAMP},
+                </if>
+                <if test="aiInfoId != null">
+                    #{aiInfoId, jdbcType=BIGINT},
+                </if>
+                <if test="errorCode != null and errorCode != ''">
+                    #{errorCode, jdbcType=VARCHAR},
+                </if>
+                <if test="errorMessage != null and errorMessage != ''">
+                    #{errorMessage, jdbcType=VARCHAR},
+                </if>
+                <if test="createTime != null">
+                    #{createTime, jdbcType=TIMESTAMP},
+                </if>
+                <if test="queueTime != null">
+                    #{queueTime, jdbcType=TIMESTAMP},
+                </if>
+                <if test="startTime != null">
+                    #{startTime, jdbcType=TIMESTAMP},
+                </if>
+                <if test="finishTime != null">
+                    #{finishTime, jdbcType=TIMESTAMP},
+                </if>
+                <if test="versionId != null">
+                    #{versionId, jdbcType=INTEGER},
+                </if>
+            </trim>
     </insert>
 
     <select id="selectAiTaskByTaskId" resultType="diary.common.entity.ai.po.AiTaskPO">

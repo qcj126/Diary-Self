@@ -12,7 +12,7 @@ import diary.common.entity.ai.po.AiInfoPO;
 import diary.common.entity.ai.po.AiNutrientPO;
 import diary.common.enums.aienum.AIEnum;
 import diary.common.exception.CustomException;
-import diary.diaryai.mapper.DiaryAIMapper;
+import diary.diaryai.mapper.DiaryAiMapper;
 import diary.diaryai.prompt.PromptContext;
 import diary.diaryai.properties.AliCloudProperty;
 import diary.diaryai.strategy.service.InvokeAIService;
@@ -39,12 +39,12 @@ import java.util.Map;
 public class InvokeQwenFlash extends InvokeAITemplate implements InvokeAIService {
     private final AliCloudProperty aliCloudProperty;
     private final PromptContext promptContext;
-    private final DiaryAIMapper diaryAIMapper;
+    private final DiaryAiMapper diaryAiMapper;
     private final RedisUtil redisUtil;
     private final MultiModalConversation conv = new MultiModalConversation();
 
     @Override
-    public void getAiResultAndSave(Object data, Integer aiApplication, Integer aiType, String flag, Long taskId, Long universalId) {
+    public void getAiResultAndSave(Object data, Long taskId, Long userId) {
         String model = aliCloudProperty.getQwenPlusModel();
         Map<Long, String> dataMap = (Map<Long, String>) data;
         for (Map.Entry<Long, String> entry : dataMap.entrySet()) {
@@ -67,7 +67,7 @@ public class InvokeQwenFlash extends InvokeAITemplate implements InvokeAIService
                 .aiType(aiType)
                 .aiApplication(aiApplication)
                 .build();
-        diaryAIMapper.insertAiInfo(aiInfoPO);
+        diaryAiMapper.insertAiInfo(aiInfoPO);
         MultiModalConversationResult aiResult = invokeAi(prompt, model);
         List<Map<String, String>> resultList = extractResult(aiResult, model, prompt);
         log.info("AI返回的结果列表： {}", resultList);
@@ -88,7 +88,7 @@ public class InvokeQwenFlash extends InvokeAITemplate implements InvokeAIService
                     .build());
             redisUtil.deleteString(result.get("objectKey"));
         }
-        diaryAIMapper.insertAiNutrient(aiNutrientPOS);
+        diaryAiMapper.insertAiNutrient(aiNutrientPOS);
     }
 
     @Override

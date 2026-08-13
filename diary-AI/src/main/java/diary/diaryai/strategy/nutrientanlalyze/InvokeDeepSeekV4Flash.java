@@ -12,7 +12,7 @@ import diary.common.entity.ai.po.AiInfoPO;
 import diary.common.entity.ai.po.AiNutrientPO;
 import diary.common.enums.aienum.AIEnum;
 import diary.common.exception.CustomException;
-import diary.diaryai.mapper.DiaryAIMapper;
+import diary.diaryai.mapper.DiaryAiMapper;
 import diary.diaryai.prompt.PromptContext;
 import diary.diaryai.properties.AliCloudProperty;
 import diary.diaryai.strategy.service.InvokeAIService;
@@ -36,11 +36,11 @@ import java.util.Map;
 public class InvokeDeepSeekV4Flash extends InvokeAITemplate implements InvokeAIService {
     private final AliCloudProperty aliCloudProperty;
     private final PromptContext promptContext;
-    private final DiaryAIMapper diaryAIMapper;
+    private final DiaryAiMapper diaryAiMapper;
     private final Generation generation = new Generation();
 
     @Override
-    public void getAiResultAndSave(Object data, Integer aiApplication, Integer aiType, String flag, Long taskId, Long universalId) {
+    public void getAiResultAndSave(Object data, Long taskId, Long userId) {
         String model = aliCloudProperty.getDeepSeekV4FlashModel();
         Object prompt = buildPrompt(data);
         AiInfoPO aiInfoPO = AiInfoPO.builder()
@@ -51,7 +51,7 @@ public class InvokeDeepSeekV4Flash extends InvokeAITemplate implements InvokeAIS
                 .aiType(aiType)
                 .aiApplication(aiApplication)
                 .build();
-        diaryAIMapper.insertAiInfo(aiInfoPO);
+        diaryAiMapper.insertAiInfo(aiInfoPO);
         GenerationResult aiResult = invokeAi(prompt, model);
         List<Map<String, String>> resultList = extractResult(aiResult, model, prompt);
         log.info("AI返回的结果列表： {}", resultList);
@@ -71,7 +71,7 @@ public class InvokeDeepSeekV4Flash extends InvokeAITemplate implements InvokeAIS
                     .flag(flag)
                     .build());
         }
-        diaryAIMapper.insertAiNutrient(aiNutrientPOS);
+        diaryAiMapper.insertAiNutrient(aiNutrientPOS);
     }
 
     @Override

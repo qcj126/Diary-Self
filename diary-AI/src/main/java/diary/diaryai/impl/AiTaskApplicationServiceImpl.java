@@ -4,10 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import diary.common.entity.ai.dto.AiInvokeDTO;
 import diary.common.entity.ai.dto.AiTaskMessageDto;
+import diary.common.entity.ai.dto.AiTaskProcessDto;
 import diary.common.entity.ai.po.AiTaskPO;
 import diary.common.entity.ai.vo.AiTaskSubmitVo;
-import diary.diaryai.mapper.DiaryAIMapper;
-import diary.diaryai.properties.AliCloudProperty;
+import diary.diaryai.mapper.DiaryAiMapper;
 import diary.diaryai.service.AiTaskApplicationService;
 import diary.diaryai.service.AiTaskMessageProducer;
 import diary.utils.commonutil.MyUtils;
@@ -26,9 +26,8 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class AiTaskApplicationServiceImpl implements AiTaskApplicationService {
     private final AiTaskMessageProducer rocketMqHandlerService;
-    private final DiaryAIMapper diaryAIMapper;
+    private final DiaryAiMapper diaryAiMapper;
     private final ObjectMapper objectMapper;
-    private final AliCloudProperty aliCloudProperty;
     @Override
     public AiTaskSubmitVo submitTask(AiInvokeDTO aiInvokeDTO) {
         // 校验参数、根据clientRequestId 做幂等判断
@@ -44,13 +43,14 @@ public class AiTaskApplicationServiceImpl implements AiTaskApplicationService {
                 .stringKeyMapNotContainsEmpty(aiInvokeDTO.getMaterials(), "materials")
                 .notNull(aiInvokeDTO.getUniversalId(), "universalId");
 
+        Long userId = 10000L;
         Long taskId = MyUtils.getPrimaryKey();
         try {
             String inputSnapshot = objectMapper.writeValueAsString(aiInvokeDTO);
             // 根据taskId创建任务
             AiTaskPO aiTaskPO = AiTaskPO.builder()
                     .id(taskId)
-                    .userId(10000L)
+                    .userId(userId)
                     .clientRequestId(aiInvokeDTO.getClientRequestId())
                     .taskType("QWEN_PLUS_NUTRIENT")
                     .status("PENDING")
@@ -69,12 +69,13 @@ public class AiTaskApplicationServiceImpl implements AiTaskApplicationService {
                     .versionId(0)
                     .build();
             // 保存任务
-            diaryAIMapper.insertAiTask(aiTaskPO);
+            diaryAiMapper.insertAiTask(aiTaskPO);
             // 调用RocketMQ发送任务
             AiTaskMessageDto aiTaskMessageDto = AiTaskMessageDto.builder()
                     .eventId("evt-" + MyUtils.getPrimaryKey())
                     .taskId(taskId)
                     .userId(10000L)
+                    .clientRequestId(aiInvokeDTO.getClientRequestId())
                     .taskType("QWEN_PLUS_NUTRIENT")
                     .schemaVersion(1)
                     .occurTime(LocalDateTime.now())
@@ -83,29 +84,30 @@ public class AiTaskApplicationServiceImpl implements AiTaskApplicationService {
             SendReceipt send = rocketMqHandlerService.send(aiTaskMessageDto);
             MessageId messageId = send.getMessageId();
             log.info("Message sent, messageId: {}", messageId);
-            /**
-             * 必须是条件更新 PENDING → QUEUED。否则 Consumer 很快完成后，可能把 SUCCESS 覆盖成 QUEUED。
-             */
-            diaryAIMapper.updateAiTaskStatus(aiTaskMessageDto.getTaskId(), "QUEUED", null);
+            // 构建条件请求体
+            AiTaskProcessDto aiTaskProcessDto = AiTaskProcessDto.builder()
+                    .taskId(taskId)
+                    .userId(userId)
+                    .clientRequestId(aiInvokeDTO.getClientRequestId())
+                    .status("QUEUED")
+                    .build();
+            diaryAiMapper.updateAiTaskStatus(aiTaskProcessDto);
             return AiTaskSubmitVo.builder()
                     .status("QUEUED")
                     .taskId(taskId)
                     .message("AI分析任务正在处理中")
                     .build();
 
-            /**
-             * 失败处理仍未形成状态机
-             * 当前模型异常会让任务停留在 RUNNING，尚未实现：
-             * RETRY_WAIT
-             * FAILED
-             * attemptCount
-             * errorCode/errorMessage
-             * 租约恢复
-             * 最大模型调用次数
-             * 永久错误与可重试错误分类
-             */
-        } catch (JsonProcessingException | RuntimeException e) {
-            diaryAIMapper.updateAiTaskStatus(taskId, "PENDING", null);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        } catch (RuntimeException e) {
+            AiTaskProcessDto aiTaskProcessDto = AiTaskProcessDto.builder()
+                    .taskId(taskId)
+                    .userId(userId)
+                    .clientRequestId(aiInvokeDTO.getClientRequestId())
+                    .status("PENDING")
+                    .build();
+            diaryAiMapper.updateAiTaskStatus(aiTaskProcessDto);
             throw new RuntimeException(e);
         }
     }
