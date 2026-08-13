@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -19,44 +21,29 @@ public class AiTaskExecutor {
     private final DiaryAiMapper diaryAiMapper;
     private final AIFactory aiFactory;
     private final ObjectMapper objectMapper;
-    public void execute(AiTaskMessageDto message) {
-        // 校验message信息
-
-        AiTaskPO aiTaskPO = diaryAiMapper.selectAiTaskByTaskId(message.getTaskId());
+    public boolean execute(AiTaskMessageDto message, AiTaskPO aiTaskPO) {
+        // 在两次查询之间，理论上可能发生：
+        // 任务被管理程序或人工删除；
+        // 补偿线程改变了任务状态和版本；
+        // 其他流程异常修改了记录；
+        // execute() 将来被其他代码直接调用，没有经过抢占流程；
+        // 查询错误地走了存在延迟的读库。
+        // 因此，这里需要进行两次查询，并进行状态检查。
         if (aiTaskPO == null) {
-            throw new RuntimeException("任务不存在: " + message.getTaskId());
-        }
-        // 获取任务状态  SUCCESS或FAILED重复消息直接返回
-        if (aiTaskPO.getStatus().equals("SUCCESS") || aiTaskPO.getStatus().equals("FAILED")) {
-            return;
+            throw new IllegalArgumentException("任务不存在: " + message.getTaskId());
         }
 
-        // 更新任务状态为RUNNING  添加更多查询条件，锁定单条任务数据
-        /**
-         * 注释中的原子抢占尚未真正实现
-         * [AiTaskExecutor.java (line 34)](E:/Diary-Self/diary-AI/src/main/java/diary/diaryai/executor/AiTaskExecutor.java:34) 已注释“添加更多查询条件，锁定单条任务数据”，方向正确，但当前仍是普通状态更新。
-         * Mapper 后续必须做条件更新：
-         * WHERE task_id = ?
-         *   AND (
-         *     status IN ('QUEUED', 'RETRY_WAIT')
-         *     OR (status = 'RUNNING' AND lease_until < NOW())
-         *   )
-         *   AND attempt_count < max_attempts
-         * 同时更新 workerId、leaseUntil、attemptCount 和版本号。
-         */
-        int cnt = diaryAiMapper.updateAiTaskStatus(message.getTaskId(), "RUNNING", null, message.getUserId(), message.getClientRequestId());
-        if (cnt < 1) {
-            log.info("更新任务状态为RUNNING失败: {}", message.getTaskId());
-            return;
-        }
-
-        // 获取前端传入的原始数据
         try {
             AiInvokeDTO aiInvokeDTO = objectMapper.readValue(aiTaskPO.getInputSnapshot(), AiInvokeDTO.class);
             InvokeAIService aiService = aiFactory.getAIService(aiInvokeDTO.getAiType());
-            aiService.getAiResultAndSave(aiInvokeDTO, message.getTaskId(), message.getUserId());
+            aiService.getAiResultAndSave(aiInvokeDTO, message.getTaskId(), message.getUserId(), aiTaskPO.getWorkerId(), aiTaskPO.getVersionId());
+            return true;
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            /*
+             * input_snapshot 是提交时已经固定的持久化数据，反序列化失败不会通过 MQ 重投自行恢复。
+             * 以前统一包装为普通 RuntimeException，容易被当成临时错误反复调用；现在标记为永久参数错误。
+             */
+            throw new IllegalArgumentException("AI任务输入快照无法反序列化: " + message.getTaskId(), e);
         }
     }
 }

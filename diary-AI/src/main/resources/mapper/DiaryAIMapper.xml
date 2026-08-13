@@ -17,6 +17,7 @@
         <result column="user_id" property="userId" jdbcType="BIGINT"/>
         <result column="universal_id" property="universalId" jdbcType="BIGINT"/>
         <result column="ai_info_id" property="aiInfoId" jdbcType="BIGINT"/>
+        <result column="ai_task_id" property="aiTaskId" jdbcType="BIGINT"/>
         <result column="calory" property="calory" jdbcType="VARCHAR"/>
         <result column="protein" property="protein" jdbcType="VARCHAR"/>
         <result column="fat" property="fat" jdbcType="VARCHAR"/>
@@ -27,9 +28,36 @@
         <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
     </resultMap>
 
+    <resultMap id="AiTaskResultMap" type="diary.common.entity.ai.po.AiTaskPO">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="user_id" property="userId" jdbcType="BIGINT"/>
+        <result column="client_request_id" property="clientRequestId" jdbcType="VARCHAR"/>
+        <result column="task_type" property="taskType" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="VARCHAR"/>
+        <result column="input_snapshot" property="inputSnapshot" jdbcType="LONGVARCHAR"/>
+        <result column="attempt_count" property="attemptCount" jdbcType="INTEGER"/>
+        <result column="max_attempts" property="maxAttempts" jdbcType="INTEGER"/>
+        <result column="worker_id" property="workerId" jdbcType="VARCHAR"/>
+        <result column="lease_until" property="leaseUntil" jdbcType="TIMESTAMP"/>
+        <result column="ai_info_id" property="aiInfoId" jdbcType="BIGINT"/>
+        <result column="error_code" property="errorCode" jdbcType="VARCHAR"/>
+        <result column="error_message" property="errorMessage" jdbcType="LONGVARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="queue_time" property="queueTime" jdbcType="TIMESTAMP"/>
+        <result column="start_time" property="startTime" jdbcType="TIMESTAMP"/>
+        <result column="finish_time" property="finishTime" jdbcType="TIMESTAMP"/>
+        <result column="version_id" property="versionId" jdbcType="INTEGER"/>
+    </resultMap>
+
     <insert id="insertAiNutrient">
-        INSERT INTO ai_nutrient (id, user_id, universal_id, flag, ai_info_id, calory, protein, fat, carbohydrate, sugar, sodium)
-        VALUES (#{id}, #{userId}, #{universalId}, #{flag}, #{aiInfoId}, #{calory}, #{protein}, #{fat}, #{carbohydrate}, #{sugar}, #{sodium})
+        <!--
+            以前表中的 ai_task_id 是 NOT NULL，但插入语句没有写该列，会直接导致结果落库失败，
+            同时也无法依靠 taskId 防止重复结果。现在每条营养结果都明确关联其 AI 任务。
+        -->
+        INSERT INTO ai_nutrient
+            (id, user_id, universal_id, flag, ai_info_id, ai_task_id, calory, protein, fat, carbohydrate, sugar, sodium)
+        VALUES
+            (#{id}, #{userId}, #{universalId}, #{flag}, #{aiInfoId}, #{aiTaskId}, #{calory}, #{protein}, #{fat}, #{carbohydrate}, #{sugar}, #{sodium})
     </insert>
 
     <insert id="insertAiInfo">
@@ -37,148 +65,163 @@
         values (#{id}, #{userId}, #{model}, #{temperature}, #{aiType}, #{aiApplication})
     </insert>
 
-    <update id="updateAiTaskStatus" parameterType="diary.common.entity.ai.dto.AiTaskProcessDto">
-        UPDATE ai_task
-        <set>
-            <if test="userId != null">user_id = #{userId, jdbcType=BIGINT},</if>
-            <if test="clientRequestId != null and clientRequestId != ''">client_request_id = #{clientRequestId, jdbcType=VARCHAR},</if>
-            <if test="taskType != null and taskType != ''">task_type = #{taskType, jdbcType=VARCHAR},</if>
-            <if test="status != null and status != ''">status = #{status, jdbcType=VARCHAR},</if>
-            <if test="inputSnapshot != null and inputSnapshot != ''">input_snapshot = #{inputSnapshot, jdbcType=VARCHAR},</if>
-            <if test="attemptCount != null">attempt_count = #{attemptCount, jdbcType=INTEGER},</if>
-            <if test="maxAttempts != null">max_attempts = #{maxAttempts, jdbcType=INTEGER},</if>
-            <if test="workerId != null and workerId != ''">worker_id = #{workerId, jdbcType=VARCHAR},</if>
-            <if test="leaseUntil != null">lease_until = #{leaseUntil, jdbcType=TIMESTAMP},</if>
-            <if test="aiInfoId != null">ai_info_id = #{aiInfoId, jdbcType=BIGINT},</if>
-            <if test="errorCode != null and errorCode != ''">error_code = #{errorCode, jdbcType=VARCHAR},</if>
-            <if test="errorMessage != null and errorMessage != ''">error_message = #{errorMessage, jdbcType=VARCHAR},</if>
-            <if test="createTime != null">create_time = #{createTime, jdbcType=TIMESTAMP},</if>
-            <if test="queueTime != null">queue_time = #{queueTime, jdbcType=TIMESTAMP},</if>
-            <if test="startTime != null">start_time = #{startTime, jdbcType=TIMESTAMP},</if>
-            <if test="finishTime != null">finish_time = #{finishTime, jdbcType=TIMESTAMP},</if>
-            <if test="versionId != null">version_id = #{versionId, jdbcType=INTEGER},</if>
-        </set>
-        WHERE id = #{taskId} and user_id = #{userId} and client_request_id = #{clientRequestId} and max_attempts > #{attemptCount}
-    </update>
-
     <insert id="insertAiTask" parameterType="diary.common.entity.ai.po.AiTaskPO">
-            INSERT INTO ai_task
-            <trim prefix="(" suffix=")" suffixOverrides=",">
-                <if test="id != null">
-                    id,
-                </if>
-                <if test="userId != null">
-                    user_id,
-                </if>
-                <if test="clientRequestId != null and clientRequestId != ''">
-                    client_request_id,
-                </if>
-                <if test="taskType != null and taskType != ''">
-                    task_type,
-                </if>
-                <if test="status != null and status != ''">
-                    status,
-                </if>
-                <if test="inputSnapshot != null and inputSnapshot != ''">
-                    input_snapshot,
-                </if>
-                <if test="attemptCount != null">
-                    attempt_count,
-                </if>
-                <if test="maxAttempts != null">
-                    max_attempts,
-                </if>
-                <if test="workerId != null and workerId != ''">
-                    worker_id,
-                </if>
-                <if test="leaseUntil != null">
-                    lease_until,
-                </if>
-                <if test="aiInfoId != null">
-                    ai_info_id,
-                </if>
-                <if test="errorCode != null and errorCode != ''">
-                    error_code,
-                </if>
-                <if test="errorMessage != null and errorMessage != ''">
-                    error_message,
-                </if>
-                <if test="createTime != null">
-                    create_time,
-                </if>
-                <if test="queueTime != null">
-                    queue_time,
-                </if>
-                <if test="startTime != null">
-                    start_time,
-                </if>
-                <if test="finishTime != null">
-                    finish_time,
-                </if>
-                <if test="versionId != null">
-                    version_id,
-                </if>
-            </trim>
-            VALUES
-            <trim prefix="(" suffix=")" suffixOverrides=",">
-                <if test="taskId != null">
-                    #{id},
-                </if>
-                <if test="userId != null">
-                    #{userId, jdbcType=BIGINT},
-                </if>
-                <if test="clientRequestId != null and clientRequestId != ''">
-                    #{clientRequestId, jdbcType=VARCHAR},
-                </if>
-                <if test="taskType != null and taskType != ''">
-                    #{taskType, jdbcType=VARCHAR},
-                </if>
-                <if test="status != null and status != ''">
-                    #{status, jdbcType=VARCHAR},
-                </if>
-                <if test="inputSnapshot != null and inputSnapshot != ''">
-                    #{inputSnapshot, jdbcType=VARCHAR},
-                </if>
-                <if test="attemptCount != null">
-                    #{attemptCount, jdbcType=INTEGER},
-                </if>
-                <if test="maxAttempts != null">
-                    #{maxAttempts, jdbcType=INTEGER},
-                </if>
-                <if test="workerId != null and workerId != ''">
-                    #{workerId, jdbcType=VARCHAR},
-                </if>
-                <if test="leaseUntil != null">
-                    #{leaseUntil, jdbcType=TIMESTAMP},
-                </if>
-                <if test="aiInfoId != null">
-                    #{aiInfoId, jdbcType=BIGINT},
-                </if>
-                <if test="errorCode != null and errorCode != ''">
-                    #{errorCode, jdbcType=VARCHAR},
-                </if>
-                <if test="errorMessage != null and errorMessage != ''">
-                    #{errorMessage, jdbcType=VARCHAR},
-                </if>
-                <if test="createTime != null">
-                    #{createTime, jdbcType=TIMESTAMP},
-                </if>
-                <if test="queueTime != null">
-                    #{queueTime, jdbcType=TIMESTAMP},
-                </if>
-                <if test="startTime != null">
-                    #{startTime, jdbcType=TIMESTAMP},
-                </if>
-                <if test="finishTime != null">
-                    #{finishTime, jdbcType=TIMESTAMP},
-                </if>
-                <if test="versionId != null">
-                    #{versionId, jdbcType=INTEGER},
-                </if>
-            </trim>
+        <!--
+            以前列部分判断 id，值部分却判断不存在的 taskId 属性，MyBatis 可能抛属性读取异常，
+            也可能生成列和值数量不一致的 SQL。任务创建字段均为第一版必填项，因此改为静态、对称的插入语句。
+        -->
+        INSERT INTO ai_task
+            (id, user_id, client_request_id, task_type, status, input_snapshot,
+             attempt_count, max_attempts, create_time, version_id)
+        VALUES
+            (#{id}, #{userId}, #{clientRequestId}, #{taskType}, #{status}, #{inputSnapshot},
+             #{attemptCount}, #{maxAttempts}, #{createTime}, #{versionId})
     </insert>
 
-    <select id="selectAiTaskByTaskId" resultType="diary.common.entity.ai.po.AiTaskPO">
-
+    <select id="selectAiTaskByTaskId" resultMap="AiTaskResultMap">
+        SELECT * FROM ai_task WHERE id = #{taskId} LIMIT 1
     </select>
+
+    <select id="selectByUserIdAndClientRequestId" resultMap="AiTaskResultMap">
+        SELECT *
+        FROM ai_task
+        WHERE user_id = #{userId}
+          AND client_request_id = #{clientRequestId}
+        LIMIT 1
+    </select>
+
+    <update id="markQueuedIfPending" parameterType="diary.common.entity.ai.dto.AiTaskProcessDto">
+        <!-- Producer 只能推进 PENDING；若 Consumer 已因投递竞态抢占，不能把 RUNNING/SUCCESS 覆盖回 QUEUED。 -->
+        UPDATE ai_task
+        SET status = 'QUEUED',
+            queue_time = COALESCE(queue_time, #{queueTime}),
+            version_id = version_id + 1
+        WHERE id = #{taskId}
+          AND user_id = #{userId}
+          AND client_request_id = #{clientRequestId}
+          AND status = 'PENDING'
+    </update>
+
+    <update id="claimForExecution" parameterType="diary.common.entity.ai.dto.AiTaskProcessDto">
+        <!--
+            以前 Consumer 先做普通 RUNNING 更新、再无条件调用模型，重复消息会并发计费。
+            现在状态抢占、attempt_count/version_id 递增、Worker 和租约写入在一条 SQL 中原子完成。
+            允许 PENDING 是为了处理“Broker 已投递，但 Producer 尚未来得及写 QUEUED”的直接发送竞态。
+        -->
+        <!--
+            虽然数据库状态还是 RUNNING，但原消费者持有任务的时间已经到期，因此推测原消费者宕机或卡死，允许新消费者接管。
+            lease_until &lt; #{startTime}是旧消费者的租约是否到期，是则允许新消费者接管。
+        -->
+        UPDATE ai_task
+        SET status = 'RUNNING',
+            worker_id = #{workerId},
+            lease_until = #{leaseUntil},
+            queue_time = COALESCE(queue_time, #{queueTime}),
+            start_time = COALESCE(start_time, #{startTime}),
+            finish_time = NULL,
+            error_code = NULL,
+            error_message = NULL,
+            attempt_count = attempt_count + 1,
+            version_id = version_id + 1
+        WHERE id = #{taskId}
+          AND user_id = #{userId}
+          AND client_request_id = #{clientRequestId}
+          AND attempt_count &lt; max_attempts
+          AND (
+                status IN ('PENDING', 'QUEUED', 'RETRY_WAIT')
+                OR (status = 'RUNNING' AND lease_until &lt; #{startTime})
+          )
+    </update>
+
+    <update id="markRetryWaitIfOwned" parameterType="diary.common.entity.ai.dto.AiTaskProcessDto">
+        UPDATE ai_task
+        SET status = 'RETRY_WAIT',
+            worker_id = NULL,
+            lease_until = NULL,
+            error_code = #{errorCode},
+            error_message = #{errorMessage},
+            version_id = version_id + 1
+        WHERE id = #{taskId}
+          AND user_id = #{userId}
+          AND client_request_id = #{clientRequestId}
+          AND status = 'RUNNING'
+          AND worker_id = #{workerId}
+          AND version_id = #{versionId}
+    </update>
+
+    <update id="markSuccessIfOwned" parameterType="diary.common.entity.ai.dto.AiTaskProcessDto">
+        <!-- 旧 Worker 必须同时匹配 worker_id 和抢占后的 version_id，避免租约恢复后覆盖新 Worker 的结果。 -->
+        UPDATE ai_task
+        SET status = 'SUCCESS',
+            ai_info_id = #{aiInfoId},
+            worker_id = NULL,
+            lease_until = NULL,
+            error_code = NULL,
+            error_message = NULL,
+            finish_time = #{finishTime},
+            version_id = version_id + 1
+        WHERE id = #{taskId}
+          AND user_id = #{userId}
+          AND client_request_id = #{clientRequestId}
+          AND status = 'RUNNING'
+          AND worker_id = #{workerId}
+          AND version_id = #{versionId}
+    </update>
+
+    <update id="markFailedIfOwned" parameterType="diary.common.entity.ai.dto.AiTaskProcessDto">
+        UPDATE ai_task
+        SET status = 'FAILED',
+            worker_id = NULL,
+            lease_until = NULL,
+            error_code = #{errorCode},
+            error_message = #{errorMessage},
+            finish_time = #{finishTime},
+            version_id = version_id + 1
+        WHERE id = #{taskId}
+          AND user_id = #{userId}
+          AND client_request_id = #{clientRequestId}
+          AND status = 'RUNNING'
+          AND worker_id = #{workerId}
+          AND version_id = #{versionId}
+    </update>
+
+    <update id="markFailedIfAttemptsExhausted" parameterType="diary.common.entity.ai.dto.AiTaskProcessDto">
+        <!--
+            Worker 可能在最后一次尝试中宕机，attempt_count 已到上限但没有机会写 FAILED。
+            以前这类任务既不能再次抢占，也没有终态，会永久卡住。现在重复投递可在租约过期后收敛为 FAILED。
+        -->
+        UPDATE ai_task
+        SET status = 'FAILED',
+            worker_id = NULL,
+            lease_until = NULL,
+            error_code = #{errorCode},
+            error_message = #{errorMessage},
+            finish_time = #{finishTime},
+            version_id = version_id + 1
+        WHERE id = #{taskId}
+          AND user_id = #{userId}
+          AND client_request_id = #{clientRequestId}
+          AND attempt_count &gt;= max_attempts
+          AND version_id = #{versionId}
+          AND (
+                status IN ('QUEUED', 'RETRY_WAIT')
+                OR (status = 'RUNNING' AND lease_until &lt; #{finishTime})
+          )
+    </update>
+
+    <update id="recoverExpiredRunning" parameterType="diary.common.entity.ai.dto.AiTaskProcessDto">
+        <!-- 供后续恢复任务调用；只恢复确实过期且仍有剩余尝试次数的 RUNNING 任务。 -->
+        UPDATE ai_task
+        SET status = 'RETRY_WAIT',
+            worker_id = NULL,
+            lease_until = NULL,
+            error_code = #{errorCode},
+            error_message = #{errorMessage},
+            version_id = version_id + 1
+        WHERE id = #{taskId}
+          AND status = 'RUNNING'
+          AND lease_until &lt; #{leaseUntil}
+          AND attempt_count &lt; max_attempts
+          AND version_id = #{versionId}
+    </update>
 </mapper>

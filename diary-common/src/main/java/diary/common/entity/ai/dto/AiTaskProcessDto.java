@@ -18,7 +18,7 @@ public class AiTaskProcessDto {
     private String taskType;                        // QWEN_PLUS_NUTRIENT
     private String status;                          // 任务状态
     private String inputSnapshot;                   // 稳定的任务输入 JSON，或输入表引用
-    private Integer attemptCount;                   // 已执行次数
+    private Integer attemptCount;                   // 成功抢占并进入模型调用流程的次数；不是 MQ delivery 次数
     private Integer maxAttempts;                    // 任务允许的最大执行次数
     private String workerId;                        // 当前处理任务的实例
     private LocalDateTime leaseUntil;               // RUNNING 任务租约截止时间
@@ -29,5 +29,5 @@ public class AiTaskProcessDto {
     private LocalDateTime queueTime;                // 消息成功发送时间
     private LocalDateTime startTime;                // 开始执行时间
     private LocalDateTime finishTime;               // 执行结束时间
-    private Integer versionId;                      // 乐观锁版本
+    private Integer versionId;                      // 当前 Worker 抢占后持有的预期版本；SQL 成功后由数据库自增
 }

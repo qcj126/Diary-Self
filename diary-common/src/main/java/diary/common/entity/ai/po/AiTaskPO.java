@@ -13,12 +13,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class AiTaskPO {
     private Long id;                        // AI 任务唯一 ID
-    private Long userId;                    //  本期固定为 10000
+    private Long userId;                    // 本期固定为 10000
     private String clientRequestId;         // 提交幂等键
     private String taskType;                // QWEN_PLUS_NUTRIENT
     private String status;                  // 任务状态
     private String inputSnapshot;           // 稳定的任务输入 JSON，或输入表引用
-    private Integer attemptCount;           // 已执行次数
+    private Integer attemptCount;           // 成功抢占并进入模型调用流程的次数；不是 MQ delivery 次数
     private Integer maxAttempts;            // 任务允许的最大执行次数
     private String workerId;                // 当前处理任务的实例
     private LocalDateTime leaseUntil;       // RUNNING 任务租约截止时间
@@ -29,5 +29,5 @@ public class AiTaskPO {
     private LocalDateTime queueTime;        // 消息成功发送时间
     private LocalDateTime startTime;        // 开始执行时间
     private LocalDateTime finishTime;       // 执行结束时间
-    private Integer versionId;              // 乐观锁版本
+    private Integer versionId;              // 乐观锁版本：每次有效状态迁移由数据库执行 version_id + 1
 }

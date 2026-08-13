@@ -35,14 +35,19 @@ public class InvokeQwenPlus extends InvokeAITemplate implements InvokeAIService 
     private final MultiModalConversation conv = new MultiModalConversation();
     private final DatabaseServiceImpl databaseServiceImpl;
     @Override
-    public void getAiResultAndSave(Object data, Long taskId, Long userId) {
+    public void getAiResultAndSave(Object data, Long taskId, Long userId, String workerId, Integer versionId) {
         String model = aliCloudProperty.getQwenPlusModel();
         Double temperature = aliCloudProperty.getTemperature();
         Object prompt = buildPrompt(data);
         MultiModalConversationResult aiResult = invokeAi(prompt, model);
         Map<String, String> result = extractResult(aiResult, model, prompt);
-        log.info("AI返回的结果： {}", result);
-        databaseServiceImpl.processData(taskId, data, model, result, temperature, userId);
+        validateResult(result);
+        /*
+         * 以前生产日志打印完整 AI 结果和用户食材，可能暴露用户饮食内容。现在只记录任务及返回字段，
+         * 既能排查响应契约，也避免把完整输入输出写入日志。
+         */
+        log.info("AI nutrient result parsed, taskId={}, fields={}", taskId, result.keySet());
+        databaseServiceImpl.processData(taskId, data, model, result, temperature, userId, workerId, versionId);
     }
 
     @Override
@@ -52,7 +57,11 @@ public class InvokeQwenPlus extends InvokeAITemplate implements InvokeAIService 
 
     @Override
     public List<Map<String, Object>> buildPrompt(Object data) {
-        return promptContext.getNutrientContentByModelQwenPlusAndFlash(data);
+        /*
+         * 以前 Qwen Plus 与旧图片/多结果 Prompt 共用方法，Prompt 要求模型返回 universalId，
+         * 但模型不知道真实业务 ID，容易生成错误关联。现在使用单业务对象、单 JSON 汇总结果契约。
+         */
+        return promptContext.getNutrientSummaryContentForQwenPlus(data);
     }
 
     @Override
@@ -83,9 +92,34 @@ public class InvokeQwenPlus extends InvokeAITemplate implements InvokeAIService 
 
     @Override
     public Map<String, String> extractResult(Object aiResult, String model, Object prompt) {
-        String aiContent = ((MultiModalConversationResult) aiResult).getOutput().getChoices().getFirst().getMessage().getContent().getFirst().get("text").toString();
-        Gson gson = new Gson();
-        Type type = new TypeToken<Map<String, String>>(){}.getType();
-        return gson.fromJson(aiContent, type);
+        try {
+            String aiContent = ((MultiModalConversationResult) aiResult)
+                    .getOutput()
+                    .getChoices()
+                    .getFirst()
+                    .getMessage()
+                    .getContent()
+                    .getFirst()
+                    .get("text")
+                    .toString();
+            Gson gson = new Gson();
+            Type type = new TypeToken<Map<String, String>>(){}.getType();
+            return gson.fromJson(aiContent, type);
+        } catch (RuntimeException responseException) {
+            throw new CustomException("Qwen Plus 响应不是约定的单个 JSON 对象: " + responseException.getMessage());
+        }
+    }
+
+    private void validateResult(Map<String, String> result) {
+        if (result == null) {
+            throw new CustomException("Qwen Plus 返回空的营养分析结果");
+        }
+        List<String> requiredFields = List.of("卡路里", "蛋白质", "脂肪", "碳水化合物", "糖", "钠");
+        for (String field : requiredFields) {
+            String value = result.get(field);
+            if (value == null || value.isBlank()) {
+                throw new CustomException("Qwen Plus 营养分析结果缺少字段: " + field);
+            }
+        }
     }
 }

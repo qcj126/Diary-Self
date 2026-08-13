@@ -36,35 +36,13 @@ create table if not exists ai_nutrient
 create index idx_ai_nutrient_info_id
     on ai_nutrient (ai_info_id);
 
-create index idx_ai_nutrient_task_id
+-- 以前这里只建普通索引，重复消息仍可为同一 task 写入多条结果。
+-- 现在使用唯一索引，让结果幂等最终由数据库兜底。
+create unique index uk_ai_nutrient_task_id
     on ai_nutrient (ai_task_id);
 
 create index idx_ai_nutrient_user_time
     on ai_nutrient (user_id, create_time);
-
-.id(taskId)
-                    .userId(10000L)
-                    .clientRequestId(aiInvokeDTO.getClientRequestId())
-                    .taskType("QWEN_PLUS_NUTRIENT")
-                    .aiType(aiInvokeDTO.getAiType())
-                    .aiApplication(aiInvokeDTO.getAiApplication())
-                    .flag(aiInvokeDTO.getFlag())
-                    .model(aliCloudProperty.getQwenPlusModel())
-                    .status("PENDING")
-                    .inputSnapshot(inputSnapshot)
-                    .attemptCount(0)
-                    .maxAttempts(3)
-                    .workerId(null)
-                    .leaseUntil(null)
-                    .aiInfoId(null)
-                    .errorCode(null)
-                    .errorMessage(null)
-                    .createTime(LocalDateTime.now())
-                    .queueTime(null)
-                    .startTime(null)
-                    .finishTime(null)
-                    .versionId(0)
-                    .build();
 
 create table ai_task(
     id             bigint unsigned not null comment 'primary key'
@@ -87,3 +65,7 @@ create table ai_task(
     finish_time     datetime null comment 'finish time',
     version_id      int unsigned not null comment 'version id'
 ) engine = InnoDB default charset = utf8mb4 comment = 'ai 任务表';
+
+-- 实际数据库已经存在该唯一索引；以前 SQL 文档没有记录，按文档重建环境时会丢失提交幂等保障。
+create unique index uk_ai_task_user_client_request
+    on ai_task (user_id, client_request_id);
