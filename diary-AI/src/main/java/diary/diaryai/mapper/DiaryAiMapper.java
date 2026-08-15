@@ -4,8 +4,12 @@ import diary.common.entity.ai.dto.AiTaskProcessDto;
 import diary.common.entity.ai.po.AiInfoPO;
 import diary.common.entity.ai.po.AiNutrientPO;
 import diary.common.entity.ai.po.AiTaskPO;
+import diary.common.entity.mq.po.MqOutboxPO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Mapper
 public interface DiaryAiMapper {
@@ -40,4 +44,58 @@ public interface DiaryAiMapper {
     int markFailedIfAttemptsExhausted(AiTaskProcessDto aiTaskProcessDto);
 
     int recoverExpiredRunning(AiTaskProcessDto aiTaskProcessDto);
+
+    int insertOutbox(MqOutboxPO outbox);
+
+    List<MqOutboxPO> selectReadyOutbox(
+            @Param("now") LocalDateTime now,
+            @Param("limit") int limit
+    );
+
+    MqOutboxPO selectOutboxById(@Param("id") Long id);
+
+    int claimOutbox(
+            @Param("id") Long id,
+            @Param("versionId") Integer versionId,
+            @Param("updateTime") LocalDateTime updateTime
+    );
+
+    int markOutboxSent(
+            @Param("id") Long id,
+            @Param("versionId") Integer versionId,
+            @Param("brokerMessageId") String brokerMessageId,
+            @Param("sentTime") LocalDateTime sentTime
+    );
+
+    int markOutboxRetry(
+            @Param("id") Long id,
+            @Param("versionId") Integer versionId,
+            @Param("nextRetryTime") LocalDateTime nextRetryTime,
+            @Param("lastError") String lastError,
+            @Param("updateTime") LocalDateTime updateTime
+    );
+
+    int markOutboxDead(
+            @Param("id") Long id,
+            @Param("versionId") Integer versionId,
+            @Param("lastError") String lastError,
+            @Param("updateTime") LocalDateTime updateTime
+    );
+
+    int recoverSendingTimeout(
+            @Param("timeoutBefore") LocalDateTime timeoutBefore,
+            @Param("now") LocalDateTime now
+    );
+
+    int markQueuedByTaskIdIfPending(
+            @Param("taskId") Long taskId,
+            @Param("queueTime") LocalDateTime queueTime
+    );
+
+    List<AiTaskPO> selectExpiredRunningTasks(
+            @Param("now") LocalDateTime now,
+            @Param("limit") int limit
+    );
+
+    AiNutrientPO selectAiNutrientByTaskId(@Param("taskId") Long taskId);
 }

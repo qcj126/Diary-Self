@@ -1,6 +1,5 @@
 package diary.utils.commonutil;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -8,8 +7,6 @@ import java.util.Map;
 import java.util.Objects;
 
 public class MyUtils {
-    // 创建ObjectMapper实例，用于JSON转换
-    private static final ObjectMapper objectMapper = new ObjectMapper();
     private static long lastTimestamp = -1L;
     private static long sequence = 0L;
     private static final long START_TIMESTAMP = 1704038400000L; // 2024-01-01

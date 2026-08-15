@@ -15,7 +15,3 @@ spring:
         group: DEFAULT_GROUP
         file-extension: yaml
         refresh-enabled: true
-rocketmq:
-  producer:
-    endpoints: 192.168.101.128:8081 # 替换为你的Proxy地址
-    topic: diary-notify-event

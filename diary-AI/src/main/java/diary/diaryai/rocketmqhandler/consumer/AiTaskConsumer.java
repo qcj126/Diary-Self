@@ -4,8 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import diary.common.entity.ai.dto.AiTaskMessageDto;
 import diary.common.entity.ai.dto.AiTaskProcessDto;
 import diary.common.entity.ai.po.AiTaskPO;
+import diary.common.enums.aienum.AiTaskErrorCodeEnum;
+import diary.common.enums.aienum.AiTaskStatusEnum;
 import diary.diaryai.executor.AiTaskExecutor;
 import diary.diaryai.mapper.DiaryAiMapper;
+import diary.diaryai.properties.AiTaskProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.annotation.RocketMQMessageListener;
@@ -15,10 +18,12 @@ import org.apache.rocketmq.client.core.RocketMQListener;
 import org.springframework.stereotype.Service;
 
 import java.nio.ByteBuffer;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
+
+import static diary.common.consts.AiTaskConst.MAX_ERROR_MSG_LENGTH;
+import static diary.common.consts.AiTaskConst.OUTBOX_SCHEMA_VERSION;
 
 @Service
 @RocketMQMessageListener(
@@ -29,14 +34,11 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class AiTaskConsumer implements RocketMQListener {
-    private static final int SUPPORTED_SCHEMA_VERSION = 1;
-    private static final String TASK_TYPE = "QWEN_PLUS_NUTRIENT";
-    private static final Duration EXECUTION_LEASE = Duration.ofMinutes(5);
-    private static final int MAX_ERROR_MESSAGE_LENGTH = 1000;
-
+    private final AiTaskProperties aiTaskProperties;
     private final ObjectMapper objectMapper;
     private final AiTaskExecutor aiTaskExecutor;
     private final DiaryAiMapper diaryAiMapper;
+
     @Override
     public ConsumeResult consume(MessageView messageView) {
         ByteBuffer bodyBuffer = messageView.getBody();
@@ -65,7 +67,7 @@ public class AiTaskConsumer implements RocketMQListener {
                 .workerId(workerId)
                 .queueTime(now)
                 .startTime(now)
-                .leaseUntil(now.plus(EXECUTION_LEASE))
+                .leaseUntil(now.plus(aiTaskProperties.getTask().getLeaseDuration()))
                 .build();
 
         final int claimed;
@@ -89,7 +91,7 @@ public class AiTaskConsumer implements RocketMQListener {
             return ConsumeResult.FAILURE;
         }
         if (claimedTask == null
-                || !"RUNNING".equals(claimedTask.getStatus())
+                || !AiTaskStatusEnum.RUNNING.name().equals(claimedTask.getStatus())
                 || !Objects.equals(workerId, claimedTask.getWorkerId())) {
             log.warn("AI task was claimed but ownership cannot be confirmed, taskId={}, workerId={}",
                     message.getTaskId(), workerId);
@@ -125,8 +127,8 @@ public class AiTaskConsumer implements RocketMQListener {
                     .userId(currentTask.getUserId())
                     .clientRequestId(currentTask.getClientRequestId())
                     .versionId(currentTask.getVersionId())
-                    .errorCode("AI_RETRY_EXHAUSTED")
-                    .errorMessage("任务尝试次数已达到上限")
+                    .errorCode(AiTaskErrorCodeEnum.RETRY_EXHAUSTED.name())
+                    .errorMessage(AiTaskErrorCodeEnum.RETRY_EXHAUSTED.getDisplayName())
                     .finishTime(LocalDateTime.now())
                     .build();
             int failed = diaryAiMapper.markFailedIfAttemptsExhausted(exhaustedRequest);
@@ -153,9 +155,9 @@ public class AiTaskConsumer implements RocketMQListener {
                 .clientRequestId(message.getClientRequestId())
                 .workerId(workerId)
                 .versionId(claimedTask.getVersionId())
-                .errorCode(permanentError
-                        ? "AI_PERMANENT_ERROR"
-                        : attemptsExhausted ? "AI_RETRY_EXHAUSTED" : "AI_RETRYABLE_ERROR")
+                .errorCode(
+                        permanentError ? AiTaskErrorCodeEnum.PERMANENT_ERROR.name() :
+                        attemptsExhausted ? AiTaskErrorCodeEnum.RETRY_EXHAUSTED.name() : AiTaskErrorCodeEnum.RETRYABLE_ERROR.name())
                 .errorMessage(errorMessage)
                 .finishTime(LocalDateTime.now())
                 .build();
@@ -201,25 +203,23 @@ public class AiTaskConsumer implements RocketMQListener {
                 || message.getUserId() == null
                 || message.getClientRequestId() == null
                 || message.getClientRequestId().isBlank()
-                || !Objects.equals(SUPPORTED_SCHEMA_VERSION, message.getSchemaVersion())
-                || !TASK_TYPE.equals(message.getTaskType())) {
+                || !Objects.equals(OUTBOX_SCHEMA_VERSION, message.getSchemaVersion())
+                || !aiTaskProperties.getRocketmq().getTaskTag().equals(message.getTaskType())) {
             throw new IllegalArgumentException("AI任务消息字段或协议版本不合法");
         }
     }
 
     private boolean isTerminal(String status) {
-        return "SUCCESS".equals(status)
-                || "FAILED".equals(status)
-                || "CANCELLED".equals(status)
-                || "DEAD_LETTER".equals(status);
+        return AiTaskStatusEnum.SUCCESS.name().equals(status)
+                || AiTaskStatusEnum.FAILED.name().equals(status)
+                || AiTaskStatusEnum.CANCELLED.name().equals(status)
+                || AiTaskStatusEnum.DEAD_LETTER.name().equals(status);
     }
 
     private String truncateErrorMessage(String message) {
         if (message == null || message.isBlank()) {
             return "未提供异常信息";
         }
-        return message.length() <= MAX_ERROR_MESSAGE_LENGTH
-                ? message
-                : message.substring(0, MAX_ERROR_MESSAGE_LENGTH);
+        return message.length() <= MAX_ERROR_MSG_LENGTH ? message : message.substring(0, MAX_ERROR_MSG_LENGTH);
     }
 }

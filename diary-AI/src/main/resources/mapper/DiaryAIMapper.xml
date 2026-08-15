@@ -24,6 +24,7 @@
         <result column="carbohydrate" property="carbohydrate" jdbcType="VARCHAR"/>
         <result column="sugar" property="sugar" jdbcType="VARCHAR"/>
         <result column="sodium" property="sodium" jdbcType="VARCHAR"/>
+        <result column="flag" property="flag" jdbcType="VARCHAR"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
     </resultMap>
@@ -47,6 +48,29 @@
         <result column="start_time" property="startTime" jdbcType="TIMESTAMP"/>
         <result column="finish_time" property="finishTime" jdbcType="TIMESTAMP"/>
         <result column="version_id" property="versionId" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <resultMap id="MqOutboxResultMap" type="diary.common.entity.mq.po.MqOutboxPO">
+        <id column="id" property="id"/>
+        <result column="event_id" property="eventId"/>
+        <result column="aggregate_type" property="aggregateType"/>
+        <result column="aggregate_id" property="aggregateId"/>
+        <result column="event_type" property="eventType"/>
+        <result column="topic" property="topic"/>
+        <result column="tag" property="tag"/>
+        <result column="message_key" property="messageKey"/>
+        <result column="payload" property="payload"/>
+        <result column="schema_version" property="schemaVersion"/>
+        <result column="status" property="status"/>
+        <result column="retry_count" property="retryCount"/>
+        <result column="max_retries" property="maxRetries"/>
+        <result column="next_retry_time" property="nextRetryTime"/>
+        <result column="broker_message_id" property="brokerMessageId"/>
+        <result column="last_error" property="lastError"/>
+        <result column="sent_time" property="sentTime"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="version_id" property="versionId"/>
     </resultMap>
 
     <insert id="insertAiNutrient">
@@ -224,4 +248,114 @@
           AND attempt_count &lt; max_attempts
           AND version_id = #{versionId}
     </update>
+
+    <insert id="insertOutbox" parameterType="diary.common.entity.mq.po.MqOutboxPO">
+        INSERT INTO mq_outbox
+        (id, event_id, aggregate_type, aggregate_id, event_type,
+         topic, tag, message_key, payload, schema_version,
+         status, retry_count, max_retries, next_retry_time,
+         create_time, update_time, version_id)
+        VALUES
+            (#{id}, #{eventId}, #{aggregateType}, #{aggregateId}, #{eventType},
+             #{topic}, #{tag}, #{messageKey}, #{payload}, #{schemaVersion},
+             #{status}, #{retryCount}, #{maxRetries}, #{nextRetryTime},
+             #{createTime}, #{updateTime}, #{versionId})
+    </insert>
+
+    <select id="selectReadyOutbox" resultMap="MqOutboxResultMap">
+        SELECT *
+        FROM mq_outbox
+        WHERE status IN ('NEW', 'RETRY_WAIT')
+        AND next_retry_time &lt;= #{now}
+        ORDER BY next_retry_time ASC, id ASC
+        LIMIT #{limit}
+    </select>
+
+    <select id="selectOutboxById" resultMap="MqOutboxResultMap">
+        SELECT * FROM mq_outbox WHERE id = #{id} LIMIT 1
+    </select>
+
+    <update id="claimOutbox">
+        UPDATE mq_outbox
+        SET status = 'SENDING',
+            update_time = #{updateTime},
+            version_id = version_id + 1
+        WHERE id = #{id}
+          AND status IN ('NEW', 'RETRY_WAIT')
+          AND version_id = #{versionId}
+    </update>
+
+    <update id="markOutboxSent">
+        UPDATE mq_outbox
+        SET status = 'SENT',
+            broker_message_id = #{brokerMessageId},
+            sent_time = #{sentTime},
+            update_time = #{sentTime},
+            last_error = NULL,
+            version_id = version_id + 1
+        WHERE id = #{id}
+          AND status = 'SENDING'
+          AND version_id = #{versionId}
+    </update>
+
+    <update id="markOutboxRetry">
+        UPDATE mq_outbox
+        SET status = 'RETRY_WAIT',
+            retry_count = retry_count + 1,
+            next_retry_time = #{nextRetryTime},
+            last_error = #{lastError},
+            update_time = #{updateTime},
+            version_id = version_id + 1
+        WHERE id = #{id}
+          AND status = 'SENDING'
+          AND version_id = #{versionId}
+    </update>
+
+    <update id="markOutboxDead">
+        UPDATE mq_outbox
+        SET status = 'DEAD',
+            retry_count = retry_count + 1,
+            last_error = #{lastError},
+            update_time = #{updateTime},
+            version_id = version_id + 1
+        WHERE id = #{id}
+          AND status = 'SENDING'
+          AND version_id = #{versionId}
+    </update>
+
+    <update id="recoverSendingTimeout">
+        UPDATE mq_outbox
+        SET status = 'RETRY_WAIT',
+        next_retry_time = #{now},
+        last_error = 'SENDING_TIMEOUT_RECOVERED',
+        update_time = #{now},
+        version_id = version_id + 1
+        WHERE status = 'SENDING'
+        AND update_time &lt; #{timeoutBefore}
+    </update>
+
+    <update id="markQueuedByTaskIdIfPending">
+        UPDATE ai_task
+        SET status = 'QUEUED',
+            queue_time = COALESCE(queue_time, #{queueTime}),
+            version_id = version_id + 1
+        WHERE id = #{taskId}
+          AND status = 'PENDING'
+    </update>
+
+    <select id="selectExpiredRunningTasks" resultMap="AiTaskResultMap">
+        SELECT *
+        FROM ai_task
+        WHERE status = 'RUNNING'
+        AND lease_until &lt; #{now}
+        ORDER BY lease_until ASC
+        LIMIT #{limit}
+    </select>
+
+    <select id="selectAiNutrientByTaskId" resultMap="AiNutrientResultMap">
+        SELECT *
+        FROM ai_nutrient
+        WHERE ai_task_id = #{taskId}
+            LIMIT 1
+    </select>
 </mapper>
