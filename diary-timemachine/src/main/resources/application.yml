@@ -1,7 +1,10 @@
 spring:
   config:
     import:
+      # 1. 引入服务自身配置（optional: 表示不存在也不报错）
       - optional:nacos:diary-timemachine.yaml?group=DEFAULT_GROUP&namespace=b78c8d52-3fc3-4276-9cbb-0f2efd326481
+      # 2. 引入公共配置（注意 group 是 commonGroup）
+      - optional:nacos:common.yaml?group=commonGroup&namespace=b78c8d52-3fc3-4276-9cbb-0f2efd326481&refreshEnabled=true
   cloud:
     nacos:
       discovery:
@@ -10,6 +13,3 @@ spring:
       config:
         server-addr: 192.168.101.128:8848
         namespace: b78c8d52-3fc3-4276-9cbb-0f2efd326481
-        group: DEFAULT_GROUP
-        file-extension: yaml
-        refresh-enabled: true

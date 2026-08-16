@@ -1,0 +1,88 @@
+spring:
+  config:
+    import: optional:nacos:xxl-job-admin.yaml?group=DEFAULT_GROUP&namespace=b78c8d52-3fc3-4276-9cbb-0f2efd326481
+  cloud:
+    nacos:
+      config:
+        server-addr: 192.168.101.128:8848
+        namespace: b78c8d52-3fc3-4276-9cbb-0f2efd326481
+        group: DEFAULT_GROUP
+        file-extension: yaml
+        refresh-enabled: true
+      discovery:
+        server-addr: 192.168.101.128:8848
+        namespace: b78c8d52-3fc3-4276-9cbb-0f2efd326481
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.101.128:3306/diary-xxl-job?useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: qcjly
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      minimum-idle: 10
+      maximum-pool-size: 30
+      auto-commit: true
+      idle-timeout: 30000
+      pool-name: HikariCP
+      max-lifetime: 900000
+      connection-timeout: 10000
+      connection-test-query: SELECT 1
+      validation-timeout: 1000
+  mail:
+    host: smtp.qq.com
+    port: 587
+    username: your_real_qq@qq.com  # ?????? QQ ??
+    password: your_authorization_code  # ??? QQ ?????
+    from: your_real_qq@qq.com  # ? username ????
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          socketFactory:
+            class: javax.net.ssl.SSLSocketFactory
+  application:
+    name: diary-xxljobadmin
+
+logging:
+  level:
+    com.example.demo: DEBUG
+    com.xxl: DEBUG
+    org.springframework: DEBUG
+    org.springframework.boot: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+xxl:
+  job:
+    accessToken: default_token
+    timeout: 3
+    i18n: zh_CN  # ???????
+    triggerpool:
+      fast:
+        max: 300
+      slow:
+        max: 200
+    schedule:
+      batchsize: 100
+    logretentiondays: 30
+xxl-sso:
+  token:
+    key: xxl_job_login_token  # ????????
+    timeout: 604800000
+  client:
+    excluded:
+      paths: ""
+    login:
+      path: /auth/login
+mybatis:
+  mapper-locations:
+    - classpath:/mapper/*Mapper.xml
+    - classpath*:/mybatis/mapper/*.xml
+    - classpath*:/mapper/*Mapper.xml
+  type-aliases-package: com.xxl.job.admin.core.model
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
