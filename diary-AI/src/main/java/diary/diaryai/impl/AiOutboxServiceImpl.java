@@ -37,8 +37,7 @@ public class AiOutboxServiceImpl implements AiOutboxService {
     @Transactional(rollbackFor = Exception.class)
     public void confirmSent(MqOutboxPO outbox, String brokerMessageId) {
         LocalDateTime now = LocalDateTime.now();
-        int sent = diaryAiMapper.markOutboxSent(
-                outbox.getId(), outbox.getVersionId(), brokerMessageId, now);
+        int sent = diaryAiMapper.markOutboxSent(outbox.getId(), outbox.getVersionId(), brokerMessageId, now);
         if (sent != 1) {
             throw new IllegalStateException("Outbox SENT 更新失败: " + outbox.getId());
         }
@@ -57,15 +56,9 @@ public class AiOutboxServiceImpl implements AiOutboxService {
 
         int changed;
         if (nextRetryCount >= outbox.getMaxRetries()) {
-            changed = diaryAiMapper.markOutboxDead(
-                    outbox.getId(), outbox.getVersionId(), lastError, now);
+            changed = diaryAiMapper.markOutboxDead(outbox.getId(), outbox.getVersionId(), lastError, now);
         } else {
-            changed = diaryAiMapper.markOutboxRetry(
-                    outbox.getId(),
-                    outbox.getVersionId(),
-                    calculateNextRetry(outbox.getRetryCount()),
-                    lastError,
-                    now);
+            changed = diaryAiMapper.markOutboxRetry(outbox.getId(), outbox.getVersionId(), calculateNextRetry(outbox.getRetryCount()), lastError, now);
         }
         if (changed != 1) {
             throw new IllegalStateException("Outbox失败状态更新失败: " + outbox.getId());

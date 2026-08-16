@@ -6,19 +6,15 @@ import diary.common.entity.ai.dto.AiInvokeDTO;
 import diary.common.entity.ai.dto.AiTaskMessageDto;
 import diary.common.entity.ai.po.AiTaskPO;
 import diary.diaryai.factory.AIFactory;
-import diary.diaryai.mapper.DiaryAiMapper;
 import diary.diaryai.strategy.service.InvokeAIService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class AiTaskExecutor {
-    private final DiaryAiMapper diaryAiMapper;
     private final AIFactory aiFactory;
     private final ObjectMapper objectMapper;
     public boolean execute(AiTaskMessageDto message, AiTaskPO aiTaskPO) {

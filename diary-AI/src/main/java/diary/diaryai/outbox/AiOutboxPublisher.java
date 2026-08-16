@@ -37,8 +37,7 @@ public class AiOutboxPublisher {
             }
             try {
                 SendReceipt receipt = producer.send(outbox);
-                aiOutboxService.confirmSent(
-                        outbox, receipt.getMessageId().toString());
+                aiOutboxService.confirmSent(outbox, receipt.getMessageId().toString());
             } catch (RuntimeException e) {
                 log.error("Outbox发送失败, outboxId={}, eventId={}",
                         outbox.getId(), outbox.getEventId(), e);

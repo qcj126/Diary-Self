@@ -27,9 +27,10 @@ import static diary.common.consts.AiTaskConst.OUTBOX_SCHEMA_VERSION;
 
 @Service
 @RocketMQMessageListener(
-        consumerGroup = "diary-ai-qwen-plus-worker-v1",
-        topic = "diary-ai-task",
-        tag = "QWEN_PLUS_NUTRIENT"
+        consumerGroup = "${diary.ai.rocketmq.task-consumer-group}",
+        topic = "${diary.ai.rocketmq.task-topic}",
+        tag = "${diary.ai.rocketmq.task-tag}",
+        sslEnabled = false
 )
 @RequiredArgsConstructor
 @Slf4j
