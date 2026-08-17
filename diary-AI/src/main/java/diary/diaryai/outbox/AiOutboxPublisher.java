@@ -25,7 +25,8 @@ public class AiOutboxPublisher {
 
     @Scheduled(fixedDelayString = "${diary.ai.rocketmq.publisher-interval-ms:1000}")
     public void publishReadyMessages() {
-        aiOutboxService.recoverSendingTimeout();
+        int i = aiOutboxService.recoverSendingTimeout();
+        log.info("恢复了 {} 条数据", i);
 
         List<MqOutboxPO> batch = diaryAiMapper.selectReadyOutbox(
                 LocalDateTime.now(),
@@ -38,7 +39,7 @@ public class AiOutboxPublisher {
             try {
                 SendReceipt receipt = producer.send(outbox);
                 aiOutboxService.confirmSent(outbox, receipt.getMessageId().toString());
-            } catch (RuntimeException e) {
+            } catch (Exception e) {
                 log.error("Outbox发送失败, outboxId={}, eventId={}",
                         outbox.getId(), outbox.getEventId(), e);
                 aiOutboxService.recordFailure(outbox, e);
