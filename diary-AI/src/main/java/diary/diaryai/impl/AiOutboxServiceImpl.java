@@ -23,9 +23,9 @@ public class AiOutboxServiceImpl implements AiOutboxService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean claim(MqOutboxPO outbox) {
-        int changed = diaryAiMapper.claimOutbox(
-                outbox.getId(), outbox.getVersionId(), LocalDateTime.now());
+        int changed = diaryAiMapper.claimOutbox(outbox.getId(), outbox.getVersionId(), LocalDateTime.now());
         if (changed == 1) {
+            // 数据库中已经将outbox状态改为sending，为后续步骤，需要设置outbox状态为sending，并且版本号+1
             outbox.setStatus(OutboxStatusEnum.SENDING.name());
             outbox.setVersionId(outbox.getVersionId() + 1);
             return true;
@@ -43,6 +43,7 @@ public class AiOutboxServiceImpl implements AiOutboxService {
         }
 
         if (OutboxEventTypeEnum.AI_TASK_CREATED.name().equals(outbox.getEventType())) {
+            // 消息发送完毕之后再将任务状态改为queued
             diaryAiMapper.markQueuedByTaskIdIfPending(outbox.getAggregateId(), now);
         }
     }

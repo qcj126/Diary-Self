@@ -4,6 +4,7 @@ import diary.common.entity.ai.dto.AiInvokeDTO;
 import diary.common.entity.ai.vo.AiTaskResultVo;
 import diary.common.entity.ai.vo.AiTaskStatusVo;
 import diary.common.entity.ai.vo.AiTaskSubmitVo;
+import diary.common.enums.aienum.AiTaskStatusEnum;
 import diary.common.result.ApiResponse;
 import diary.diaryai.service.AiTaskApplicationService;
 import diary.diaryai.service.AiTaskQueryService;
@@ -24,20 +25,28 @@ public class DiaryAIController {
     private final AiTaskApplicationService aiTaskApplicationService;
     private final AiTaskQueryService aiTaskQueryService;
 
-    @PostMapping("/task")
-    public ResponseEntity<ApiResponse<AiTaskSubmitVo>> invokeAiTasks (@RequestBody AiInvokeDTO aiInvokeDTO) {
-        return ResponseEntity
-                .status(HttpStatus.ACCEPTED)
-                .body(ApiResponse.success(aiTaskApplicationService.submitTask(aiInvokeDTO)));
+    @PostMapping("/tasks")
+    public ResponseEntity<ApiResponse<AiTaskSubmitVo>> submit(
+            @RequestBody AiInvokeDTO request) {
+        return ResponseEntity.status(HttpStatus.ACCEPTED)
+                .body(ApiResponse.success(aiTaskApplicationService.submitTask(request)));
     }
 
-    @GetMapping("/task/{taskId}")
-    public ApiResponse<AiTaskStatusVo> getAiTaskStatus (@PathVariable String taskId) {
-        return ApiResponse.success(aiTaskQueryService.getTaskStatus(taskId));
+    @GetMapping("/tasks/{taskId}")
+    public ResponseEntity<ApiResponse<AiTaskStatusVo>> status(
+            @PathVariable Long taskId) {
+        return ResponseEntity.ok(
+                ApiResponse.success(aiTaskQueryService.getTaskStatus(taskId)));
     }
 
-    @GetMapping("/task/result/{taskId}")
-    public ApiResponse<AiTaskResultVo> getAiTaskResult (@PathVariable String taskId) {
-        return ApiResponse.success(aiTaskQueryService.getTaskResult(taskId));
+    @GetMapping("/tasks/{taskId}/result")
+    public ResponseEntity<ApiResponse<AiTaskResultVo>> result(
+            @PathVariable Long taskId) {
+        AiTaskResultVo result = aiTaskQueryService.getTaskResult(taskId);
+        HttpStatus status = AiTaskStatusEnum.SUCCESS.name().equals(result.getStatus())
+                ? HttpStatus.OK
+                : HttpStatus.ACCEPTED;
+        return ResponseEntity.status(status)
+                .body(ApiResponse.success(result));
     }
 }

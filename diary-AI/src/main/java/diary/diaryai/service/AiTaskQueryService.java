@@ -4,7 +4,7 @@ import diary.common.entity.ai.vo.AiTaskResultVo;
 import diary.common.entity.ai.vo.AiTaskStatusVo;
 
 public interface AiTaskQueryService {
-    AiTaskStatusVo getTaskStatus(String taskId);
+    AiTaskStatusVo getTaskStatus(Long taskId);
 
-    AiTaskResultVo getTaskResult(String taskId);
+    AiTaskResultVo getTaskResult(Long taskId);
 }

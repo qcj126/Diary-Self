@@ -40,6 +40,8 @@ public class AiTaskCommandServiceImpl implements AiTaskCommandService {
     public AiTaskPO createTaskAndOutbox(AiInvokeDTO request, Long userId) {
         LocalDateTime now = LocalDateTime.now();
         Long taskId = MyUtils.getPrimaryKey();
+        // mq消息和outbox数据使用同一个eventId，保证事件的一致性
+        // 不会出现mq消息属于另一个outbox数据的情况
         String eventId = OUTBOX_EVENT_ID + MyUtil.getPrimaryKey();
         String inputSnapshot = writeJson(request, "AI任务输入快照序列化失败");
 

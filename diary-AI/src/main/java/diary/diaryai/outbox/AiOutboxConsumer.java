@@ -1,4 +1,4 @@
-package diary.diaryai.rocketmqhandler.consumer;
+package diary.diaryai.outbox;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import diary.common.entity.ai.dto.AiTaskMessageDto;
@@ -34,7 +34,7 @@ import static diary.common.consts.AiTaskConst.OUTBOX_SCHEMA_VERSION;
 )
 @RequiredArgsConstructor
 @Slf4j
-public class AiTaskConsumer implements RocketMQListener {
+public class AiOutboxConsumer implements RocketMQListener {
     private final AiTaskProperties aiTaskProperties;
     private final ObjectMapper objectMapper;
     private final AiTaskExecutor aiTaskExecutor;
