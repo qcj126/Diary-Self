@@ -32,10 +32,7 @@ public class AiOutboxPublisher {
     public void publishReadyMessages() {
         int cnt = aiOutboxService.recoverSendingTimeout();
         log.info("恢复了 {} 条数据", cnt);
-        if (cnt == 0) return;
-        List<MqOutboxPO> batch = diaryAiMapper.selectReadyOutbox(
-                LocalDateTime.now(),
-                properties.getRocketmq().getPublisherBatchSize());
+        List<MqOutboxPO> batch = diaryAiMapper.selectReadyOutbox(LocalDateTime.now(), properties.getRocketmq().getPublisherBatchSize());
 
         for (MqOutboxPO outbox : batch) {
             if (!aiOutboxService.claim(outbox)) {

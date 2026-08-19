@@ -12,7 +12,6 @@ import diary.common.enums.aienum.AIEnum;
 import diary.common.exception.CustomException;
 import diary.diaryai.prompt.PromptContext;
 import diary.diaryai.properties.AliCloudProperty;
-import diary.diaryai.repository.DatabaseServiceImpl;
 import diary.diaryai.service.AiTaskCommandService;
 import diary.diaryai.strategy.service.InvokeAIService;
 import diary.diaryai.template.InvokeAITemplate;

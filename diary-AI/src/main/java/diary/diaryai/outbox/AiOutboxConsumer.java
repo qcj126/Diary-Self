@@ -117,8 +117,18 @@ public class AiOutboxConsumer implements RocketMQListener {
                 boolean executed = aiTaskExecutor.execute(message, claimedTask);
                 return executed ? ConsumeResult.SUCCESS : handleOwnershipLost(message.getTaskId());
             } catch (RuntimeException executionException) {
-                // 此逻辑需要放入事务中
-                return aiTaskCommandService.handleExecutionFailure(message, claimedTask, workerId, executionException);
+                try {
+                    return aiTaskCommandService.handleExecutionFailure(
+                            message, claimedTask, workerId, executionException);
+                } catch (RuntimeException failureStateException) {
+                    /*
+                     * handleExecutionFailure 的事务已在异常抛出前完成回滚。
+                     * Listener 在事务外将其转换为 FAILURE，交给 RocketMQ 后续重投。
+                     */
+                    log.error("Failed to persist AI task failure state, taskId={}",
+                            message.getTaskId(), failureStateException);
+                    return ConsumeResult.FAILURE;
+                }
             }
         } finally {
             localAiConcurrencyGuard.release();

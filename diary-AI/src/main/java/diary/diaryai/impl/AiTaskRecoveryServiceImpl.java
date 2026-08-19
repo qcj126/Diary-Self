@@ -1,4 +1,4 @@
-package diary.diaryai.recovery;
+package diary.diaryai.impl;
 
 import diary.common.entity.ai.dto.AiTaskProcessDto;
 import diary.common.entity.ai.po.AiTaskPO;
@@ -40,6 +40,7 @@ public class AiTaskRecoveryServiceImpl implements AiTaskRecoveryService {
             if (cnt == 0) {
                 log.warn("任务状态修改为失败未成功，请检查任务ID：{}", task.getId());
             }
+            // TODO 向outbox插入失败事件数据
             return;
         }
 
@@ -55,12 +56,14 @@ public class AiTaskRecoveryServiceImpl implements AiTaskRecoveryService {
         int cnt = diaryAiMapper.recoverExpiredRunning(retry);
         if (cnt == 0) {
             log.warn("任务状态修改为重试等待未成功，请检查任务ID：{}", task.getId());
+            throw new RuntimeException("任务状态修改为重试等待未成功，请检查任务ID：" + task.getId());
         }
 
         // TODO 向outbox插入任务恢复事件
         int insertCnt = diaryAiMapper.insertRetryTaskOutbox(task, now);
         if (insertCnt == 0) {
             log.warn("任务恢复事件插入outbox未成功，请检查任务ID：{}", task.getId());
+            throw new RuntimeException("任务恢复事件插入outbox未成功，请检查任务ID：" + task.getId());
         }
     }
 }

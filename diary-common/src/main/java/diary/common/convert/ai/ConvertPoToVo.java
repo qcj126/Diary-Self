@@ -25,7 +25,7 @@ public class ConvertPoToVo {
 
     public static AiTaskResultVo convertToVo(AiNutrientPO nutrientPO, AiTaskPO aiTaskPO) {
         return AiTaskResultVo.builder()
-                .taskId(nutrientPO.getId())
+                .taskId(aiTaskPO.getId())
                 .status(aiTaskPO.getStatus())
                 .aiInfoId(nutrientPO.getAiInfoId())
                 .universalId(nutrientPO.getUniversalId())

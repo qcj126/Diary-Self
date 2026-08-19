@@ -204,6 +204,9 @@ public class AiTaskCommandServiceImpl implements AiTaskCommandService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ConsumeResult handleExecutionFailure(AiTaskMessageDto message, AiTaskPO claimedTask, String workerId, RuntimeException executionException) {
+        String eventId = OUTBOX_EVENT_ID + MyUtil.getPrimaryKey();
+        LocalDateTime now = LocalDateTime.now();
+
         boolean permanentError = executionException instanceof IllegalArgumentException;
         boolean attemptsExhausted = claimedTask.getAttemptCount() >= claimedTask.getMaxAttempts();
         String errorMessage = truncateErrorMessage(executionException.getMessage());
@@ -218,30 +221,61 @@ public class AiTaskCommandServiceImpl implements AiTaskCommandService {
                         permanentError ? AiTaskErrorCodeEnum.PERMANENT_ERROR.name() :
                                 attemptsExhausted ? AiTaskErrorCodeEnum.RETRY_EXHAUSTED.name() : AiTaskErrorCodeEnum.RETRYABLE_ERROR.name())
                 .errorMessage(errorMessage)
-                .finishTime(LocalDateTime.now())
+                .finishTime(now)
                 .build();
 
-        try {
-            if (permanentError || attemptsExhausted) {
-                /*
-                 * 永久错误或业务模型调用次数耗尽时写 FAILED 并 ACK。继续返回 FAILURE 只会让 Broker
-                 * 重复投递一个已确认无法继续执行的任务，混淆“业务失败”和“消息进入 DLQ”两种语义。
-                 */
-                int failed = diaryAiMapper.markFailedIfOwned(failureRequest);
-                log.error("AI task failed permanently, taskId={}, attemptCount={}",
-                        message.getTaskId(), claimedTask.getAttemptCount(), executionException);
-                return failed == 1 ? ConsumeResult.SUCCESS : handleOwnershipLost(message.getTaskId());
+        if (permanentError || attemptsExhausted) {
+            /*
+             * 永久错误或业务模型调用次数耗尽时写 FAILED 并 ACK。只有 FAILED 条件更新成功，
+             * 才能创建 AI_FAILED Outbox，避免旧 Worker 或已失去所有权的 Worker 发布虚假失败事件。
+             */
+            int failed = diaryAiMapper.markFailedIfOwned(failureRequest);
+            if (failed != 1) {
+                return handleOwnershipLost(message.getTaskId());
             }
 
-            int retryWaiting = diaryAiMapper.markRetryWaitIfOwned(failureRequest);
-            log.warn("AI task will be retried, taskId={}, attemptCount={}",
+            log.error("AI task failed permanently, taskId={}, attemptCount={}",
                     message.getTaskId(), claimedTask.getAttemptCount(), executionException);
-            return retryWaiting == 1 ? ConsumeResult.FAILURE : handleOwnershipLost(message.getTaskId());
-        } catch (RuntimeException statusUpdateException) {
-            log.error("Failed to persist AI task failure state, taskId={}",
-                    message.getTaskId(), statusUpdateException);
-            return ConsumeResult.FAILURE;
+
+            // 新增outbox记录failed事件
+            MqOutboxPO mqOutboxPO = MqOutboxPO.builder()
+                    .id(MyUtils.getPrimaryKey())
+                    .eventId(eventId)
+                    .aggregateType(OUTBOX_AGGREGATE_TYPE_ONE)
+                    .aggregateId(claimedTask.getId())
+                    .eventType(OutboxEventTypeEnum.AI_FAILED.name())
+                    .topic(properties.getRocketmq().getEventTopic())
+                    .tag(properties.getRocketmq().getEventTag())
+                    .messageKey(String.valueOf(claimedTask.getId()))
+                    .payload(writeJson(message, "AI任务消息序列化失败"))
+                    .schemaVersion(1)
+                    .status(OutboxStatusEnum.NEW.name())
+                    .retryCount(0)
+                    .maxRetries(properties.getRocketmq().getOutboxMaxRetries())
+                    .nextRetryTime(now)
+                    .brokerMessageId(null)
+                    .lastError(null)
+                    .sentTime(null)
+                    .createTime(now)
+                    .updateTime(now)
+                    .versionId(0)
+                    .build();
+            int outboxFailedCnt = diaryAiMapper.insertOutbox(mqOutboxPO);
+            if (outboxFailedCnt != 1) {
+                /*
+                 * 异常必须抛出事务代理：FAILED 更新与 Outbox 插入会一起回滚，
+                 * 不能在事务方法内部捕获后返回 FAILURE，否则可能提交半成品状态。
+                 */
+                throw new IllegalStateException("失败事件写入outbox失败, taskId=" + message.getTaskId());
+            }
+            log.info("AI任务失败并写入outbox, taskId={}", message.getTaskId());
+            return ConsumeResult.SUCCESS;
         }
+
+        int retryWaiting = diaryAiMapper.markRetryWaitIfOwned(failureRequest);
+        log.warn("AI task will be retried, taskId={}, attemptCount={}",
+                message.getTaskId(), claimedTask.getAttemptCount(), executionException);
+        return retryWaiting == 1 ? ConsumeResult.FAILURE : handleOwnershipLost(message.getTaskId());
     }
 
     private ConsumeResult handleOwnershipLost(Long taskId) {
