@@ -7,8 +7,11 @@ import diary.common.entity.ai.po.AiTaskPO;
 import diary.common.enums.aienum.AiTaskErrorCodeEnum;
 import diary.common.enums.aienum.AiTaskStatusEnum;
 import diary.diaryai.executor.AiTaskExecutor;
+import diary.diaryai.guard.LocalAiConcurrencyGuard;
 import diary.diaryai.mapper.DiaryAiMapper;
 import diary.diaryai.properties.AiTaskProperties;
+import diary.diaryai.redis.AiTaskCacheService;
+import diary.diaryai.service.AiTaskCommandService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.annotation.RocketMQMessageListener;
@@ -27,9 +30,9 @@ import static diary.common.consts.AiTaskConst.OUTBOX_SCHEMA_VERSION;
 
 @Service
 @RocketMQMessageListener(
-        consumerGroup = "${diary.ai.rocketmq.task-consumer-group}",
-        topic = "${diary.ai.rocketmq.task-topic}",
-        tag = "${diary.ai.rocketmq.task-tag}",
+        consumerGroup = "${diary.ai.rocketmq.task-consumer-group:diary-ai-qwen-plus-worker-v2}",
+        topic = "${diary.ai.rocketmq.task-topic:diary-ai-task}",
+        tag = "${diary.ai.rocketmq.task-tag:QWEN_PLUS_NUTRIENT}",
         sslEnabled = false
 )
 @RequiredArgsConstructor
@@ -39,6 +42,9 @@ public class AiOutboxConsumer implements RocketMQListener {
     private final ObjectMapper objectMapper;
     private final AiTaskExecutor aiTaskExecutor;
     private final DiaryAiMapper diaryAiMapper;
+    private final AiTaskCacheService aiTaskCacheService;
+    private final LocalAiConcurrencyGuard localAiConcurrencyGuard;
+    private final AiTaskCommandService aiTaskCommandService;
 
     @Override
     public ConsumeResult consume(MessageView messageView) {
@@ -59,51 +65,63 @@ public class AiOutboxConsumer implements RocketMQListener {
             return ConsumeResult.FAILURE;
         }
 
-        final String workerId = "diary-ai-" + UUID.randomUUID();
-        final LocalDateTime now = LocalDateTime.now();
-        AiTaskProcessDto claimRequest = AiTaskProcessDto.builder()
-                .taskId(message.getTaskId())
-                .userId(message.getUserId())
-                .clientRequestId(message.getClientRequestId())
-                .workerId(workerId)
-                .queueTime(now)
-                .startTime(now)
-                .leaseUntil(now.plus(aiTaskProperties.getTask().getLeaseDuration()))
-                .build();
-
-        final int claimed;
-        try {
-            claimed = diaryAiMapper.claimForExecution(claimRequest);
-        } catch (RuntimeException databaseException) {
-            log.error("Failed to claim AI task, taskId={}", message.getTaskId(), databaseException);
-            return ConsumeResult.FAILURE;
-        }
-
-        if (claimed != 1) {
-            return handleUnclaimedMessage(message);
-        }
-        // 再一次确认此任务属于当前的workId
-        final AiTaskPO claimedTask;
-        try {
-            claimedTask = diaryAiMapper.selectAiTaskByTaskId(message.getTaskId());
-        } catch (RuntimeException e) {
-            log.error("Failed to confirm AI task ownership, taskId={}",
-                    message.getTaskId(), e);
-            return ConsumeResult.FAILURE;
-        }
-        if (claimedTask == null
-                || !AiTaskStatusEnum.RUNNING.name().equals(claimedTask.getStatus())
-                || !Objects.equals(workerId, claimedTask.getWorkerId())) {
-            log.warn("AI task was claimed but ownership cannot be confirmed, taskId={}, workerId={}",
-                    message.getTaskId(), workerId);
+        // 在任务进入处理前，执行并发保护
+        if (!localAiConcurrencyGuard.tryAcquire()) {
+            log.warn("本地AI并发已满, taskId={}", message.getTaskId());
             return ConsumeResult.FAILURE;
         }
 
         try {
-            boolean executed = aiTaskExecutor.execute(message, claimedTask);
-            return executed ? ConsumeResult.SUCCESS : handleOwnershipLost(message.getTaskId());
-        } catch (RuntimeException executionException) {
-            return handleExecutionFailure(message, claimedTask, workerId, executionException);
+            final String workerId = "diary-ai-" + UUID.randomUUID();
+            final LocalDateTime now = LocalDateTime.now();
+            AiTaskProcessDto claimRequest = AiTaskProcessDto.builder()
+                    .taskId(message.getTaskId())
+                    .userId(message.getUserId())
+                    .clientRequestId(message.getClientRequestId())
+                    .workerId(workerId)
+                    .queueTime(now)
+                    .startTime(now)
+                    .leaseUntil(now.plusSeconds(aiTaskProperties.getTask().getExecutionLeaseSeconds()))
+                    .build();
+
+            final int claimed;
+            try {
+                claimed = diaryAiMapper.claimForExecution(claimRequest);
+            } catch (RuntimeException databaseException) {
+                log.error("Failed to claim AI task, taskId={}", message.getTaskId(), databaseException);
+                return ConsumeResult.FAILURE;
+            }
+
+            if (claimed != 1) {
+                return handleUnclaimedMessage(message);
+            }
+            aiTaskCacheService.evict(message.getTaskId());
+            // 再一次确认此任务属于当前的workId
+            final AiTaskPO claimedTask;
+            try {
+                claimedTask = diaryAiMapper.selectAiTaskByTaskId(message.getTaskId());
+            } catch (RuntimeException e) {
+                log.error("Failed to confirm AI task ownership, taskId={}",
+                        message.getTaskId(), e);
+                return ConsumeResult.FAILURE;
+            }
+            if (claimedTask == null
+                    || !AiTaskStatusEnum.RUNNING.name().equals(claimedTask.getStatus())
+                    || !Objects.equals(workerId, claimedTask.getWorkerId())) {
+                log.warn("AI task was claimed but ownership cannot be confirmed, taskId={}, workerId={}",
+                        message.getTaskId(), workerId);
+                return ConsumeResult.FAILURE;
+            }
+
+            try {
+                boolean executed = aiTaskExecutor.execute(message, claimedTask);
+                return executed ? ConsumeResult.SUCCESS : handleOwnershipLost(message.getTaskId());
+            } catch (RuntimeException executionException) {
+                // 此逻辑需要放入事务中
+                return aiTaskCommandService.handleExecutionFailure(message, claimedTask, workerId, executionException);
+            }
+        } finally {
+            localAiConcurrencyGuard.release();
         }
     }
 
@@ -145,47 +163,6 @@ public class AiOutboxConsumer implements RocketMQListener {
         return handleOwnershipLost(message.getTaskId());
     }
 
-    private ConsumeResult handleExecutionFailure(AiTaskMessageDto message, AiTaskPO claimedTask, String workerId, RuntimeException executionException) {
-        boolean permanentError = executionException instanceof IllegalArgumentException;
-        boolean attemptsExhausted = claimedTask.getAttemptCount() >= claimedTask.getMaxAttempts();
-        String errorMessage = truncateErrorMessage(executionException.getMessage());
-
-        AiTaskProcessDto failureRequest = AiTaskProcessDto.builder()
-                .taskId(message.getTaskId())
-                .userId(message.getUserId())
-                .clientRequestId(message.getClientRequestId())
-                .workerId(workerId)
-                .versionId(claimedTask.getVersionId())
-                .errorCode(
-                        permanentError ? AiTaskErrorCodeEnum.PERMANENT_ERROR.name() :
-                        attemptsExhausted ? AiTaskErrorCodeEnum.RETRY_EXHAUSTED.name() : AiTaskErrorCodeEnum.RETRYABLE_ERROR.name())
-                .errorMessage(errorMessage)
-                .finishTime(LocalDateTime.now())
-                .build();
-
-        try {
-            if (permanentError || attemptsExhausted) {
-                /*
-                 * 永久错误或业务模型调用次数耗尽时写 FAILED 并 ACK。继续返回 FAILURE 只会让 Broker
-                 * 重复投递一个已确认无法继续执行的任务，混淆“业务失败”和“消息进入 DLQ”两种语义。
-                 */
-                int failed = diaryAiMapper.markFailedIfOwned(failureRequest);
-                log.error("AI task failed permanently, taskId={}, attemptCount={}",
-                        message.getTaskId(), claimedTask.getAttemptCount(), executionException);
-                return failed == 1 ? ConsumeResult.SUCCESS : handleOwnershipLost(message.getTaskId());
-            }
-
-            int retryWaiting = diaryAiMapper.markRetryWaitIfOwned(failureRequest);
-            log.warn("AI task will be retried, taskId={}, attemptCount={}",
-                    message.getTaskId(), claimedTask.getAttemptCount(), executionException);
-            return retryWaiting == 1 ? ConsumeResult.FAILURE : handleOwnershipLost(message.getTaskId());
-        } catch (RuntimeException statusUpdateException) {
-            log.error("Failed to persist AI task failure state, taskId={}",
-                    message.getTaskId(), statusUpdateException);
-            return ConsumeResult.FAILURE;
-        }
-    }
-
     private ConsumeResult handleOwnershipLost(Long taskId) {
         AiTaskPO currentTask = diaryAiMapper.selectAiTaskByTaskId(taskId);
         if (currentTask != null) {
@@ -215,12 +192,5 @@ public class AiOutboxConsumer implements RocketMQListener {
                 || AiTaskStatusEnum.FAILED.name().equals(status)
                 || AiTaskStatusEnum.CANCELLED.name().equals(status)
                 || AiTaskStatusEnum.DEAD_LETTER.name().equals(status);
-    }
-
-    private String truncateErrorMessage(String message) {
-        if (message == null || message.isBlank()) {
-            return "未提供异常信息";
-        }
-        return message.length() <= MAX_ERROR_MSG_LENGTH ? message : message.substring(0, MAX_ERROR_MSG_LENGTH);
     }
 }

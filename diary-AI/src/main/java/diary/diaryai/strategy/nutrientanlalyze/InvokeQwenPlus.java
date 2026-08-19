@@ -13,6 +13,7 @@ import diary.common.exception.CustomException;
 import diary.diaryai.prompt.PromptContext;
 import diary.diaryai.properties.AliCloudProperty;
 import diary.diaryai.repository.DatabaseServiceImpl;
+import diary.diaryai.service.AiTaskCommandService;
 import diary.diaryai.strategy.service.InvokeAIService;
 import diary.diaryai.template.InvokeAITemplate;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +34,7 @@ public class InvokeQwenPlus extends InvokeAITemplate implements InvokeAIService 
     private final AliCloudProperty aliCloudProperty;
     private final PromptContext promptContext;
     private final MultiModalConversation conv = new MultiModalConversation();
-    private final DatabaseServiceImpl databaseServiceImpl;
+    private final AiTaskCommandService aiTaskCommandService;
     @Override
     public void getAiResultAndSave(Object data, Long taskId, Long userId, String workerId, Integer versionId) {
         String model = aliCloudProperty.getQwenPlusModel();
@@ -47,7 +48,7 @@ public class InvokeQwenPlus extends InvokeAITemplate implements InvokeAIService 
          * 既能排查响应契约，也避免把完整输入输出写入日志。
          */
         log.info("AI nutrient result parsed, taskId={}, fields={}", taskId, result.keySet());
-        databaseServiceImpl.processData(taskId, data, model, result, temperature, userId, workerId, versionId);
+        aiTaskCommandService.processData(taskId, data, model, result, temperature, userId, workerId, versionId);
     }
 
     @Override

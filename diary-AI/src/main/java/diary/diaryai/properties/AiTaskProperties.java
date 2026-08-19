@@ -21,6 +21,7 @@ public class AiTaskProperties {
         private String taskTag = "QWEN_PLUS_NUTRIENT";
         private String taskConsumerGroup = "diary-ai-qwen-plus-worker-v2";
         private String eventTopic = "diary-ai-event";
+        private String eventTag = "AI_COMPLETED";
         private int publisherBatchSize = 20;
         private long publisherIntervalMs = 1000;
         private long publisherSendingTimeoutSeconds = 60;
@@ -32,7 +33,6 @@ public class AiTaskProperties {
         private int maxAttempts = 3;
         private long executionLeaseSeconds = 330;
         private long recoveryIntervalMs = 30000;
-        private Duration leaseDuration = Duration.ofMinutes(5);
     }
 
     @Data

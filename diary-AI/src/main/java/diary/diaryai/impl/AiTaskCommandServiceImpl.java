@@ -1,11 +1,13 @@
 package diary.diaryai.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import diary.common.entity.ai.dto.AiInvokeDTO;
 import diary.common.entity.ai.dto.AiTaskMessageDto;
+import diary.common.entity.ai.dto.AiTaskProcessDto;
+import diary.common.entity.ai.po.AiInfoPO;
+import diary.common.entity.ai.po.AiNutrientPO;
 import diary.common.entity.ai.po.AiTaskPO;
 import diary.common.entity.mq.po.MqOutboxPO;
+import diary.common.enums.aienum.AiTaskErrorCodeEnum;
 import diary.common.enums.aienum.AiTaskStatusEnum;
 import diary.common.enums.outbox.OutboxEventTypeEnum;
 import diary.common.enums.outbox.OutboxStatusEnum;
@@ -16,23 +18,24 @@ import diary.diaryai.service.AiTaskCommandService;
 import diary.utils.commonutil.MyUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.rocketmq.client.apis.consumer.ConsumeResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import org.slf4j.MDC;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
-import static diary.common.consts.AiTaskConst.OUTBOX_AGGREGATE_TYPE_ONE;
-import static diary.common.consts.AiTaskConst.OUTBOX_EVENT_ID;
-import static diary.common.consts.AiTaskConst.OUTBOX_SCHEMA_VERSION;
+import static diary.common.consts.AiTaskConst.*;
+import static diary.common.consts.AiTaskConst.MAX_ERROR_MSG_LENGTH;
+import static diary.utils.commonutil.MyUtils.writeJson;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class AiTaskCommandServiceImpl implements AiTaskCommandService {
     private final DiaryAiMapper diaryAiMapper;
-    private final ObjectMapper objectMapper;
     private final AiTaskProperties properties;
 
     @Override
@@ -98,11 +101,163 @@ public class AiTaskCommandServiceImpl implements AiTaskCommandService {
         return task;
     }
 
-    private String writeJson(Object value, String message) {
-        try {
-            return objectMapper.writeValueAsString(value);
-        } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException(message, e);
+    /**
+     * @param model AI模型
+     * @param result AI结果
+     * @param temperature 温度参数
+     * @param userId 用户ID
+     * @param workerId 当前任务抢占者；用于阻止旧 Worker 提交结果
+     * @param versionId Consumer 抢占成功后的乐观锁版本
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void processData(Long taskId, Object data, String model, Map<String, String> result, Double temperature, Long userId, String workerId, Integer versionId) {
+        String eventId = OUTBOX_EVENT_ID + MyUtil.getPrimaryKey();
+        LocalDateTime now = LocalDateTime.now();
+
+        AiInvokeDTO aiInvokeDTO = (AiInvokeDTO) data;
+        AiInfoPO aiInfoPO = AiInfoPO.builder()
+                .id(MyUtils.getPrimaryKey())
+                .userId(userId)
+                .temperature(String.valueOf(temperature))
+                .model(model)
+                .aiType(aiInvokeDTO.getAiType())
+                .aiApplication(aiInvokeDTO.getAiApplication())
+                .build();
+        AiNutrientPO aiNutrientPO = AiNutrientPO.builder()
+                .id(MyUtils.getPrimaryKey())
+                .userId(userId)
+                .universalId(aiInvokeDTO.getUniversalId())
+                .aiInfoId(aiInfoPO.getId())
+                .calory(result.get("卡路里"))
+                .protein(result.get("蛋白质"))
+                .fat(result.get("脂肪"))
+                .carbohydrate(result.get("碳水化合物"))
+                .sugar(result.get("糖"))
+                .sodium(result.get("钠"))
+                .flag(aiInvokeDTO.getFlag())
+                .aiTaskId(taskId)
+                .build();
+        AiTaskProcessDto aiTaskProcessDto = AiTaskProcessDto.builder()
+                .taskId(taskId)
+                .userId(userId)
+                .clientRequestId(aiInvokeDTO.getClientRequestId())
+                .workerId(workerId)
+                .versionId(versionId)
+                .aiInfoId(aiInfoPO.getId())
+                .finishTime(LocalDateTime.now())
+                .build();
+
+        AiTaskMessageDto message = AiTaskMessageDto.builder()
+                .eventId(eventId)
+                .taskId(taskId)
+                .userId(userId)
+                .clientRequestId(aiInvokeDTO.getClientRequestId())
+                .taskType(properties.getRocketmq().getEventTag())
+                .schemaVersion(OUTBOX_SCHEMA_VERSION)
+                .occurTime(now)
+                .traceId(MDC.get("traceId"))
+                .build();
+
+        MqOutboxPO mqOutboxPO = MqOutboxPO.builder()
+                .id(MyUtils.getPrimaryKey())
+                .eventId(eventId)
+                .aggregateType(OUTBOX_AGGREGATE_TYPE_ONE)
+                .aggregateId(taskId)
+                .eventType(OutboxEventTypeEnum.AI_COMPLETED.name())
+                .topic(properties.getRocketmq().getEventTopic())
+                .tag(properties.getRocketmq().getEventTag())
+                .messageKey(String.valueOf(taskId))
+                .payload(writeJson(message, "AI任务消息序列化失败"))
+                .schemaVersion(1)
+                .status(OutboxStatusEnum.NEW.name())
+                .retryCount(0)
+                .maxRetries(properties.getRocketmq().getOutboxMaxRetries())
+                .nextRetryTime(now)
+                .brokerMessageId(null)
+                .lastError(null)
+                .sentTime(null)
+                .createTime(LocalDateTime.now())
+                .updateTime(LocalDateTime.now())
+                .versionId(0)
+                .build();
+        int aiInfoCnt = diaryAiMapper.insertAiInfo(aiInfoPO);
+        int aiNutrientCnt = diaryAiMapper.insertAiNutrient(aiNutrientPO);
+        int aiTaskCnt = diaryAiMapper.markSuccessIfOwned(aiTaskProcessDto);
+        int mqOutboxCnt = diaryAiMapper.insertOutbox(mqOutboxPO);
+        /*
+         * 以前任意一步失败后，会在同一个事务里把任务改回 PENDING 再抛异常；但抛异常会让该更新一起回滚，
+         * 而且执行失败也不应回到“消息尚未发送”的 PENDING。现在三步必须都恰好影响一行，否则直接抛出，
+         * 让 AiInfo、AiNutrient 和 SUCCESS 状态整体回滚，再由 Consumer 在事务外写 RETRY_WAIT/FAILED。
+         * SUCCESS 更新还校验 workerId + versionId，旧 Worker 已失去租约时不会提交重复结果。
+         */
+        if (aiInfoCnt != 1 || aiNutrientCnt != 1 || aiTaskCnt != 1 || mqOutboxCnt != 1) {
+            throw new IllegalStateException(
+                    "AI结果事务提交失败: aiInfo=" + aiInfoCnt
+                            + ", aiNutrient=" + aiNutrientCnt
+                            + ", aiTask=" + aiTaskCnt
+                            + ", mqOutbox=" + mqOutboxCnt
+            );
         }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ConsumeResult handleExecutionFailure(AiTaskMessageDto message, AiTaskPO claimedTask, String workerId, RuntimeException executionException) {
+        boolean permanentError = executionException instanceof IllegalArgumentException;
+        boolean attemptsExhausted = claimedTask.getAttemptCount() >= claimedTask.getMaxAttempts();
+        String errorMessage = truncateErrorMessage(executionException.getMessage());
+
+        AiTaskProcessDto failureRequest = AiTaskProcessDto.builder()
+                .taskId(message.getTaskId())
+                .userId(message.getUserId())
+                .clientRequestId(message.getClientRequestId())
+                .workerId(workerId)
+                .versionId(claimedTask.getVersionId())
+                .errorCode(
+                        permanentError ? AiTaskErrorCodeEnum.PERMANENT_ERROR.name() :
+                                attemptsExhausted ? AiTaskErrorCodeEnum.RETRY_EXHAUSTED.name() : AiTaskErrorCodeEnum.RETRYABLE_ERROR.name())
+                .errorMessage(errorMessage)
+                .finishTime(LocalDateTime.now())
+                .build();
+
+        try {
+            if (permanentError || attemptsExhausted) {
+                /*
+                 * 永久错误或业务模型调用次数耗尽时写 FAILED 并 ACK。继续返回 FAILURE 只会让 Broker
+                 * 重复投递一个已确认无法继续执行的任务，混淆“业务失败”和“消息进入 DLQ”两种语义。
+                 */
+                int failed = diaryAiMapper.markFailedIfOwned(failureRequest);
+                log.error("AI task failed permanently, taskId={}, attemptCount={}",
+                        message.getTaskId(), claimedTask.getAttemptCount(), executionException);
+                return failed == 1 ? ConsumeResult.SUCCESS : handleOwnershipLost(message.getTaskId());
+            }
+
+            int retryWaiting = diaryAiMapper.markRetryWaitIfOwned(failureRequest);
+            log.warn("AI task will be retried, taskId={}, attemptCount={}",
+                    message.getTaskId(), claimedTask.getAttemptCount(), executionException);
+            return retryWaiting == 1 ? ConsumeResult.FAILURE : handleOwnershipLost(message.getTaskId());
+        } catch (RuntimeException statusUpdateException) {
+            log.error("Failed to persist AI task failure state, taskId={}",
+                    message.getTaskId(), statusUpdateException);
+            return ConsumeResult.FAILURE;
+        }
+    }
+
+    private ConsumeResult handleOwnershipLost(Long taskId) {
+        AiTaskPO currentTask = diaryAiMapper.selectAiTaskByTaskId(taskId);
+        if (currentTask != null) {
+            log.info("AI task is owned or completed elsewhere, taskId={}, status={}, workerId={}, version={}",
+                    taskId, currentTask.getStatus(), currentTask.getWorkerId(), currentTask.getVersionId());
+            return ConsumeResult.SUCCESS;
+        }
+        return ConsumeResult.FAILURE;
+    }
+
+    private String truncateErrorMessage(String message) {
+        if (message == null || message.isBlank()) {
+            return "未提供异常信息";
+        }
+        return message.length() <= MAX_ERROR_MSG_LENGTH ? message : message.substring(0, MAX_ERROR_MSG_LENGTH);
     }
 }

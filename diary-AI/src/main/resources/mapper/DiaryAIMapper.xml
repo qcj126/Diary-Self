@@ -358,4 +358,8 @@
         WHERE ai_task_id = #{taskId}
             LIMIT 1
     </select>
+
+    <insert id="insertRetryTaskOutbox">
+
+    </insert>
 </mapper>

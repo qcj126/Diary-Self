@@ -1,5 +1,7 @@
 package diary.utils.commonutil;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -10,7 +12,6 @@ public class MyUtils {
     private static long lastTimestamp = -1L;
     private static long sequence = 0L;
     private static final long START_TIMESTAMP = 1704038400000L; // 2024-01-01
-
     public static synchronized long nextId() {
         long timestamp = System.currentTimeMillis();
 
@@ -48,6 +49,16 @@ public class MyUtils {
     // 判断文件为空
     public static boolean isFileEmpty(MultipartFile file) {
         return file == null || file.isEmpty();
+    }
+
+    // 序列化为json
+    public static String writeJson(Object value, String message) {
+        try {
+            var objectMapper = new ObjectMapper();
+            return objectMapper.writeValueAsString(value);
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException(message, e);
+        }
     }
 
     // 添加这个静态方法，调用更简洁
