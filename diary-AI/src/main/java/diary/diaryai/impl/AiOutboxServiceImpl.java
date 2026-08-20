@@ -68,11 +68,10 @@ public class AiOutboxServiceImpl implements AiOutboxService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int recoverSendingTimeout() {
+    public void recoverSendingTimeout() {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime timeoutBefore = now.minusSeconds(
-                properties.getRocketmq().getPublisherSendingTimeoutSeconds());
-        return diaryAiMapper.recoverSendingTimeout(timeoutBefore, now);
+        LocalDateTime timeoutBefore = now.minusSeconds(properties.getRocketmq().getPublisherSendingTimeoutSeconds());
+        diaryAiMapper.recoverSendingTimeout(timeoutBefore, now);
     }
 
     private LocalDateTime calculateNextRetry(int currentRetryCount) {

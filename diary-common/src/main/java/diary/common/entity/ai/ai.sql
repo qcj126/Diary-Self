@@ -37,6 +37,9 @@ CREATE UNIQUE INDEX idx_ai_nutrient_task_id ON ai_nutrient (ai_task_id);
 
 create index idx_ai_nutrient_user_time on ai_nutrient (user_id, create_time);
 
+-- 恢复扫描索引
+CREATE INDEX idx_ai_task_status_lease_until ON ai_task (status, lease_until);
+
 create table ai_task(
     id                bigint unsigned                    not null comment 'primary key'
         primary key,

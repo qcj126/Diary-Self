@@ -10,13 +10,19 @@ import diary.common.enums.outbox.OutboxStatusEnum;
 import diary.common.util.MyUtil;
 import diary.diaryai.mapper.DiaryAiMapper;
 import diary.diaryai.properties.AiTaskProperties;
+import diary.diaryai.recovery.event.TaskRecoveredEvent;
+import diary.diaryai.redis.AiTaskCacheService;
 import diary.diaryai.service.AiTaskRecoveryService;
 import diary.utils.commonutil.MyUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.reactive.TransactionSynchronization;
+import org.springframework.transaction.reactive.TransactionSynchronizationManager;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 
@@ -29,7 +35,7 @@ import static diary.utils.commonutil.MyUtils.writeJson;
 public class AiTaskRecoveryServiceImpl implements AiTaskRecoveryService {
     private final DiaryAiMapper diaryAiMapper;
     private final AiTaskProperties properties;
-
+    private final ApplicationEventPublisher eventPublisher;
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void recover(AiTaskPO task) {
@@ -52,6 +58,7 @@ public class AiTaskRecoveryServiceImpl implements AiTaskRecoveryService {
             int cnt = diaryAiMapper.markFailedIfAttemptsExhausted(failed);
             if (cnt == 0) {
                 log.warn("任务状态修改为失败未成功，请检查任务ID：{}", task.getId());
+                throw new RuntimeException("任务状态修改为失败未成功，请检查任务ID：" + task.getId());
             }
 
             // 新增outbox记录failed事件
@@ -69,7 +76,7 @@ public class AiTaskRecoveryServiceImpl implements AiTaskRecoveryService {
             MqOutboxPO mqOutboxPO = MqOutboxPO.builder()
                     .id(MyUtils.getPrimaryKey())
                     .eventId(eventId)
-                    .aggregateType(OUTBOX_AGGREGATE_TYPE_ONE)
+                    .aggregateType(AI_TASK_AGGREGATE_TYPE)
                     .aggregateId(task.getId())
                     .eventType(OutboxEventTypeEnum.AI_FAILED.name())
                     .topic(properties.getRocketmq().getEventTopic())
@@ -92,6 +99,8 @@ public class AiTaskRecoveryServiceImpl implements AiTaskRecoveryService {
             if (outboxFailedCnt != 1) {
                 log.warn("任务失败事件插入outbox未成功，请检查任务ID：{}", task.getId());
             }
+            // 只监听任务恢复事件
+            eventPublisher.publishEvent(new TaskRecoveredEvent(this, task.getId()));
             return;
         }
 
@@ -115,6 +124,8 @@ public class AiTaskRecoveryServiceImpl implements AiTaskRecoveryService {
             log.warn("任务恢复事件插入outbox未成功，请检查任务ID：{}", task.getId());
             throw new RuntimeException("任务恢复事件插入outbox未成功，请检查任务ID：" + task.getId());
         }
+        // 只监听任务恢复事件
+        eventPublisher.publishEvent(new TaskRecoveredEvent(this, task.getId()));
     }
 
     private int insertRetryTaskOutbox(AiTaskPO task, LocalDateTime now) {
@@ -134,9 +145,9 @@ public class AiTaskRecoveryServiceImpl implements AiTaskRecoveryService {
         MqOutboxPO outboxPO = MqOutboxPO.builder()
                 .id(MyUtils.getPrimaryKey())
                 .eventId(eventId)
-                .aggregateType(OUTBOX_AGGREGATE_TYPE_ONE)
+                .aggregateType(AI_TASK_AGGREGATE_TYPE)
                 .aggregateId(task.getId())
-                .eventType(OutboxEventTypeEnum.AI_FAILED.name())
+                .eventType(OutboxEventTypeEnum.AI_TASK_RETRY.name())
                 .topic(properties.getRocketmq().getTaskTopic())
                 .tag(properties.getRocketmq().getTaskTag())
                 .messageKey(String.valueOf(task.getId()))

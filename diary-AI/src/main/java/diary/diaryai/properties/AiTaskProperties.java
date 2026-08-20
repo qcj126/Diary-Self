@@ -25,7 +25,7 @@ public class AiTaskProperties {
         private int publisherBatchSize = 20;
         private long publisherIntervalMs = 1000;
         private long publisherSendingTimeoutSeconds = 60;
-        private int outboxMaxRetries = 10;
+        private int outboxMaxRetries = 3;
     }
 
     @Data
@@ -33,6 +33,7 @@ public class AiTaskProperties {
         private int maxAttempts = 3;
         private long executionLeaseSeconds = 330;
         private long recoveryIntervalMs = 30000;
+        private int recoveryBatchSize = 50;
     }
 
     @Data

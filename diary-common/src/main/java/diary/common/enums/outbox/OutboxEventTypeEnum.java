@@ -5,6 +5,7 @@ import lombok.Getter;
 @Getter
 public enum OutboxEventTypeEnum {
     AI_TASK_CREATED("任务已创建"),
+    AI_TASK_RETRY("任务已重试"),
     AI_COMPLETED("任务已完成"),
     AI_FAILED("任务失败");
 

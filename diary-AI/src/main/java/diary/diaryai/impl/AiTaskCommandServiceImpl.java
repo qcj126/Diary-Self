@@ -26,6 +26,7 @@ import org.slf4j.MDC;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 import static diary.common.consts.AiTaskConst.*;
 import static diary.common.consts.AiTaskConst.MAX_ERROR_MSG_LENGTH;
@@ -75,7 +76,7 @@ public class AiTaskCommandServiceImpl implements AiTaskCommandService {
         MqOutboxPO outbox = MqOutboxPO.builder()
                 .id(MyUtils.getPrimaryKey())
                 .eventId(eventId)
-                .aggregateType(OUTBOX_AGGREGATE_TYPE_ONE)
+                .aggregateType(AI_TASK_AGGREGATE_TYPE)
                 .aggregateId(taskId)
                 .eventType(OutboxEventTypeEnum.AI_TASK_CREATED.name())
                 .topic(properties.getRocketmq().getTaskTopic())
@@ -162,7 +163,7 @@ public class AiTaskCommandServiceImpl implements AiTaskCommandService {
         MqOutboxPO mqOutboxPO = MqOutboxPO.builder()
                 .id(MyUtils.getPrimaryKey())
                 .eventId(eventId)
-                .aggregateType(OUTBOX_AGGREGATE_TYPE_ONE)
+                .aggregateType(AI_TASK_AGGREGATE_TYPE)
                 .aggregateId(taskId)
                 .eventType(OutboxEventTypeEnum.AI_COMPLETED.name())
                 .topic(properties.getRocketmq().getEventTopic())
@@ -203,7 +204,7 @@ public class AiTaskCommandServiceImpl implements AiTaskCommandService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ConsumeResult handleExecutionFailure(AiTaskMessageDto message, AiTaskPO claimedTask, String workerId, RuntimeException executionException) {
+    public ConsumeResult handleExecutionFailure(AiTaskMessageDto message, AiTaskPO claimedTask, String workerId, Exception executionException) {
         String eventId = OUTBOX_EVENT_ID + MyUtil.getPrimaryKey();
         LocalDateTime now = LocalDateTime.now();
 
@@ -241,7 +242,7 @@ public class AiTaskCommandServiceImpl implements AiTaskCommandService {
             MqOutboxPO mqOutboxPO = MqOutboxPO.builder()
                     .id(MyUtils.getPrimaryKey())
                     .eventId(eventId)
-                    .aggregateType(OUTBOX_AGGREGATE_TYPE_ONE)
+                    .aggregateType(AI_TASK_AGGREGATE_TYPE)
                     .aggregateId(claimedTask.getId())
                     .eventType(OutboxEventTypeEnum.AI_FAILED.name())
                     .topic(properties.getRocketmq().getEventTopic())

@@ -50,6 +50,7 @@ public class AiTaskCacheServiceImpl implements AiTaskCacheService {
                     ttl.plusSeconds(jitter));
         } catch (Exception e) {
             log.warn("写入AI任务缓存失败, taskId={}", value.getTaskId(), e);
+            throw new RuntimeException("缓存写入失败，请稍后重试", e);
         }
     }
 
@@ -58,6 +59,7 @@ public class AiTaskCacheServiceImpl implements AiTaskCacheService {
             redisTemplate.delete(keyFactory.task(taskId));
         } catch (RuntimeException e) {
             log.warn("删除AI任务缓存失败, taskId={}", taskId, e);
+            throw new RuntimeException("缓存清理失败，请稍后重试", e);
         }
     }
 }

@@ -77,11 +77,7 @@ public class MqOutboxPO {
 
     /**
      * 消息状态
-     * PENDING：待发送
-     * SENT：已发送（但尚未确认）
-     * SUCCESS：发送成功
-     * FAILED：发送失败
-     * DEAD：死信（超过最大重试次数）
+     * NEW/SENDING/RETRY_WAIT/SENT/DEAD
      */
     private String status;
 

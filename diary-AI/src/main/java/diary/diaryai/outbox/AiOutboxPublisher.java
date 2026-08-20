@@ -30,8 +30,7 @@ public class AiOutboxPublisher {
 
     @Scheduled(fixedDelayString = "${diary.ai.rocketmq.publisher-interval-ms:1000}")
     public void publishReadyMessages() {
-        int cnt = aiOutboxService.recoverSendingTimeout();
-        log.info("恢复了 {} 条数据", cnt);
+        aiOutboxService.recoverSendingTimeout();
         List<MqOutboxPO> batch = diaryAiMapper.selectReadyOutbox(LocalDateTime.now(), properties.getRocketmq().getPublisherBatchSize());
 
         for (MqOutboxPO outbox : batch) {

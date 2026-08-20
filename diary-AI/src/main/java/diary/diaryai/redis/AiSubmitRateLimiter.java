@@ -2,6 +2,7 @@ package diary.diaryai.redis;
 
 import diary.diaryai.properties.AiTaskProperties;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Component;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class AiSubmitRateLimiter {
     private static final DefaultRedisScript<Long> RATE_SCRIPT =
             new DefaultRedisScript<>("""
@@ -25,12 +27,17 @@ public class AiSubmitRateLimiter {
     private final AiTaskProperties properties;
 
     public boolean allow(Long userId) {
-        long epochMinute = Instant.now().getEpochSecond() / 60;
-        String key = keyFactory.submitRate(userId, epochMinute);
-        Long current = redisTemplate.execute(
-                RATE_SCRIPT,
-                List.of(key),
-                "120");
-        return current <= properties.getLimit().getSubmitPerUserPerMinute();
+        try {
+            long epochMinute = Instant.now().getEpochSecond() / 60;
+            String key = keyFactory.submitRate(userId, epochMinute);
+            Long current = redisTemplate.execute(
+                    RATE_SCRIPT,
+                    List.of(key),
+                    "120");
+            return current <= properties.getLimit().getSubmitPerUserPerMinute();
+        } catch (Exception e) {
+            log.error("Failed to check submit rate", e);
+            return false;
+        }
     }
 }
