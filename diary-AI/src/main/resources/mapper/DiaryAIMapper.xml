@@ -359,7 +359,16 @@
             LIMIT 1
     </select>
 
-    <insert id="insertRetryTaskOutbox">
-
+    <insert id="insertRetryTaskOutbox" parameterType="diary.common.entity.mq.po.MqOutboxPO">
+        INSERT INTO mq_outbox
+        (id, event_id, aggregate_type, aggregate_id, event_type,
+        topic, tag, message_key, payload, schema_version,
+        status, retry_count, max_retries, next_retry_time,
+        create_time, update_time, version_id)
+        VALUES
+        (#{id}, #{eventId}, #{aggregateType}, #{aggregateId}, #{eventType},
+        #{topic}, #{tag}, #{messageKey}, #{payload}, #{schemaVersion},
+        #{status}, #{retryCount}, #{maxRetries}, #{nextRetryTime},
+        #{createTime}, #{updateTime}, #{versionId})
     </insert>
 </mapper>

@@ -99,5 +99,5 @@ public interface DiaryAiMapper {
 
     AiNutrientPO selectAiNutrientByTaskId(@Param("taskId") Long taskId);
 
-    int insertRetryTaskOutbox(AiTaskPO task, LocalDateTime now);
+    int insertRetryTaskOutbox(MqOutboxPO outbox);
 }

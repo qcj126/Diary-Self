@@ -1,26 +1,39 @@
 package diary.diaryai.impl;
 
+import diary.common.entity.ai.dto.AiTaskMessageDto;
 import diary.common.entity.ai.dto.AiTaskProcessDto;
 import diary.common.entity.ai.po.AiTaskPO;
+import diary.common.entity.mq.po.MqOutboxPO;
 import diary.common.enums.aienum.AiTaskErrorCodeEnum;
+import diary.common.enums.outbox.OutboxEventTypeEnum;
+import diary.common.enums.outbox.OutboxStatusEnum;
+import diary.common.util.MyUtil;
 import diary.diaryai.mapper.DiaryAiMapper;
+import diary.diaryai.properties.AiTaskProperties;
 import diary.diaryai.service.AiTaskRecoveryService;
+import diary.utils.commonutil.MyUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+
+import static diary.common.consts.AiTaskConst.*;
+import static diary.utils.commonutil.MyUtils.writeJson;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class AiTaskRecoveryServiceImpl implements AiTaskRecoveryService {
     private final DiaryAiMapper diaryAiMapper;
+    private final AiTaskProperties properties;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void recover(AiTaskPO task) {
+        String eventId = OUTBOX_EVENT_ID + MyUtil.getPrimaryKey();
         LocalDateTime now = LocalDateTime.now();
 
         // 先看尝试次数是否大于最大可尝试次数
@@ -40,7 +53,45 @@ public class AiTaskRecoveryServiceImpl implements AiTaskRecoveryService {
             if (cnt == 0) {
                 log.warn("任务状态修改为失败未成功，请检查任务ID：{}", task.getId());
             }
-            // TODO 向outbox插入失败事件数据
+
+            // 新增outbox记录failed事件
+            AiTaskMessageDto aiTaskMessageDto = AiTaskMessageDto.builder()
+                    .clientRequestId(task.getClientRequestId())
+                    .eventId(eventId)
+                    .taskId(task.getId())
+                    .userId(task.getUserId())
+                    .taskType(task.getTaskType())
+                    .schemaVersion(OUTBOX_SCHEMA_VERSION)
+                    .occurTime(now)
+                    .traceId(MDC.get("traceId"))
+                    .build();
+
+            MqOutboxPO mqOutboxPO = MqOutboxPO.builder()
+                    .id(MyUtils.getPrimaryKey())
+                    .eventId(eventId)
+                    .aggregateType(OUTBOX_AGGREGATE_TYPE_ONE)
+                    .aggregateId(task.getId())
+                    .eventType(OutboxEventTypeEnum.AI_FAILED.name())
+                    .topic(properties.getRocketmq().getEventTopic())
+                    .tag(properties.getRocketmq().getEventTag())
+                    .messageKey(String.valueOf(task.getId()))
+                    .payload(writeJson(aiTaskMessageDto, "AI任务消息序列化失败"))
+                    .schemaVersion(OUTBOX_SCHEMA_VERSION)
+                    .status(OutboxStatusEnum.NEW.name())
+                    .retryCount(0)
+                    .maxRetries(properties.getRocketmq().getOutboxMaxRetries())
+                    .nextRetryTime(now)
+                    .brokerMessageId(null)
+                    .lastError(null)
+                    .sentTime(null)
+                    .createTime(now)
+                    .updateTime(now)
+                    .versionId(0)
+                    .build();
+            int outboxFailedCnt = diaryAiMapper.insertOutbox(mqOutboxPO);
+            if (outboxFailedCnt != 1) {
+                log.warn("任务失败事件插入outbox未成功，请检查任务ID：{}", task.getId());
+            }
             return;
         }
 
@@ -59,11 +110,50 @@ public class AiTaskRecoveryServiceImpl implements AiTaskRecoveryService {
             throw new RuntimeException("任务状态修改为重试等待未成功，请检查任务ID：" + task.getId());
         }
 
-        // TODO 向outbox插入任务恢复事件
-        int insertCnt = diaryAiMapper.insertRetryTaskOutbox(task, now);
+        int insertCnt = insertRetryTaskOutbox(task, now);
         if (insertCnt == 0) {
             log.warn("任务恢复事件插入outbox未成功，请检查任务ID：{}", task.getId());
             throw new RuntimeException("任务恢复事件插入outbox未成功，请检查任务ID：" + task.getId());
         }
+    }
+
+    private int insertRetryTaskOutbox(AiTaskPO task, LocalDateTime now) {
+        String eventId = OUTBOX_EVENT_ID + MyUtil.getPrimaryKey();
+
+        AiTaskMessageDto aiTaskMessageDto = AiTaskMessageDto.builder()
+                .clientRequestId(task.getClientRequestId())
+                .eventId(eventId)
+                .taskId(task.getId())
+                .userId(task.getUserId())
+                .taskType(task.getTaskType())
+                .schemaVersion(OUTBOX_SCHEMA_VERSION)
+                .occurTime(now)
+                .traceId(MDC.get("traceId"))
+                .build();
+
+        MqOutboxPO outboxPO = MqOutboxPO.builder()
+                .id(MyUtils.getPrimaryKey())
+                .eventId(eventId)
+                .aggregateType(OUTBOX_AGGREGATE_TYPE_ONE)
+                .aggregateId(task.getId())
+                .eventType(OutboxEventTypeEnum.AI_FAILED.name())
+                .topic(properties.getRocketmq().getTaskTopic())
+                .tag(properties.getRocketmq().getTaskTag())
+                .messageKey(String.valueOf(task.getId()))
+                .payload(writeJson(aiTaskMessageDto, "AI任务消息序列化失败"))
+                .schemaVersion(OUTBOX_SCHEMA_VERSION)
+                .status(OutboxStatusEnum.NEW.name())
+                .retryCount(0)
+                .maxRetries(properties.getRocketmq().getOutboxMaxRetries())
+                .nextRetryTime(now)
+                .brokerMessageId(null)
+                .lastError(null)
+                .sentTime(null)
+                .createTime(now)
+                .updateTime(now)
+                .versionId(0)
+                .build();
+
+        return diaryAiMapper.insertRetryTaskOutbox(outboxPO);
     }
 }
