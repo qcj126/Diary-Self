@@ -30,6 +30,7 @@
         <module>diary-AI</module>
         <module>diary-notify</module>
         <module>diary-love</module>
+        <module>diary-leetcode</module>
     </modules>
     
     <properties>
