@@ -25,7 +25,10 @@ public class RecipePO {
     @NotNull
     private Integer difficulty;          // 难度：1-5
     @NotNull
+    private String cookWay;                   // 烹饪方式
+    @NotNull
     private Integer cookingTime;       // 烹饪时长（分钟）
+    @NotNull
     private String story;                   // 情感故事/备注
     @NotNull
     private Integer sort;                    // 排序

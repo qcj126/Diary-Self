@@ -11,6 +11,7 @@ public class AiInvokeDTO {
     private Integer aiType;                                     // 调用AI的枚举值
     private Map<String, String> materials;                      // 食材列表
     private Integer aiApplication;                              // AI用途
+    private String cookWay;                                     // 烹饪方式
     private String flag;                                        // 标记: 饮食或食谱，对应id为universalId
     private Long universalId;                                   // 标记: 饮食或食谱，对应id为universalId
 }

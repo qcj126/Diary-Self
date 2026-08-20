@@ -5,13 +5,10 @@
   "flag": "DIET",
   "universalId": 1234567890,
   "materials": {
-      "pork": "300g",
-      "chicken": "200g",
-      "beef": "150g",
-      "fish": "100g",
-      "vegetables": "200g",
-      "fruits": "150g",
-      "grains": "100g",
-      "cookWay": "爆炒"
-  }
+      "五花肉": "300g",
+      "火腿肠": "200g",
+      "大蒜": "150g",
+      "香菜": "100g"
+  },
+  "cookWay": "爆炒"
 }

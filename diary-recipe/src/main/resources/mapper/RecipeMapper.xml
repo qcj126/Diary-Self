@@ -12,6 +12,7 @@
         <result column="category_num" property="categoryNum"/>
         <result column="meal_type" property="mealType"/>
         <result column="difficulty" property="difficulty"/>
+        <result column="cook_way" property="cookWay"/>
         <result column="cooking_time" property="cookingTime"/>
         <result column="story" property="story"/>
         <result column="sort" property="sort"/>
@@ -21,7 +22,7 @@
 
     <sql id="BaseColumns">
         id, user_id, title, image_id, description, category_num, meal_type,
-        difficulty, cooking_time, story, sort, red_heart, family_member, create_time, update_time
+        difficulty, cook_way, cooking_time, story, sort, red_heart, family_member, create_time, update_time
     </sql>
 
     <sql id="PageWhereCondition">
@@ -69,6 +70,7 @@
             <if test="req.categoryNum != null">category_num = #{req.categoryNum},</if>
             <if test="req.mealType != null">meal_type = #{req.mealType},</if>
             <if test="req.difficulty != null">difficulty = #{req.difficulty},</if>
+            <if test="req.cookWay != null">cook_way = #{req.cookWay},</if>
             <if test="req.cookingTime != null">cooking_time = #{req.cookingTime},</if>
             <if test="req.story != null">story = #{req.story},</if>
             <if test="req.familyMember != null">family_member = #{req.familyMember},</if>

@@ -30,6 +30,9 @@ public class RecipeReqDto {
     /** 难度 1-3 */
     private Integer difficulty;
 
+    /** 烹饪方式 */
+    private String cookWay;
+
     /** 烹饪时长（分钟） */
     private Integer cookingTime;
 

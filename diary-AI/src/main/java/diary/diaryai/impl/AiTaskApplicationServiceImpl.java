@@ -4,6 +4,8 @@ import diary.common.convert.ai.ConvertPoToVo;
 import diary.common.entity.ai.dto.AiInvokeDTO;
 import diary.common.entity.ai.po.AiTaskPO;
 import diary.common.entity.ai.vo.AiTaskSubmitVo;
+import diary.common.enums.aienum.AiApplicationEnum;
+import diary.common.enums.aienum.AiFlagEnum;
 import diary.common.exception.AiSubmitRateLimitException;
 import diary.diaryai.mapper.DiaryAiMapper;
 import diary.diaryai.redis.AiIdempotencyCacheService;
@@ -93,7 +95,8 @@ public class AiTaskApplicationServiceImpl implements AiTaskApplicationService {
                 .notNull(request.getMaterials(), "materials")
                 .stringKeyMapNotContainsEmpty(request.getMaterials(), "materials")
                 .notNull(request.getUniversalId(), "universalId");
-
+        AiFlagEnum.isTrueFlag(request.getFlag());
+        AiApplicationEnum.isTrueApplication(request.getAiApplication());
         request.setClientRequestId(request.getClientRequestId().trim());
         request.setFlag(request.getFlag().trim().toUpperCase());
     }

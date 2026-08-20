@@ -39,6 +39,9 @@ public class RecipeVO {
     /** 难度 1-3 */
     private Integer difficulty;
 
+    /** 烹饪方式 */
+    private String cookWay;
+
     /** 烹饪时长 */
     private Integer cookingTime;
 
