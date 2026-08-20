@@ -29,6 +29,7 @@
         <module>diary-goal</module>
         <module>diary-AI</module>
         <module>diary-notify</module>
+        <module>diary-love</module>
     </modules>
     
     <properties>
