@@ -20,7 +20,7 @@ public class LoveCoupleDTO {
     @Size(max = 32, message = "伴侣昵称最多32个字符")
     private String partnerName;
     @NotNull(message = "恋爱开始日期不能为空")
-    private LocalDate startDate;
+    private String startDate;
     @Min(value = 0, message = "状态值不合法")
     @Max(value = 1, message = "状态值不合法")
     private Byte status;

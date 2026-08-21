@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="diary.diarylove.mapper.DiaryLoveMapper">
+    <resultMap id="loveCoupleResultMap" type="diary.common.entity.love.po.LoveCouplePO">
+        <id property="id" column="id"/>
+        <result property="ownerUserId" column="owner_user_id"/>
+        <result property="partnerUserId" column="partner_user_id"/>
+        <result property="partnerName" column="partner_name"/>
+        <result property="startDate" column="start_date"/>
+        <result property="status" column="status"/>
+        <result property="deleted" column="deleted"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <insert id="insertLoveCouples">
+        INSERT INTO love_couples (id, owner_user_id, partner_user_id, partner_name, start_date, status)
+        VALUES (#{id}, #{ownerUserId}, #{partnerUserId}, #{partnerName}, #{startDate}, #{status})
+    </insert>
+</mapper>

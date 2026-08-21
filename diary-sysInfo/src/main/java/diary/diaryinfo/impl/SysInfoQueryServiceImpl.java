@@ -16,6 +16,8 @@ import diary.diaryinfo.mapper.SysInfoMapper;
 import diary.diaryinfo.service.SysInfoCacheService;
 import diary.diaryinfo.service.SysInfoQueryService;
 import diary.utils.commonutil.MyUtils;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -24,14 +26,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class SysInfoQueryServiceImpl implements SysInfoQueryService {
     private final SysInfoMapper sysInfoMapper;
     private final SysInfoCacheService sysInfoCacheService;
-
-    public SysInfoQueryServiceImpl(SysInfoMapper sysInfoMapper, SysInfoCacheService sysInfoCacheService) {
-        this.sysInfoMapper = sysInfoMapper;
-        this.sysInfoCacheService = sysInfoCacheService;
-    }
 
     @Override
     public ApiResponse<List<IngredientCategoryVo>> getIngredientCategories() {
@@ -53,7 +52,8 @@ public class SysInfoQueryServiceImpl implements SysInfoQueryService {
     public ApiResponse<List<IngredientVo>> getIngredientsByCategory(IngredientReqDto ingredientReqDto) {
         MyUtils.check()
                 .notNull(ingredientReqDto, "食材查询参数")
-                .notEmpty(ingredientReqDto.getCategory(), "category");
+                .notEmpty(ingredientReqDto.getCategory(), "category")
+                .notNull(ingredientReqDto.getIsMain(), "isMain");
 
         IngredientPo condition = DtoConvertToPo.convertToIngredientPo(ingredientReqDto);
         String cacheKey = RedisKeyConst.SYS_INFO_INGREDIENT_PREFIX + condition.getCategory();

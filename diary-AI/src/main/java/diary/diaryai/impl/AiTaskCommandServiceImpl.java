@@ -11,7 +11,7 @@ import diary.common.enums.aienum.AiTaskErrorCodeEnum;
 import diary.common.enums.aienum.AiTaskStatusEnum;
 import diary.common.enums.outbox.OutboxEventTypeEnum;
 import diary.common.enums.outbox.OutboxStatusEnum;
-import diary.common.util.MyUtil;
+
 import diary.diaryai.mapper.DiaryAiMapper;
 import diary.diaryai.properties.AiTaskProperties;
 import diary.diaryai.service.AiTaskCommandService;
@@ -26,7 +26,6 @@ import org.slf4j.MDC;
 
 import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.concurrent.TimeoutException;
 
 import static diary.common.consts.AiTaskConst.*;
 import static diary.common.consts.AiTaskConst.MAX_ERROR_MSG_LENGTH;
@@ -46,7 +45,7 @@ public class AiTaskCommandServiceImpl implements AiTaskCommandService {
         Long taskId = MyUtils.getPrimaryKey();
         // mq消息和outbox数据使用同一个eventId，保证事件的一致性
         // 不会出现mq消息属于另一个outbox数据的情况
-        String eventId = OUTBOX_EVENT_ID + MyUtil.getPrimaryKey();
+        String eventId = OUTBOX_EVENT_ID + MyUtils.getPrimaryKey();
         String inputSnapshot = writeJson(request, "AI任务输入快照序列化失败");
 
         AiTaskPO task = AiTaskPO.builder()
@@ -113,7 +112,7 @@ public class AiTaskCommandServiceImpl implements AiTaskCommandService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void processData(Long taskId, Object data, String model, Map<String, String> result, Double temperature, Long userId, String workerId, Integer versionId) {
-        String eventId = OUTBOX_EVENT_ID + MyUtil.getPrimaryKey();
+        String eventId = OUTBOX_EVENT_ID + MyUtils.getPrimaryKey();
         LocalDateTime now = LocalDateTime.now();
 
         AiInvokeDTO aiInvokeDTO = (AiInvokeDTO) data;
@@ -205,7 +204,7 @@ public class AiTaskCommandServiceImpl implements AiTaskCommandService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ConsumeResult handleExecutionFailure(AiTaskMessageDto message, AiTaskPO claimedTask, String workerId, Exception executionException) {
-        String eventId = OUTBOX_EVENT_ID + MyUtil.getPrimaryKey();
+        String eventId = OUTBOX_EVENT_ID + MyUtils.getPrimaryKey();
         LocalDateTime now = LocalDateTime.now();
 
         boolean permanentError = executionException instanceof IllegalArgumentException;

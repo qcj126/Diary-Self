@@ -1,9 +1,5 @@
 package diary.common.entity.love.po;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,9 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName("love_menstrual_cycle")
 public class LoveMenstrualCyclePO {
-    @TableId(type = IdType.ASSIGN_ID)
     private Long id;
     private Long coupleId;
     private Long subjectUserId;
@@ -31,7 +25,6 @@ public class LoveMenstrualCyclePO {
     private String symptoms;
     private String note;
     private Byte privacyScope;
-    @TableLogic
     private Boolean deleted;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;

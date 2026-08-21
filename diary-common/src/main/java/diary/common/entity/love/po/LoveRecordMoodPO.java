@@ -1,8 +1,5 @@
 package diary.common.entity.love.po;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,9 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName("love_record_mood")
 public class LoveRecordMoodPO {
-    @TableId(type = IdType.ASSIGN_ID)
     private Long id;
     private Long recordId;
     private Long moodId;

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="diary.diaryinfo.mapper.SysInfoMapper">
+    <resultMap id="IngredientPoResultMap" type="diary.common.entity.sysInfo.po.IngredientPo">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="category" column="category"/>
+        <result property="categoryName" column="category_name"/>
+        <result property="isMain" column="is_main"/>
+        <result property="iconId" column="icon_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+    <resultMap id="IngredientIconDtoResultMap" type="diary.common.entity.sysInfo.dto.IngredientIconDto">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="category" column="category"/>
+        <result property="categoryName" column="category_name"/>
+        <result property="isMain" column="is_main"/>
+        <result property="iconId" column="icon_id"/>
+        <result property="iconName" column="icon_name"/>
+        <result property="iconPath" column="icon_path"/>
+        <result property="userId" column="user_id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <resultMap id="CookWayPoResultMap" type="diary.common.entity.sysInfo.po.CookWayPo">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="description" column="description"/>
+        <result property="userId" column="user_id"/>
+        <result property="sortOrder" column="sort_order"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+    <select id="selectIngredientCategories" resultMap="IngredientPoResultMap">
+        SELECT MIN(id) AS id, category, category_name FROM ingredient
+        GROUP BY category, category_name ORDER BY MIN(id)
+    </select>
+
+    <select id="selectIngredientsByCategory" resultMap="IngredientIconDtoResultMap">
+        SELECT a.id, a.name, a.category, a.category_name, a.is_main, a.icon_id, b.icon_name,
+        b.icon_path, a.user_id, a.create_time, a.update_time
+        FROM ingredient a left join icon b on a.icon_id = b.id
+        WHERE a.category = #{condition.category}
+        and a.is_main = #{condition.isMain}
+        ORDER BY id
+    </select>
+
+    <select id="selectAllCookWays" resultMap="CookWayPoResultMap">
+        SELECT id, name, description, user_id, sort_order,
+        create_time, update_time FROM cook_way
+        ORDER BY sort_order, id
+    </select>
+</mapper>

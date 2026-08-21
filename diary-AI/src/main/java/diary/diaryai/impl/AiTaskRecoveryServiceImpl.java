@@ -7,11 +7,9 @@ import diary.common.entity.mq.po.MqOutboxPO;
 import diary.common.enums.aienum.AiTaskErrorCodeEnum;
 import diary.common.enums.outbox.OutboxEventTypeEnum;
 import diary.common.enums.outbox.OutboxStatusEnum;
-import diary.common.util.MyUtil;
 import diary.diaryai.mapper.DiaryAiMapper;
 import diary.diaryai.properties.AiTaskProperties;
 import diary.diaryai.recovery.event.TaskRecoveredEvent;
-import diary.diaryai.redis.AiTaskCacheService;
 import diary.diaryai.service.AiTaskRecoveryService;
 import diary.utils.commonutil.MyUtils;
 import lombok.RequiredArgsConstructor;
@@ -20,9 +18,6 @@ import org.slf4j.MDC;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.reactive.TransactionSynchronization;
-import org.springframework.transaction.reactive.TransactionSynchronizationManager;
-import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 
@@ -39,7 +34,7 @@ public class AiTaskRecoveryServiceImpl implements AiTaskRecoveryService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void recover(AiTaskPO task) {
-        String eventId = OUTBOX_EVENT_ID + MyUtil.getPrimaryKey();
+        String eventId = OUTBOX_EVENT_ID + MyUtils.getPrimaryKey();
         LocalDateTime now = LocalDateTime.now();
 
         // 先看尝试次数是否大于最大可尝试次数
@@ -129,7 +124,7 @@ public class AiTaskRecoveryServiceImpl implements AiTaskRecoveryService {
     }
 
     private int insertRetryTaskOutbox(AiTaskPO task, LocalDateTime now) {
-        String eventId = OUTBOX_EVENT_ID + MyUtil.getPrimaryKey();
+        String eventId = OUTBOX_EVENT_ID + MyUtils.getPrimaryKey();
 
         AiTaskMessageDto aiTaskMessageDto = AiTaskMessageDto.builder()
                 .clientRequestId(task.getClientRequestId())
