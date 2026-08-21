@@ -18,4 +18,11 @@
         INSERT INTO love_couples (id, owner_user_id, partner_user_id, partner_name, start_date, status)
         VALUES (#{id}, #{ownerUserId}, #{partnerUserId}, #{partnerName}, #{startDate}, #{status})
     </insert>
+
+    <select id="queryCouples" resultMap="loveCoupleResultMap">
+        SELECT * FROM love_couples WHERE owner_user_id = #{loveCoupleDTO.ownerUserId}
+        <if test="status != null">
+            AND status = #{loveCoupleDTO.status}
+        </if>
+    </select>
 </mapper>

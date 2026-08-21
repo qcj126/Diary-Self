@@ -18,7 +18,7 @@ public class LoveCouplePO {
     private Long partnerUserId;
     private String partnerName;
     private String startDate;
-    private Byte status;
+    private Integer status;
     private Boolean deleted;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;

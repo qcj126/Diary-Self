@@ -23,8 +23,8 @@ public class LoveCoupleVO {
     @JsonSerialize(using = ToStringSerializer.class)
     private Long partnerUserId;
     private String partnerName;
-    private LocalDate startDate;
-    private Byte status;
+    private String startDate;
+    private Integer status;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 }

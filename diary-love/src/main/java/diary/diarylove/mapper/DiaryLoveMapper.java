@@ -7,4 +7,6 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface DiaryLoveMapper {
     int insertLoveCouples(LoveCouplePO loveCouplePO);
+
+    LoveCouplePO queryCouples(LoveCoupleDTO loveCoupleDTO);
 }

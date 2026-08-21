@@ -3,10 +3,10 @@ package diary.diarylove.impl;
 import diary.common.convert.love.DtoConvertToPo;
 import diary.common.entity.love.dto.LoveCoupleDTO;
 import diary.common.entity.love.po.LoveCouplePO;
-import diary.common.entity.love.vo.LoveCoupleVO;
+
 import diary.common.result.ApiResponse;
 import diary.diarylove.mapper.DiaryLoveMapper;
-import diary.diarylove.service.DiaryLoveService;
+import diary.diarylove.service.DiaryLoveAddService;
 import diary.utils.commonutil.MyUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,11 +15,11 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class DiaryLoveServiceImpl implements DiaryLoveService {
+public class DiaryLoveAddServiceImpl implements DiaryLoveAddService {
     private final DiaryLoveMapper diaryLoveMapper;
 
     @Override
-    public Integer addCouples(LoveCoupleDTO loveCoupleDTO) {
+    public ApiResponse<String> addCouples(LoveCoupleDTO loveCoupleDTO) {
         MyUtils.check()
                 .notNull(loveCoupleDTO, "loveCoupleDTO")
                 .notNull(loveCoupleDTO.getOwnerUserId(), "ownerUserId")
@@ -29,6 +29,7 @@ public class DiaryLoveServiceImpl implements DiaryLoveService {
                 .notNull(loveCoupleDTO.getStartDate(), "startDate");
         loveCoupleDTO.setId(MyUtils.getPrimaryKey());
         LoveCouplePO loveCouplePO = DtoConvertToPo.convertToPo(loveCoupleDTO);
-        return diaryLoveMapper.insertLoveCouples(loveCouplePO);
+        int insertCnt = diaryLoveMapper.insertLoveCouples(loveCouplePO);
+        return insertCnt > 0 ? ApiResponse.success("添加情侣关系成功") : ApiResponse.addFail();
     }
 }
