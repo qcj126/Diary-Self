@@ -38,6 +38,7 @@
     </resultMap>
     <select id="selectIngredientCategories" resultMap="IngredientPoResultMap">
         SELECT MIN(id) AS id, category, category_name FROM ingredient
+        WHERE is_main = #{isMain}
         GROUP BY category, category_name ORDER BY MIN(id)
     </select>
 

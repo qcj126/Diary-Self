@@ -4,10 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum AIEnum {
-    DEEPSEEK(1, "deepseek"),
-    QWENMAX(2, "通义千问-MAX"),
-    QWENPLUS(3, "通义千问-PLUS"),
-    YBAO(4, "元宝");
+    QWEN37PLUS(1, "qwen3.7-plus");
 
     private final int code;
     private final String desc;

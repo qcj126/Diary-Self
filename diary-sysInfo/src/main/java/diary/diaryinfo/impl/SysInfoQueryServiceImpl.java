@@ -33,19 +33,16 @@ public class SysInfoQueryServiceImpl implements SysInfoQueryService {
     private final SysInfoCacheService sysInfoCacheService;
 
     @Override
-    public ApiResponse<List<IngredientCategoryVo>> getIngredientCategories() {
-        String cacheKey = RedisKeyConst.SYS_INFO_INGREDIENT_CATEGORY_KEY;
-        List<IngredientCategoryVo> categories = sysInfoCacheService
-                .getList(cacheKey, IngredientCategoryVo.class)
-                .orElseGet(() -> {
-                    List<IngredientPo> ingredientPos = emptyIfNull(sysInfoMapper.selectIngredientCategories());
-                    List<IngredientCategoryVo> result = ingredientPos.stream()
-                            .map(PoConvertToVo::convertToIngredientCategoryVo)
-                            .collect(Collectors.toCollection(ArrayList::new));
-                    sysInfoCacheService.putList(cacheKey, result);
-                    return result;
-                });
-        return ApiResponse.success(categories);
+    public ApiResponse<List<IngredientCategoryVo>> getIngredientCategories(Integer isMain) {
+        MyUtils.check().notNull(isMain, "isMain");
+
+        List<IngredientPo> ingredientPos = emptyIfNull(
+                sysInfoMapper.selectIngredientCategories(isMain));
+        List<IngredientCategoryVo> result = ingredientPos.stream()
+                .map(PoConvertToVo::convertToIngredientCategoryVo)
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        return ApiResponse.success(result);
     }
 
     @Override
@@ -56,35 +53,21 @@ public class SysInfoQueryServiceImpl implements SysInfoQueryService {
                 .notNull(ingredientReqDto.getIsMain(), "isMain");
 
         IngredientPo condition = DtoConvertToPo.convertToIngredientPo(ingredientReqDto);
-        String cacheKey = RedisKeyConst.SYS_INFO_INGREDIENT_PREFIX + condition.getCategory();
-        List<IngredientVo> ingredients = sysInfoCacheService
-                .getList(cacheKey, IngredientVo.class)
-                .orElseGet(() -> {
-                    List<IngredientIconDto> ingredientIconDtos = emptyIfNull(
-                            sysInfoMapper.selectIngredientsByCategory(condition));
-                    List<IngredientVo> result = ingredientIconDtos.stream()
-                            .map(DtoConvertToVo::convertToVo)
-                            .collect(Collectors.toCollection(ArrayList::new));
-                    sysInfoCacheService.putList(cacheKey, result);
-                    return result;
-                });
-        return ApiResponse.success(ingredients);
+        List<IngredientIconDto> ingredientIconDtos = sysInfoMapper.selectIngredientsByCategory(condition);
+        List<IngredientVo> result = ingredientIconDtos.stream()
+                .map(DtoConvertToVo::convertToVo)
+                .collect(Collectors.toCollection(ArrayList::new));
+        return ApiResponse.success(result);
     }
 
     @Override
     public ApiResponse<List<CookWayVo>> getCookWays() {
-        String cacheKey = RedisKeyConst.SYS_INFO_COOK_WAY_KEY;
-        List<CookWayVo> cookWays = sysInfoCacheService
-                .getList(cacheKey, CookWayVo.class)
-                .orElseGet(() -> {
-                    List<CookWayPo> cookWayPos = emptyIfNull(sysInfoMapper.selectAllCookWays());
-                    List<CookWayVo> result = cookWayPos.stream()
-                            .map(PoConvertToVo::convertToCookWayVo)
-                            .collect(Collectors.toCollection(ArrayList::new));
-                    sysInfoCacheService.putList(cacheKey, result);
-                    return result;
-                });
-        return ApiResponse.success(cookWays);
+
+        List<CookWayPo> cookWayPos = emptyIfNull(sysInfoMapper.selectAllCookWays());
+        List<CookWayVo> result = cookWayPos.stream()
+                .map(PoConvertToVo::convertToCookWayVo)
+                .collect(Collectors.toCollection(ArrayList::new));
+        return ApiResponse.success(result);
     }
 
     private static <T> List<T> emptyIfNull(List<T> values) {

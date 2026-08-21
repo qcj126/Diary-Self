@@ -12,7 +12,7 @@ import java.util.List;
 @Mapper
 public interface SysInfoMapper {
 
-    List<IngredientPo> selectIngredientCategories();
+    List<IngredientPo> selectIngredientCategories(@Param("isMain") Integer isMain);
 
     List<IngredientIconDto> selectIngredientsByCategory(@Param("condition") IngredientPo condition);
 

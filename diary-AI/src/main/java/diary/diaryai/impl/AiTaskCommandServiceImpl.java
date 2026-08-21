@@ -1,5 +1,8 @@
 package diary.diaryai.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import diary.common.entity.ai.dto.AiInvokeDTO;
 import diary.common.entity.ai.dto.AiTaskMessageDto;
 import diary.common.entity.ai.dto.AiTaskProcessDto;
@@ -25,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.MDC;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Map;
 
 import static diary.common.consts.AiTaskConst.*;

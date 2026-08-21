@@ -9,7 +9,7 @@ import diary.common.result.ApiResponse;
 import java.util.List;
 
 public interface SysInfoQueryService {
-    ApiResponse<List<IngredientCategoryVo>> getIngredientCategories();
+    ApiResponse<List<IngredientCategoryVo>> getIngredientCategories(Integer isMain);
 
     ApiResponse<List<IngredientVo>> getIngredientsByCategory(IngredientReqDto ingredientReqDto);
 

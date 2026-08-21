@@ -1,6 +1,5 @@
 package diary.common.enums.aienum;
 
-import lombok.Data;
 import lombok.Getter;
 
 @Getter

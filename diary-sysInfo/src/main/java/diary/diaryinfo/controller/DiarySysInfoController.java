@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -23,8 +24,8 @@ public class DiarySysInfoController {
 
     // 查询食材分类
     @GetMapping("/ingredients/category")
-    public ApiResponse<List<IngredientCategoryVo>> getIngredientCategory() {
-        return sysInfoQueryService.getIngredientCategories();
+    public ApiResponse<List<IngredientCategoryVo>> getIngredientCategory(@RequestParam Integer isMain) {
+        return sysInfoQueryService.getIngredientCategories(isMain);
     }
 
     // 根据分类和是否主料查询食材，然后选择食材，并手动填写用量

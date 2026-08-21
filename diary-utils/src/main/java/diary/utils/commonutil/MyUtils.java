@@ -2,6 +2,8 @@ package diary.utils.commonutil;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -9,6 +11,9 @@ import java.util.Map;
 import java.util.Objects;
 
 public class MyUtils {
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+            .registerModule(new JavaTimeModule())
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     private static long lastTimestamp = -1L;
     private static long sequence = 0L;
     private static final long START_TIMESTAMP = 1704038400000L; // 2024-01-01
@@ -54,8 +59,7 @@ public class MyUtils {
     // 序列化为json
     public static String writeJson(Object value, String message) {
         try {
-            var objectMapper = new ObjectMapper();
-            return objectMapper.writeValueAsString(value);
+            return OBJECT_MAPPER.writeValueAsString(value);
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException(message, e);
         }

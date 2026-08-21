@@ -29,16 +29,13 @@ create table ai_nutrient(
 ) engine=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='AI饮食营养表';
 create index idx_ai_nutrient_info_id on ai_nutrient (ai_info_id);
 
--- 1. 先删除原有索引
-DROP INDEX idx_ai_nutrient_task_id ON ai_nutrient;
+create index idx_ai_nutrient_info_id
+    on ai_nutrient (ai_info_id);
 
--- 2. 创建唯一索引
-CREATE UNIQUE INDEX idx_ai_nutrient_task_id ON ai_nutrient (ai_task_id);
+create index idx_ai_nutrient_user_time
+    on ai_nutrient (user_id, create_time);
 
-create index idx_ai_nutrient_user_time on ai_nutrient (user_id, create_time);
-
--- 恢复扫描索引
-CREATE INDEX idx_ai_task_status_lease_until ON ai_task (status, lease_until);
+CREATE UNIQUE INDEX uk_ai_nutrient_task_id ON ai_nutrient (ai_task_id);
 
 create table ai_task(
     id                bigint unsigned                    not null comment 'primary key'

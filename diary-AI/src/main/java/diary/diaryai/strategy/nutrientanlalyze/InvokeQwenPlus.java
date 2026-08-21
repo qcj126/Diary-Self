@@ -52,7 +52,7 @@ public class InvokeQwenPlus extends InvokeAITemplate implements InvokeAIService 
 
     @Override
     public Integer getCode() {
-        return AIEnum.QWENPLUS.getCode();
+        return AIEnum.QWEN37PLUS.getCode();
     }
 
     @Override
