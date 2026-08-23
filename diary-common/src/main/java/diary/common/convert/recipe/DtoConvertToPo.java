@@ -19,6 +19,7 @@ public class DtoConvertToPo {
         recipePO.setCategoryNum(recipeReqDto.getCategoryNum());
         recipePO.setMealType(recipeReqDto.getMealType());
         recipePO.setDifficulty(recipeReqDto.getDifficulty());
+        recipePO.setCookWay(recipeReqDto.getCookWay());
         recipePO.setCookingTime(recipeReqDto.getCookingTime());
         recipePO.setStory(recipeReqDto.getStory() == null ? "" : recipeReqDto.getStory());
         recipePO.setFamilyMember(recipeReqDto.getFamilyMember());

@@ -49,10 +49,10 @@
     <insert id="insert" parameterType="diary.common.entity.recipe.po.RecipePO">
         INSERT INTO recipe (
             id, user_id, title, image_id, description, category_num, meal_type,
-            difficulty, cooking_time, story, sort, family_member, create_time, update_time
+            difficulty, cook_way, cooking_time, story, sort, family_member, create_time, update_time
         ) VALUES (
             #{id}, #{userId}, #{title}, #{imageId}, #{description}, #{categoryNum}, #{mealType},
-            #{difficulty}, #{cookingTime}, #{story}, #{sort}, #{familyMember}, #{createTime}, #{updateTime}
+            #{difficulty}, #{cookWay}, #{cookingTime}, #{story}, #{sort}, #{familyMember}, #{createTime}, #{updateTime}
         )
     </insert>
 
@@ -66,6 +66,7 @@
         UPDATE recipe
         <set>
             <if test="req.title != null and req.title != ''">title = #{req.title},</if>
+            <if test="req.imageId != null">image_id = #{req.imageId},</if>
             <if test="req.description != null and req.description != ''">description = #{req.description},</if>
             <if test="req.categoryNum != null">category_num = #{req.categoryNum},</if>
             <if test="req.mealType != null">meal_type = #{req.mealType},</if>

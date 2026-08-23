@@ -100,6 +100,7 @@ public class RecipeAddServiceImpl implements RecipeAddService {
                 .notNull(recipeReqDto.getCategoryNum(), "食谱分类编号")
                 .notNull(recipeReqDto.getMealType(), "餐别")
                 .notNull(recipeReqDto.getDifficulty(), "难度")
+                .notEmpty(recipeReqDto.getCookWay(), "烹饪方式")
                 .notNull(recipeReqDto.getCookingTime(), "烹饪时长")
                 .notNull(recipeReqDto.getIngredients(), "食材")
                 .listNotEmpty(recipeReqDto.getIngredients(), "食材")

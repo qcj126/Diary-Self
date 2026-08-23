@@ -1,13 +1,11 @@
 package diary.diaryai;
 
-import diary.common.enums.aienum.AiTaskErrorCodeEnum;
-import diary.common.enums.aienum.AiTaskStatusEnum;
-import diary.common.exception.AiSubmitRateLimitException;
-
-import java.util.Date;
+import diary.utils.commonutil.MyUtils;
 
 public class MyTest {
     public static void main(String[] args) {
-
+        for (int i = 0; i < 130; i++) {
+            System.out.println(MyUtils.getPrimaryKey());
+        }
     }
 }
