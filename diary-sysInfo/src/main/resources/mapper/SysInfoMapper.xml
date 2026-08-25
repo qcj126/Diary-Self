@@ -56,4 +56,9 @@
         create_time, update_time FROM cook_way
         ORDER BY sort_order, id
     </select>
+
+    <insert id="insertIngredient">
+        INSERT INTO ingredient (id, name, category, category_name, is_main, icon_id, user_id)
+        VALUES (#{id}, #{name}, #{category}, #{categoryName}, #{isMain}, #{iconId}, #{userId})
+    </insert>
 </mapper>

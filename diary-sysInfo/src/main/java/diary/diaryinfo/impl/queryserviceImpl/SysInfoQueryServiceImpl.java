@@ -1,6 +1,5 @@
-package diary.diaryinfo.impl;
+package diary.diaryinfo.impl.queryserviceImpl;
 
-import diary.common.consts.RedisKeyConst;
 import diary.common.convert.sysInfo.DtoConvertToPo;
 import diary.common.convert.sysInfo.DtoConvertToVo;
 import diary.common.convert.sysInfo.PoConvertToVo;
@@ -13,7 +12,6 @@ import diary.common.entity.sysInfo.vo.IngredientCategoryVo;
 import diary.common.entity.sysInfo.vo.IngredientVo;
 import diary.common.result.ApiResponse;
 import diary.diaryinfo.mapper.SysInfoMapper;
-import diary.diaryinfo.service.SysInfoCacheService;
 import diary.diaryinfo.service.SysInfoQueryService;
 import diary.utils.commonutil.MyUtils;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +28,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SysInfoQueryServiceImpl implements SysInfoQueryService {
     private final SysInfoMapper sysInfoMapper;
-    private final SysInfoCacheService sysInfoCacheService;
 
     @Override
     public ApiResponse<List<IngredientCategoryVo>> getIngredientCategories(Integer isMain) {

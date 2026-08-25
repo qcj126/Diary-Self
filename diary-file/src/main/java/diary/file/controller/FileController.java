@@ -1,22 +1,13 @@
 package diary.file.controller;
 
-import diary.common.entity.file.dto.IconDTO;
 import diary.common.entity.image.vo.ImageVO;
 import diary.common.result.ApiResponse;
 import diary.file.service.VideoFileService;
-import diary.file.service.addservice.IconAddService;
 import diary.file.service.deleteservice.DeleteService;
-import diary.file.service.deleteservice.IconDeleteService;
 import diary.file.service.downloadservice.DownloadService;
-import diary.file.service.queryservice.IconQueryService;
 import diary.file.service.queryurlservice.QueryUrlService;
-import diary.file.service.updateservice.IconUpdateService;
 import diary.file.service.uploadservice.UploadService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,13 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.util.UriUtils;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
@@ -38,7 +23,6 @@ import java.util.Map;
 @RequestMapping("/file")
 @RequiredArgsConstructor
 public class FileController {
-    private static final Path ICON_DIR = Paths.get("E:\\Diary-Front\\icon").normalize();
 
     private final UploadService uploadService;
 
@@ -49,14 +33,6 @@ public class FileController {
     private final QueryUrlService queryUrlService;
 
     private final DeleteService deleteService;
-
-    private final IconAddService iconAddService;
-
-    private final IconDeleteService iconDeleteService;
-
-    private final IconQueryService iconQueryService;
-
-    private final IconUpdateService iconUpdateService;
 
     @PostMapping("/upload/images")
     public ApiResponse<List<Long>> upload(@RequestParam("files") List<MultipartFile> files,
@@ -96,47 +72,5 @@ public class FileController {
     public ApiResponse<String> deleteFile(@PathVariable Long id) {
         // Implementation for deleting a file
         return ApiResponse.success(deleteService.deleteImage(id));
-    }
-
-    @PostMapping("/icon/add")
-    public ApiResponse<?> addIcon(@RequestParam("file") MultipartFile file,
-                                  @ModelAttribute IconDTO iconDTO) {
-        return iconAddService.addIcon(file, iconDTO);
-    }
-
-    @PostMapping("/icon/query")
-    public ApiResponse<?> queryIcons(@RequestBody(required = false) IconDTO iconDTO) {
-        return iconQueryService.queryIcons(iconDTO);
-    }
-
-    @PostMapping("/icon/update")
-    public ApiResponse<?> updateIcon(@RequestParam(value = "file", required = false) MultipartFile file,
-                                     @ModelAttribute IconDTO iconDTO) {
-        return iconUpdateService.updateIcon(file, iconDTO);
-    }
-
-    @PostMapping("/icon/delete")
-    public ApiResponse<?> deleteIcon(@RequestBody IconDTO iconDTO) {
-        return iconDeleteService.deleteIcon(iconDTO);
-    }
-
-    @GetMapping(value = "/icon/{fileName}", produces = MediaType.IMAGE_PNG_VALUE)
-    public ResponseEntity<byte[]> getIcon(@PathVariable String fileName) throws IOException {
-        Path iconPath = resolveIconPath(fileName);
-        if (iconPath == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_PNG)
-                .body(Files.readAllBytes(iconPath));
-    }
-
-    private Path resolveIconPath(String fileName) {
-        String decodedFileName = UriUtils.decode(fileName, StandardCharsets.UTF_8);
-        Path iconPath = ICON_DIR.resolve(decodedFileName).normalize();
-        if (!iconPath.startsWith(ICON_DIR) || !Files.isRegularFile(iconPath)) {
-            return null;
-        }
-        return iconPath;
     }
 }

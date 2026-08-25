@@ -1,22 +1,16 @@
-package diary.file.impl.deleteserviceImpl;
+package diary.diaryinfo.impl.deleteserviceImpl;
 
 import diary.common.entity.file.dto.IconDTO;
 import diary.common.entity.file.po.IconPO;
 import diary.common.exception.NullResultException;
 import diary.common.result.ApiResponse;
-import diary.file.mapper.IconMapper;
-import diary.file.service.deleteservice.IconDeleteService;
+import diary.diaryinfo.mapper.IconMapper;
+import diary.diaryinfo.service.IconDeleteService;
 import diary.utils.commonutil.MyUtils;
 import diary.utils.file.FileUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @Slf4j
 @Service

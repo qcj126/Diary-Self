@@ -1,4 +1,4 @@
-package diary.file.mapper;
+package diary.diaryinfo.mapper;
 
 import diary.common.entity.file.dto.IconDTO;
 import diary.common.entity.file.po.IconPO;

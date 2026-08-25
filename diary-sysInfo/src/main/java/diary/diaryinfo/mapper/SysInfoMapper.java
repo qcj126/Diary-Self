@@ -17,4 +17,6 @@ public interface SysInfoMapper {
     List<IngredientIconDto> selectIngredientsByCategory(@Param("condition") IngredientPo condition);
 
     List<CookWayPo> selectAllCookWays();
+
+    int insertIngredient(IngredientPo ingredientPo);
 }

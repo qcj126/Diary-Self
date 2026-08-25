@@ -1,11 +1,12 @@
-package diary.file.impl.updateserviceImpl;
+package diary.diaryinfo.impl.updateserviceImpl;
 
 import diary.common.convert.file.DtoConvertToPo;
 import diary.common.entity.file.dto.IconDTO;
 import diary.common.entity.file.po.IconPO;
 import diary.common.result.ApiResponse;
-import diary.file.mapper.IconMapper;
-import diary.file.service.updateservice.IconUpdateService;
+
+import diary.diaryinfo.mapper.IconMapper;
+import diary.diaryinfo.service.IconUpdateService;
 import diary.utils.commonutil.MyUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

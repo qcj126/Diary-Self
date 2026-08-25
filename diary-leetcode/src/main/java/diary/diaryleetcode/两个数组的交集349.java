@@ -119,6 +119,32 @@ public class 两个数组的交集349 {
     }
 
     // 两个数组的交集 II
+    public int[] intersect5(int[] nums1, int[] nums2) {
+        // 3ms 44.43MB
+        // 第一个是小集合
+        if (nums1.length > nums2.length) {
+            return intersect5(nums2, nums1);
+        }
+        int[] ints = new int[nums1.length];
+        HashMap<Integer, Integer> map = new HashMap<>();
+        for (int i = 0; i < nums1.length; i++) {
+            map.put(nums1[i], map.getOrDefault(nums1[i], 0) + 1);
+        }
+        int index = 0;
+        for (int i = 0; i < nums2.length; i++) {
+            if (map.containsKey(nums2[i])) {
+                if (map.get(nums2[i]) > 0) {
+                    map.put(nums2[i], map.get(nums2[i]) - 1);
+                    ints[index ++] = nums2[i];
+                } else {
+                    map.remove(nums2[i]);
+                }
+            }
+        }
+        return Arrays.copyOfRange(ints, 0, index);
+    }
+
+    // 两个数组的交集 II
     public int[] intersect6(int[] nums1, int[] nums2) {
         // 3ms 44.61MB
         // 第一个是小集合
@@ -148,29 +174,22 @@ public class 两个数组的交集349 {
         return ints;
     }
 
-    // 两个数组的交集 II
-    public int[] intersect5(int[] nums1, int[] nums2) {
-        // 3ms 44.43MB
-        // 第一个是小集合
-        if (nums1.length > nums2.length) {
-            return intersect5(nums2, nums1);
+    // 两数组交集 II 数组作为hash表的方式     与投票选举类似
+    public int[] intersect7(int[] nums1, int[] nums2) {
+        // 0ms 44.16MB
+        int[] count = new int[1001];
+        for (int i : nums1) {
+            count[i] ++;
         }
-        int[] ints = new int[nums1.length];
-        HashMap<Integer, Integer> map = new HashMap<>();
-        for (int i = 0; i < nums1.length; i++) {
-            map.put(nums1[i], map.getOrDefault(nums1[i], 0) + 1);
-        }
+        int length = nums1.length <= nums2.length ? nums1.length : nums2.length;
+        int[] tempArr = new int[length];
         int index = 0;
-        for (int i = 0; i < nums2.length; i++) {
-            if (map.containsKey(nums2[i])) {
-                if (map.get(nums2[i]) > 0) {
-                    map.put(nums2[i], map.get(nums2[i]) - 1);
-                    ints[index ++] = nums2[i];
-                } else {
-                    map.remove(nums2[i]);
-                }
+        for (int i : nums2) {
+            if (count[i] > 0) {
+                tempArr[index ++] = i;
+                count[i] --;
             }
         }
-        return Arrays.copyOfRange(ints, 0, index);
+        return Arrays.copyOfRange(tempArr, 0, index);
     }
 }
