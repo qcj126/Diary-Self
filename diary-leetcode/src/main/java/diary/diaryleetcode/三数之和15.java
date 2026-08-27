@@ -6,12 +6,60 @@ import java.util.*;
 
 public class 三数之和15 {
     public static void main(String[] args) {
-        int[] nums = {-100,-70,-60,110,120,130,160}; // 1,4,-5  2,3,-5  1,6,-7  2,5,-7 3,4,-7
+        int[] nums = {-5,1,-3,-1,-4,-2,4,-1,-1}; // 1,4,-5  2,3,-5  1,6,-7  2,5,-7 3,4,-7
         List<List<Integer>> lists = threeSum(nums);
         List<List<Integer>> lists2 = threeSum2(nums);
+        List<List<Integer>> lists3 = threeSum3(nums);
         System.out.println(lists);
         System.out.println(lists2);
+        System.out.println(lists3);
     }
+
+    // 前后双指针解法
+    // 43ms  58.16MB
+    // 优化之后的版本：31ms  58.01MB
+    public static List<List<Integer>> threeSum3(int[] nums) {
+        Arrays.sort(nums);
+        List<List<Integer>> resultSet = new ArrayList<>();
+        // 先固定一个桶，用剩余数字进行加操作
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] > 0) break;
+            if (i > 0 && nums[i - 1] == nums[i]) continue;
+            int target = -nums[i];
+            int right = nums.length - 1;
+            int left = i + 1;
+            while (left < right) {
+                // 每次循环判重，可优化为找到3元组后，再判重，留下的依旧是不重复元素
+//                if (nums[left] == nums[left - 1] && left > i + 1) {
+//                    left ++;
+//                    continue;
+//                }
+//                if (right < nums.length - 1 && nums[right] == nums[right + 1]) {
+//                    right --;
+//                    continue;
+//                }
+                int add = nums[left] + nums[right];
+                if (target == add) {
+                    while(left < right && nums[left] == nums[left+1]) left++;
+                    while(left < right && nums[right] == nums[right-1]) right--;
+                    ArrayList<Integer> objects = new ArrayList<>(3);
+                    objects.add(nums[i]);
+                    objects.add(nums[left]);
+                    objects.add(nums[right]);
+                    resultSet.add(objects); // list中的数据是天然排序的
+                    right --;
+                    left ++;
+                } else if (add < target) { // 说明left所在的数太小了，需要大一点的
+                    left ++;
+                } else { // 说明right所在的数太大了，需要小一点的
+                    right --;
+                }
+            }
+        }
+        return resultSet;
+
+    }
+
     // 暴力求解法超时
     public static List<List<Integer>> threeSum(int[] nums) {
         List<List<Integer>> result = new ArrayList<>();
@@ -54,7 +102,7 @@ public class 三数之和15 {
 //        }
 //        return result;
 
-        // 正确写法   594ms 59.63MB
+        // 正确写法   383ms 59.91MB
         // 1. 先排序，方便去重
         Arrays.sort(nums);
         Set<List<Integer>> resultSet = new HashSet<>();
