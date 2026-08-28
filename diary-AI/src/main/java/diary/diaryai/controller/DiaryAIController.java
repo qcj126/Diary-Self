@@ -6,6 +6,7 @@ import diary.common.entity.ai.vo.AiTaskStatusVo;
 import diary.common.entity.ai.vo.AiTaskSubmitVo;
 import diary.common.enums.aienum.AiTaskStatusEnum;
 import diary.common.result.ApiResponse;
+import diary.config.logconfig.OperLog;
 import diary.diaryai.service.AiTaskApplicationService;
 import diary.diaryai.service.AiTaskQueryService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class DiaryAIController {
     private final AiTaskApplicationService aiTaskApplicationService;
     private final AiTaskQueryService aiTaskQueryService;
 
+    @OperLog(module = "AI", description = "提交AI任务", operationType = "INSERT", saveParams = true, saveResult = false)
     @PostMapping("/tasks")
     public ResponseEntity<ApiResponse<AiTaskSubmitVo>> submit(
             @RequestBody AiInvokeDTO request) {
@@ -32,6 +34,7 @@ public class DiaryAIController {
                 .body(ApiResponse.success(aiTaskApplicationService.submitTask(request)));
     }
 
+    @OperLog(module = "AI", description = "获取AI任务状态", operationType = "SELECT", saveParams = true, saveResult = true)
     @GetMapping("/tasks/{taskId}")
     public ResponseEntity<ApiResponse<AiTaskStatusVo>> status(
             @PathVariable Long taskId) {
@@ -39,6 +42,7 @@ public class DiaryAIController {
                 ApiResponse.success(aiTaskQueryService.getTaskStatus(taskId)));
     }
 
+    @OperLog(module = "AI", description = "获取AI任务结果", operationType = "SELECT", saveParams = true, saveResult = false)
     @GetMapping("/tasks/{taskId}/result")
     public ResponseEntity<ApiResponse<AiTaskResultVo>> result(
             @PathVariable Long taskId) {

@@ -14,7 +14,6 @@ public class 和为K的子数组560 {
     // 暴力枚举法
     private static int subarraySum(int[] nums, int k) {
         int result = 0;
-
         for (int i = 0; i < nums.length; i++) {
             int sum = 0;
             for (int j = i; j < nums.length; j++) {

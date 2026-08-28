@@ -56,10 +56,16 @@
         <openpdf.version>2.0.3</openpdf.version>
         <netty.version>4.1.132.Final</netty.version>
         <rocketmq.version>2.3.6</rocketmq.version>
+        <aop.version>3.5.14</aop.version>
     </properties>
     
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-aop</artifactId>
+                <version>${aop.version}</version>
+            </dependency>
             <!-- Spring Cloud BOM -->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
