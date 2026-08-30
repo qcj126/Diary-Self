@@ -2,6 +2,7 @@ package diary.file.controller;
 
 import diary.common.entity.image.vo.ImageVO;
 import diary.common.result.ApiResponse;
+import diary.config.logconfig.OperLog;
 import diary.file.service.VideoFileService;
 import diary.file.service.deleteservice.DeleteService;
 import diary.file.service.downloadservice.DownloadService;
@@ -34,12 +35,14 @@ public class FileController {
 
     private final DeleteService deleteService;
 
+    @OperLog(module = "文件管理", description = "批量上传图片", operationType = "UPLOAD", saveParams = false, saveResult = true)
     @PostMapping("/upload/images")
     public ApiResponse<List<Long>> upload(@RequestParam("files") List<MultipartFile> files,
                                           @RequestParam("code") Integer code) {
         return ApiResponse.success(uploadService.uploadImagesAndInsert(files, code));
     }
 
+    @OperLog(module = "文件管理", description = "查询图片访问地址", operationType = "SELECT", saveResult = false)
     @PostMapping("/query/images/urls")
     public ApiResponse<List<ImageVO>> queryImageUrls(@RequestBody List<Long> imageIds) {
         // 根据 imageIds 查询图片，并动态生成签名 URL（有效期5分钟）
@@ -47,18 +50,21 @@ public class FileController {
         return ApiResponse.success(queryUrlService.queryImageUrls(imageIds));
     }
 
+    @OperLog(module = "文件管理", description = "查询轮播图片", operationType = "SELECT", saveParams = false, saveResult = false)
     @PostMapping("/query/images/carousel")
     public ApiResponse<List<ImageVO>> queryCarouselImages() {
         // 查询轮播图图片  规则：查看每个分类的最新2张图片
         return ApiResponse.success(queryUrlService.queryCarouselImages());
     }
 
+    @OperLog(module = "文件管理", description = "批量下载图片", operationType = "DOWNLOAD", saveParams = false, saveResult = false)
     @PostMapping("/download/image")
     public ApiResponse<Map<String, Object>> download(@RequestBody Map<Long, String> imageIdUrls) {
         // 批量下载图片
         return ApiResponse.success(downloadService.batchDownloadPhotos(imageIdUrls));
     }
 
+    @OperLog(module = "文件管理", description = "上传视频", operationType = "UPLOAD", saveParams = false, saveResult = false)
     @PostMapping("/upload/video")
     public ApiResponse<Map<String, Object>> uploadVideo(@RequestParam("file") MultipartFile file) {
         // 直接先插入数据
@@ -68,6 +74,7 @@ public class FileController {
         return ApiResponse.success(result);
     }
 
+    @OperLog(module = "文件管理", description = "删除图片文件", operationType = "DELETE", saveResult = true)
     @PostMapping("/delete/{id}")
     public ApiResponse<String> deleteFile(@PathVariable Long id) {
         // Implementation for deleting a file

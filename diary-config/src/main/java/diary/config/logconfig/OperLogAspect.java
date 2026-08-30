@@ -26,12 +26,12 @@ public class OperLogAspect {
      * 定义切点：拦截带有@OperationLog注解的方法
      */
     @Pointcut("@annotation(diary.config.logconfig.OperLog)")
-    public void operationLogPointcut() {}
+    public void OperLog() {}
 
     /**
      * 环绕通知
      */
-    @Around("operationLogPointcut()")
+    @Around("OperLog()")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
         long startTime = System.currentTimeMillis();
 

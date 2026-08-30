@@ -4,7 +4,9 @@ import diary.common.enums.dietenum.MealTypeEnum;
 import diary.common.entity.diet.po.DietRecordPO;
 import diary.common.entity.diet.vo.DietRecordVO;
 
-public class POConvertToVO {
+public final class POConvertToVO {
+    private POConvertToVO() {
+    }
     
     /**
      * PO转VO
@@ -21,9 +23,12 @@ public class POConvertToVO {
                 .protein(po.getProtein())
                 .fat(po.getFat())
                 .carbohydrate(po.getCarbohydrate())
+                .sugar(po.getSugar())
+                .sodium(po.getSodium())
                 .fullnessScore(po.getFullnessScore())
                 .location(po.getLocation())
                 .note(po.getNote())
+                .imageUrl(po.getImageUrl())
                 .createTime(po.getCreateTime())
                 .updateTime(po.getUpdateTime())
                 .build();

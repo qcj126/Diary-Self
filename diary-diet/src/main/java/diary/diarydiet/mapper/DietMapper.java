@@ -1,5 +1,6 @@
 package diary.diarydiet.mapper;
 
+import diary.common.entity.diet.dto.DietQueryDTO;
 import diary.common.entity.diet.po.DietRecordPO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -23,9 +24,13 @@ public interface DietMapper {
      * 根据ID更新饮食记录
      */
     int updateById(DietRecordPO dietRecordPO);
+
+    int logicalDeleteById(@Param("id") Long id);
     
     /**
      * 根据用户ID查询所有未删除的饮食记录
      */
     List<DietRecordPO> selectByUserId(@Param("userId") Long userId);
+
+    List<DietRecordPO> selectList(DietQueryDTO query);
 }

@@ -14,18 +14,21 @@
         <result column="protein" property="protein"/>
         <result column="fat" property="fat"/>
         <result column="carbohydrate" property="carbohydrate"/>
+        <result column="sugar" property="sugar"/>
+        <result column="sodium" property="sodium"/>
         <result column="fullness_score" property="fullnessScore"/>
         <result column="location" property="location"/>
         <result column="note" property="note"/>
+        <result column="image_url" property="imageUrl"/>
         <result column="deleted" property="deleted"/>
-        <result column="created_at" property="createdAt"/>
-        <result column="updated_at" property="updatedAt"/>
+        <result column="created_at" property="createTime"/>
+        <result column="updated_at" property="updateTime"/>
     </resultMap>
 
     <!-- 基础字段 -->
     <sql id="BaseColumns">
         id, user_id, eat_time, meal_type, food_name, calories,
-        protein, fat, carbohydrate, fullness_score, location, note,
+        protein, fat, carbohydrate, sugar, sodium, fullness_score, location, note, image_url,
         deleted, created_at, updated_at
     </sql>
 
@@ -33,11 +36,11 @@
     <insert id="insert" parameterType="diary.common.entity.diet.po.DietRecordPO">
         INSERT INTO diet_record (
             id, user_id, eat_time, meal_type, food_name, calories,
-            protein, fat, carbohydrate, fullness_score, location, note,
+            protein, fat, carbohydrate, sugar, sodium, fullness_score, location, note, image_url,
             deleted, created_at, updated_at
         ) VALUES (
             #{id}, #{userId}, #{eatTime}, #{mealType}, #{foodName}, #{calories},
-            #{protein}, #{fat}, #{carbohydrate}, #{fullnessScore}, #{location}, #{note},
+            #{protein}, #{fat}, #{carbohydrate}, #{sugar}, #{sodium}, #{fullnessScore}, #{location}, #{note}, #{imageUrl},
             #{deleted}, NOW(), NOW()
         )
     </insert>
@@ -62,13 +65,23 @@
             <if test="protein != null">protein = #{protein},</if>
             <if test="fat != null">fat = #{fat},</if>
             <if test="carbohydrate != null">carbohydrate = #{carbohydrate},</if>
+            <if test="sugar != null">sugar = #{sugar},</if>
+            <if test="sodium != null">sodium = #{sodium},</if>
             <if test="fullnessScore != null">fullness_score = #{fullnessScore},</if>
             <if test="location != null">location = #{location},</if>
             <if test="note != null">note = #{note},</if>
+            <if test="imageUrl != null">image_url = #{imageUrl},</if>
             <if test="deleted != null">deleted = #{deleted},</if>
             updated_at = NOW()
         </set>
         WHERE id = #{id}
+    </update>
+
+    <update id="logicalDeleteById">
+        UPDATE diet_record
+        SET deleted = 1, updated_at = NOW()
+        WHERE id = #{id}
+          AND deleted = 0
     </update>
 
     <!-- 根据用户ID查询所有未删除的记录 -->
@@ -78,6 +91,41 @@
         WHERE user_id = #{userId}
         AND deleted = 0
         ORDER BY eat_time DESC
+    </select>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns"/>
+        FROM diet_record
+        WHERE user_id = #{userId}
+          AND deleted = 0
+        <if test="keyword != null and keyword != ''">
+            AND (
+                food_name LIKE CONCAT('%', #{keyword}, '%')
+                OR note LIKE CONCAT('%', #{keyword}, '%')
+                OR CASE meal_type
+                    WHEN 10 THEN '早餐'
+                    WHEN 15 THEN '早加餐'
+                    WHEN 20 THEN '午餐'
+                    WHEN 25 THEN '午加餐'
+                    WHEN 30 THEN '晚餐'
+                    WHEN 35 THEN '夜宵'
+                    ELSE '其他'
+                END LIKE CONCAT('%', #{keyword}, '%')
+            )
+        </if>
+        <if test="startTime != null">
+            AND eat_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND eat_time &lt;= #{endTime}
+        </if>
+        <if test="mealType != null">
+            AND meal_type = #{mealType}
+        </if>
+        <if test="location != null and location != ''">
+            AND location = #{location}
+        </if>
+        ORDER BY eat_time DESC, id DESC
     </select>
 
 </mapper>

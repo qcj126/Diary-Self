@@ -1,17 +1,17 @@
 package diary.diarydiet.impl.query;
 
 import diary.common.convert.diet.POConvertToVO;
+import diary.common.entity.diet.dto.DietQueryDTO;
 import diary.common.entity.diet.po.DietRecordPO;
 import diary.common.entity.diet.vo.DietRecordVO;
-import diary.common.exception.ParamIllegalException;
 import diary.common.result.ApiResponse;
+import diary.diarydiet.support.DietRecordValidator;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import diary.diarydiet.mapper.DietMapper;
 import diary.diarydiet.service.query.DietQueryService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class DietQueryServiceImpl implements DietQueryService {
@@ -20,13 +20,11 @@ public class DietQueryServiceImpl implements DietQueryService {
 
     @Override
     public ApiResponse<DietRecordVO> getDietRecordById(Long id) {
-        if (id == null) {
-            throw new ParamIllegalException("记录ID不能为空");
-        }
+        DietRecordValidator.validateId(id);
 
         DietRecordPO dietRecordPO = dietMapper.selectById(id);
         if (dietRecordPO == null) {
-            throw new ParamIllegalException("饮食记录不存在");
+            return ApiResponse.queryFail();
         }
 
         return ApiResponse.success(POConvertToVO.convertToVO(dietRecordPO));
@@ -34,17 +32,20 @@ public class DietQueryServiceImpl implements DietQueryService {
 
     @Override
     public ApiResponse<List<DietRecordVO>> getDietRecordsByUserId(Long userId) {
-        if (userId == null) {
-            throw new ParamIllegalException("用户ID不能为空");
+        DietQueryDTO query = new DietQueryDTO();
+        query.setUserId(userId);
+        return queryDietRecords(query);
+    }
+
+    @Override
+    public ApiResponse<List<DietRecordVO>> queryDietRecords(DietQueryDTO query) {
+        DietRecordValidator.validateQuery(query);
+        if (query.getKeyword() != null) {
+            query.setKeyword(query.getKeyword().trim());
         }
-
-        // 查询该用户的所有未删除的饮食记录
-        List<DietRecordPO> dietRecordPOs = dietMapper.selectByUserId(userId);
-
-        List<DietRecordVO> dietRecordVOs = dietRecordPOs.stream()
-                                                       .map(POConvertToVO::convertToVO)
-                                                       .collect(Collectors.toList());
-
-        return ApiResponse.success(dietRecordVOs);
+        List<DietRecordVO> records = dietMapper.selectList(query).stream()
+                .map(POConvertToVO::convertToVO)
+                .toList();
+        return ApiResponse.success(records);
     }
 }

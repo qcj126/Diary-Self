@@ -44,10 +44,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
             <groupId>diary</groupId>
             <artifactId>diary-common</artifactId>
             <version>0.0.1-SNAPSHOT</version>
@@ -56,6 +52,12 @@
         <dependency>
             <groupId>diary</groupId>
             <artifactId>diary-utils</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>diary</groupId>
+            <artifactId>diary-config</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>

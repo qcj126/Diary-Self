@@ -14,15 +14,475 @@
         <result property="updateTime" column="update_time"/>
     </resultMap>
 
-    <insert id="insertLoveCouples">
-        INSERT INTO love_couples (id, owner_user_id, partner_user_id, partner_name, start_date, status)
-        VALUES (#{id}, #{ownerUserId}, #{partnerUserId}, #{partnerName}, #{startDate}, #{status})
+    <resultMap id="loveAnniversaryResultMap" type="diary.common.entity.love.po.LoveAnniversaryPO">
+        <id property="id" column="id"/>
+        <result property="coupleId" column="couple_id"/>
+        <result property="creatorUserId" column="creator_user_id"/>
+        <result property="name" column="name"/>
+        <result property="eventDate" column="event_date"/>
+        <result property="repeatType" column="repeat_type"/>
+        <result property="remindDays" column="remind_days"/>
+        <result property="pinned" column="pinned"/>
+        <result property="sort" column="sort"/>
+        <result property="deleted" column="deleted"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <resultMap id="loveLocationResultMap" type="diary.common.entity.love.po.LoveLocationPO">
+        <id property="id" column="id"/>
+        <result property="coupleId" column="couple_id"/>
+        <result property="name" column="name"/>
+        <result property="address" column="address"/>
+        <result property="longitude" column="longitude"/>
+        <result property="latitude" column="latitude"/>
+        <result property="cityCode" column="city_code"/>
+        <result property="cityName" column="city_name"/>
+        <result property="deleted" column="deleted"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <resultMap id="loveRecordResultMap" type="diary.common.entity.love.po.LoveRecordPO">
+        <id property="id" column="id"/>
+        <result property="coupleId" column="couple_id"/>
+        <result property="creatorUserId" column="creator_user_id"/>
+        <result property="locationId" column="location_id"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="recordDate" column="record_date"/>
+        <result property="categoryCode" column="category_code"/>
+        <result property="important" column="important"/>
+        <result property="sort" column="sort"/>
+        <result property="deleted" column="deleted"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <resultMap id="loveRecordImageResultMap" type="diary.common.entity.love.po.LoveRecordImagePO">
+        <id property="id" column="id"/>
+        <result property="recordId" column="record_id"/>
+        <result property="imageId" column="image_id"/>
+        <result property="isCover" column="is_cover"/>
+        <result property="sort" column="sort"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <resultMap id="loveMoodResultMap" type="diary.common.entity.love.po.LoveMoodPO">
+        <id property="id" column="id"/>
+        <result property="moodCode" column="mood_code"/>
+        <result property="moodName" column="mood_name"/>
+        <result property="emoji" column="emoji"/>
+        <result property="sort" column="sort"/>
+        <result property="enabled" column="enabled"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <resultMap id="loveRecordMoodResultMap" type="diary.common.entity.love.po.LoveRecordMoodPO">
+        <id property="id" column="id"/>
+        <result property="recordId" column="record_id"/>
+        <result property="moodId" column="mood_id"/>
+        <result property="sort" column="sort"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <resultMap id="loveTagResultMap" type="diary.common.entity.love.po.LoveTagPO">
+        <id property="id" column="id"/>
+        <result property="coupleId" column="couple_id"/>
+        <result property="creatorUserId" column="creator_user_id"/>
+        <result property="tagName" column="tag_name"/>
+        <result property="color" column="color"/>
+        <result property="useCount" column="use_count"/>
+        <result property="deleted" column="deleted"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <resultMap id="loveRecordTagResultMap" type="diary.common.entity.love.po.LoveRecordTagPO">
+        <id property="id" column="id"/>
+        <result property="recordId" column="record_id"/>
+        <result property="tagId" column="tag_id"/>
+        <result property="sort" column="sort"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <sql id="loveCoupleColumns">
+        id, owner_user_id, partner_user_id, partner_name, start_date,
+        status, deleted, create_time, update_time
+    </sql>
+    <sql id="loveAnniversaryColumns">
+        id, couple_id, creator_user_id, name, event_date, repeat_type,
+        remind_days, pinned, sort, deleted, create_time, update_time
+    </sql>
+    <sql id="loveLocationColumns">
+        id, couple_id, name, address, longitude, latitude, city_code,
+        city_name, deleted, create_time, update_time
+    </sql>
+    <sql id="loveRecordColumns">
+        id, couple_id, creator_user_id, location_id, title, content,
+        record_date, category_code, important, sort, deleted, create_time, update_time
+    </sql>
+    <sql id="loveRecordImageColumns">
+        id, record_id, image_id, is_cover, sort, create_time
+    </sql>
+    <sql id="loveMoodColumns">
+        id, mood_code, mood_name, emoji, sort, enabled, create_time, update_time
+    </sql>
+    <sql id="loveRecordMoodColumns">
+        id, record_id, mood_id, sort, create_time
+    </sql>
+    <sql id="loveTagColumns">
+        id, couple_id, creator_user_id, tag_name, color, use_count,
+        deleted, create_time, update_time
+    </sql>
+    <sql id="loveRecordTagColumns">
+        id, record_id, tag_id, sort, create_time
+    </sql>
+
+    <insert id="insertLoveCouple">
+        INSERT INTO love_couple
+        (id, owner_user_id, partner_user_id, partner_name, start_date, status)
+        VALUES
+        (#{id}, #{ownerUserId}, #{partnerUserId}, #{partnerName}, #{startDate}, #{status})
     </insert>
 
-    <select id="queryCouples" resultMap="loveCoupleResultMap">
-        SELECT * FROM love_couples WHERE owner_user_id = #{loveCoupleDTO.ownerUserId}
-        <if test="status != null">
-            AND status = #{loveCoupleDTO.status}
+    <select id="selectLoveCouple" resultMap="loveCoupleResultMap">
+        SELECT <include refid="loveCoupleColumns"/>
+        FROM love_couple
+        WHERE deleted = 0
+        <if test="query.id != null">
+            AND id = #{query.id}
         </if>
+        <if test="query.ownerUserId != null">
+            AND (owner_user_id = #{query.ownerUserId} OR partner_user_id = #{query.ownerUserId})
+        </if>
+        <if test="query.partnerUserId != null">
+            AND partner_user_id = #{query.partnerUserId}
+        </if>
+        <if test="query.status != null">
+            AND status = #{query.status}
+        </if>
+        ORDER BY update_time DESC, id DESC
+        LIMIT 1
     </select>
+
+    <update id="updateLoveCouple">
+        UPDATE love_couple
+        SET owner_user_id = #{ownerUserId},
+            partner_user_id = #{partnerUserId},
+            partner_name = #{partnerName},
+            start_date = #{startDate},
+            status = #{status},
+            update_time = CURRENT_TIMESTAMP
+        WHERE id = #{id} AND deleted = 0
+    </update>
+
+    <update id="deleteLoveCouple">
+        UPDATE love_couple
+        SET deleted = 1, update_time = CURRENT_TIMESTAMP
+        WHERE id = #{id} AND deleted = 0
+    </update>
+
+    <insert id="insertLoveAnniversary">
+        INSERT INTO love_anniversary
+        (id, couple_id, creator_user_id, name, event_date, repeat_type, remind_days, pinned, sort)
+        VALUES
+        (#{id}, #{coupleId}, #{creatorUserId}, #{name}, #{eventDate}, #{repeatType}, #{remindDays}, #{pinned}, #{sort})
+    </insert>
+
+    <select id="selectLoveAnniversaryById" resultMap="loveAnniversaryResultMap">
+        SELECT <include refid="loveAnniversaryColumns"/>
+        FROM love_anniversary
+        WHERE id = #{id} AND deleted = 0
+    </select>
+
+    <select id="selectLoveAnniversariesByCoupleId" resultMap="loveAnniversaryResultMap">
+        SELECT <include refid="loveAnniversaryColumns"/>
+        FROM love_anniversary
+        WHERE couple_id = #{coupleId} AND deleted = 0
+        ORDER BY pinned DESC, sort ASC, event_date ASC, id ASC
+    </select>
+
+    <update id="updateLoveAnniversary">
+        UPDATE love_anniversary
+        SET couple_id = #{coupleId},
+            creator_user_id = #{creatorUserId},
+            name = #{name},
+            event_date = #{eventDate},
+            repeat_type = #{repeatType},
+            remind_days = #{remindDays},
+            pinned = #{pinned},
+            sort = #{sort},
+            update_time = CURRENT_TIMESTAMP
+        WHERE id = #{id} AND deleted = 0
+    </update>
+
+    <update id="deleteLoveAnniversary">
+        UPDATE love_anniversary
+        SET deleted = 1, update_time = CURRENT_TIMESTAMP
+        WHERE id = #{id} AND deleted = 0
+    </update>
+
+    <insert id="insertLoveLocation">
+        INSERT INTO love_location
+        (id, couple_id, name, address, longitude, latitude, city_code, city_name)
+        VALUES
+        (#{id}, #{coupleId}, #{name}, #{address}, #{longitude}, #{latitude}, #{cityCode}, #{cityName})
+    </insert>
+
+    <select id="selectLoveLocationById" resultMap="loveLocationResultMap">
+        SELECT <include refid="loveLocationColumns"/>
+        FROM love_location
+        WHERE id = #{id} AND deleted = 0
+    </select>
+
+    <select id="selectLoveLocationsByCoupleId" resultMap="loveLocationResultMap">
+        SELECT <include refid="loveLocationColumns"/>
+        FROM love_location
+        WHERE couple_id = #{coupleId} AND deleted = 0
+        ORDER BY update_time DESC, id DESC
+    </select>
+
+    <update id="updateLoveLocation">
+        UPDATE love_location
+        SET couple_id = #{coupleId},
+            name = #{name},
+            address = #{address},
+            longitude = #{longitude},
+            latitude = #{latitude},
+            city_code = #{cityCode},
+            city_name = #{cityName},
+            update_time = CURRENT_TIMESTAMP
+        WHERE id = #{id} AND deleted = 0
+    </update>
+
+    <update id="deleteLoveLocation">
+        UPDATE love_location
+        SET deleted = 1, update_time = CURRENT_TIMESTAMP
+        WHERE id = #{id} AND deleted = 0
+    </update>
+
+    <insert id="insertLoveRecord">
+        INSERT INTO love_record
+        (id, couple_id, creator_user_id, location_id, title, content, record_date, category_code, important, sort)
+        VALUES
+        (#{id}, #{coupleId}, #{creatorUserId}, #{locationId}, #{title}, #{content}, #{recordDate}, #{categoryCode}, #{important}, #{sort})
+    </insert>
+
+    <select id="selectLoveRecordById" resultMap="loveRecordResultMap">
+        SELECT <include refid="loveRecordColumns"/>
+        FROM love_record
+        WHERE id = #{id} AND deleted = 0
+    </select>
+
+    <select id="selectLoveRecords" resultMap="loveRecordResultMap">
+        SELECT <include refid="loveRecordColumns"/>
+        FROM love_record
+        WHERE couple_id = #{query.coupleId} AND deleted = 0
+        <if test="query.creatorUserId != null">
+            AND creator_user_id = #{query.creatorUserId}
+        </if>
+        <if test="query.locationId != null">
+            AND location_id = #{query.locationId}
+        </if>
+        <if test="query.title != null and query.title != ''">
+            AND title LIKE CONCAT('%', #{query.title}, '%')
+        </if>
+        <if test="query.recordDate != null">
+            AND record_date = #{query.recordDate}
+        </if>
+        <if test="query.categoryCode != null and query.categoryCode != ''">
+            AND category_code = #{query.categoryCode}
+        </if>
+        <if test="query.important != null">
+            AND important = #{query.important}
+        </if>
+        ORDER BY record_date DESC, sort ASC, id DESC
+    </select>
+
+    <update id="updateLoveRecord">
+        UPDATE love_record
+        SET couple_id = #{coupleId},
+            creator_user_id = #{creatorUserId},
+            location_id = #{locationId},
+            title = #{title},
+            content = #{content},
+            record_date = #{recordDate},
+            category_code = #{categoryCode},
+            important = #{important},
+            sort = #{sort},
+            update_time = CURRENT_TIMESTAMP
+        WHERE id = #{id} AND deleted = 0
+    </update>
+
+    <update id="deleteLoveRecord">
+        UPDATE love_record
+        SET deleted = 1, update_time = CURRENT_TIMESTAMP
+        WHERE id = #{id} AND deleted = 0
+    </update>
+
+    <insert id="insertLoveRecordImage">
+        INSERT INTO love_record_image
+        (id, record_id, image_id, is_cover, sort)
+        VALUES
+        (#{id}, #{recordId}, #{imageId}, #{isCover}, #{sort})
+    </insert>
+
+    <select id="selectLoveRecordImageById" resultMap="loveRecordImageResultMap">
+        SELECT <include refid="loveRecordImageColumns"/>
+        FROM love_record_image
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectLoveRecordImagesByRecordId" resultMap="loveRecordImageResultMap">
+        SELECT <include refid="loveRecordImageColumns"/>
+        FROM love_record_image
+        WHERE record_id = #{recordId}
+        ORDER BY is_cover DESC, sort ASC, id ASC
+    </select>
+
+    <update id="updateLoveRecordImage">
+        UPDATE love_record_image
+        SET record_id = #{recordId}, image_id = #{imageId}, is_cover = #{isCover}, sort = #{sort}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteLoveRecordImage">
+        DELETE FROM love_record_image WHERE id = #{id}
+    </delete>
+
+    <insert id="insertLoveMood">
+        INSERT INTO love_mood
+        (id, mood_code, mood_name, emoji, sort, enabled)
+        VALUES
+        (#{id}, #{moodCode}, #{moodName}, #{emoji}, #{sort}, #{enabled})
+    </insert>
+
+    <select id="selectLoveMoodById" resultMap="loveMoodResultMap">
+        SELECT <include refid="loveMoodColumns"/>
+        FROM love_mood
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectLoveMoods" resultMap="loveMoodResultMap">
+        SELECT <include refid="loveMoodColumns"/>
+        FROM love_mood
+        <if test="enabled != null">
+            WHERE enabled = #{enabled}
+        </if>
+        ORDER BY sort ASC, id ASC
+    </select>
+
+    <update id="updateLoveMood">
+        UPDATE love_mood
+        SET mood_code = #{moodCode},
+            mood_name = #{moodName},
+            emoji = #{emoji},
+            sort = #{sort},
+            enabled = #{enabled},
+            update_time = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteLoveMood">
+        DELETE FROM love_mood WHERE id = #{id}
+    </delete>
+
+    <insert id="insertLoveRecordMood">
+        INSERT INTO love_record_mood
+        (id, record_id, mood_id, sort)
+        VALUES
+        (#{id}, #{recordId}, #{moodId}, #{sort})
+    </insert>
+
+    <select id="selectLoveRecordMoodById" resultMap="loveRecordMoodResultMap">
+        SELECT <include refid="loveRecordMoodColumns"/>
+        FROM love_record_mood
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectLoveRecordMoodsByRecordId" resultMap="loveRecordMoodResultMap">
+        SELECT <include refid="loveRecordMoodColumns"/>
+        FROM love_record_mood
+        WHERE record_id = #{recordId}
+        ORDER BY sort ASC, id ASC
+    </select>
+
+    <update id="updateLoveRecordMood">
+        UPDATE love_record_mood
+        SET record_id = #{recordId}, mood_id = #{moodId}, sort = #{sort}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteLoveRecordMood">
+        DELETE FROM love_record_mood WHERE id = #{id}
+    </delete>
+
+    <insert id="insertLoveTag">
+        INSERT INTO love_tag
+        (id, couple_id, creator_user_id, tag_name, color, use_count)
+        VALUES
+        (#{id}, #{coupleId}, #{creatorUserId}, #{tagName}, #{color}, #{useCount})
+    </insert>
+
+    <select id="selectLoveTagById" resultMap="loveTagResultMap">
+        SELECT <include refid="loveTagColumns"/>
+        FROM love_tag
+        WHERE id = #{id} AND deleted = 0
+    </select>
+
+    <select id="selectLoveTagsByCoupleId" resultMap="loveTagResultMap">
+        SELECT <include refid="loveTagColumns"/>
+        FROM love_tag
+        WHERE couple_id = #{coupleId} AND deleted = 0
+        ORDER BY use_count DESC, update_time DESC, id DESC
+    </select>
+
+    <update id="updateLoveTag">
+        UPDATE love_tag
+        SET couple_id = #{coupleId},
+            creator_user_id = #{creatorUserId},
+            tag_name = #{tagName},
+            color = #{color},
+            use_count = #{useCount},
+            update_time = CURRENT_TIMESTAMP
+        WHERE id = #{id} AND deleted = 0
+    </update>
+
+    <update id="deleteLoveTag">
+        UPDATE love_tag
+        SET deleted = 1, update_time = CURRENT_TIMESTAMP
+        WHERE id = #{id} AND deleted = 0
+    </update>
+
+    <insert id="insertLoveRecordTag">
+        INSERT INTO love_record_tag
+        (id, record_id, tag_id, sort)
+        VALUES
+        (#{id}, #{recordId}, #{tagId}, #{sort})
+    </insert>
+
+    <select id="selectLoveRecordTagById" resultMap="loveRecordTagResultMap">
+        SELECT <include refid="loveRecordTagColumns"/>
+        FROM love_record_tag
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectLoveRecordTagsByRecordId" resultMap="loveRecordTagResultMap">
+        SELECT <include refid="loveRecordTagColumns"/>
+        FROM love_record_tag
+        WHERE record_id = #{recordId}
+        ORDER BY sort ASC, id ASC
+    </select>
+
+    <update id="updateLoveRecordTag">
+        UPDATE love_record_tag
+        SET record_id = #{recordId}, tag_id = #{tagId}, sort = #{sort}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteLoveRecordTag">
+        DELETE FROM love_record_tag WHERE id = #{id}
+    </delete>
 </mapper>

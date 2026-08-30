@@ -65,6 +65,16 @@ public class DietRecordVO {
     private BigDecimal carbohydrate;
 
     /**
+     * 糖(g)
+     */
+    private BigDecimal sugar;
+
+    /**
+     * 钠(mg)
+     */
+    private BigDecimal sodium;
+
+    /**
      * 饱腹感评分 1~10
      */
     private Byte fullnessScore;
@@ -78,6 +88,11 @@ public class DietRecordVO {
      * 备注
      */
     private String note;
+
+    /**
+     * 食物图片地址
+     */
+    private String imageUrl;
 
     /**
      * 创建时间

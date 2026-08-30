@@ -1,13 +1,17 @@
 package diary.common.entity.diet.po;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class DietRecordPO {
     /**
      * 主键
@@ -55,6 +59,16 @@ public class DietRecordPO {
     private BigDecimal carbohydrate;
 
     /**
+     * 糖(g)
+     */
+    private BigDecimal sugar;
+
+    /**
+     * 钠(mg)
+     */
+    private BigDecimal sodium;
+
+    /**
      * 饱腹感评分 1~10
      */
     private Byte fullnessScore;
@@ -68,6 +82,11 @@ public class DietRecordPO {
      * 备注
      */
     private String note;
+
+    /**
+     * 食物图片地址
+     */
+    private String imageUrl;
 
     /**
      * 逻辑删除 0正常 1删除

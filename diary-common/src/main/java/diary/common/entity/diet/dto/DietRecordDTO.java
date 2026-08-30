@@ -72,6 +72,20 @@ public class DietRecordDTO {
     private BigDecimal carbohydrate;
 
     /**
+     * 糖(g)
+     */
+    @NotNull(message = "糖不能为空")
+    @DecimalMin(value = "0.00", message = "糖不能为负数")
+    private BigDecimal sugar;
+
+    /**
+     * 钠(mg)
+     */
+    @NotNull(message = "钠不能为空")
+    @DecimalMin(value = "0.00", message = "钠不能为负数")
+    private BigDecimal sodium;
+
+    /**
      * 饱腹感评分 1~10
      */
     @Min(value = 1, message = "饱腹感评分最小为1")
@@ -89,4 +103,10 @@ public class DietRecordDTO {
      */
     @Size(max = 500, message = "备注最多500字符")
     private String note;
+
+    /**
+     * 食物图片地址
+     */
+    @Size(max = 1000, message = "图片地址最多1000字符")
+    private String imageUrl;
 }
