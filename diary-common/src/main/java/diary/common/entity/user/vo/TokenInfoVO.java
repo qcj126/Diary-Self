@@ -21,6 +21,8 @@ public class TokenInfoVO implements Serializable {
 
     private String username;
 
+    private Long userId;
+
     private List<String> roles;
 
     private String accessTokenId;

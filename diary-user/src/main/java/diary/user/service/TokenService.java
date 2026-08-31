@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface TokenService {
 
-    TokenPairVO issueTokenPair(String username, List<String> roles);
+    TokenPairVO issueTokenPair(Long userId, String username, List<String> roles);
 
     TokenPairVO refresh(String refreshToken);
 

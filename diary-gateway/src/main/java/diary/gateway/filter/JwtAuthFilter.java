@@ -51,6 +51,7 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
 
         String accessToken = authHeader.substring(7);
         String username;
+        Long userId;
         String tokenId;
         List<String> roles;
         try {
@@ -58,6 +59,10 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
                 return unauthorized(exchange);
             }
             username = jwtUtil.extractUsername(accessToken);
+            userId = jwtUtil.extractUserId(accessToken);
+            if (userId == null) {
+                return unauthorized(exchange);
+            }
             tokenId = jwtUtil.extractTokenId(accessToken);
             roles = jwtUtil.extractRoles(accessToken);
         } catch (Exception e) {
@@ -77,10 +82,20 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
                         return forbidden(exchange);
                     }
 
-                    // Downstream services can read these trusted headers directly.
+                    /*
+                     * 改前：AI 服务把 userId 固定为 10000，查询又只按 taskId，无法做真正的数据归属校验。
+                     * 改后：JWT 携带 user_id，网关先删除客户端可能伪造的身份头，再写入可信身份头。
+                     * 效果：下游可使用 taskId + userId 查询，避免横向越权。
+                     */
                     ServerHttpRequest mutatedRequest = request.mutate()
-                            .header("X-Auth-Username", username)
-                            .header("X-Auth-Roles", String.join(",", roles))
+                            .headers(headers -> {
+                                headers.remove("X-Auth-User-Id");
+                                headers.remove("X-Auth-Username");
+                                headers.remove("X-Auth-Roles");
+                                headers.set("X-Auth-User-Id", userId.toString());
+                                headers.set("X-Auth-Username", username);
+                                headers.set("X-Auth-Roles", String.join(",", roles));
+                            })
                             .build();
                     return chain.filter(exchange.mutate().request(mutatedRequest).build());
                 });

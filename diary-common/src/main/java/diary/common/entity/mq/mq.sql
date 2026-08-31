@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS `mq_outbox` (
     `message_key`       VARCHAR(128)    DEFAULT NULL                COMMENT '消息 Key',
     `payload`           JSON            NOT NULL                    COMMENT '消息体（JSON 格式）',
     `schema_version`    INT             DEFAULT 1                   COMMENT '消息体 Schema 版本',
-    `status`            VARCHAR(32)     NOT NULL                    COMMENT '消息状态：PENDING/SENT/SUCCESS/FAILED/DEAD',
+    `status`            VARCHAR(32)     NOT NULL                    COMMENT '消息状态：NEW/SENDING/RETRY_WAIT/SENT/DEAD',
     `retry_count`       INT             DEFAULT 0                   COMMENT '当前重试次数',
     `max_retries`       INT             DEFAULT 3                   COMMENT '最大重试次数',
     `next_retry_time`   DATETIME        DEFAULT NULL                COMMENT '下次重试时间',

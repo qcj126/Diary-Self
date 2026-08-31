@@ -17,6 +17,10 @@ public class AiTaskMessageDto {
     private Long taskId;
     private Long userId;
     private String taskType;
+    private String eventType;
+    private String taskStatus;
+    private String errorCode;
+    private String errorMessage;
     private Integer schemaVersion;
     private LocalDateTime occurTime;
     private String traceId;

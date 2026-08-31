@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
 
         User user = userDTO.getType() == 2 ? loginByCode(userDTO) : loginByPassword(userDTO);
         List<String> roles = loadRoleCodes(user.getUserId());
-        TokenPairVO tokenPair = tokenService.issueTokenPair(user.getUsername(), roles);
+        TokenPairVO tokenPair = tokenService.issueTokenPair(user.getUserId(), user.getUsername(), roles);
 
         // OAuth2-style Bearer tokens: access token for APIs, refresh token for renewal.
         return Map.of(

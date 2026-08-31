@@ -17,6 +17,7 @@ public class AiTaskEventDto {
     private Long taskId;                // AI任务Id
     private Long userId;                // 用户Id
     private Long resultId;              // AI任务成功时返回任务Id
+    private String taskStatus;          // SUCCESS/FAILED/DEAD_LETTER，区分业务失败与投递死信
     private String errorCode;           // AI任务失败时返回错误码
     private String errorMessage;        // AI任务失败时返回错误信息
     private LocalDateTime occurTime;    // 事件发生时间

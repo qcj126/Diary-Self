@@ -1,6 +1,5 @@
 package diary.diaryai.recovery.event;
 
-import com.alibaba.dashscope.common.TaskStatus;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 

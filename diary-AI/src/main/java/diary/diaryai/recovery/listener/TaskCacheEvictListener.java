@@ -21,7 +21,7 @@ public class TaskCacheEvictListener {
             log.debug("任务状态变更后清理缓存成功, taskId={}", event.getTaskId());
         } catch (Exception e) {
             log.error("任务状态变更后清理缓存失败, taskId={}", event.getTaskId(), e);
-            throw new RuntimeException("任务状态变更后清理缓存失败, taskId=" + event.getTaskId(), e);
+            // AFTER_COMMIT 阶段已无法回滚数据库；抛异常只会制造误报，缓存 TTL 会自动收敛。
         }
     }
 }

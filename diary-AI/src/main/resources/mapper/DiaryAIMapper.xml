@@ -47,6 +47,7 @@
         <result column="queue_time" property="queueTime" jdbcType="TIMESTAMP"/>
         <result column="start_time" property="startTime" jdbcType="TIMESTAMP"/>
         <result column="finish_time" property="finishTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
         <result column="version_id" property="versionId" jdbcType="INTEGER"/>
     </resultMap>
 
@@ -96,14 +97,22 @@
         -->
         INSERT INTO ai_task
             (id, user_id, client_request_id, task_type, status, input_snapshot,
-             attempt_count, max_attempts, create_time, version_id)
+             attempt_count, max_attempts, create_time, update_time, version_id)
         VALUES
             (#{id}, #{userId}, #{clientRequestId}, #{taskType}, #{status}, #{inputSnapshot},
-             #{attemptCount}, #{maxAttempts}, #{createTime}, #{versionId})
+             #{attemptCount}, #{maxAttempts}, #{createTime}, #{updateTime}, #{versionId})
     </insert>
 
     <select id="selectAiTaskByTaskId" resultMap="AiTaskResultMap">
         SELECT * FROM ai_task WHERE id = #{taskId} LIMIT 1
+    </select>
+
+    <select id="selectAiTaskByTaskIdAndUserId" resultMap="AiTaskResultMap">
+        SELECT *
+        FROM ai_task
+        WHERE id = #{taskId}
+          AND user_id = #{userId}
+        LIMIT 1
     </select>
 
     <select id="selectByUserIdAndClientRequestId" resultMap="AiTaskResultMap">
@@ -119,6 +128,7 @@
         UPDATE ai_task
         SET status = 'QUEUED',
             queue_time = COALESCE(queue_time, #{queueTime}),
+            update_time = CURRENT_TIMESTAMP,
             version_id = version_id + 1
         WHERE id = #{taskId}
           AND user_id = #{userId}
@@ -146,6 +156,7 @@
             error_code = NULL,
             error_message = NULL,
             attempt_count = attempt_count + 1,
+            update_time = CURRENT_TIMESTAMP,
             version_id = version_id + 1
         WHERE id = #{taskId}
           AND user_id = #{userId}
@@ -164,6 +175,7 @@
             lease_until = NULL,
             error_code = #{errorCode},
             error_message = #{errorMessage},
+            update_time = CURRENT_TIMESTAMP,
             version_id = version_id + 1
         WHERE id = #{taskId}
           AND user_id = #{userId}
@@ -183,6 +195,7 @@
             error_code = NULL,
             error_message = NULL,
             finish_time = #{finishTime},
+            update_time = CURRENT_TIMESTAMP,
             version_id = version_id + 1
         WHERE id = #{taskId}
           AND user_id = #{userId}
@@ -200,6 +213,7 @@
             error_code = #{errorCode},
             error_message = #{errorMessage},
             finish_time = #{finishTime},
+            update_time = CURRENT_TIMESTAMP,
             version_id = version_id + 1
         WHERE id = #{taskId}
           AND user_id = #{userId}
@@ -221,6 +235,7 @@
             error_code = #{errorCode},
             error_message = #{errorMessage},
             finish_time = #{finishTime},
+            update_time = CURRENT_TIMESTAMP,
             version_id = version_id + 1
         WHERE id = #{taskId}
           AND user_id = #{userId}
@@ -241,11 +256,61 @@
             lease_until = NULL,
             error_code = #{errorCode},
             error_message = #{errorMessage},
+            update_time = CURRENT_TIMESTAMP,
             version_id = version_id + 1
         WHERE id = #{taskId}
           AND status = 'RUNNING'
           AND lease_until &lt; #{leaseUntil}
           AND attempt_count &lt; max_attempts
+          AND version_id = #{versionId}
+    </update>
+
+    <update id="markDeadLetterIfDispatchable" parameterType="diary.common.entity.ai.dto.AiTaskProcessDto">
+        <!--
+            改前：任务投递 Outbox 进入 DEAD 后只修改 Outbox，任务会永久停在 PENDING/QUEUED/RETRY_WAIT。
+            改后：只允许尚未被 Worker 持有的等待态任务收敛到 DEAD_LETTER；RUNNING/终态不会被旧投递结果覆盖。
+        -->
+        UPDATE ai_task
+        SET status = 'DEAD_LETTER',
+            worker_id = NULL,
+            lease_until = NULL,
+            error_code = #{errorCode},
+            error_message = #{errorMessage},
+            finish_time = #{finishTime},
+            update_time = CURRENT_TIMESTAMP,
+            version_id = version_id + 1
+        WHERE id = #{taskId}
+          AND user_id = #{userId}
+          AND client_request_id = #{clientRequestId}
+          AND status IN ('PENDING', 'QUEUED', 'RETRY_WAIT')
+          AND version_id = #{versionId}
+    </update>
+
+    <update id="renewExecutionLease" parameterType="diary.common.entity.ai.dto.AiTaskProcessDto">
+        <!-- 租约续期不是状态迁移，因此不递增 version_id；提交结果仍使用抢占时的同一所有权版本。 -->
+        UPDATE ai_task
+        SET lease_until = #{leaseUntil},
+            update_time = CURRENT_TIMESTAMP
+        WHERE id = #{taskId}
+          AND status = 'RUNNING'
+          AND worker_id = #{workerId}
+          AND version_id = #{versionId}
+    </update>
+
+    <update id="recoverStaleWaiting">
+        <!--
+            改前：Recovery Job 只处理过期 RUNNING，消息进 DLQ 后 QUEUED/RETRY_WAIT 会永久卡住。
+            改后：对长期无活动 Outbox 的等待态任务做 CAS 恢复，并在同一事务追加新的重投 Outbox。
+        -->
+        UPDATE ai_task
+        SET status = 'RETRY_WAIT',
+            error_code = #{errorCode},
+            error_message = #{errorMessage},
+            update_time = #{now},
+            version_id = version_id + 1
+        WHERE id = #{taskId}
+          AND status IN ('PENDING', 'QUEUED', 'RETRY_WAIT')
+          AND update_time &lt; #{staleBefore}
           AND version_id = #{versionId}
     </update>
 
@@ -338,6 +403,7 @@
         UPDATE ai_task
         SET status = 'QUEUED',
             queue_time = COALESCE(queue_time, #{queueTime}),
+            update_time = CURRENT_TIMESTAMP,
             version_id = version_id + 1
         WHERE id = #{taskId}
           AND status = 'PENDING'
@@ -350,6 +416,32 @@
         AND lease_until &lt; #{now}
         ORDER BY lease_until ASC
         LIMIT #{limit}
+    </select>
+
+    <select id="selectStaleWaitingTasks" resultMap="AiTaskResultMap">
+        SELECT *
+        FROM ai_task
+        WHERE status IN ('PENDING', 'QUEUED', 'RETRY_WAIT')
+          AND update_time &lt; #{staleBefore}
+        ORDER BY update_time ASC, id ASC
+        LIMIT #{limit}
+    </select>
+
+    <select id="countActiveTaskDispatchOutbox" resultType="int">
+        SELECT COUNT(*)
+        FROM mq_outbox
+        WHERE aggregate_type = 'AI-TASK'
+          AND aggregate_id = #{taskId}
+          AND event_type IN ('AI_TASK_CREATED', 'AI_TASK_RETRY')
+          AND status IN ('NEW', 'SENDING', 'RETRY_WAIT')
+    </select>
+
+    <select id="countTaskRetryOutbox" resultType="int">
+        SELECT COUNT(*)
+        FROM mq_outbox
+        WHERE aggregate_type = 'AI-TASK'
+          AND aggregate_id = #{taskId}
+          AND event_type = 'AI_TASK_RETRY'
     </select>
 
     <select id="selectAiNutrientByTaskId" resultMap="AiNutrientResultMap">

@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class AiTaskProcessDto {
     private Long taskId;                            // AI 任务唯一 ID
-    private Long userId;                            // 本期固定为 10000
+    private Long userId;                            // JWT认证用户ID，用于状态迁移归属校验
     private String clientRequestId;                 // 提交幂等键
     private String taskType;                        // QWEN_PLUS_NUTRIENT
     private String status;                          // 任务状态

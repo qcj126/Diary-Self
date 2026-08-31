@@ -13,4 +13,8 @@ public interface AiTaskCommandService {
     void processData(Long taskId, Object data, String model, Map<String, String> result, Double temperature, Long userId, String workerId, Integer versionId);
 
     ConsumeResult handleExecutionFailure(AiTaskMessageDto message, AiTaskPO claimedTask, String workerId, Exception executionException);
+
+    boolean failExhaustedTask(AiTaskPO task, String errorMessage);
+
+    boolean deadLetterDispatchTask(AiTaskPO task, String errorMessage);
 }

@@ -21,25 +21,25 @@ public class AiTaskQueryServiceImpl implements AiTaskQueryService {
     private final AiTaskCacheService taskCache;
 
     @Override
-    public AiTaskStatusVo getTaskStatus(Long taskId) {
-        Optional<AiTaskStatusVo> cached = taskCache.get(taskId);
+    public AiTaskStatusVo getTaskStatus(Long taskId, Long userId) {
+        Optional<AiTaskStatusVo> cached = taskCache.get(taskId, userId);
         if (cached.isPresent()) {
             return cached.get();
         }
 
-        AiTaskPO aiTaskPO = diaryAiMapper.selectAiTaskByTaskId(taskId);
+        AiTaskPO aiTaskPO = diaryAiMapper.selectAiTaskByTaskIdAndUserId(taskId, userId);
         if (aiTaskPO == null) {
             throw new IllegalArgumentException("AI任务不存在: " + taskId);
         }
 
         AiTaskStatusVo result = ConvertPoToVo.convertToVo(aiTaskPO);
-        taskCache.put(result);
+        taskCache.put(result, userId);
         return result;
     }
 
     @Override
-    public AiTaskResultVo getTaskResult(Long taskId) {
-        AiTaskPO aiTaskPO = diaryAiMapper.selectAiTaskByTaskId(taskId);
+    public AiTaskResultVo getTaskResult(Long taskId, Long userId) {
+        AiTaskPO aiTaskPO = diaryAiMapper.selectAiTaskByTaskIdAndUserId(taskId, userId);
         if (aiTaskPO == null) {
             throw new IllegalArgumentException("AI任务不存在: " + taskId);
         }

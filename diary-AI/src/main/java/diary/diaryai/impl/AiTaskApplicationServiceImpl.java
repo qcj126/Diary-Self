@@ -32,9 +32,9 @@ public class AiTaskApplicationServiceImpl implements AiTaskApplicationService {
 
     // 提交任务时，仅让task状态为Pending即可，当定时任务提取了消息并发送时，再改为queued
     @Override
-    public AiTaskSubmitVo submitTask(AiInvokeDTO aiInvokeDTO) {
+    public AiTaskSubmitVo submitTask(AiInvokeDTO aiInvokeDTO, Long userId) {
         validateAndNormalizeRequest(aiInvokeDTO);
-        final Long userId = 10000L;
+        MyUtils.check().notNull(userId, "userId");
         String clientRequestId = aiInvokeDTO.getClientRequestId();
         // 幂等判断这一步，最终必须要落到mysql中进行判断，然后删除redis数据，防止脏数据影响
         if (aiIdempotencyCacheService.get(userId, clientRequestId).isPresent()) {
@@ -70,7 +70,7 @@ public class AiTaskApplicationServiceImpl implements AiTaskApplicationService {
                 throw new IllegalStateException("AI任务创建失败");
             }
             aiIdempotencyCacheService.put(userId, clientRequestId, aiTaskPO.getId());
-            aiTaskCacheService.put(ConvertPoToVo.convertToVo(aiTaskPO));
+            aiTaskCacheService.put(ConvertPoToVo.convertToVo(aiTaskPO), userId);
         } catch (DuplicateKeyException duplicateKeyException) {
             // aiTask表有userId和clientRequestId联合唯一索引
             // 当并发请求同时插入时，后插入的请求会抛出 DuplicateKeyException

@@ -21,6 +21,11 @@ public interface DiaryAiMapper {
 
     AiTaskPO selectAiTaskByTaskId(@Param("taskId") Long taskId);
 
+    AiTaskPO selectAiTaskByTaskIdAndUserId(
+            @Param("taskId") Long taskId,
+            @Param("userId") Long userId
+    );
+
     AiTaskPO selectByUserIdAndClientRequestId(
             @Param("userId") Long userId,
             @Param("clientRequestId") String clientRequestId
@@ -44,6 +49,19 @@ public interface DiaryAiMapper {
     int markFailedIfAttemptsExhausted(AiTaskProcessDto aiTaskProcessDto);
 
     int recoverExpiredRunning(AiTaskProcessDto aiTaskProcessDto);
+
+    int markDeadLetterIfDispatchable(AiTaskProcessDto aiTaskProcessDto);
+
+    int renewExecutionLease(AiTaskProcessDto aiTaskProcessDto);
+
+    int recoverStaleWaiting(
+            @Param("taskId") Long taskId,
+            @Param("versionId") Integer versionId,
+            @Param("staleBefore") LocalDateTime staleBefore,
+            @Param("now") LocalDateTime now,
+            @Param("errorCode") String errorCode,
+            @Param("errorMessage") String errorMessage
+    );
 
     int insertOutbox(MqOutboxPO outbox);
 
@@ -96,6 +114,15 @@ public interface DiaryAiMapper {
             @Param("now") LocalDateTime now,
             @Param("limit") int limit
     );
+
+    List<AiTaskPO> selectStaleWaitingTasks(
+            @Param("staleBefore") LocalDateTime staleBefore,
+            @Param("limit") int limit
+    );
+
+    int countActiveTaskDispatchOutbox(@Param("taskId") Long taskId);
+
+    int countTaskRetryOutbox(@Param("taskId") Long taskId);
 
     AiNutrientPO selectAiNutrientByTaskId(@Param("taskId") Long taskId);
 

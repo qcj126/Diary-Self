@@ -25,23 +25,28 @@ public class JwtUtil {
     private long refreshTokenExpirationMs;
 
     private static final String CLAIM_ROLES = "roles";
+    private static final String CLAIM_USER_ID = "user_id";
 
     private static final String CLAIM_TOKEN_TYPE = "token_type";
 
-    public String generateAccessToken(String username, List<String> roles) {
-        return generateToken(username, roles, "access", accessTokenExpirationMs);
+    public String generateAccessToken(Long userId, String username, List<String> roles) {
+        return generateToken(userId, username, roles, "access", accessTokenExpirationMs);
     }
 
-    public String generateRefreshToken(String username, List<String> roles) {
-        return generateToken(username, roles, "refresh", refreshTokenExpirationMs);
+    public String generateRefreshToken(Long userId, String username, List<String> roles) {
+        return generateToken(userId, username, roles, "refresh", refreshTokenExpirationMs);
     }
 
-    private String generateToken(String username, List<String> roles, String tokenType, long expirationMs) {
-        return Jwts.builder()
+    private String generateToken(Long userId, String username, List<String> roles, String tokenType, long expirationMs) {
+        var builder = Jwts.builder()
                 .setSubject(username)
                 .setId(UUID.randomUUID().toString())
                 .claim(CLAIM_ROLES, roles)
-                .claim(CLAIM_TOKEN_TYPE, tokenType)
+                .claim(CLAIM_TOKEN_TYPE, tokenType);
+        if (userId != null) {
+            builder.claim(CLAIM_USER_ID, userId);
+        }
+        return builder
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(signingKey())
@@ -50,6 +55,11 @@ public class JwtUtil {
 
     public String extractUsername(String token) {
         return extractClaims(token).getSubject();
+    }
+
+    public Long extractUserId(String token) {
+        Object value = extractClaims(token).get(CLAIM_USER_ID);
+        return value instanceof Number number ? number.longValue() : null;
     }
 
     public String extractTokenId(String token) {

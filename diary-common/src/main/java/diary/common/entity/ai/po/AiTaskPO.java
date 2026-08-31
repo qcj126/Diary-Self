@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class AiTaskPO {
     private Long id;                        // AI 任务唯一 ID
-    private Long userId;                    // 本期固定为 10000
+    private Long userId;                    // JWT认证用户ID，用于任务数据归属校验
     private String clientRequestId;         // 提交幂等键
     private String taskType;                // QWEN_PLUS_NUTRIENT
     private String status;                  // 任务状态
@@ -29,5 +29,6 @@ public class AiTaskPO {
     private LocalDateTime queueTime;        // 消息成功发送时间
     private LocalDateTime startTime;        // 开始执行时间
     private LocalDateTime finishTime;       // 执行结束时间
+    private LocalDateTime updateTime;       // 最近一次状态更新时间；用于识别长期卡住的非 RUNNING 任务
     private Integer versionId;              // 乐观锁版本：每次有效状态迁移由数据库执行 version_id + 1
 }

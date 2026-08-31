@@ -46,10 +46,23 @@ public class AiOutboxPublisher {
                 String destination = outbox.getTopic() + ":" + outbox.getTag();
                 SendReceipt sendReceipt = rocketMQClientTemplate.syncSendNormalMessage(destination, message);
                 aiOutboxService.confirmSent(outbox, sendReceipt.getMessageId().toString());
+                // 改前只在发送前清缓存，发送窗口中的查询可能重新缓存 PENDING；确认 SENT/QUEUED 后再次清理以关闭竞态窗口。
+                aiTaskCacheService.evict(outbox.getAggregateId());
             } catch (Exception e) {
                 log.error("Outbox发送失败, outboxId={}, eventId={}",
                         outbox.getId(), outbox.getEventId(), e);
-                aiOutboxService.recordFailure(outbox, e);
+                try {
+                    aiOutboxService.recordFailure(outbox, e);
+                } catch (RuntimeException stateException) {
+                    /*
+                     * 改前：某一条 Outbox 的失败状态落库异常会中断整个批次，后面的正常消息也无法发送。
+                     * 改后：单条消息失败隔离，保留 SENDING 超时恢复兜底并继续处理当前批次其余消息。
+                     */
+                    log.error("Outbox失败状态落库异常, 等待SENDING超时恢复, outboxId={}",
+                            outbox.getId(), stateException);
+                } finally {
+                    aiTaskCacheService.evict(outbox.getAggregateId());
+                }
             }
         }
     }

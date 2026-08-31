@@ -29,9 +29,6 @@ create table ai_nutrient(
 ) engine=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='AI饮食营养表';
 create index idx_ai_nutrient_info_id on ai_nutrient (ai_info_id);
 
-create index idx_ai_nutrient_info_id
-    on ai_nutrient (ai_info_id);
-
 create index idx_ai_nutrient_user_time
     on ai_nutrient (user_id, create_time);
 
@@ -56,6 +53,12 @@ create table ai_task(
     queue_time        datetime                           null comment '进入队列的时间',
     start_time        datetime                           null comment 'start time',
     finish_time       datetime                           null comment 'finish time',
+    update_time       datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '最近一次状态更新时间',
     version_id        int unsigned                       not null comment 'version id',
     constraint uk_ai_task_user_client_request unique (user_id, client_request_id)
 ) engine=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='AI任务表';
+
+-- 改前：恢复任务只能依赖主键/唯一索引扫描 RUNNING，数据量增大后会全表扫描；
+-- 改后：状态与更新时间组成恢复索引，同时覆盖 RUNNING 租约扫描和等待态对账扫描。
+create index idx_ai_task_status_lease on ai_task (status, lease_until, id);
+create index idx_ai_task_status_update on ai_task (status, update_time, id);

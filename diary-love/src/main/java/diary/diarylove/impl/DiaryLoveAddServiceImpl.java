@@ -32,9 +32,7 @@ public class DiaryLoveAddServiceImpl implements DiaryLoveAddService {
     public ApiResponse<String> addCouples(LoveCoupleDTO dto) {
         validateCouple(dto, false);
         dto.setId(MyUtils.getPrimaryKey());
-        if (dto.getStatus() == null) {
-            dto.setStatus(1);
-        }
+        if (dto.getStatus() == null) dto.setStatus(1);
         return addResult(diaryLoveMapper.insertLoveCouple(DtoConvertToPo.convertToPo(dto)), "添加情侣关系成功");
     }
 

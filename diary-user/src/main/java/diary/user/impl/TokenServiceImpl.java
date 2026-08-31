@@ -34,12 +34,13 @@ public class TokenServiceImpl implements TokenService {
     private ObjectMapper objectMapper;
 
     @Override
-    public TokenPairVO issueTokenPair(String username, List<String> roles) {
-        String accessToken = jwtUtil.generateAccessToken(username, roles);
-        String refreshToken = jwtUtil.generateRefreshToken(username, roles);
+    public TokenPairVO issueTokenPair(Long userId, String username, List<String> roles) {
+        String accessToken = jwtUtil.generateAccessToken(userId, username, roles);
+        String refreshToken = jwtUtil.generateRefreshToken(userId, username, roles);
 
         TokenInfoVO tokenInfo = TokenInfoVO.builder()
                 .username(username)
+                .userId(userId)
                 .roles(roles)
                 .accessTokenId(jwtUtil.extractTokenId(accessToken))
                 .refreshTokenId(jwtUtil.extractTokenId(refreshToken))
@@ -75,6 +76,7 @@ public class TokenServiceImpl implements TokenService {
             }
             TokenInfoVO oldTokenInfo = readWhiteToken(tokenId);
             String username = jwtUtil.extractUsername(refreshToken);
+            Long userId = jwtUtil.extractUserId(refreshToken);
             List<String> roles = jwtUtil.extractRoles(refreshToken);
             if (oldTokenInfo != null) {
                 blackToken(oldTokenInfo.getAccessTokenId());
@@ -82,7 +84,11 @@ public class TokenServiceImpl implements TokenService {
             }
             blackToken(tokenId);
             stringRedisTemplate.delete(RedisKeyConst.TOKEN_WHITE_PREFIX + tokenId);
-            return issueTokenPair(username, roles);
+            if (userId == null) {
+                // 旧 Token 没有 user_id，不能继续向下游传播可信身份；要求重新登录换取新 Token。
+                throw new CustomException("refresh token lacks user identity, please login again");
+            }
+            return issueTokenPair(userId, username, roles);
         } catch (CustomException e) {
             throw e;
         } catch (Exception e) {
@@ -95,6 +101,7 @@ public class TokenServiceImpl implements TokenService {
         try {
             String tokenId = jwtUtil.extractTokenId(accessToken);
             return jwtUtil.isAccessToken(accessToken)
+                    && jwtUtil.extractUserId(accessToken) != null
                     && !isBlack(tokenId)
                     && Boolean.TRUE.equals(stringRedisTemplate.hasKey(RedisKeyConst.TOKEN_WHITE_PREFIX + tokenId));
         } catch (Exception e) {

@@ -33,5 +33,21 @@ public class AiTaskRecoveryJob {
                 log.error("恢复AI任务失败, taskId={}", task.getId(), e);
             }
         }
+
+        /*
+         * 改前：只扫描租约过期的 RUNNING，消息在真正执行前进入 DLQ 时没有任何恢复入口。
+         * 改后：同一轮任务再扫描长期停留的 PENDING/QUEUED/RETRY_WAIT，由服务判断是否存在活跃 Outbox 后恢复。
+         */
+        LocalDateTime staleBefore = LocalDateTime.now().minusSeconds(
+                aiTaskProperties.getTask().getWaitingRecoverySeconds());
+        List<AiTaskPO> waitingTasks = diaryAiMapper.selectStaleWaitingTasks(
+                staleBefore, aiTaskProperties.getTask().getRecoveryBatchSize());
+        for (AiTaskPO task : waitingTasks) {
+            try {
+                aiTaskRecoveryService.recoverWaiting(task);
+            } catch (RuntimeException e) {
+                log.error("恢复等待态AI任务失败, taskId={}", task.getId(), e);
+            }
+        }
     }
 }
