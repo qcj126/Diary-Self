@@ -54,7 +54,7 @@ class AiTaskApplicationServiceImplTest {
         when(idempotencyCache.get(9L, "request-1")).thenReturn(Optional.empty());
         when(mapper.selectByUserIdAndClientRequestId(9L, "request-1")).thenReturn(existing);
 
-        assertThatThrownBy(() -> service.submitTask(request("200g"), 9L))
+        assertThatThrownBy(() -> service.submitTask(request("200g")))
                 .isInstanceOf(IdempotencyConflictException.class);
 
         verify(commandService, never()).createTaskAndOutbox(org.mockito.ArgumentMatchers.any(),

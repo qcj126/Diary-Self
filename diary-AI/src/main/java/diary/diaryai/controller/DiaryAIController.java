@@ -32,9 +32,8 @@ public class DiaryAIController {
     @OperLog(module = "AI", description = "提交AI任务", operationType = "INSERT", saveParams = false, saveResult = false)
     @PostMapping("/tasks")
     public ResponseEntity<ApiResponse<AiTaskSubmitVo>> submit(
-            @RequestBody AiInvokeDTO request,
-            @RequestHeader("X-Auth-User-Id") Long userId) {
-        AiTaskSubmitVo submitted = aiTaskApplicationService.submitTask(request, userId);
+            @RequestBody AiInvokeDTO request) {
+        AiTaskSubmitVo submitted = aiTaskApplicationService.submitTask(request);
         return ResponseEntity.accepted()
                 .location(URI.create("/ai/tasks/" + submitted.getTaskId()))
                 .body(ApiResponse.success(submitted));
@@ -43,17 +42,15 @@ public class DiaryAIController {
     @OperLog(module = "AI", description = "获取AI任务状态", operationType = "SELECT", saveParams = true, saveResult = true)
     @GetMapping("/tasks/{taskId}")
     public ResponseEntity<ApiResponse<AiTaskStatusVo>> status(
-            @PathVariable Long taskId,
-            @RequestHeader("X-Auth-User-Id") Long userId) {
-        return ResponseEntity.ok(ApiResponse.success(aiTaskQueryService.getTaskStatus(taskId, userId)));
+            @PathVariable Long taskId) {
+        return ResponseEntity.ok(ApiResponse.success(aiTaskQueryService.getTaskStatus(taskId)));
     }
 
     @OperLog(module = "AI", description = "获取AI任务结果", operationType = "SELECT", saveParams = true, saveResult = false)
     @GetMapping("/tasks/{taskId}/result")
     public ResponseEntity<ApiResponse<AiTaskResultVo>> result(
-            @PathVariable Long taskId,
-            @RequestHeader("X-Auth-User-Id") Long userId) {
-        AiTaskResultVo result = aiTaskQueryService.getTaskResult(taskId, userId);
+            @PathVariable Long taskId) {
+        AiTaskResultVo result = aiTaskQueryService.getTaskResult(taskId);
         /*
          * 改前：只有 SUCCESS 返回 200，FAILED/DEAD_LETTER 等终态仍永久返回 202。
          * 改后：所有终态都返回 200，只有仍在处理的状态返回 202；业务成功/失败由响应体 status 表达。

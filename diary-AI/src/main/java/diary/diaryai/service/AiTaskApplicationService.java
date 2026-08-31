@@ -5,6 +5,6 @@ import diary.common.entity.ai.vo.AiTaskSubmitVo;
 
 public interface AiTaskApplicationService {
 
-    AiTaskSubmitVo submitTask(AiInvokeDTO aiInvokeDTO, Long userId);
+    AiTaskSubmitVo submitTask(AiInvokeDTO aiInvokeDTO);
 
 }

@@ -35,8 +35,9 @@ public class AiTaskApplicationServiceImpl implements AiTaskApplicationService {
 
     // 提交任务时，仅让task状态为Pending即可，当定时任务提取了消息并发送时，再改为queued
     @Override
-    public AiTaskSubmitVo submitTask(AiInvokeDTO aiInvokeDTO, Long userId) {
+    public AiTaskSubmitVo submitTask(AiInvokeDTO aiInvokeDTO) {
         validateAndNormalizeRequest(aiInvokeDTO);
+        Long userId = 10000L;
         MyUtils.check().notNull(userId, "userId");
         String clientRequestId = aiInvokeDTO.getClientRequestId();
         String requestHash = requestFingerprint.fingerprint(aiInvokeDTO);

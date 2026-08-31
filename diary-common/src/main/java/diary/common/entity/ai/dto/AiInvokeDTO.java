@@ -14,4 +14,5 @@ public class AiInvokeDTO {
     private String cookWay;                                     // 烹饪方式
     private String flag;                                        // 标记: 饮食或食谱，对应id为universalId
     private Long universalId;                                   // 标记: 饮食或食谱，对应id为universalId
+    private Long userId;                                        // 用户ID
 }
