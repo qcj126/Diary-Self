@@ -13,8 +13,6 @@ import java.time.LocalDateTime;
 /** 恋爱关系响应对象。 */
 @Data
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class LoveCoupleVO {
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;

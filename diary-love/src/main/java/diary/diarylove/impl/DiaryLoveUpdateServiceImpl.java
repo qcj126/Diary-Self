@@ -1,6 +1,6 @@
 package diary.diarylove.impl;
 
-import diary.common.convert.love.LoveEntityConverter;
+import diary.common.convert.love.DtoConvertToPo;
 import diary.common.entity.love.dto.LoveAnniversaryDTO;
 import diary.common.entity.love.dto.LoveCoupleDTO;
 import diary.common.entity.love.dto.LoveLocationDTO;
@@ -27,7 +27,7 @@ public class DiaryLoveUpdateServiceImpl implements DiaryLoveUpdateService {
     public ApiResponse<String> updateCouple(LoveCoupleDTO dto) {
         DiaryLoveAddServiceImpl.validateCouple(dto, true);
         if (dto.getStatus() == null) dto.setStatus(1);
-        return updateResult(diaryLoveMapper.updateLoveCouple(LoveEntityConverter.toPo(dto)), "修改情侣关系成功");
+        return updateResult(diaryLoveMapper.updateLoveCouple(DtoConvertToPo.convertToPo(dto)), "修改情侣关系成功");
     }
 
     @Override
@@ -38,14 +38,14 @@ public class DiaryLoveUpdateServiceImpl implements DiaryLoveUpdateService {
         if (dto.getRemindDays() == null) dto.setRemindDays(7);
         if (dto.getPinned() == null) dto.setPinned(false);
         if (dto.getSort() == null) dto.setSort(0);
-        return updateResult(diaryLoveMapper.updateLoveAnniversary(LoveEntityConverter.toPo(dto)), "修改纪念日成功");
+        return updateResult(diaryLoveMapper.updateLoveAnniversary(DtoConvertToPo.convertToPo(dto)), "修改纪念日成功");
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ApiResponse<String> updateLocation(LoveLocationDTO dto) {
         DiaryLoveAddServiceImpl.validateLocation(dto, true);
-        return updateResult(diaryLoveMapper.updateLoveLocation(LoveEntityConverter.toPo(dto)), "修改地点成功");
+        return updateResult(diaryLoveMapper.updateLoveLocation(DtoConvertToPo.convertToPo(dto)), "修改地点成功");
     }
 
     @Override
@@ -56,7 +56,7 @@ public class DiaryLoveUpdateServiceImpl implements DiaryLoveUpdateService {
         if (dto.getSort() == null) dto.setSort(0);
 
         // TODO 接入缓存后，在事务提交成功后删除详情缓存并推进 coupleId 对应的缓存版本；TTL 应增加随机抖动。
-        return updateResult(diaryLoveMapper.updateLoveRecord(LoveEntityConverter.toPo(dto)), "修改恋爱记录成功");
+        return updateResult(diaryLoveMapper.updateLoveRecord(DtoConvertToPo.convertToPo(dto)), "修改恋爱记录成功");
     }
 
     @Override
@@ -65,7 +65,7 @@ public class DiaryLoveUpdateServiceImpl implements DiaryLoveUpdateService {
         DiaryLoveAddServiceImpl.validateRecordImage(dto, true);
         if (dto.getIsCover() == null) dto.setIsCover(false);
         if (dto.getSort() == null) dto.setSort(0);
-        return updateResult(diaryLoveMapper.updateLoveRecordImage(LoveEntityConverter.toPo(dto)), "修改记录图片成功");
+        return updateResult(diaryLoveMapper.updateLoveRecordImage(DtoConvertToPo.convertToPo(dto)), "修改记录图片成功");
     }
 
     @Override
@@ -74,7 +74,7 @@ public class DiaryLoveUpdateServiceImpl implements DiaryLoveUpdateService {
         DiaryLoveAddServiceImpl.validateMood(dto, true);
         if (dto.getSort() == null) dto.setSort(0);
         if (dto.getEnabled() == null) dto.setEnabled(true);
-        return updateResult(diaryLoveMapper.updateLoveMood(LoveEntityConverter.toPo(dto)), "修改心情成功");
+        return updateResult(diaryLoveMapper.updateLoveMood(DtoConvertToPo.convertToPo(dto)), "修改心情成功");
     }
 
     @Override
@@ -82,7 +82,7 @@ public class DiaryLoveUpdateServiceImpl implements DiaryLoveUpdateService {
     public ApiResponse<String> updateRecordMood(LoveRecordMoodDTO dto) {
         DiaryLoveAddServiceImpl.validateRecordMood(dto, true);
         if (dto.getSort() == null) dto.setSort(0);
-        return updateResult(diaryLoveMapper.updateLoveRecordMood(LoveEntityConverter.toPo(dto)), "修改记录心情成功");
+        return updateResult(diaryLoveMapper.updateLoveRecordMood(DtoConvertToPo.convertToPo(dto)), "修改记录心情成功");
     }
 
     @Override
@@ -90,7 +90,7 @@ public class DiaryLoveUpdateServiceImpl implements DiaryLoveUpdateService {
     public ApiResponse<String> updateTag(LoveTagDTO dto) {
         DiaryLoveAddServiceImpl.validateTag(dto, true);
         if (dto.getUseCount() == null) dto.setUseCount(0);
-        return updateResult(diaryLoveMapper.updateLoveTag(LoveEntityConverter.toPo(dto)), "修改标签成功");
+        return updateResult(diaryLoveMapper.updateLoveTag(DtoConvertToPo.convertToPo(dto)), "修改标签成功");
     }
 
     @Override
@@ -98,7 +98,7 @@ public class DiaryLoveUpdateServiceImpl implements DiaryLoveUpdateService {
     public ApiResponse<String> updateRecordTag(LoveRecordTagDTO dto) {
         DiaryLoveAddServiceImpl.validateRecordTag(dto, true);
         if (dto.getSort() == null) dto.setSort(0);
-        return updateResult(diaryLoveMapper.updateLoveRecordTag(LoveEntityConverter.toPo(dto)), "修改记录标签成功");
+        return updateResult(diaryLoveMapper.updateLoveRecordTag(DtoConvertToPo.convertToPo(dto)), "修改记录标签成功");
     }
 
     private ApiResponse<String> updateResult(int affectedRows, String message) {

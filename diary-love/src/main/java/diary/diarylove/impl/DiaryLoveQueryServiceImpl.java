@@ -1,6 +1,6 @@
 package diary.diarylove.impl;
 
-import diary.common.convert.love.LoveEntityConverter;
+import diary.common.convert.love.PoConvertToVo;
 import diary.common.entity.love.dto.LoveCoupleDTO;
 import diary.common.entity.love.dto.LoveRecordDTO;
 import diary.common.entity.love.po.LoveCouplePO;
@@ -36,14 +36,14 @@ public class DiaryLoveQueryServiceImpl implements DiaryLoveQueryService {
         }
         if (query.getStatus() == null) query.setStatus(1);
         LoveCouplePO po = diaryLoveMapper.selectLoveCouple(query);
-        return po == null ? ApiResponse.queryFail() : ApiResponse.success(LoveEntityConverter.toVo(po));
+        return po == null ? ApiResponse.queryFail() : ApiResponse.success(PoConvertToVo.convertToVo(po));
     }
 
     @Override
     public ApiResponse<List<LoveAnniversaryVO>> queryAnniversaries(Long coupleId) {
         MyUtils.check().notNull(coupleId, "coupleId");
         return ApiResponse.success(diaryLoveMapper.selectLoveAnniversariesByCoupleId(coupleId).stream()
-                .map(LoveEntityConverter::toVo)
+                .map(PoConvertToVo::convertToVo)
                 .toList());
     }
 
@@ -51,7 +51,7 @@ public class DiaryLoveQueryServiceImpl implements DiaryLoveQueryService {
     public ApiResponse<List<LoveLocationVO>> queryLocations(Long coupleId) {
         MyUtils.check().notNull(coupleId, "coupleId");
         return ApiResponse.success(diaryLoveMapper.selectLoveLocationsByCoupleId(coupleId).stream()
-                .map(LoveEntityConverter::toVo)
+                .map(PoConvertToVo::convertToVo)
                 .toList());
     }
 
@@ -59,7 +59,7 @@ public class DiaryLoveQueryServiceImpl implements DiaryLoveQueryService {
     public ApiResponse<LoveRecordVO> queryRecord(Long id) {
         MyUtils.check().notNull(id, "id");
         LoveRecordPO po = diaryLoveMapper.selectLoveRecordById(id);
-        return po == null ? ApiResponse.queryFail() : ApiResponse.success(LoveEntityConverter.toVo(po));
+        return po == null ? ApiResponse.queryFail() : ApiResponse.success(PoConvertToVo.convertToVo(po));
     }
 
     @Override
@@ -72,7 +72,7 @@ public class DiaryLoveQueryServiceImpl implements DiaryLoveQueryService {
          *      首页多块数据组装后可使用有界线程池并行查询；普通列表查询无需为了“多线程”而拆分 SQL。
          */
         return ApiResponse.success(diaryLoveMapper.selectLoveRecords(query).stream()
-                .map(LoveEntityConverter::toVo)
+                .map(PoConvertToVo::convertToVo)
                 .toList());
     }
 
@@ -80,14 +80,14 @@ public class DiaryLoveQueryServiceImpl implements DiaryLoveQueryService {
     public ApiResponse<List<LoveRecordImageVO>> queryRecordImages(Long recordId) {
         MyUtils.check().notNull(recordId, "recordId");
         return ApiResponse.success(diaryLoveMapper.selectLoveRecordImagesByRecordId(recordId).stream()
-                .map(LoveEntityConverter::toVo)
+                .map(PoConvertToVo::convertToVo)
                 .toList());
     }
 
     @Override
     public ApiResponse<List<LoveMoodVO>> queryMoods(Boolean enabled) {
         return ApiResponse.success(diaryLoveMapper.selectLoveMoods(enabled).stream()
-                .map(LoveEntityConverter::toVo)
+                .map(PoConvertToVo::convertToVo)
                 .toList());
     }
 
@@ -95,7 +95,7 @@ public class DiaryLoveQueryServiceImpl implements DiaryLoveQueryService {
     public ApiResponse<List<LoveRecordMoodVO>> queryRecordMoods(Long recordId) {
         MyUtils.check().notNull(recordId, "recordId");
         return ApiResponse.success(diaryLoveMapper.selectLoveRecordMoodsByRecordId(recordId).stream()
-                .map(LoveEntityConverter::toVo)
+                .map(PoConvertToVo::convertToVo)
                 .toList());
     }
 
@@ -103,7 +103,7 @@ public class DiaryLoveQueryServiceImpl implements DiaryLoveQueryService {
     public ApiResponse<List<LoveTagVO>> queryTags(Long coupleId) {
         MyUtils.check().notNull(coupleId, "coupleId");
         return ApiResponse.success(diaryLoveMapper.selectLoveTagsByCoupleId(coupleId).stream()
-                .map(LoveEntityConverter::toVo)
+                .map(PoConvertToVo::convertToVo)
                 .toList());
     }
 
@@ -111,7 +111,7 @@ public class DiaryLoveQueryServiceImpl implements DiaryLoveQueryService {
     public ApiResponse<List<LoveRecordTagVO>> queryRecordTags(Long recordId) {
         MyUtils.check().notNull(recordId, "recordId");
         return ApiResponse.success(diaryLoveMapper.selectLoveRecordTagsByRecordId(recordId).stream()
-                .map(LoveEntityConverter::toVo)
+                .map(PoConvertToVo::convertToVo)
                 .toList());
     }
 }

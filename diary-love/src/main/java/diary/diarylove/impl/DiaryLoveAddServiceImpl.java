@@ -1,6 +1,6 @@
 package diary.diarylove.impl;
 
-import diary.common.convert.love.LoveEntityConverter;
+import diary.common.convert.love.DtoConvertToPo;
 import diary.common.entity.love.dto.LoveAnniversaryDTO;
 import diary.common.entity.love.dto.LoveCoupleDTO;
 import diary.common.entity.love.dto.LoveLocationDTO;
@@ -35,7 +35,7 @@ public class DiaryLoveAddServiceImpl implements DiaryLoveAddService {
         if (dto.getStatus() == null) {
             dto.setStatus(1);
         }
-        return addResult(diaryLoveMapper.insertLoveCouple(LoveEntityConverter.toPo(dto)), "添加情侣关系成功");
+        return addResult(diaryLoveMapper.insertLoveCouple(DtoConvertToPo.convertToPo(dto)), "添加情侣关系成功");
     }
 
     @Override
@@ -47,7 +47,7 @@ public class DiaryLoveAddServiceImpl implements DiaryLoveAddService {
         if (dto.getRemindDays() == null) dto.setRemindDays(7);
         if (dto.getPinned() == null) dto.setPinned(false);
         if (dto.getSort() == null) dto.setSort(0);
-        return addResult(diaryLoveMapper.insertLoveAnniversary(LoveEntityConverter.toPo(dto)), "添加纪念日成功");
+        return addResult(diaryLoveMapper.insertLoveAnniversary(DtoConvertToPo.convertToPo(dto)), "添加纪念日成功");
     }
 
     @Override
@@ -55,7 +55,7 @@ public class DiaryLoveAddServiceImpl implements DiaryLoveAddService {
     public ApiResponse<String> addLocation(LoveLocationDTO dto) {
         validateLocation(dto, false);
         dto.setId(MyUtils.getPrimaryKey());
-        return addResult(diaryLoveMapper.insertLoveLocation(LoveEntityConverter.toPo(dto)), "添加地点成功");
+        return addResult(diaryLoveMapper.insertLoveLocation(DtoConvertToPo.convertToPo(dto)), "添加地点成功");
     }
 
     @Override
@@ -70,7 +70,7 @@ public class DiaryLoveAddServiceImpl implements DiaryLoveAddService {
          * TODO 后续将记录、图片、心情、标签和地点关联合并为一个事务用例，并在同一事务写 Outbox。
          *      RocketMQ 只负责提交后的异步统计/缓存投影，不能成为基础新增成功的前置条件。
          */
-        return addResult(diaryLoveMapper.insertLoveRecord(LoveEntityConverter.toPo(dto)), "添加恋爱记录成功");
+        return addResult(diaryLoveMapper.insertLoveRecord(DtoConvertToPo.convertToPo(dto)), "添加恋爱记录成功");
     }
 
     @Override
@@ -80,7 +80,7 @@ public class DiaryLoveAddServiceImpl implements DiaryLoveAddService {
         dto.setId(MyUtils.getPrimaryKey());
         if (dto.getIsCover() == null) dto.setIsCover(false);
         if (dto.getSort() == null) dto.setSort(0);
-        return addResult(diaryLoveMapper.insertLoveRecordImage(LoveEntityConverter.toPo(dto)), "添加记录图片成功");
+        return addResult(diaryLoveMapper.insertLoveRecordImage(DtoConvertToPo.convertToPo(dto)), "添加记录图片成功");
     }
 
     @Override
@@ -90,7 +90,7 @@ public class DiaryLoveAddServiceImpl implements DiaryLoveAddService {
         dto.setId(MyUtils.getPrimaryKey());
         if (dto.getSort() == null) dto.setSort(0);
         if (dto.getEnabled() == null) dto.setEnabled(true);
-        return addResult(diaryLoveMapper.insertLoveMood(LoveEntityConverter.toPo(dto)), "添加心情成功");
+        return addResult(diaryLoveMapper.insertLoveMood(DtoConvertToPo.convertToPo(dto)), "添加心情成功");
     }
 
     @Override
@@ -99,7 +99,7 @@ public class DiaryLoveAddServiceImpl implements DiaryLoveAddService {
         validateRecordMood(dto, false);
         dto.setId(MyUtils.getPrimaryKey());
         if (dto.getSort() == null) dto.setSort(0);
-        return addResult(diaryLoveMapper.insertLoveRecordMood(LoveEntityConverter.toPo(dto)), "添加记录心情成功");
+        return addResult(diaryLoveMapper.insertLoveRecordMood(DtoConvertToPo.convertToPo(dto)), "添加记录心情成功");
     }
 
     @Override
@@ -108,7 +108,7 @@ public class DiaryLoveAddServiceImpl implements DiaryLoveAddService {
         validateTag(dto, false);
         dto.setId(MyUtils.getPrimaryKey());
         if (dto.getUseCount() == null) dto.setUseCount(0);
-        return addResult(diaryLoveMapper.insertLoveTag(LoveEntityConverter.toPo(dto)), "添加标签成功");
+        return addResult(diaryLoveMapper.insertLoveTag(DtoConvertToPo.convertToPo(dto)), "添加标签成功");
     }
 
     @Override
@@ -117,7 +117,7 @@ public class DiaryLoveAddServiceImpl implements DiaryLoveAddService {
         validateRecordTag(dto, false);
         dto.setId(MyUtils.getPrimaryKey());
         if (dto.getSort() == null) dto.setSort(0);
-        return addResult(diaryLoveMapper.insertLoveRecordTag(LoveEntityConverter.toPo(dto)), "添加记录标签成功");
+        return addResult(diaryLoveMapper.insertLoveRecordTag(DtoConvertToPo.convertToPo(dto)), "添加记录标签成功");
     }
 
     static void validateCouple(LoveCoupleDTO dto, boolean requireId) {
