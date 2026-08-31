@@ -9,5 +9,5 @@ public interface AiOutboxService {
 
     void recordFailure(MqOutboxPO sendingOutbox, Throwable error);
 
-    void recoverSendingTimeout();
+    void recoverSendingTimeout(MqOutboxPO timedOutOutbox);
 }

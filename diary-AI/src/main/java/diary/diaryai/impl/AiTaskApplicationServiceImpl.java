@@ -7,6 +7,8 @@ import diary.common.entity.ai.vo.AiTaskSubmitVo;
 import diary.common.enums.aienum.AiApplicationEnum;
 import diary.common.enums.aienum.AiFlagEnum;
 import diary.common.exception.AiSubmitRateLimitException;
+import diary.common.exception.IdempotencyConflictException;
+import diary.diaryai.idempotency.AiRequestFingerprint;
 import diary.diaryai.mapper.DiaryAiMapper;
 import diary.diaryai.redis.AiIdempotencyCacheService;
 import diary.diaryai.redis.AiSubmitRateLimiter;
@@ -29,6 +31,7 @@ public class AiTaskApplicationServiceImpl implements AiTaskApplicationService {
     private final AiIdempotencyCacheService aiIdempotencyCacheService;
     private final AiSubmitRateLimiter aiSubmitRateLimiter;
     private final AiTaskCacheService aiTaskCacheService;
+    private final AiRequestFingerprint requestFingerprint;
 
     // 提交任务时，仅让task状态为Pending即可，当定时任务提取了消息并发送时，再改为queued
     @Override
@@ -36,11 +39,13 @@ public class AiTaskApplicationServiceImpl implements AiTaskApplicationService {
         validateAndNormalizeRequest(aiInvokeDTO);
         MyUtils.check().notNull(userId, "userId");
         String clientRequestId = aiInvokeDTO.getClientRequestId();
+        String requestHash = requestFingerprint.fingerprint(aiInvokeDTO);
         // 幂等判断这一步，最终必须要落到mysql中进行判断，然后删除redis数据，防止脏数据影响
         if (aiIdempotencyCacheService.get(userId, clientRequestId).isPresent()) {
             // 若有缓存数据，那么查询数据库中有无数据，防止脏缓存影响结果
             AiTaskPO aiTaskPO = diaryAiMapper.selectByUserIdAndClientRequestId(userId, clientRequestId);
             if (aiTaskPO != null) {
+                assertSameRequest(aiTaskPO, requestHash);
                 return toSubmitVo(aiTaskPO, "该请求已提交");
             }
             // 若数据库没有数据，则删除脏缓存
@@ -51,6 +56,7 @@ public class AiTaskApplicationServiceImpl implements AiTaskApplicationService {
         // 通过userId与clientRequestId联合唯一索引查询任务
         AiTaskPO existingTask = diaryAiMapper.selectByUserIdAndClientRequestId(userId, clientRequestId);
         if (existingTask != null) {
+            assertSameRequest(existingTask, requestHash);
             // 添加缓存信息
             aiIdempotencyCacheService.put(userId, clientRequestId, existingTask.getId());
             return toSubmitVo(existingTask, "该请求已提交");
@@ -80,9 +86,29 @@ public class AiTaskApplicationServiceImpl implements AiTaskApplicationService {
                 // 此时就不是联合唯一索引冲突，而是主键冲突了
                 throw duplicateKeyException;
             }
+            assertSameRequest(concurrentTask, requestHash);
             return toSubmitVo(concurrentTask, "该请求已提交");
         }
         return toSubmitVo(aiTaskPO, "AI分析任务已受理");
+    }
+
+    private void assertSameRequest(AiTaskPO existingTask, String requestHash) {
+        String storedHash = existingTask.getRequestHash();
+        if (storedHash == null || storedHash.isBlank()) {
+            String snapshotHash = requestFingerprint.fingerprintSnapshot(existingTask.getInputSnapshot());
+            int backfilled = diaryAiMapper.updateRequestHashIfNull(existingTask.getId(), snapshotHash);
+            if (backfilled == 1) {
+                storedHash = snapshotHash;
+            } else {
+                // 存量任务首次幂等重放可能并发回填；未抢到 CAS 的请求必须重读胜出值。
+                AiTaskPO refreshed = diaryAiMapper.selectAiTaskByTaskId(existingTask.getId());
+                storedHash = refreshed == null ? null : refreshed.getRequestHash();
+            }
+        }
+        if (storedHash == null || !storedHash.equals(requestHash)) {
+            throw new IdempotencyConflictException(
+                    "clientRequestId已用于不同的AI请求: " + existingTask.getClientRequestId());
+        }
     }
 
     private void validateAndNormalizeRequest(AiInvokeDTO request) {

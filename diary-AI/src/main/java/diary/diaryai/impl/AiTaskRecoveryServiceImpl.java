@@ -58,7 +58,6 @@ public class AiTaskRecoveryServiceImpl implements AiTaskRecoveryService {
         AiTaskProcessDto retry = AiTaskProcessDto.builder()
                 .taskId(task.getId())
                 .versionId(task.getVersionId())
-                .leaseUntil(now)
                 .errorCode(AiTaskErrorCodeEnum.RETRYABLE_ERROR.name())
                 .errorMessage("RUNNING租约过期，等待恢复")
                 .build();
@@ -87,28 +86,23 @@ public class AiTaskRecoveryServiceImpl implements AiTaskRecoveryService {
             return;
         }
 
-        int retryMessages = diaryAiMapper.countTaskRetryOutbox(task.getId());
-        int successfulClaims = task.getAttemptCount() == null ? 0 : task.getAttemptCount();
-        // 第一次成功抢占通常来自 AI_TASK_CREATED，只有后续抢占才能抵扣 Recovery 生成的 AI_TASK_RETRY。
-        int successfulRecoveryClaims = Math.max(0, successfulClaims - 1);
-        int unclaimedRecoveryMessages = Math.max(0, retryMessages - successfulRecoveryClaims);
-        if (unclaimedRecoveryMessages >= properties.getTask().getWaitingMaxRecoveryMessages()) {
-            if (aiTaskCommandService.deadLetterDispatchTask(
-                    task, "等待态任务多次补发仍未被Consumer抢占")) {
-                publishCacheEvictAfterCommit(task.getId());
-            }
-            return;
-        }
-
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime staleBefore = now.minusSeconds(properties.getTask().getWaitingRecoverySeconds());
+        int currentRecoveryCount = task.getRecoveryCount() == null ? 0 : task.getRecoveryCount();
+        boolean reachesRecoveryLimit = currentRecoveryCount + 1
+                >= properties.getTask().getWaitingMaxRecoveryMessages();
+        String errorCode = reachesRecoveryLimit
+                ? AiTaskErrorCodeEnum.DISPATCH_RECOVERY_EXHAUSTED.name()
+                : AiTaskErrorCodeEnum.RETRYABLE_ERROR.name();
+        String errorMessage = reachesRecoveryLimit
+                ? "等待态消息已达自动补发上限，保留任务等待迟到消息或人工处理"
+                : "等待态消息可能延迟或进入DLQ，创建恢复消息";
         int recovered = diaryAiMapper.recoverStaleWaiting(
                 task.getId(),
                 task.getVersionId(),
-                staleBefore,
-                now,
-                AiTaskErrorCodeEnum.RETRYABLE_ERROR.name(),
-                "等待态消息可能已进入DLQ，创建恢复消息"
+                properties.getTask().getWaitingRecoverySeconds(),
+                properties.getTask().getWaitingMaxRecoveryMessages(),
+                errorCode,
+                errorMessage
         );
         if (recovered != 1) {
             return;
@@ -118,9 +112,18 @@ public class AiTaskRecoveryServiceImpl implements AiTaskRecoveryService {
          * 改前：Recovery Job 只扫描 RUNNING；本地并发满、数据库暂时异常或 MQ 重试进入 DLQ 后，
          * task 会永久停在 PENDING/QUEUED/RETRY_WAIT。
          * 改后：等待超过阈值且没有活跃投递 Outbox 时，用 version CAS 更新状态，并在同一事务创建恢复 Outbox。
-         * 效果：非 RUNNING 的消息丢失也能自动收敛；多实例同时扫描只会有一个实例恢复成功。
+         * 效果：非 RUNNING 的消息丢失可以有界补发；多实例同时扫描只会有一个实例恢复成功，
+         * 同时不会把 Broker 积压误判成业务终态。
          */
         insertRetryTaskOutbox(task, now);
+        if (reachesRecoveryLimit) {
+            /*
+             * SENT 只表示 Broker 已接收，不能证明 Consumer 已消费。补发耗尽时不能把
+             * 可能仅是积压的任务改成终态；保留等待态，迟到消息仍可正常抢占。
+             */
+            log.error("AI任务自动补发已达上限，需要检查Consumer Lag/DLQ, taskId={}, recoveryCount={}",
+                    task.getId(), currentRecoveryCount + 1);
+        }
         publishCacheEvictAfterCommit(task.getId());
     }
 

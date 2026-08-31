@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.springframework.util.StringUtils.truncate;
@@ -28,7 +27,7 @@ public class AiOutboxServiceImpl implements AiOutboxService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean claim(MqOutboxPO outbox) {
-        int changed = diaryAiMapper.claimOutbox(outbox.getId(), outbox.getVersionId(), LocalDateTime.now());
+        int changed = diaryAiMapper.claimOutbox(outbox.getId(), outbox.getVersionId());
         if (changed == 1) {
             // 数据库中已经将outbox状态改为sending，为后续步骤，需要设置outbox状态为sending，并且版本号+1
             outbox.setStatus(OutboxStatusEnum.SENDING.name());
@@ -41,22 +40,30 @@ public class AiOutboxServiceImpl implements AiOutboxService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void confirmSent(MqOutboxPO outbox, String brokerMessageId) {
-        LocalDateTime now = LocalDateTime.now();
-        int sent = diaryAiMapper.markOutboxSent(outbox.getId(), outbox.getVersionId(), brokerMessageId, now);
+        int sent = diaryAiMapper.markOutboxSent(outbox.getId(), outbox.getVersionId(), brokerMessageId);
         if (sent != 1) {
             throw new IllegalStateException("Outbox SENT 更新失败: " + outbox.getId());
         }
 
-        if (OutboxEventTypeEnum.AI_TASK_CREATED.name().equals(outbox.getEventType())) {
-            // 消息发送完毕之后再将任务状态改为queued
-            diaryAiMapper.markQueuedByTaskIdIfPending(outbox.getAggregateId(), now);
+        if (isTaskDispatchEvent(outbox)) {
+            // 首次发送和恢复消息都已进入 Broker，对外统一表达为 QUEUED。
+            diaryAiMapper.markQueuedByTaskIdIfWaiting(outbox.getAggregateId());
         }
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void recordFailure(MqOutboxPO outbox, Throwable error) {
-        LocalDateTime now = LocalDateTime.now();
+        transitionFailure(outbox, error);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void recoverSendingTimeout(MqOutboxPO outbox) {
+        transitionFailure(outbox, new IllegalStateException("SENDING_TIMEOUT_RECOVERED"));
+    }
+
+    private void transitionFailure(MqOutboxPO outbox, Throwable error) {
         int nextRetryCount = outbox.getRetryCount() + 1;
         String lastError = truncate(error.getMessage(), 1000);
 
@@ -66,9 +73,10 @@ public class AiOutboxServiceImpl implements AiOutboxService {
          * 改后：首次发送不算重试，失败次数超过 maxRetries 才进入 DEAD，即总尝试次数为 1 + maxRetries。
          */
         if (nextRetryCount > outbox.getMaxRetries()) {
-            changed = diaryAiMapper.markOutboxDead(outbox.getId(), outbox.getVersionId(), lastError, now);
+            changed = diaryAiMapper.markOutboxDead(outbox.getId(), outbox.getVersionId(), lastError);
         } else {
-            changed = diaryAiMapper.markOutboxRetry(outbox.getId(), outbox.getVersionId(), calculateNextRetry(outbox.getRetryCount()), lastError, now);
+            changed = diaryAiMapper.markOutboxRetry(
+                    outbox.getId(), outbox.getVersionId(), calculateRetryDelaySeconds(outbox.getRetryCount()), lastError);
         }
         if (changed != 1) {
             throw new IllegalStateException("Outbox失败状态更新失败: " + outbox.getId());
@@ -93,19 +101,10 @@ public class AiOutboxServiceImpl implements AiOutboxService {
         }
     }
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void recoverSendingTimeout() {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime timeoutBefore = now.minusSeconds(properties.getRocketmq().getPublisherSendingTimeoutSeconds());
-        diaryAiMapper.recoverSendingTimeout(timeoutBefore, now);
-    }
-
-    private LocalDateTime calculateNextRetry(int currentRetryCount) {
+    private long calculateRetryDelaySeconds(int currentRetryCount) {
         long baseSeconds = Math.min(1L << Math.min(currentRetryCount, 7), 120L) * 5L;
         long jitterSeconds = ThreadLocalRandom.current().nextLong(0, 4);
-        return LocalDateTime.now().plusSeconds(
-                Math.min(baseSeconds, 600L) + jitterSeconds);
+        return Math.min(baseSeconds, 600L) + jitterSeconds;
     }
 
     private boolean isTaskDispatchEvent(MqOutboxPO outbox) {

@@ -13,6 +13,7 @@ import diary.common.enums.aienum.AiTaskStatusEnum;
 import diary.common.enums.outbox.OutboxEventTypeEnum;
 import diary.common.enums.outbox.OutboxStatusEnum;
 
+import diary.diaryai.idempotency.AiRequestFingerprint;
 import diary.diaryai.mapper.DiaryAiMapper;
 import diary.diaryai.properties.AiTaskProperties;
 import diary.diaryai.service.AiTaskCommandService;
@@ -37,6 +38,7 @@ import static diary.utils.commonutil.MyUtils.writeJson;
 public class AiTaskCommandServiceImpl implements AiTaskCommandService {
     private final DiaryAiMapper diaryAiMapper;
     private final AiTaskProperties properties;
+    private final AiRequestFingerprint requestFingerprint;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -46,16 +48,19 @@ public class AiTaskCommandServiceImpl implements AiTaskCommandService {
         // mq消息和outbox数据使用同一个eventId，保证事件的一致性
         // 不会出现mq消息属于另一个outbox数据的情况
         String eventId = OUTBOX_EVENT_ID + MyUtils.getPrimaryKey();
-        String inputSnapshot = writeJson(request, "AI任务输入快照序列化失败");
+        String inputSnapshot = requestFingerprint.canonicalSnapshot(request);
+        String requestHash = requestFingerprint.fingerprint(request);
 
         AiTaskPO task = AiTaskPO.builder()
                 .id(taskId)
                 .userId(userId)
                 .clientRequestId(request.getClientRequestId())
+                .requestHash(requestHash)
                 .taskType(properties.getRocketmq().getTaskTag())
                 .status(AiTaskStatusEnum.PENDING.name())
                 .inputSnapshot(inputSnapshot)
                 .attemptCount(0)
+                .recoveryCount(0)
                 .maxAttempts(properties.getTask().getMaxAttempts())
                 .createTime(now)
                 .updateTime(now)

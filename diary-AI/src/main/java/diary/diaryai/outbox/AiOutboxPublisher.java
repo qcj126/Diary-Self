@@ -15,7 +15,6 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -30,8 +29,8 @@ public class AiOutboxPublisher {
 
     @Scheduled(fixedDelayString = "${diary.ai.rocketmq.publisher-interval-ms:1000}")
     public void publishReadyMessages() {
-        aiOutboxService.recoverSendingTimeout();
-        List<MqOutboxPO> batch = diaryAiMapper.selectReadyOutbox(LocalDateTime.now(), properties.getRocketmq().getPublisherBatchSize());
+        recoverTimedOutMessages();
+        List<MqOutboxPO> batch = diaryAiMapper.selectReadyOutbox(properties.getRocketmq().getPublisherBatchSize());
 
         for (MqOutboxPO outbox : batch) {
             if (!aiOutboxService.claim(outbox)) {
@@ -63,6 +62,21 @@ public class AiOutboxPublisher {
                 } finally {
                     aiTaskCacheService.evict(outbox.getAggregateId());
                 }
+            }
+        }
+    }
+
+    private void recoverTimedOutMessages() {
+        List<MqOutboxPO> timedOut = diaryAiMapper.selectTimedOutbox(
+                properties.getRocketmq().getPublisherSendingTimeoutSeconds(),
+                properties.getRocketmq().getPublisherBatchSize());
+        for (MqOutboxPO outbox : timedOut) {
+            try {
+                /* 超时表示发送结果未知，必须计入重试上限，否则会无限重复发送。 */
+                aiOutboxService.recoverSendingTimeout(outbox);
+                aiTaskCacheService.evict(outbox.getAggregateId());
+            } catch (RuntimeException e) {
+                log.error("恢复超时Outbox失败, outboxId={}", outbox.getId(), e);
             }
         }
     }

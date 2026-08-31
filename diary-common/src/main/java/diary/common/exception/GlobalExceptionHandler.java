@@ -40,4 +40,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleAiSubmitRateLimitException(AiSubmitRateLimitException e) {
         return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(e.getMessage());
     }
+
+    @ExceptionHandler(IdempotencyConflictException.class)
+    public ResponseEntity<ApiResponse<Void>> handleIdempotencyConflictException(IdempotencyConflictException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiResponse.fail(HttpStatus.CONFLICT.value(), e.getMessage()));
+    }
 }

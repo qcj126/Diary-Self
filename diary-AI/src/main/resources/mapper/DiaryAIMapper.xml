@@ -33,11 +33,13 @@
         <id column="id" property="id" jdbcType="BIGINT"/>
         <result column="user_id" property="userId" jdbcType="BIGINT"/>
         <result column="client_request_id" property="clientRequestId" jdbcType="VARCHAR"/>
+        <result column="request_hash" property="requestHash" jdbcType="VARCHAR"/>
         <result column="task_type" property="taskType" jdbcType="VARCHAR"/>
         <result column="status" property="status" jdbcType="VARCHAR"/>
         <result column="input_snapshot" property="inputSnapshot" jdbcType="LONGVARCHAR"/>
         <result column="attempt_count" property="attemptCount" jdbcType="INTEGER"/>
         <result column="max_attempts" property="maxAttempts" jdbcType="INTEGER"/>
+        <result column="recovery_count" property="recoveryCount" jdbcType="INTEGER"/>
         <result column="worker_id" property="workerId" jdbcType="VARCHAR"/>
         <result column="lease_until" property="leaseUntil" jdbcType="TIMESTAMP"/>
         <result column="ai_info_id" property="aiInfoId" jdbcType="BIGINT"/>
@@ -96,11 +98,11 @@
             也可能生成列和值数量不一致的 SQL。任务创建字段均为第一版必填项，因此改为静态、对称的插入语句。
         -->
         INSERT INTO ai_task
-            (id, user_id, client_request_id, task_type, status, input_snapshot,
-             attempt_count, max_attempts, create_time, update_time, version_id)
+            (id, user_id, client_request_id, request_hash, task_type, status, input_snapshot,
+             attempt_count, max_attempts, recovery_count, create_time, update_time, version_id)
         VALUES
-            (#{id}, #{userId}, #{clientRequestId}, #{taskType}, #{status}, #{inputSnapshot},
-             #{attemptCount}, #{maxAttempts}, #{createTime}, #{updateTime}, #{versionId})
+            (#{id}, #{userId}, #{clientRequestId}, #{requestHash}, #{taskType}, #{status}, #{inputSnapshot},
+             #{attemptCount}, #{maxAttempts}, #{recoveryCount}, #{createTime}, #{updateTime}, #{versionId})
     </insert>
 
     <select id="selectAiTaskByTaskId" resultMap="AiTaskResultMap">
@@ -123,19 +125,6 @@
         LIMIT 1
     </select>
 
-    <update id="markQueuedIfPending" parameterType="diary.common.entity.ai.dto.AiTaskProcessDto">
-        <!-- Producer 只能推进 PENDING；若 Consumer 已因投递竞态抢占，不能把 RUNNING/SUCCESS 覆盖回 QUEUED。 -->
-        UPDATE ai_task
-        SET status = 'QUEUED',
-            queue_time = COALESCE(queue_time, #{queueTime}),
-            update_time = CURRENT_TIMESTAMP,
-            version_id = version_id + 1
-        WHERE id = #{taskId}
-          AND user_id = #{userId}
-          AND client_request_id = #{clientRequestId}
-          AND status = 'PENDING'
-    </update>
-
     <update id="claimForExecution" parameterType="diary.common.entity.ai.dto.AiTaskProcessDto">
         <!--
             以前 Consumer 先做普通 RUNNING 更新、再无条件调用模型，重复消息会并发计费。
@@ -144,14 +133,14 @@
         -->
         <!--
             虽然数据库状态还是 RUNNING，但原消费者持有任务的时间已经到期，因此推测原消费者宕机或卡死，允许新消费者接管。
-            lease_until &lt; #{startTime}是旧消费者的租约是否到期，是则允许新消费者接管。
+            lease_until &lt; CURRENT_TIMESTAMP 由数据库统一判断租约是否到期，避免多实例时钟偏差。
         -->
         UPDATE ai_task
         SET status = 'RUNNING',
             worker_id = #{workerId},
-            lease_until = #{leaseUntil},
-            queue_time = COALESCE(queue_time, #{queueTime}),
-            start_time = COALESCE(start_time, #{startTime}),
+            lease_until = TIMESTAMPADD(SECOND, #{leaseSeconds}, CURRENT_TIMESTAMP),
+            queue_time = COALESCE(queue_time, CURRENT_TIMESTAMP),
+            start_time = COALESCE(start_time, CURRENT_TIMESTAMP),
             finish_time = NULL,
             error_code = NULL,
             error_message = NULL,
@@ -164,7 +153,7 @@
           AND attempt_count &lt; max_attempts
           AND (
                 status IN ('PENDING', 'QUEUED', 'RETRY_WAIT')
-                OR (status = 'RUNNING' AND lease_until &lt; #{startTime})
+                OR (status = 'RUNNING' AND lease_until &lt; CURRENT_TIMESTAMP)
           )
     </update>
 
@@ -244,7 +233,7 @@
           AND version_id = #{versionId}
           AND (
                 status IN ('QUEUED', 'RETRY_WAIT')
-                OR (status = 'RUNNING' AND lease_until &lt; #{finishTime})
+                OR (status = 'RUNNING' AND lease_until &lt; CURRENT_TIMESTAMP)
           )
     </update>
 
@@ -260,7 +249,7 @@
             version_id = version_id + 1
         WHERE id = #{taskId}
           AND status = 'RUNNING'
-          AND lease_until &lt; #{leaseUntil}
+          AND lease_until &lt; CURRENT_TIMESTAMP
           AND attempt_count &lt; max_attempts
           AND version_id = #{versionId}
     </update>
@@ -289,7 +278,7 @@
     <update id="renewExecutionLease" parameterType="diary.common.entity.ai.dto.AiTaskProcessDto">
         <!-- 租约续期不是状态迁移，因此不递增 version_id；提交结果仍使用抢占时的同一所有权版本。 -->
         UPDATE ai_task
-        SET lease_until = #{leaseUntil},
+        SET lease_until = TIMESTAMPADD(SECOND, #{leaseSeconds}, CURRENT_TIMESTAMP),
             update_time = CURRENT_TIMESTAMP
         WHERE id = #{taskId}
           AND status = 'RUNNING'
@@ -306,11 +295,13 @@
         SET status = 'RETRY_WAIT',
             error_code = #{errorCode},
             error_message = #{errorMessage},
-            update_time = #{now},
+            recovery_count = recovery_count + 1,
+            update_time = CURRENT_TIMESTAMP,
             version_id = version_id + 1
         WHERE id = #{taskId}
           AND status IN ('PENDING', 'QUEUED', 'RETRY_WAIT')
-          AND update_time &lt; #{staleBefore}
+          AND update_time &lt; TIMESTAMPADD(SECOND, -#{waitingRecoverySeconds}, CURRENT_TIMESTAMP)
+          AND recovery_count &lt; #{maxRecoveryMessages}
           AND version_id = #{versionId}
     </update>
 
@@ -323,15 +314,15 @@
         VALUES
             (#{id}, #{eventId}, #{aggregateType}, #{aggregateId}, #{eventType},
              #{topic}, #{tag}, #{messageKey}, #{payload}, #{schemaVersion},
-             #{status}, #{retryCount}, #{maxRetries}, #{nextRetryTime},
-             #{createTime}, #{updateTime}, #{versionId})
+             #{status}, #{retryCount}, #{maxRetries}, CURRENT_TIMESTAMP,
+             CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, #{versionId})
     </insert>
 
     <select id="selectReadyOutbox" resultMap="MqOutboxResultMap">
         SELECT *
         FROM mq_outbox
         WHERE status IN ('NEW', 'RETRY_WAIT')
-        AND next_retry_time &lt;= #{now}
+        AND next_retry_time &lt;= CURRENT_TIMESTAMP
         ORDER BY next_retry_time ASC, id ASC
         LIMIT #{limit}
     </select>
@@ -340,10 +331,19 @@
         SELECT * FROM mq_outbox WHERE id = #{id} LIMIT 1
     </select>
 
+    <select id="selectTimedOutbox" resultMap="MqOutboxResultMap">
+        SELECT *
+        FROM mq_outbox
+        WHERE status = 'SENDING'
+          AND update_time &lt; TIMESTAMPADD(SECOND, -#{timeoutSeconds}, CURRENT_TIMESTAMP)
+        ORDER BY update_time ASC, id ASC
+        LIMIT #{limit}
+    </select>
+
     <update id="claimOutbox">
         UPDATE mq_outbox
         SET status = 'SENDING',
-            update_time = #{updateTime},
+            update_time = CURRENT_TIMESTAMP,
             version_id = version_id + 1
         WHERE id = #{id}
           AND status IN ('NEW', 'RETRY_WAIT')
@@ -354,8 +354,8 @@
         UPDATE mq_outbox
         SET status = 'SENT',
             broker_message_id = #{brokerMessageId},
-            sent_time = #{sentTime},
-            update_time = #{sentTime},
+            sent_time = CURRENT_TIMESTAMP,
+            update_time = CURRENT_TIMESTAMP,
             last_error = NULL,
             version_id = version_id + 1
         WHERE id = #{id}
@@ -367,9 +367,9 @@
         UPDATE mq_outbox
         SET status = 'RETRY_WAIT',
             retry_count = retry_count + 1,
-            next_retry_time = #{nextRetryTime},
+            next_retry_time = TIMESTAMPADD(SECOND, #{retryDelaySeconds}, CURRENT_TIMESTAMP),
             last_error = #{lastError},
-            update_time = #{updateTime},
+            update_time = CURRENT_TIMESTAMP,
             version_id = version_id + 1
         WHERE id = #{id}
           AND status = 'SENDING'
@@ -381,48 +381,45 @@
         SET status = 'DEAD',
             retry_count = retry_count + 1,
             last_error = #{lastError},
-            update_time = #{updateTime},
+            update_time = CURRENT_TIMESTAMP,
             version_id = version_id + 1
         WHERE id = #{id}
           AND status = 'SENDING'
           AND version_id = #{versionId}
     </update>
 
-    <update id="recoverSendingTimeout">
-        UPDATE mq_outbox
-        SET status = 'RETRY_WAIT',
-        next_retry_time = #{now},
-        last_error = 'SENDING_TIMEOUT_RECOVERED',
-        update_time = #{now},
-        version_id = version_id + 1
-        WHERE status = 'SENDING'
-        AND update_time &lt; #{timeoutBefore}
-    </update>
-
-    <update id="markQueuedByTaskIdIfPending">
+    <update id="markQueuedByTaskIdIfWaiting">
         UPDATE ai_task
         SET status = 'QUEUED',
-            queue_time = COALESCE(queue_time, #{queueTime}),
+            queue_time = COALESCE(queue_time, CURRENT_TIMESTAMP),
             update_time = CURRENT_TIMESTAMP,
             version_id = version_id + 1
         WHERE id = #{taskId}
-          AND status = 'PENDING'
+          AND status IN ('PENDING', 'RETRY_WAIT')
     </update>
 
     <select id="selectExpiredRunningTasks" resultMap="AiTaskResultMap">
         SELECT *
         FROM ai_task
         WHERE status = 'RUNNING'
-        AND lease_until &lt; #{now}
+        AND lease_until &lt; CURRENT_TIMESTAMP
         ORDER BY lease_until ASC
         LIMIT #{limit}
     </select>
+
+    <update id="updateRequestHashIfNull">
+        UPDATE ai_task
+        SET request_hash = #{requestHash}
+        WHERE id = #{taskId}
+          AND request_hash IS NULL
+    </update>
 
     <select id="selectStaleWaitingTasks" resultMap="AiTaskResultMap">
         SELECT *
         FROM ai_task
         WHERE status IN ('PENDING', 'QUEUED', 'RETRY_WAIT')
-          AND update_time &lt; #{staleBefore}
+          AND update_time &lt; TIMESTAMPADD(SECOND, -#{waitingRecoverySeconds}, CURRENT_TIMESTAMP)
+          AND recovery_count &lt; #{maxRecoveryMessages}
         ORDER BY update_time ASC, id ASC
         LIMIT #{limit}
     </select>
@@ -434,14 +431,6 @@
           AND aggregate_id = #{taskId}
           AND event_type IN ('AI_TASK_CREATED', 'AI_TASK_RETRY')
           AND status IN ('NEW', 'SENDING', 'RETRY_WAIT')
-    </select>
-
-    <select id="countTaskRetryOutbox" resultType="int">
-        SELECT COUNT(*)
-        FROM mq_outbox
-        WHERE aggregate_type = 'AI-TASK'
-          AND aggregate_id = #{taskId}
-          AND event_type = 'AI_TASK_RETRY'
     </select>
 
     <select id="selectAiNutrientByTaskId" resultMap="AiNutrientResultMap">
@@ -460,7 +449,16 @@
         VALUES
         (#{id}, #{eventId}, #{aggregateType}, #{aggregateId}, #{eventType},
         #{topic}, #{tag}, #{messageKey}, #{payload}, #{schemaVersion},
-        #{status}, #{retryCount}, #{maxRetries}, #{nextRetryTime},
-        #{createTime}, #{updateTime}, #{versionId})
+             #{status}, #{retryCount}, #{maxRetries}, CURRENT_TIMESTAMP,
+             CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, #{versionId})
     </insert>
+
+    <!-- 只清理已确认 SENT 的历史记录；DEAD 必须保留供告警排查和人工重放。 -->
+    <delete id="deleteExpiredSentOutbox">
+        DELETE FROM mq_outbox
+        WHERE status = 'SENT'
+          AND update_time &lt; TIMESTAMPADD(DAY, -#{retentionDays}, CURRENT_TIMESTAMP)
+        ORDER BY update_time ASC, id ASC
+        LIMIT #{limit}
+    </delete>
 </mapper>

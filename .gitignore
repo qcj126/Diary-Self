@@ -4,4 +4,4 @@ target/
 *.class
 *.lst
 /diary-common/target/**
-test/
+/test/

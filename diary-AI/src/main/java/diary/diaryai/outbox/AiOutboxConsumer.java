@@ -21,7 +21,6 @@ import org.apache.rocketmq.client.core.RocketMQListener;
 import org.springframework.stereotype.Service;
 
 import java.nio.ByteBuffer;
-import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -74,15 +73,12 @@ public class AiOutboxConsumer implements RocketMQListener {
 
         try {
             final String workerId = "diary-ai-" + UUID.randomUUID();
-            final LocalDateTime now = LocalDateTime.now();
             AiTaskProcessDto claimRequest = AiTaskProcessDto.builder()
                     .taskId(message.getTaskId())
                     .userId(message.getUserId())
                     .clientRequestId(message.getClientRequestId())
                     .workerId(workerId)
-                    .queueTime(now)
-                    .startTime(now)
-                    .leaseUntil(now.plusSeconds(aiTaskProperties.getTask().getExecutionLeaseSeconds()))
+                    .leaseSeconds(aiTaskProperties.getTask().getExecutionLeaseSeconds())
                     .build();
 
             final int claimed;

@@ -41,6 +41,10 @@ public class AiTaskProperties {
         private long publisherSendingTimeoutSeconds = 60;
         @Min(0)
         private int outboxMaxRetries = 10;
+        @Min(1)
+        private int sentRetentionDays = 7;
+        @Min(1)
+        private int cleanupBatchSize = 500;
     }
 
     @Data
@@ -70,8 +74,11 @@ public class AiTaskProperties {
 
     @Data
     public static class Limit {
+        @Min(1)
         private int submitPerUserPerMinute = 10;
+        @Min(1)
         private int modelLocalConcurrency = 2;
+        @Min(0)
         private long localPermitWaitMs = 1000;
     }
 }

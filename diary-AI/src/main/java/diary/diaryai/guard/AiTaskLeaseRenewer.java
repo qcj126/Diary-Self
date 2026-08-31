@@ -4,11 +4,9 @@ import diary.common.entity.ai.dto.AiTaskProcessDto;
 import diary.diaryai.mapper.DiaryAiMapper;
 import diary.diaryai.properties.AiTaskProperties;
 import jakarta.annotation.PreDestroy;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -17,11 +15,17 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class AiTaskLeaseRenewer {
     private final DiaryAiMapper diaryAiMapper;
     private final AiTaskProperties properties;
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1, new LeaseThreadFactory());
+    private final ScheduledExecutorService scheduler;
+
+    public AiTaskLeaseRenewer(DiaryAiMapper diaryAiMapper, AiTaskProperties properties) {
+        this.diaryAiMapper = diaryAiMapper;
+        this.properties = properties;
+        int schedulerThreads = Math.max(1, properties.getLimit().getModelLocalConcurrency());
+        this.scheduler = Executors.newScheduledThreadPool(schedulerThreads, new LeaseThreadFactory());
+    }
 
     public LeaseRenewalHandle start(Long taskId, String workerId, Integer versionId) {
         long leaseSeconds = properties.getTask().getExecutionLeaseSeconds();
@@ -32,7 +36,7 @@ public class AiTaskLeaseRenewer {
                         .taskId(taskId)
                         .workerId(workerId)
                         .versionId(versionId)
-                        .leaseUntil(LocalDateTime.now().plusSeconds(leaseSeconds))
+                        .leaseSeconds(leaseSeconds)
                         .build();
                 int renewed = diaryAiMapper.renewExecutionLease(renewal);
                 if (renewed != 1) {

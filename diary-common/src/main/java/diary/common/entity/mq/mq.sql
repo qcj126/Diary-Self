@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS `mq_outbox` (
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_event_id` (`event_id`),
     KEY `idx_status_next_retry` (`status`, `next_retry_time`),
+    KEY `idx_status_update` (`status`, `update_time`, `id`),
     KEY `idx_aggregate` (`aggregate_type`, `aggregate_id`),
     KEY `idx_create_time` (`create_time`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='MQ 发件箱表';

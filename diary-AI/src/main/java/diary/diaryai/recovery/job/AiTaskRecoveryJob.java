@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -23,7 +22,7 @@ public class AiTaskRecoveryJob {
     @Scheduled(fixedDelayString = "${diary.ai.task.recovery-interval-ms:30000}")
     public void recoverExpiredRunning() {
         List<AiTaskPO> tasks = diaryAiMapper.selectExpiredRunningTasks(
-                LocalDateTime.now(), aiTaskProperties.getTask().getRecoveryBatchSize());
+                aiTaskProperties.getTask().getRecoveryBatchSize());
 
         for (AiTaskPO task : tasks) {
             try {
@@ -38,10 +37,10 @@ public class AiTaskRecoveryJob {
          * 改前：只扫描租约过期的 RUNNING，消息在真正执行前进入 DLQ 时没有任何恢复入口。
          * 改后：同一轮任务再扫描长期停留的 PENDING/QUEUED/RETRY_WAIT，由服务判断是否存在活跃 Outbox 后恢复。
          */
-        LocalDateTime staleBefore = LocalDateTime.now().minusSeconds(
-                aiTaskProperties.getTask().getWaitingRecoverySeconds());
         List<AiTaskPO> waitingTasks = diaryAiMapper.selectStaleWaitingTasks(
-                staleBefore, aiTaskProperties.getTask().getRecoveryBatchSize());
+                aiTaskProperties.getTask().getWaitingRecoverySeconds(),
+                aiTaskProperties.getTask().getWaitingMaxRecoveryMessages(),
+                aiTaskProperties.getTask().getRecoveryBatchSize());
         for (AiTaskPO task : waitingTasks) {
             try {
                 aiTaskRecoveryService.recoverWaiting(task);

@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URI;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/ai")
@@ -27,13 +29,15 @@ public class DiaryAIController {
     private final AiTaskApplicationService aiTaskApplicationService;
     private final AiTaskQueryService aiTaskQueryService;
 
-    @OperLog(module = "AI", description = "提交AI任务", operationType = "INSERT", saveParams = true, saveResult = false)
+    @OperLog(module = "AI", description = "提交AI任务", operationType = "INSERT", saveParams = false, saveResult = false)
     @PostMapping("/tasks")
     public ResponseEntity<ApiResponse<AiTaskSubmitVo>> submit(
             @RequestBody AiInvokeDTO request,
             @RequestHeader("X-Auth-User-Id") Long userId) {
-        return ResponseEntity.status(HttpStatus.ACCEPTED)
-                .body(ApiResponse.success(aiTaskApplicationService.submitTask(request, userId)));
+        AiTaskSubmitVo submitted = aiTaskApplicationService.submitTask(request, userId);
+        return ResponseEntity.accepted()
+                .location(URI.create("/ai/tasks/" + submitted.getTaskId()))
+                .body(ApiResponse.success(submitted));
     }
 
     @OperLog(module = "AI", description = "获取AI任务状态", operationType = "SELECT", saveParams = true, saveResult = true)

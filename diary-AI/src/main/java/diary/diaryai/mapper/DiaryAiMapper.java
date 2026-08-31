@@ -8,7 +8,6 @@ import diary.common.entity.mq.po.MqOutboxPO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -36,8 +35,6 @@ public interface DiaryAiMapper {
      * 可以互相覆盖状态，甚至把 SUCCESS 覆盖回 QUEUED。现在为每条状态迁移保留独立 Mapper，
      * 让 SQL 自己校验前置状态、Worker 所有权和乐观锁版本，调用方再根据受影响行数判断是否成功。
      */
-    int markQueuedIfPending(AiTaskProcessDto aiTaskProcessDto);
-
     int claimForExecution(AiTaskProcessDto aiTaskProcessDto);
 
     int markRetryWaitIfOwned(AiTaskProcessDto aiTaskProcessDto);
@@ -57,74 +54,70 @@ public interface DiaryAiMapper {
     int recoverStaleWaiting(
             @Param("taskId") Long taskId,
             @Param("versionId") Integer versionId,
-            @Param("staleBefore") LocalDateTime staleBefore,
-            @Param("now") LocalDateTime now,
+            @Param("waitingRecoverySeconds") long waitingRecoverySeconds,
+            @Param("maxRecoveryMessages") int maxRecoveryMessages,
             @Param("errorCode") String errorCode,
             @Param("errorMessage") String errorMessage
     );
 
+    int updateRequestHashIfNull(
+            @Param("taskId") Long taskId,
+            @Param("requestHash") String requestHash
+    );
+
     int insertOutbox(MqOutboxPO outbox);
 
-    List<MqOutboxPO> selectReadyOutbox(
-            @Param("now") LocalDateTime now,
-            @Param("limit") int limit
-    );
+    List<MqOutboxPO> selectReadyOutbox(@Param("limit") int limit);
 
     MqOutboxPO selectOutboxById(@Param("id") Long id);
 
+    List<MqOutboxPO> selectTimedOutbox(
+            @Param("timeoutSeconds") long timeoutSeconds,
+            @Param("limit") int limit
+    );
+
     int claimOutbox(
             @Param("id") Long id,
-            @Param("versionId") Integer versionId,
-            @Param("updateTime") LocalDateTime updateTime
+            @Param("versionId") Integer versionId
     );
 
     int markOutboxSent(
             @Param("id") Long id,
             @Param("versionId") Integer versionId,
-            @Param("brokerMessageId") String brokerMessageId,
-            @Param("sentTime") LocalDateTime sentTime
+            @Param("brokerMessageId") String brokerMessageId
     );
 
     int markOutboxRetry(
             @Param("id") Long id,
             @Param("versionId") Integer versionId,
-            @Param("nextRetryTime") LocalDateTime nextRetryTime,
-            @Param("lastError") String lastError,
-            @Param("updateTime") LocalDateTime updateTime
+            @Param("retryDelaySeconds") long retryDelaySeconds,
+            @Param("lastError") String lastError
     );
 
     int markOutboxDead(
             @Param("id") Long id,
             @Param("versionId") Integer versionId,
-            @Param("lastError") String lastError,
-            @Param("updateTime") LocalDateTime updateTime
+            @Param("lastError") String lastError
     );
 
-    int recoverSendingTimeout(
-            @Param("timeoutBefore") LocalDateTime timeoutBefore,
-            @Param("now") LocalDateTime now
-    );
+    int markQueuedByTaskIdIfWaiting(@Param("taskId") Long taskId);
 
-    int markQueuedByTaskIdIfPending(
-            @Param("taskId") Long taskId,
-            @Param("queueTime") LocalDateTime queueTime
-    );
-
-    List<AiTaskPO> selectExpiredRunningTasks(
-            @Param("now") LocalDateTime now,
-            @Param("limit") int limit
-    );
+    List<AiTaskPO> selectExpiredRunningTasks(@Param("limit") int limit);
 
     List<AiTaskPO> selectStaleWaitingTasks(
-            @Param("staleBefore") LocalDateTime staleBefore,
+            @Param("waitingRecoverySeconds") long waitingRecoverySeconds,
+            @Param("maxRecoveryMessages") int maxRecoveryMessages,
             @Param("limit") int limit
     );
 
     int countActiveTaskDispatchOutbox(@Param("taskId") Long taskId);
 
-    int countTaskRetryOutbox(@Param("taskId") Long taskId);
-
     AiNutrientPO selectAiNutrientByTaskId(@Param("taskId") Long taskId);
 
     int insertRetryTaskOutbox(MqOutboxPO outbox);
+
+    int deleteExpiredSentOutbox(
+            @Param("retentionDays") int retentionDays,
+            @Param("limit") int limit
+    );
 }
