@@ -5,12 +5,14 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
 
 /** 创建或更新恋爱足迹地点的参数。 */
 @Data
+@Builder
 public class LoveLocationDTO {
     private Long id;
     @NotNull(message = "恋爱关系ID不能为空")

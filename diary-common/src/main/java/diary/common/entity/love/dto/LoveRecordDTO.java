@@ -5,12 +5,14 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
 
 /** 创建或更新恋爱记录的参数。 */
 @Data
+@Builder
 public class LoveRecordDTO {
     private Long id;
     @NotNull(message = "恋爱关系ID不能为空")

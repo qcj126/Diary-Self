@@ -1,15 +1,7 @@
 package diary.diarylove.impl;
 
 import diary.common.convert.love.DtoConvertToPo;
-import diary.common.entity.love.dto.LoveAnniversaryDTO;
-import diary.common.entity.love.dto.LoveCoupleDTO;
-import diary.common.entity.love.dto.LoveLocationDTO;
-import diary.common.entity.love.dto.LoveMoodDTO;
-import diary.common.entity.love.dto.LoveRecordDTO;
-import diary.common.entity.love.dto.LoveRecordImageDTO;
-import diary.common.entity.love.dto.LoveRecordMoodDTO;
-import diary.common.entity.love.dto.LoveRecordTagDTO;
-import diary.common.entity.love.dto.LoveTagDTO;
+import diary.common.entity.love.dto.*;
 import diary.common.result.ApiResponse;
 import diary.diarylove.mapper.DiaryLoveMapper;
 import diary.diarylove.service.DiaryLoveUpdateService;
@@ -50,8 +42,7 @@ public class DiaryLoveUpdateServiceImpl implements DiaryLoveUpdateService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ApiResponse<String> updateRecord(LoveRecordDTO dto) {
-        DiaryLoveAddServiceImpl.validateRecord(dto, true);
+    public ApiResponse<String> updateRecord(UpdateLoveRecordDto dto) {
         if (dto.getImportant() == null) dto.setImportant(false);
         if (dto.getSort() == null) dto.setSort(0);
 

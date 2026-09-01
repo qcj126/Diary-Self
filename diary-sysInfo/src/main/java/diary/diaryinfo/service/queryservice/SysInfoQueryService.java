@@ -1,4 +1,4 @@
-package diary.diaryinfo.service;
+package diary.diaryinfo.service.queryservice;
 
 import diary.common.entity.sysInfo.dto.IngredientReqDto;
 import diary.common.entity.sysInfo.vo.CookWayVo;

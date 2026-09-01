@@ -1,4 +1,4 @@
-package diary.diaryinfo.service;
+package diary.diaryinfo.service.addservice;
 
 import diary.common.entity.sysInfo.dto.IngredientReqDto;
 import diary.common.result.ApiResponse;

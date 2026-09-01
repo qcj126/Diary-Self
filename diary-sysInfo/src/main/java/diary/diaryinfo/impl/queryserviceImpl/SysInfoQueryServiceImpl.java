@@ -12,7 +12,7 @@ import diary.common.entity.sysInfo.vo.IngredientCategoryVo;
 import diary.common.entity.sysInfo.vo.IngredientVo;
 import diary.common.result.ApiResponse;
 import diary.diaryinfo.mapper.SysInfoMapper;
-import diary.diaryinfo.service.SysInfoQueryService;
+import diary.diaryinfo.service.queryservice.SysInfoQueryService;
 import diary.utils.commonutil.MyUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

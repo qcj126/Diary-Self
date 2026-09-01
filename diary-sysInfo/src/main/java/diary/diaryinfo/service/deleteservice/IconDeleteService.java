@@ -1,4 +1,4 @@
-package diary.diaryinfo.service;
+package diary.diaryinfo.service.deleteservice;
 
 import diary.common.entity.file.dto.IconDTO;
 import diary.common.result.ApiResponse;

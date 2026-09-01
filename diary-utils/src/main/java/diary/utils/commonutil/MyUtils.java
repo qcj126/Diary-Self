@@ -17,7 +17,7 @@ public class MyUtils {
     private static long lastTimestamp = -1L;
     private static long sequence = 0L;
     private static final long START_TIMESTAMP = 1704038400000L; // 2024-01-01
-    public static synchronized long nextId() {
+    public static synchronized long getPrimaryKey() {
         long timestamp = System.currentTimeMillis();
 
         if (timestamp < lastTimestamp) {
@@ -39,11 +39,6 @@ public class MyUtils {
 
         return ((timestamp - START_TIMESTAMP) << 22)  // 时间戳左移22位
                 | (sequence);                          // 序列号
-    }
-    // 生成雪花算法主键id
-    public static long getPrimaryKey() {
-        // 使用雪花算法
-        return nextId();
     }
 
     // 判断字符串为空或空串

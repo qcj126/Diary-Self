@@ -1,14 +1,6 @@
 package diary.diarylove.controller;
 
-import diary.common.entity.love.dto.LoveAnniversaryDTO;
-import diary.common.entity.love.dto.LoveCoupleDTO;
-import diary.common.entity.love.dto.LoveLocationDTO;
-import diary.common.entity.love.dto.LoveMoodDTO;
-import diary.common.entity.love.dto.LoveRecordDTO;
-import diary.common.entity.love.dto.LoveRecordImageDTO;
-import diary.common.entity.love.dto.LoveRecordMoodDTO;
-import diary.common.entity.love.dto.LoveRecordTagDTO;
-import diary.common.entity.love.dto.LoveTagDTO;
+import diary.common.entity.love.dto.*;
 import diary.common.entity.love.vo.LoveAnniversaryVO;
 import diary.common.entity.love.vo.LoveCoupleVO;
 import diary.common.entity.love.vo.LoveLocationVO;
@@ -64,7 +56,7 @@ public class DiaryLoveController {
 
     @OperLog(module = "恋爱记录", description = "新增恋爱记录", operationType = "INSERT", saveResult = true)
     @PostMapping("/add/records")
-    public ApiResponse<String> addRecord(@RequestBody LoveRecordDTO dto) {
+    public ApiResponse<String> addRecord(@RequestBody AddLoveRecordDto dto) {
         return diaryLoveAddService.addRecord(dto);
     }
 
@@ -72,30 +64,6 @@ public class DiaryLoveController {
     @PostMapping("/add/record-images")
     public ApiResponse<String> addRecordImage(@RequestBody LoveRecordImageDTO dto) {
         return diaryLoveAddService.addRecordImage(dto);
-    }
-
-    @OperLog(module = "恋爱记录", description = "新增心情", operationType = "INSERT", saveResult = true)
-    @PostMapping("/add/moods")
-    public ApiResponse<String> addMood(@RequestBody LoveMoodDTO dto) {
-        return diaryLoveAddService.addMood(dto);
-    }
-
-    @OperLog(module = "恋爱记录", description = "新增记录心情关联", operationType = "INSERT", saveResult = true)
-    @PostMapping("/add/record-moods")
-    public ApiResponse<String> addRecordMood(@RequestBody LoveRecordMoodDTO dto) {
-        return diaryLoveAddService.addRecordMood(dto);
-    }
-
-    @OperLog(module = "恋爱记录", description = "新增标签", operationType = "INSERT", saveResult = true)
-    @PostMapping("/add/tags")
-    public ApiResponse<String> addTag(@RequestBody LoveTagDTO dto) {
-        return diaryLoveAddService.addTag(dto);
-    }
-
-    @OperLog(module = "恋爱记录", description = "新增记录标签关联", operationType = "INSERT", saveResult = true)
-    @PostMapping("/add/record-tags")
-    public ApiResponse<String> addRecordTag(@RequestBody LoveRecordTagDTO dto) {
-        return diaryLoveAddService.addRecordTag(dto);
     }
 
     @OperLog(module = "恋爱记录", description = "查询情侣关系", operationType = "SELECT", saveResult = true)
@@ -178,7 +146,7 @@ public class DiaryLoveController {
 
     @OperLog(module = "恋爱记录", description = "修改恋爱记录", operationType = "UPDATE", saveResult = true)
     @PostMapping("/update/records")
-    public ApiResponse<String> updateRecord(@RequestBody LoveRecordDTO dto) {
+    public ApiResponse<String> updateRecord(@RequestBody UpdateLoveRecordDto dto) {
         return diaryLoveUpdateService.updateRecord(dto);
     }
 

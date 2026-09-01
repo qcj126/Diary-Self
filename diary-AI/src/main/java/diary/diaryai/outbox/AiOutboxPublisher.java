@@ -36,6 +36,7 @@ public class AiOutboxPublisher {
             if (!aiOutboxService.claim(outbox)) {
                 continue;
             }
+            // 每次改变状态后必须清理缓存，防止脏数据产生
             aiTaskCacheService.evict(outbox.getAggregateId());
             try {
                 Message<String> message = MessageBuilder

@@ -1,14 +1,6 @@
 package diary.diarylove.service;
 
-import diary.common.entity.love.dto.LoveAnniversaryDTO;
-import diary.common.entity.love.dto.LoveCoupleDTO;
-import diary.common.entity.love.dto.LoveLocationDTO;
-import diary.common.entity.love.dto.LoveMoodDTO;
-import diary.common.entity.love.dto.LoveRecordDTO;
-import diary.common.entity.love.dto.LoveRecordImageDTO;
-import diary.common.entity.love.dto.LoveRecordMoodDTO;
-import diary.common.entity.love.dto.LoveRecordTagDTO;
-import diary.common.entity.love.dto.LoveTagDTO;
+import diary.common.entity.love.dto.*;
 import diary.common.result.ApiResponse;
 
 public interface DiaryLoveUpdateService {
@@ -18,7 +10,7 @@ public interface DiaryLoveUpdateService {
 
     ApiResponse<String> updateLocation(LoveLocationDTO dto);
 
-    ApiResponse<String> updateRecord(LoveRecordDTO dto);
+    ApiResponse<String> updateRecord(UpdateLoveRecordDto dto);
 
     ApiResponse<String> updateRecordImage(LoveRecordImageDTO dto);
 

@@ -45,6 +45,7 @@ public class AiOutboxServiceImpl implements AiOutboxService {
             throw new IllegalStateException("Outbox SENT 更新失败: " + outbox.getId());
         }
 
+        // 确认消息投递成功后，将状态为PENDING和RETRY_WAIT的任务更新为 QUEUED
         if (isTaskDispatchEvent(outbox)) {
             // 首次发送和恢复消息都已进入 Broker，对外统一表达为 QUEUED。
             diaryAiMapper.markQueuedByTaskIdIfWaiting(outbox.getAggregateId());
@@ -91,8 +92,7 @@ public class AiOutboxServiceImpl implements AiOutboxService {
              */
             AiTaskPO task = diaryAiMapper.selectAiTaskByTaskId(outbox.getAggregateId());
             if (task != null) {
-                boolean deadLettered = aiTaskCommandService.deadLetterDispatchTask(
-                        task,
+                boolean deadLettered = aiTaskCommandService.deadLetterDispatchTask(task,
                         "任务消息Outbox重试耗尽, outboxId=" + outbox.getId()
                 );
                 log.error("任务投递Outbox已进入DEAD, outboxId={}, taskId={}, taskDeadLettered={}",

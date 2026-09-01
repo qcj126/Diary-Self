@@ -322,11 +322,13 @@
         WHERE id = #{id} AND deleted = 0
     </update>
 
-    <insert id="insertLoveRecordImage">
+    <insert id="insertLoveRecordImage" parameterType="diary.common.entity.love.po.LoveRecordImagePO">
         INSERT INTO love_record_image
         (id, record_id, image_id, is_cover, sort)
         VALUES
-        (#{id}, #{recordId}, #{imageId}, #{isCover}, #{sort})
+        <foreach collection="loveRecordImagePOList" item="item" separator=",">
+            (#{item.id}, #{item.recordId}, #{item.imageId}, #{item.isCover}, #{item.sort})
+        </foreach>
     </insert>
 
     <select id="selectLoveRecordImageById" resultMap="loveRecordImageResultMap">

@@ -2,10 +2,12 @@ package diary.common.entity.love.dto;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Data;
 
 /** 保存恋爱记录图片关联的参数。 */
 @Data
+@Builder
 public class LoveRecordImageDTO {
     private Long id;
     @NotNull(message = "恋爱记录ID不能为空")

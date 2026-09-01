@@ -1,13 +1,23 @@
 package diary.diaryinfo.controller;
 
 import diary.common.entity.file.dto.IconDTO;
+import diary.common.entity.love.dto.LoveMoodDTO;
+import diary.common.entity.love.dto.LoveRecordMoodDTO;
+import diary.common.entity.love.dto.LoveRecordTagDTO;
+import diary.common.entity.love.dto.LoveTagDTO;
 import diary.common.entity.sysInfo.dto.IngredientReqDto;
 import diary.common.entity.sysInfo.vo.CookWayVo;
 import diary.common.entity.sysInfo.vo.IngredientCategoryVo;
 import diary.common.entity.sysInfo.vo.IngredientVo;
 import diary.common.result.ApiResponse;
 import diary.config.logconfig.OperLog;
-import diary.diaryinfo.service.*;
+import diary.diaryinfo.service.addservice.DiaryLoveAddService;
+import diary.diaryinfo.service.addservice.IconAddService;
+import diary.diaryinfo.service.addservice.SysInfoAddService;
+import diary.diaryinfo.service.deleteservice.IconDeleteService;
+import diary.diaryinfo.service.queryservice.IconQueryService;
+import diary.diaryinfo.service.queryservice.SysInfoQueryService;
+import diary.diaryinfo.service.updateservice.IconUpdateService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +37,7 @@ public class DiarySysInfoController {
     private final IconDeleteService iconDeleteService;
     private final IconQueryService iconQueryService;
     private final IconUpdateService iconUpdateService;
+    private final DiaryLoveAddService diaryLoveAddService;
 
     // 查询食材分类
     @OperLog(module = "系统资料", description = "查询食材分类", operationType = "SELECT", saveResult = true)
@@ -87,5 +98,29 @@ public class DiarySysInfoController {
     @GetMapping(value = "/icon/{fileName}", produces = MediaType.IMAGE_PNG_VALUE)
     public ResponseEntity<byte[]> getIcon(@PathVariable String fileName) throws IOException {
         return iconQueryService.getIcon(fileName);
+    }
+
+    @OperLog(module = "系统资料", description = "新增心情", operationType = "INSERT", saveResult = true)
+    @PostMapping("/add/moods")
+    public ApiResponse<String> addMood(@RequestBody LoveMoodDTO dto) {
+        return diaryLoveAddService.addMood(dto);
+    }
+
+    @OperLog(module = "系统资料", description = "新增记录心情关联", operationType = "INSERT", saveResult = true)
+    @PostMapping("/add/record-moods")
+    public ApiResponse<String> addRecordMood(@RequestBody LoveRecordMoodDTO dto) {
+        return diaryLoveAddService.addRecordMood(dto);
+    }
+
+    @OperLog(module = "系统资料", description = "新增标签", operationType = "INSERT", saveResult = true)
+    @PostMapping("/add/tags")
+    public ApiResponse<String> addTag(@RequestBody LoveTagDTO dto) {
+        return diaryLoveAddService.addTag(dto);
+    }
+
+    @OperLog(module = "系统资料", description = "新增记录标签关联", operationType = "INSERT", saveResult = true)
+    @PostMapping("/add/record-tags")
+    public ApiResponse<String> addRecordTag(@RequestBody LoveRecordTagDTO dto) {
+        return diaryLoveAddService.addRecordTag(dto);
     }
 }

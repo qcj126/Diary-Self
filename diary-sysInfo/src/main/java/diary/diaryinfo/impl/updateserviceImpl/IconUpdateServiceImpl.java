@@ -6,7 +6,7 @@ import diary.common.entity.file.po.IconPO;
 import diary.common.result.ApiResponse;
 
 import diary.diaryinfo.mapper.IconMapper;
-import diary.diaryinfo.service.IconUpdateService;
+import diary.diaryinfo.service.updateservice.IconUpdateService;
 import diary.utils.commonutil.MyUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

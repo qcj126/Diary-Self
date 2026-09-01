@@ -1,4 +1,4 @@
-package diary.diaryinfo.service;
+package diary.diaryinfo.service.queryservice;
 
 import diary.common.entity.file.dto.IconDTO;
 import diary.common.result.ApiResponse;

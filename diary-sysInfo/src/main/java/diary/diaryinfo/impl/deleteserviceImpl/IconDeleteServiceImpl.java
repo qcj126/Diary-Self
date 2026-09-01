@@ -5,7 +5,7 @@ import diary.common.entity.file.po.IconPO;
 import diary.common.exception.NullResultException;
 import diary.common.result.ApiResponse;
 import diary.diaryinfo.mapper.IconMapper;
-import diary.diaryinfo.service.IconDeleteService;
+import diary.diaryinfo.service.deleteservice.IconDeleteService;
 import diary.utils.commonutil.MyUtils;
 import diary.utils.file.FileUtil;
 import lombok.RequiredArgsConstructor;

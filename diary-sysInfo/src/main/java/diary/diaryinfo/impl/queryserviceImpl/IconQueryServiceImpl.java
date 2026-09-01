@@ -9,7 +9,7 @@ import diary.common.result.ApiResponse;
 
 import diary.diaryinfo.mapper.IconMapper;
 
-import diary.diaryinfo.service.IconQueryService;
+import diary.diaryinfo.service.queryservice.IconQueryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;

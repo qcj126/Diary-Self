@@ -23,7 +23,7 @@ public class AiTaskLeaseRenewer {
     public AiTaskLeaseRenewer(DiaryAiMapper diaryAiMapper, AiTaskProperties properties) {
         this.diaryAiMapper = diaryAiMapper;
         this.properties = properties;
-        int schedulerThreads = Math.max(1, properties.getLimit().getModelLocalConcurrency());
+        int schedulerThreads = Math.max(5, properties.getLimit().getModelLocalConcurrency());
         this.scheduler = Executors.newScheduledThreadPool(schedulerThreads, new LeaseThreadFactory());
     }
 

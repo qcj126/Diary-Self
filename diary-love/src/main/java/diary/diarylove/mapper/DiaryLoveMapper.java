@@ -56,7 +56,7 @@ public interface DiaryLoveMapper {
 
     int deleteLoveRecord(@Param("id") Long id);
 
-    int insertLoveRecordImage(LoveRecordImagePO loveRecordImagePO);
+    int insertLoveRecordImage(@Param("loveRecordImagePOList") List<LoveRecordImagePO> loveRecordImagePOList);
 
     LoveRecordImagePO selectLoveRecordImageById(@Param("id") Long id);
 

@@ -1,27 +1,30 @@
 package diary.diarylove.impl;
 
 import diary.common.convert.love.DtoConvertToPo;
-import diary.common.entity.love.dto.LoveAnniversaryDTO;
-import diary.common.entity.love.dto.LoveCoupleDTO;
-import diary.common.entity.love.dto.LoveLocationDTO;
-import diary.common.entity.love.dto.LoveMoodDTO;
-import diary.common.entity.love.dto.LoveRecordDTO;
-import diary.common.entity.love.dto.LoveRecordImageDTO;
-import diary.common.entity.love.dto.LoveRecordMoodDTO;
-import diary.common.entity.love.dto.LoveRecordTagDTO;
-import diary.common.entity.love.dto.LoveTagDTO;
+import diary.common.entity.love.dto.*;
+import diary.common.entity.love.po.LoveRecordImagePO;
+import diary.common.entity.love.po.LoveRecordPO;
 import diary.common.result.ApiResponse;
 import diary.diarylove.mapper.DiaryLoveMapper;
 import diary.diarylove.service.DiaryLoveAddService;
 import diary.utils.commonutil.MyUtils;
+import jakarta.validation.constraints.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
+
+import static diary.common.convert.love.LargeDtoConvertToTinyDto.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class DiaryLoveAddServiceImpl implements DiaryLoveAddService {
     private static final Set<String> RECORD_CATEGORIES = Set.of("DATE", "DAILY", "TRAVEL", "ANNIVERSARY");
 
@@ -48,75 +51,60 @@ public class DiaryLoveAddServiceImpl implements DiaryLoveAddService {
         return addResult(diaryLoveMapper.insertLoveAnniversary(DtoConvertToPo.convertToPo(dto)), "添加纪念日成功");
     }
 
+    // 将记录、图片、心情、标签和地点关联合并为一个事务用例，并在同一事务写 Outbox，方便后续异步处理：
+    // 消费者异步维护：
+    //- 周/月记录数量
+    //- 约会、旅行等分类统计
+    //- 年度回顾数据
+    //- 地点访问次数、城市足迹
+    //- 相册封面和图片数量
+    //- 心情趋势
+    //- 标签使用次数 love_tag.use_count
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ApiResponse<String> addLocation(LoveLocationDTO dto) {
-        validateLocation(dto, false);
-        dto.setId(MyUtils.getPrimaryKey());
-        return addResult(diaryLoveMapper.insertLoveLocation(DtoConvertToPo.convertToPo(dto)), "添加地点成功");
-    }
+    public ApiResponse<String> addRecord(AddLoveRecordDto dto) {
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public ApiResponse<String> addRecord(LoveRecordDTO dto) {
         validateRecord(dto, false);
         dto.setId(MyUtils.getPrimaryKey());
         if (dto.getImportant() == null) dto.setImportant(false);
         if (dto.getSort() == null) dto.setSort(0);
 
-        /*
-         * TODO 后续将记录、图片、心情、标签和地点关联合并为一个事务用例，并在同一事务写 Outbox。
-         *      RocketMQ 只负责提交后的异步统计/缓存投影，不能成为基础新增成功的前置条件。
-         */
-        return addResult(diaryLoveMapper.insertLoveRecord(DtoConvertToPo.convertToPo(dto)), "添加恋爱记录成功");
+        // 先构建对应的dto，再构建对应的po
+        // 构建locationDto
+        LoveLocationDTO locationDto = null;
+        if (dto.getLocationId() == null && dto.getNewLocation() != null) {
+            locationDto = convertLoveLocation(dto);
+        }
+        // 构建recordDto
+        Long locationId = locationDto == null ? dto.getLocationId() : locationDto.getId();
+        dto.setLocationId(locationId);
+        LoveRecordDTO loveRecordDTO = convertLoveRecord(dto);
+        // 构建recordImageDto
+        List<LoveRecordImageDTO> loveRecordImageDTOS = convertLoveRecordImage(dto, loveRecordDTO);
+
+        // 将dto转为po，然后插入数据库
+        int locationCnt = 1;
+        if (locationDto != null) {
+            locationCnt = diaryLoveMapper.insertLoveLocation(DtoConvertToPo.convertToPo(locationDto));
+        }
+        int recordCnt = diaryLoveMapper.insertLoveRecord(DtoConvertToPo.convertToPo(loveRecordDTO));
+
+        List<LoveRecordImagePO> recordImagePOList = new ArrayList<>();
+        for (LoveRecordImageDTO loveRecordImageDTO : loveRecordImageDTOS) {
+            recordImagePOList.add(DtoConvertToPo.convertToPo(loveRecordImageDTO));
+        }
+        int recordImageCnt = diaryLoveMapper.insertLoveRecordImage(recordImagePOList);
+
+        if (locationCnt > 0 && recordCnt > 0 && recordImageCnt > 0) {
+            return ApiResponse.success("添加记录成功");
+        }
+        log.info("添加记录失败: locationCnt={}, recordCnt={}, recordImageCnt={}", locationCnt, recordCnt, recordImageCnt);
+        return ApiResponse.addFail();
     }
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public ApiResponse<String> addRecordImage(LoveRecordImageDTO dto) {
-        validateRecordImage(dto, false);
-        dto.setId(MyUtils.getPrimaryKey());
-        if (dto.getIsCover() == null) dto.setIsCover(false);
-        if (dto.getSort() == null) dto.setSort(0);
-        return addResult(diaryLoveMapper.insertLoveRecordImage(DtoConvertToPo.convertToPo(dto)), "添加记录图片成功");
-    }
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public ApiResponse<String> addMood(LoveMoodDTO dto) {
-        validateMood(dto, false);
-        dto.setId(MyUtils.getPrimaryKey());
-        if (dto.getSort() == null) dto.setSort(0);
-        if (dto.getEnabled() == null) dto.setEnabled(true);
-        return addResult(diaryLoveMapper.insertLoveMood(DtoConvertToPo.convertToPo(dto)), "添加心情成功");
-    }
+    // mood和tag后续移入sysInfo模块
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public ApiResponse<String> addRecordMood(LoveRecordMoodDTO dto) {
-        validateRecordMood(dto, false);
-        dto.setId(MyUtils.getPrimaryKey());
-        if (dto.getSort() == null) dto.setSort(0);
-        return addResult(diaryLoveMapper.insertLoveRecordMood(DtoConvertToPo.convertToPo(dto)), "添加记录心情成功");
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public ApiResponse<String> addTag(LoveTagDTO dto) {
-        validateTag(dto, false);
-        dto.setId(MyUtils.getPrimaryKey());
-        if (dto.getUseCount() == null) dto.setUseCount(0);
-        return addResult(diaryLoveMapper.insertLoveTag(DtoConvertToPo.convertToPo(dto)), "添加标签成功");
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public ApiResponse<String> addRecordTag(LoveRecordTagDTO dto) {
-        validateRecordTag(dto, false);
-        dto.setId(MyUtils.getPrimaryKey());
-        if (dto.getSort() == null) dto.setSort(0);
-        return addResult(diaryLoveMapper.insertLoveRecordTag(DtoConvertToPo.convertToPo(dto)), "添加记录标签成功");
-    }
 
     static void validateCouple(LoveCoupleDTO dto, boolean requireId) {
         MyUtils.Checker checker = MyUtils.check().notNull(dto, "loveCoupleDTO");
@@ -144,11 +132,10 @@ public class DiaryLoveAddServiceImpl implements DiaryLoveAddService {
         }
     }
 
-    static void validateRecord(LoveRecordDTO dto, boolean requireId) {
+    static void validateRecord(AddLoveRecordDto dto, boolean requireId) {
         MyUtils.Checker checker = MyUtils.check().notNull(dto, "loveRecordDTO");
         if (requireId) checker.notNull(dto.getId(), "id");
         checker.notNull(dto.getCoupleId(), "coupleId")
-                .notNull(dto.getCreatorUserId(), "creatorUserId")
                 .notEmpty(dto.getTitle(), "title")
                 .notNull(dto.getRecordDate(), "recordDate")
                 .notEmpty(dto.getCategoryCode(), "categoryCode");

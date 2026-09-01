@@ -1,0 +1,16 @@
+package diary.diaryinfo.service.addservice;
+
+import diary.common.entity.love.dto.*;
+import diary.common.result.ApiResponse;
+
+public interface DiaryLoveAddService {
+    ApiResponse<String> addMood(LoveMoodDTO dto);
+
+    ApiResponse<String> addRecordMood(LoveRecordMoodDTO dto);
+
+    ApiResponse<String> addTag(LoveTagDTO dto);
+
+    ApiResponse<String> addRecordTag(LoveRecordTagDTO dto);
+
+    ApiResponse<String> addLocation(LoveLocationDTO dto);
+}

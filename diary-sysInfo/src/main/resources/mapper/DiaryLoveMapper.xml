@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="diary.diaryinfo.mapper.DiaryLoveMapper">
+    <resultMap id="loveMoodResultMap" type="diary.common.entity.love.po.LoveMoodPO">
+        <id property="id" column="id"/>
+        <result property="moodCode" column="mood_code"/>
+        <result property="moodName" column="mood_name"/>
+        <result property="emoji" column="emoji"/>
+        <result property="sort" column="sort"/>
+        <result property="enabled" column="enabled"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <resultMap id="loveRecordMoodResultMap" type="diary.common.entity.love.po.LoveRecordMoodPO">
+        <id property="id" column="id"/>
+        <result property="recordId" column="record_id"/>
+        <result property="moodId" column="mood_id"/>
+        <result property="sort" column="sort"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <resultMap id="loveTagResultMap" type="diary.common.entity.love.po.LoveTagPO">
+        <id property="id" column="id"/>
+        <result property="coupleId" column="couple_id"/>
+        <result property="creatorUserId" column="creator_user_id"/>
+        <result property="tagName" column="tag_name"/>
+        <result property="color" column="color"/>
+        <result property="useCount" column="use_count"/>
+        <result property="deleted" column="deleted"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <resultMap id="loveRecordTagResultMap" type="diary.common.entity.love.po.LoveRecordTagPO">
+        <id property="id" column="id"/>
+        <result property="recordId" column="record_id"/>
+        <result property="tagId" column="tag_id"/>
+        <result property="sort" column="sort"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <sql id="loveCoupleColumns">
+        id, owner_user_id, partner_user_id, partner_name, start_date,
+        status, deleted, create_time, update_time
+    </sql>
+    <sql id="loveAnniversaryColumns">
+        id, couple_id, creator_user_id, name, event_date, repeat_type,
+        remind_days, pinned, sort, deleted, create_time, update_time
+    </sql>
+    <sql id="loveLocationColumns">
+        id, couple_id, name, address, longitude, latitude, city_code,
+        city_name, deleted, create_time, update_time
+    </sql>
+    <sql id="loveRecordColumns">
+        id, couple_id, creator_user_id, location_id, title, content,
+        record_date, category_code, important, sort, deleted, create_time, update_time
+    </sql>
+    <sql id="loveRecordImageColumns">
+        id, record_id, image_id, is_cover, sort, create_time
+    </sql>
+    <sql id="loveMoodColumns">
+        id, mood_code, mood_name, emoji, sort, enabled, create_time, update_time
+    </sql>
+    <sql id="loveRecordMoodColumns">
+        id, record_id, mood_id, sort, create_time
+    </sql>
+    <sql id="loveTagColumns">
+        id, couple_id, creator_user_id, tag_name, color, use_count,
+        deleted, create_time, update_time
+    </sql>
+    <sql id="loveRecordTagColumns">
+        id, record_id, tag_id, sort, create_time
+    </sql>
+
+    <insert id="insertLoveMood">
+        INSERT INTO love_mood
+        (id, mood_code, mood_name, emoji, sort, enabled)
+        VALUES
+        (#{id}, #{moodCode}, #{moodName}, #{emoji}, #{sort}, #{enabled})
+    </insert>
+
+    <insert id="insertLoveRecordMood">
+        INSERT INTO love_record_mood
+        (id, record_id, mood_id, sort)
+        VALUES
+        (#{id}, #{recordId}, #{moodId}, #{sort})
+    </insert>
+
+    <insert id="insertLoveTag">
+        INSERT INTO love_tag
+        (id, couple_id, creator_user_id, tag_name, color, use_count)
+        VALUES
+        (#{id}, #{coupleId}, #{creatorUserId}, #{tagName}, #{color}, #{useCount})
+    </insert>
+
+    <insert id="insertLoveRecordTag">
+        INSERT INTO love_record_tag
+        (id, record_id, tag_id, sort)
+        VALUES
+        (#{id}, #{recordId}, #{tagId}, #{sort})
+    </insert>
+</mapper>

@@ -8,7 +8,7 @@ import diary.common.exception.NullResultException;
 import diary.common.result.ApiResponse;
 import diary.diaryinfo.mapper.IconMapper;
 import diary.diaryinfo.mapper.SysInfoMapper;
-import diary.diaryinfo.service.SysInfoAddService;
+import diary.diaryinfo.service.addservice.SysInfoAddService;
 import diary.utils.commonutil.MyUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

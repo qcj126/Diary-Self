@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Outbox 保留策略：分批清理已确认发送的历史记录，DEAD 记录永不自动删除。
+ * 删除sent记录是因为broker已确认消息收到，且任务已成功被消费者接收，因此可以删除，至于消费者是否成功处理，由重试机制保证，与outbox已无关。
  */
 @Slf4j
 @Component
