@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: diary-goal
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.101.128:8848
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
+server:
+  port: 8806

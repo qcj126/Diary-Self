@@ -1,0 +1,65 @@
+spring:
+  application:
+    name: diary-ai
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.101.128:8848
+  main:
+    web-application-type: servlet
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
+
+server:
+  port: 8807
+
+ali-cloud:
+  api:
+    api-key:
+    url:
+    deepSeekModel:
+    qwenPlusModel: qwen3.7-plus
+    qwenMaxModel: qwen3.7-max
+    temperature: 0.7
+
+diary:
+  ai:
+    rocketmq:
+      completed-tag: AI_COMPLETED
+      failed-tag: AI_FAILED
+      task-topic: diary-ai-task
+      task-tag: QWEN_PLUS_NUTRIENT
+      task-consumer-group: diary-ai-qwen-plus-worker-v2
+      event-topic: diary-ai-event
+      publisher-batch-size: 20
+      publisher-interval-ms: 1000
+      publisher-sending-timeout-seconds: 60
+      outbox-max-retries: 10
+    task:
+      max-attempts: 3
+      execution-lease-seconds: 330
+      recovery-interval-ms: 30000
+    cache:
+      running-ttl-seconds: 30
+      terminal-ttl-hours: 24
+      idempotency-ttl-hours: 24
+      null-ttl-seconds: 15
+      key-prefix: diary:dev:ai
+    limit:
+      submit-per-user-per-minute: 10
+      model-local-concurrency: 2
+      local-permit-wait-ms: 1000
+
+# 使用 rocketmq-v5-client-spring-boot-starter 的正确配置
+rocketmq:
+  # 启用生产者, 从而触发 RocketMQClientTemplate 的自动创建
+  producer:
+    # 你的 NameServer 地址
+    endpoints: 192.168.101.128:7081
+
+  # 如果你有消费者, 可以类似地启用消费者
+  # 但注意, 如果你使用 @RocketMQMessageListener 进行消费, 应配置 push-consumer
+  push-consumer:
+    endpoints: 192.168.101.128:7081

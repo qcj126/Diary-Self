@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: diary-diet
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.101.128:8848
+  main:
+    web-application-type: servlet
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
+server:
+  port: 8805

@@ -1,0 +1,110 @@
+server:
+  port: 8890
+  servlet:
+    context-path: /xxl-job-admin
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus,health,info,metrics,configprops,loggers,logfile,httptrace,threaddump,heapdump,mappings,scheduledtasks,conditions
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+    enable:
+      tomcat: true
+      tomcat:
+        threads: true
+      jvm: true
+      process: true
+      system: true
+      logback: true
+
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.101.128:8848
+  mvc:
+    servlet:
+      load-on-startup: 0
+    static-path-pattern: /static/**
+  web:
+    resources:
+      static-locations: classpath:/static/
+  freemarker:
+    template-loader-path: classpath:/templates/
+    suffix: .ftl
+    charset: UTF-8
+    request-context-attribute: request
+    settings:
+      number_format: 0.##########
+      new_builtin_class_resolver: safer
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.101.128:3306/diary?useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: qcjly
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      minimum-idle: 10
+      maximum-pool-size: 30
+      auto-commit: true
+      idle-timeout: 30000
+      pool-name: HikariCP
+      max-lifetime: 900000
+      connection-timeout: 10000
+      connection-test-query: SELECT 1
+      validation-timeout: 1000
+  mail:
+    host: smtp.qq.com
+    port: 25
+    username: xxx@qq.com
+    from: xxx@qq.com
+    password: xxx
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          socketFactory:
+            class: javax.net.ssl.SSLSocketFactory
+  application:
+    name: diary-xxljobadmin
+
+mybatis:
+  mapper-locations: classpath:/mapper/*Mapper.xml
+
+xxl:
+  job:
+    accessToken: default_token
+    timeout: 3
+    i18n: zh_CN
+    triggerpool:
+      fast:
+        max: 300
+      slow:
+        max: 200
+    schedule:
+      batchsize: 100
+    logretentiondays: 30
+
+xxl-sso:
+  token:
+    key: xxl_job_login_token
+    timeout: 604800000
+  client:
+    excluded:
+      paths: ""
+    login:
+      path: /auth/login
+
+logging:
+  level:
+    com.example.demo.mapper: DEBUG

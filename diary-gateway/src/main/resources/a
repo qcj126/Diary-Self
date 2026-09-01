@@ -1,0 +1,123 @@
+spring:
+  application:
+    name: diary-gateway
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.101.128:8848
+    gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: true
+              lower-case-service-id: true
+          routes:
+            - id: diary-user
+              uri: lb://diary-user
+              predicates:
+                - Path=/user/**
+            - id: diary-file
+              uri: lb://diary-file
+              predicates:
+                - Path=/file/**
+            - id: diary-recipe
+              uri: lb://diary-recipe
+              predicates:
+                - Path=/recipe/**
+            - id: diary-timemachine
+              uri: lb://diary-timemachine
+              predicates:
+                - Path=/time-machine/**
+            - id: diary-diet
+              uri: lb://diary-diet
+              predicates:
+                - Path=/diet/**
+            - id: diary-goal
+              uri: lb://diary-goal
+              predicates:
+                - Path=/goal/**
+            - id: diary-ai
+              uri: lb://diary-ai
+              predicates:
+                - Path=/ai/**
+            - id: diary-sysInfo
+              uri: lb://diary-sysInfo
+              predicates:
+                - Path=/sys/info/**
+            - id: diary-love
+              uri: lb://diary-love
+              predicates:
+                - Path=/love/**
+          globalcors:
+            corsConfigurations:
+              '[/**]':
+                allowedOriginPatterns: "http://localhost:1025"
+                allowedMethods:
+                  - GET
+                  - POST
+                  - PUT
+                  - DELETE
+                  - OPTIONS
+                allowedHeaders: "*"
+                allowCredentials: true
+
+  http:
+    codecs:
+      max-in-memory-size: 20MB
+  main:
+    web-application-type: reactive
+server:
+  port: 10000
+
+gateway:
+  auth:
+    exclude-paths:
+      - /user/login
+      - /user/refresh
+      - /user/register
+      - /user/add
+      - /user/delete
+      - /user/query
+      - /user/verifycode
+      - /user/resetPw
+      - /user/token/query
+      - /user/token/kickout
+      - /file/upload/images
+      - /file/query/images/urls
+      - /file/download/image
+      - /file/upload/video
+      - /file/query/images/carousel
+      - /file/icon/**
+      - /recipe/add
+      - /recipe/query
+      - /recipe/update
+      - /recipe/delete
+      - /time-machine/category/add
+      - /time-machine/card/add
+      - /time-machine/category/delete
+      - /time-machine/card/delete
+      - /time-machine/category/update
+      - /time-machine/card/update
+      - /time-machine/category/query
+      - /time-machine/card/query
+      - /diet/add
+      - /diet/delete
+      - /diet/update
+      - /diet/query
+      - /goal/add
+      - /goal/delete
+      - /goal/update
+      - /goal/query
+      - /goal/export
+      - /goal/batch/addSubGoal
+      - /ai/**
+      - /sys/info/**
+      - /love/**
+      - /actuator
+      - /favicon.ico
+# JWT configuration
+jwt:
+  secret: your256bitsecretkeymustbeatleast32characterslong
+  access-token-expiration: 600000 # accessToken 10分钟
+  refresh-token-expiration: 21600000 # refreshToken 6小时

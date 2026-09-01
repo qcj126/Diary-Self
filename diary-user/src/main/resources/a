@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: diary-user
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.101.128:8848
+  main:
+    web-application-type: servlet
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
+
+jwt:
+  access-token-expiration: 60000000 # accessToken 1000分钟
+  refresh-token-expiration: 21600000 # refreshToken 6小时
+server:
+  port: 8801
