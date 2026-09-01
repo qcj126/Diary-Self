@@ -11,6 +11,7 @@ import diary.common.entity.love.po.LoveRecordMoodPO;
 import diary.common.entity.love.po.LoveRecordPO;
 import diary.common.entity.love.po.LoveRecordTagPO;
 import diary.common.entity.love.po.LoveTagPO;
+import diary.common.entity.mq.po.MqOutboxPO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -105,4 +106,6 @@ public interface DiaryLoveMapper {
     int updateLoveRecordTag(LoveRecordTagPO loveRecordTagPO);
 
     int deleteLoveRecordTag(@Param("id") Long id);
+
+    int insertOutbox(MqOutboxPO outbox);
 }

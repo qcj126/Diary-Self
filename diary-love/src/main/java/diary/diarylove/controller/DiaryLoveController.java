@@ -48,22 +48,10 @@ public class DiaryLoveController {
         return diaryLoveAddService.addAnniversary(dto);
     }
 
-    @OperLog(module = "恋爱记录", description = "新增地点", operationType = "INSERT", saveResult = true)
-    @PostMapping("/add/locations")
-    public ApiResponse<String> addLocation(@RequestBody LoveLocationDTO dto) {
-        return diaryLoveAddService.addLocation(dto);
-    }
-
     @OperLog(module = "恋爱记录", description = "新增恋爱记录", operationType = "INSERT", saveResult = true)
     @PostMapping("/add/records")
     public ApiResponse<String> addRecord(@RequestBody AddLoveRecordDto dto) {
         return diaryLoveAddService.addRecord(dto);
-    }
-
-    @OperLog(module = "恋爱记录", description = "新增记录图片关联", operationType = "INSERT", saveResult = true)
-    @PostMapping("/add/record-images")
-    public ApiResponse<String> addRecordImage(@RequestBody LoveRecordImageDTO dto) {
-        return diaryLoveAddService.addRecordImage(dto);
     }
 
     @OperLog(module = "恋爱记录", description = "查询情侣关系", operationType = "SELECT", saveResult = true)

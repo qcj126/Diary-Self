@@ -1,26 +1,34 @@
 package diary.diarylove.impl;
 
 import diary.common.convert.love.DtoConvertToPo;
+import diary.common.entity.ai.dto.AiTaskMessageDto;
 import diary.common.entity.love.dto.*;
 import diary.common.entity.love.po.LoveRecordImagePO;
-import diary.common.entity.love.po.LoveRecordPO;
+import diary.common.entity.mq.po.MqOutboxPO;
+import diary.common.enums.aienum.AiTaskStatusEnum;
+import diary.common.enums.outbox.OutboxEventTypeEnum;
+import diary.common.enums.outbox.OutboxStatusEnum;
 import diary.common.result.ApiResponse;
 import diary.diarylove.mapper.DiaryLoveMapper;
+import diary.diarylove.properties.LoveRecordProperties;
 import diary.diarylove.service.DiaryLoveAddService;
 import diary.utils.commonutil.MyUtils;
-import jakarta.validation.constraints.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static diary.common.consts.MqTaskConst.AI_TASK_AGGREGATE_TYPE;
+import static diary.common.consts.MqTaskConst.OUTBOX_EVENT_ID;
+import static diary.common.consts.MqTaskConst.OUTBOX_SCHEMA_VERSION;
 import static diary.common.convert.love.LargeDtoConvertToTinyDto.*;
+import static diary.utils.commonutil.MyUtils.writeJson;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +36,7 @@ import static diary.common.convert.love.LargeDtoConvertToTinyDto.*;
 public class DiaryLoveAddServiceImpl implements DiaryLoveAddService {
     private static final Set<String> RECORD_CATEGORIES = Set.of("DATE", "DAILY", "TRAVEL", "ANNIVERSARY");
 
+    private final LoveRecordProperties properties;
     private final DiaryLoveMapper diaryLoveMapper;
 
     @Override
@@ -82,6 +91,43 @@ public class DiaryLoveAddServiceImpl implements DiaryLoveAddService {
         // 构建recordImageDto
         List<LoveRecordImageDTO> loveRecordImageDTOS = convertLoveRecordImage(dto, loveRecordDTO);
 
+        // 构建mqoutboxpo
+        LocalDateTime now = LocalDateTime.now();
+        String eventId = OUTBOX_EVENT_ID + MyUtils.getPrimaryKey();
+        LoveRecordMessageDto message = LoveRecordMessageDto.builder()
+                .eventId(eventId)
+                .recordId(loveRecordDTO.getId())
+                .userId(10000L)
+                .clientRequestId(dto.getClientRequestId())
+                .taskType(properties.getRocketmq().getTaskTag())
+                .eventType(OutboxEventTypeEnum.AI_TASK_CREATED.name())
+                .taskStatus(AiTaskStatusEnum.PENDING.name())
+                .schemaVersion(OUTBOX_SCHEMA_VERSION)
+                .occurTime(now)
+                .traceId(MDC.get("traceId"))
+                .build();
+
+        MqOutboxPO outbox = MqOutboxPO.builder()
+                .id(MyUtils.getPrimaryKey())
+                .eventId(eventId)
+                .aggregateType(AI_TASK_AGGREGATE_TYPE)
+                .aggregateId(loveRecordDTO.getId())
+                .eventType(OutboxEventTypeEnum.AI_TASK_CREATED.name())
+                .topic(properties.getRocketmq().getTaskTopic())
+                .tag(properties.getRocketmq().getTaskTag())
+                .messageKey(loveRecordDTO.getId().toString())
+                .payload(writeJson(message, "恋爱记录消息序列化失败"))
+                .schemaVersion(OUTBOX_SCHEMA_VERSION)
+                .status(OutboxStatusEnum.NEW.name())
+                .retryCount(0)
+                .maxRetries(properties.getRocketmq().getOutboxMaxRetries())
+                .nextRetryTime(now)
+                .createTime(now)
+                .updateTime(now)
+                .versionId(0)
+                .build();
+
+        int outboxCnt = diaryLoveMapper.insertOutbox(outbox);
         // 将dto转为po，然后插入数据库
         int locationCnt = 1;
         if (locationDto != null) {
@@ -95,13 +141,12 @@ public class DiaryLoveAddServiceImpl implements DiaryLoveAddService {
         }
         int recordImageCnt = diaryLoveMapper.insertLoveRecordImage(recordImagePOList);
 
-        if (locationCnt > 0 && recordCnt > 0 && recordImageCnt > 0) {
+        if (locationCnt > 0 && recordCnt > 0 && recordImageCnt > 0 && outboxCnt > 0) {
             return ApiResponse.success("添加记录成功");
         }
-        log.info("添加记录失败: locationCnt={}, recordCnt={}, recordImageCnt={}", locationCnt, recordCnt, recordImageCnt);
+        log.info("添加记录失败: locationCnt={}, recordCnt={}, recordImageCnt={}, outboxCnt={}", locationCnt, recordCnt, recordImageCnt, outboxCnt);
         return ApiResponse.addFail();
     }
-
 
     // mood和tag后续移入sysInfo模块
 

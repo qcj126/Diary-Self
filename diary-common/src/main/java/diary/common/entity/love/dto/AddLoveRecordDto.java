@@ -22,6 +22,8 @@ public class AddLoveRecordDto {
 
     private String content;
 
+    private String clientRequestId;
+
     @NotNull
     private LocalDate recordDate;
 

@@ -23,9 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
-import static diary.common.consts.AiTaskConst.AI_TASK_AGGREGATE_TYPE;
-import static diary.common.consts.AiTaskConst.OUTBOX_EVENT_ID;
-import static diary.common.consts.AiTaskConst.OUTBOX_SCHEMA_VERSION;
+import static diary.common.consts.MqTaskConst.AI_TASK_AGGREGATE_TYPE;
+import static diary.common.consts.MqTaskConst.OUTBOX_EVENT_ID;
+import static diary.common.consts.MqTaskConst.OUTBOX_SCHEMA_VERSION;
 import static diary.utils.commonutil.MyUtils.writeJson;
 
 @Slf4j

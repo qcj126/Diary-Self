@@ -29,7 +29,7 @@ import org.slf4j.MDC;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-import static diary.common.consts.AiTaskConst.*;
+import static diary.common.consts.MqTaskConst.*;
 import static diary.utils.commonutil.MyUtils.writeJson;
 
 @Service

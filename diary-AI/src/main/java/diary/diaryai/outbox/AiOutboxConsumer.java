@@ -24,8 +24,7 @@ import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.UUID;
 
-import static diary.common.consts.AiTaskConst.MAX_ERROR_MSG_LENGTH;
-import static diary.common.consts.AiTaskConst.OUTBOX_SCHEMA_VERSION;
+import static diary.common.consts.MqTaskConst.OUTBOX_SCHEMA_VERSION;
 
 @Service
 @RocketMQMessageListener(
