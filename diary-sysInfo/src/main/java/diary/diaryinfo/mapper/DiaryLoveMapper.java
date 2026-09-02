@@ -13,9 +13,17 @@ public interface DiaryLoveMapper {
 
     int insertLoveMood(LoveMoodPO loveMoodPO);
 
-    int insertLoveRecordMood(LoveRecordMoodPO loveRecordMoodPO);
-
     int insertLoveTag(LoveTagPO loveTagPO);
 
-    int insertLoveRecordTag(LoveRecordTagPO loveRecordTagPO);
+    List<LoveMoodPO> selectLoveMoods(@Param("enabled") Boolean enabled);
+
+    List<LoveTagPO> selectLoveTagsByCoupleId(@Param("coupleId") Long coupleId);
+
+    int updateLoveMood(LoveMoodPO loveMoodPO);
+
+    int updateLoveTag(LoveTagPO loveTagPO);
+
+    int deleteLoveMood(@Param("id") Long id);
+
+    int deleteLoveTag(@Param("id") Long id);
 }

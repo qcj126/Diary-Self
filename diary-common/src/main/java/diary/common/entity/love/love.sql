@@ -97,6 +97,7 @@ CREATE TABLE IF NOT EXISTS `love_record_image` (
 
 CREATE TABLE IF NOT EXISTS `love_mood` (
     `id`          BIGINT UNSIGNED NOT NULL COMMENT '主键',
+    `record_id`   BIGINT UNSIGNED NOT NULL COMMENT '恋爱记录ID',
     `mood_code`   VARCHAR(32) NOT NULL COMMENT '心情编码',
     `mood_name`   VARCHAR(32) NOT NULL COMMENT '心情名称',
     `emoji`       VARCHAR(16) NULL COMMENT '展示用 Emoji',
@@ -108,6 +109,7 @@ CREATE TABLE IF NOT EXISTS `love_mood` (
     UNIQUE KEY `uk_love_mood_code` (`mood_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='恋爱记录心情字典表';
 
+-- 此表删除
 CREATE TABLE IF NOT EXISTS `love_record_mood` (
     `id`          BIGINT UNSIGNED NOT NULL COMMENT '主键',
     `record_id`   BIGINT UNSIGNED NOT NULL COMMENT '恋爱记录ID',
@@ -121,12 +123,13 @@ CREATE TABLE IF NOT EXISTS `love_record_mood` (
 
 CREATE TABLE IF NOT EXISTS `love_tag` (
     `id`              BIGINT UNSIGNED NOT NULL COMMENT '主键',
+    `record_id`       BIGINT UNSIGNED NOT NULL COMMENT '恋爱记录ID',
     `couple_id`       BIGINT UNSIGNED NOT NULL COMMENT '恋爱关系ID',
     `creator_user_id` BIGINT UNSIGNED NOT NULL COMMENT '创建者用户ID',
     `tag_name`        VARCHAR(32) NOT NULL COMMENT '标签名称，不包含#',
     `color`           VARCHAR(16) NULL COMMENT '展示颜色，例如 #FF6B81',
+    `sort`            INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '展示排序值',
     `use_count`       INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '使用次数缓存，由业务层维护',
-    `deleted`         TINYINT(1) NOT NULL DEFAULT 0 COMMENT '逻辑删除：0-否，1-是',
     `create_time`     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time`     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
@@ -134,6 +137,7 @@ CREATE TABLE IF NOT EXISTS `love_tag` (
     KEY `idx_love_tag_name` (`couple_id`, `tag_name`, `deleted`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='恋爱记录自定义标签表';
 
+-- 此表删除
 CREATE TABLE IF NOT EXISTS `love_record_tag` (
     `id`          BIGINT UNSIGNED NOT NULL COMMENT '主键',
     `record_id`   BIGINT UNSIGNED NOT NULL COMMENT '恋爱记录ID',

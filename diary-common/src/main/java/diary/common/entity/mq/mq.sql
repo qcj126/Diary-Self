@@ -2,8 +2,8 @@
 -- MQ 发件箱表（可靠消息最终一致性）
 -- =============================================
 CREATE TABLE IF NOT EXISTS `mq_outbox` (
-                                           `id`                BIGINT          NOT NULL AUTO_INCREMENT      COMMENT '主键 ID',
-                                           `event_id`          VARCHAR(64)     NOT NULL                    COMMENT '事件 ID（全局唯一）',
+    `id`                BIGINT          NOT NULL AUTO_INCREMENT      COMMENT '主键 ID',
+    `event_id`          VARCHAR(64)     NOT NULL                    COMMENT '事件 ID（全局唯一）',
     `aggregate_type`    VARCHAR(64)     NOT NULL                    COMMENT '聚合根类型',
     `aggregate_id`      BIGINT          NOT NULL                    COMMENT '聚合根 ID',
     `event_type`        VARCHAR(128)    NOT NULL                    COMMENT '事件类型',

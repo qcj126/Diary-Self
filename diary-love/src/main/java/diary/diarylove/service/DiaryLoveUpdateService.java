@@ -13,12 +13,4 @@ public interface DiaryLoveUpdateService {
     ApiResponse<String> updateRecord(UpdateLoveRecordDto dto);
 
     ApiResponse<String> updateRecordImage(LoveRecordImageDTO dto);
-
-    ApiResponse<String> updateMood(LoveMoodDTO dto);
-
-    ApiResponse<String> updateRecordMood(LoveRecordMoodDTO dto);
-
-    ApiResponse<String> updateTag(LoveTagDTO dto);
-
-    ApiResponse<String> updateRecordTag(LoveRecordTagDTO dto);
 }

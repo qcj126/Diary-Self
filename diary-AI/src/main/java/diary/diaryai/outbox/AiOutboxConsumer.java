@@ -47,13 +47,13 @@ public class AiOutboxConsumer implements RocketMQListener {
 
     @Override
     public ConsumeResult consume(MessageView messageView) {
-        ByteBuffer bodyBuffer = messageView.getBody();
-        byte[] body = new byte[bodyBuffer.remaining()];
-        bodyBuffer.get(body);
+        ByteBuffer body = messageView.getBody();
+        byte[] bytes = new byte[body.remaining()];
+        body.get(bytes); // 将ByteBuffer数据拷贝到byte数组中的真正操作
 
         final AiTaskMessageDto message;
         try {
-            message = objectMapper.readValue(body, AiTaskMessageDto.class);
+            message = objectMapper.readValue(bytes, AiTaskMessageDto.class);
             validateMessage(message);
         } catch (Exception parseException) {
             /*

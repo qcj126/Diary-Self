@@ -76,6 +76,12 @@
         <result column="version_id" property="versionId"/>
     </resultMap>
 
+    <sql id="mqOutboxColumns">
+        id, event_id, aggregate_type, aggregate_id, event_type, topic, tag, message_key, payload,
+        schema_version, status, retry_count, max_retries, next_retry_time, broker_message_id,
+        last_error, sent_time, create_time, update_time, version_id
+    </sql>
+
     <insert id="insertAiNutrient">
         <!--
             以前表中的 ai_task_id 是 NOT NULL，但插入语句没有写该列，会直接导致结果落库失败，
@@ -319,8 +325,7 @@
     </insert>
 
     <select id="selectReadyOutbox" resultMap="MqOutboxResultMap">
-        SELECT *
-        FROM mq_outbox
+        select <include refid="mqOutboxColumns"/> from mq_outbox
         WHERE status IN ('NEW', 'RETRY_WAIT')
         AND next_retry_time &lt;= CURRENT_TIMESTAMP
         ORDER BY next_retry_time ASC, id ASC
@@ -328,83 +333,53 @@
     </select>
 
     <select id="selectOutboxById" resultMap="MqOutboxResultMap">
-        SELECT * FROM mq_outbox WHERE id = #{id} LIMIT 1
+        select <include refid="mqOutboxColumns"/> FROM mq_outbox WHERE id = #{id} LIMIT 1
     </select>
 
     <select id="selectTimedOutbox" resultMap="MqOutboxResultMap">
-        SELECT *
-        FROM mq_outbox
-        WHERE status = 'SENDING'
-          AND update_time &lt; TIMESTAMPADD(SECOND, -#{timeoutSeconds}, CURRENT_TIMESTAMP)
-        ORDER BY update_time ASC, id ASC
-        LIMIT #{limit}
+        select <include refid="mqOutboxColumns"/> FROM mq_outbox
+        WHERE status = 'SENDING' AND update_time &lt; TIMESTAMPADD(SECOND, -#{timeoutSeconds}, CURRENT_TIMESTAMP)
+        ORDER BY update_time ASC, id ASC LIMIT #{limit}
     </select>
 
     <update id="claimOutbox">
         UPDATE mq_outbox
-        SET status = 'SENDING',
-            update_time = CURRENT_TIMESTAMP,
-            version_id = version_id + 1
-        WHERE id = #{id}
-          AND status IN ('NEW', 'RETRY_WAIT')
-          AND version_id = #{versionId}
+        SET status = 'SENDING', update_time = CURRENT_TIMESTAMP, version_id = version_id + 1
+        WHERE id = #{id} AND status IN ('NEW', 'RETRY_WAIT') AND version_id = #{versionId}
     </update>
 
     <update id="markOutboxSent">
         UPDATE mq_outbox
-        SET status = 'SENT',
-            broker_message_id = #{brokerMessageId},
-            sent_time = CURRENT_TIMESTAMP,
-            update_time = CURRENT_TIMESTAMP,
-            last_error = NULL,
-            version_id = version_id + 1
-        WHERE id = #{id}
-          AND status = 'SENDING'
-          AND version_id = #{versionId}
+        SET status = 'SENT', broker_message_id = #{brokerMessageId}, sent_time = CURRENT_TIMESTAMP,
+            update_time = CURRENT_TIMESTAMP, version_id = version_id + 1
+        WHERE id = #{id} AND status = 'SENDING' AND version_id = #{versionId}
     </update>
 
     <update id="markOutboxRetry">
         UPDATE mq_outbox
-        SET status = 'RETRY_WAIT',
-            retry_count = retry_count + 1,
+        SET status = 'RETRY_WAIT', retry_count = retry_count + 1, last_error = #{lastError},
             next_retry_time = TIMESTAMPADD(SECOND, #{retryDelaySeconds}, CURRENT_TIMESTAMP),
-            last_error = #{lastError},
-            update_time = CURRENT_TIMESTAMP,
-            version_id = version_id + 1
-        WHERE id = #{id}
-          AND status = 'SENDING'
-          AND version_id = #{versionId}
+            update_time = CURRENT_TIMESTAMP, version_id = version_id + 1
+        WHERE id = #{id} AND status = 'SENDING' AND version_id = #{versionId}
     </update>
 
     <update id="markOutboxDead">
         UPDATE mq_outbox
-        SET status = 'DEAD',
-            retry_count = retry_count + 1,
-            last_error = #{lastError},
-            update_time = CURRENT_TIMESTAMP,
-            version_id = version_id + 1
-        WHERE id = #{id}
-          AND status = 'SENDING'
-          AND version_id = #{versionId}
+        SET status = 'DEAD', retry_count = retry_count + 1, last_error = #{lastError},
+            update_time = CURRENT_TIMESTAMP, version_id = version_id + 1
+        WHERE id = #{id} AND status = 'SENDING' AND version_id = #{versionId}
     </update>
 
     <update id="markQueuedByTaskIdIfWaiting">
         UPDATE ai_task
-        SET status = 'QUEUED',
-            queue_time = COALESCE(queue_time, CURRENT_TIMESTAMP),
-            update_time = CURRENT_TIMESTAMP,
-            version_id = version_id + 1
-        WHERE id = #{taskId}
-          AND status IN ('PENDING', 'RETRY_WAIT')
+        SET status = 'QUEUED', queue_time = COALESCE(queue_time, CURRENT_TIMESTAMP),
+            update_time = CURRENT_TIMESTAMP, version_id = version_id + 1
+        WHERE id = #{taskId} AND status IN ('PENDING', 'RETRY_WAIT')
     </update>
 
     <select id="selectExpiredRunningTasks" resultMap="AiTaskResultMap">
-        SELECT *
-        FROM ai_task
-        WHERE status = 'RUNNING'
-        AND lease_until &lt; CURRENT_TIMESTAMP
-        ORDER BY lease_until ASC
-        LIMIT #{limit}
+        SELECT * FROM ai_task
+        WHERE status = 'RUNNING' AND lease_until &lt; CURRENT_TIMESTAMP ORDER BY lease_until ASC LIMIT #{limit}
     </select>
 
     <update id="updateRequestHashIfNull">

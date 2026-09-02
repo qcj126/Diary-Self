@@ -4,12 +4,8 @@ import diary.common.entity.love.dto.*;
 import diary.common.entity.love.vo.LoveAnniversaryVO;
 import diary.common.entity.love.vo.LoveCoupleVO;
 import diary.common.entity.love.vo.LoveLocationVO;
-import diary.common.entity.love.vo.LoveMoodVO;
 import diary.common.entity.love.vo.LoveRecordImageVO;
-import diary.common.entity.love.vo.LoveRecordMoodVO;
-import diary.common.entity.love.vo.LoveRecordTagVO;
 import diary.common.entity.love.vo.LoveRecordVO;
-import diary.common.entity.love.vo.LoveTagVO;
 import diary.common.result.ApiResponse;
 import diary.config.logconfig.OperLog;
 import diary.diarylove.service.DiaryLoveAddService;
@@ -22,7 +18,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -90,30 +85,6 @@ public class DiaryLoveController {
         return diaryLoveQueryService.queryRecordImages(recordId);
     }
 
-    @OperLog(module = "恋爱记录", description = "查询心情", operationType = "SELECT", saveResult = true)
-    @GetMapping("/query/moods")
-    public ApiResponse<List<LoveMoodVO>> queryMoods(@RequestParam(required = false) Boolean enabled) {
-        return diaryLoveQueryService.queryMoods(enabled);
-    }
-
-    @OperLog(module = "恋爱记录", description = "查询记录心情", operationType = "SELECT", saveResult = true)
-    @GetMapping("/query/record-moods/{recordId}")
-    public ApiResponse<List<LoveRecordMoodVO>> queryRecordMoods(@PathVariable Long recordId) {
-        return diaryLoveQueryService.queryRecordMoods(recordId);
-    }
-
-    @OperLog(module = "恋爱记录", description = "查询标签", operationType = "SELECT", saveResult = true)
-    @GetMapping("/query/tags/{coupleId}")
-    public ApiResponse<List<LoveTagVO>> queryTags(@PathVariable Long coupleId) {
-        return diaryLoveQueryService.queryTags(coupleId);
-    }
-
-    @OperLog(module = "恋爱记录", description = "查询记录标签", operationType = "SELECT", saveResult = true)
-    @GetMapping("/query/record-tags/{recordId}")
-    public ApiResponse<List<LoveRecordTagVO>> queryRecordTags(@PathVariable Long recordId) {
-        return diaryLoveQueryService.queryRecordTags(recordId);
-    }
-
     @OperLog(module = "恋爱记录", description = "修改情侣关系", operationType = "UPDATE", saveResult = true)
     @PostMapping("/update/couples")
     public ApiResponse<String> updateCouple(@RequestBody LoveCoupleDTO dto) {
@@ -144,30 +115,6 @@ public class DiaryLoveController {
         return diaryLoveUpdateService.updateRecordImage(dto);
     }
 
-    @OperLog(module = "恋爱记录", description = "修改心情", operationType = "UPDATE", saveResult = true)
-    @PostMapping("/update/moods")
-    public ApiResponse<String> updateMood(@RequestBody LoveMoodDTO dto) {
-        return diaryLoveUpdateService.updateMood(dto);
-    }
-
-    @OperLog(module = "恋爱记录", description = "修改记录心情关联", operationType = "UPDATE", saveResult = true)
-    @PostMapping("/update/record-moods")
-    public ApiResponse<String> updateRecordMood(@RequestBody LoveRecordMoodDTO dto) {
-        return diaryLoveUpdateService.updateRecordMood(dto);
-    }
-
-    @OperLog(module = "恋爱记录", description = "修改标签", operationType = "UPDATE", saveResult = true)
-    @PostMapping("/update/tags")
-    public ApiResponse<String> updateTag(@RequestBody LoveTagDTO dto) {
-        return diaryLoveUpdateService.updateTag(dto);
-    }
-
-    @OperLog(module = "恋爱记录", description = "修改记录标签关联", operationType = "UPDATE", saveResult = true)
-    @PostMapping("/update/record-tags")
-    public ApiResponse<String> updateRecordTag(@RequestBody LoveRecordTagDTO dto) {
-        return diaryLoveUpdateService.updateRecordTag(dto);
-    }
-
     @OperLog(module = "恋爱记录", description = "删除情侣关系", operationType = "DELETE", saveResult = true)
     @PostMapping("/delete/couples/{id}")
     public ApiResponse<String> deleteCouple(@PathVariable Long id) {
@@ -196,29 +143,5 @@ public class DiaryLoveController {
     @PostMapping("/delete/record-images/{id}")
     public ApiResponse<String> deleteRecordImage(@PathVariable Long id) {
         return diaryLoveDeleteService.deleteRecordImage(id);
-    }
-
-    @OperLog(module = "恋爱记录", description = "删除心情", operationType = "DELETE", saveResult = true)
-    @PostMapping("/delete/moods/{id}")
-    public ApiResponse<String> deleteMood(@PathVariable Long id) {
-        return diaryLoveDeleteService.deleteMood(id);
-    }
-
-    @OperLog(module = "恋爱记录", description = "删除记录心情关联", operationType = "DELETE", saveResult = true)
-    @PostMapping("/delete/record-moods/{id}")
-    public ApiResponse<String> deleteRecordMood(@PathVariable Long id) {
-        return diaryLoveDeleteService.deleteRecordMood(id);
-    }
-
-    @OperLog(module = "恋爱记录", description = "删除标签", operationType = "DELETE", saveResult = true)
-    @PostMapping("/delete/tags/{id}")
-    public ApiResponse<String> deleteTag(@PathVariable Long id) {
-        return diaryLoveDeleteService.deleteTag(id);
-    }
-
-    @OperLog(module = "恋爱记录", description = "删除记录标签关联", operationType = "DELETE", saveResult = true)
-    @PostMapping("/delete/record-tags/{id}")
-    public ApiResponse<String> deleteRecordTag(@PathVariable Long id) {
-        return diaryLoveDeleteService.deleteRecordTag(id);
     }
 }

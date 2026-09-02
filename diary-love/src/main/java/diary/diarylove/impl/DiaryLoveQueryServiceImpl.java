@@ -5,15 +5,7 @@ import diary.common.entity.love.dto.LoveCoupleDTO;
 import diary.common.entity.love.dto.LoveRecordDTO;
 import diary.common.entity.love.po.LoveCouplePO;
 import diary.common.entity.love.po.LoveRecordPO;
-import diary.common.entity.love.vo.LoveAnniversaryVO;
-import diary.common.entity.love.vo.LoveCoupleVO;
-import diary.common.entity.love.vo.LoveLocationVO;
-import diary.common.entity.love.vo.LoveMoodVO;
-import diary.common.entity.love.vo.LoveRecordImageVO;
-import diary.common.entity.love.vo.LoveRecordMoodVO;
-import diary.common.entity.love.vo.LoveRecordTagVO;
-import diary.common.entity.love.vo.LoveRecordVO;
-import diary.common.entity.love.vo.LoveTagVO;
+import diary.common.entity.love.vo.*;
 import diary.common.result.ApiResponse;
 import diary.diarylove.mapper.DiaryLoveMapper;
 import diary.diarylove.service.DiaryLoveQueryService;
@@ -80,37 +72,6 @@ public class DiaryLoveQueryServiceImpl implements DiaryLoveQueryService {
     public ApiResponse<List<LoveRecordImageVO>> queryRecordImages(Long recordId) {
         MyUtils.check().notNull(recordId, "recordId");
         return ApiResponse.success(diaryLoveMapper.selectLoveRecordImagesByRecordId(recordId).stream()
-                .map(PoConvertToVo::convertToVo)
-                .toList());
-    }
-
-    @Override
-    public ApiResponse<List<LoveMoodVO>> queryMoods(Boolean enabled) {
-        return ApiResponse.success(diaryLoveMapper.selectLoveMoods(enabled).stream()
-                .map(PoConvertToVo::convertToVo)
-                .toList());
-    }
-
-    @Override
-    public ApiResponse<List<LoveRecordMoodVO>> queryRecordMoods(Long recordId) {
-        MyUtils.check().notNull(recordId, "recordId");
-        return ApiResponse.success(diaryLoveMapper.selectLoveRecordMoodsByRecordId(recordId).stream()
-                .map(PoConvertToVo::convertToVo)
-                .toList());
-    }
-
-    @Override
-    public ApiResponse<List<LoveTagVO>> queryTags(Long coupleId) {
-        MyUtils.check().notNull(coupleId, "coupleId");
-        return ApiResponse.success(diaryLoveMapper.selectLoveTagsByCoupleId(coupleId).stream()
-                .map(PoConvertToVo::convertToVo)
-                .toList());
-    }
-
-    @Override
-    public ApiResponse<List<LoveRecordTagVO>> queryRecordTags(Long recordId) {
-        MyUtils.check().notNull(recordId, "recordId");
-        return ApiResponse.success(diaryLoveMapper.selectLoveRecordTagsByRecordId(recordId).stream()
                 .map(PoConvertToVo::convertToVo)
                 .toList());
     }

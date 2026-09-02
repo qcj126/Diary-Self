@@ -102,5 +102,18 @@ public class DtoConvertToPo {
                 .sort(loveTagDTO.getSort())
                 .build();
     }
+    public static LoveRecordPO convertToPo(UpdateLoveRecordDto updateLoveRecordDto) {
+        return LoveRecordPO.builder()
+                .id(updateLoveRecordDto.getRecordId())
+                .coupleId(updateLoveRecordDto.getCoupleId())
+                .locationId(updateLoveRecordDto.getLocationId())
+                .title(updateLoveRecordDto.getTitle())
+                .content(updateLoveRecordDto.getContent())
+                .recordDate(updateLoveRecordDto.getRecordDate())
+                .categoryCode(updateLoveRecordDto.getCategoryCode())
+                .important(updateLoveRecordDto.getImportant())
+                .sort(updateLoveRecordDto.getSort())
+                .build();
+    }
 
 }

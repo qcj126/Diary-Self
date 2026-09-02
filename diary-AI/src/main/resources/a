@@ -52,6 +52,34 @@ diary:
       model-local-concurrency: 2
       local-permit-wait-ms: 1000
 
+ diary:
+   love:
+     rocketmq:
+       completed-tag: LOVE_COMPLETED
+       failed-tag: LOVE_FAILED
+       task-topic: diary-love-task
+       task-tag: LOVE_RECORD
+       task-consumer-group: diary-love-record-worker
+       event-topic: diary-love-event
+       publisher-batch-size: 20
+       publisher-interval-ms: 5000
+       publisher-sending-timeout-seconds: 60
+       outbox-max-retries: 10
+     task:
+       max-attempts: 3
+       execution-lease-seconds: 330
+       recovery-interval-ms: 30000
+     cache:
+       running-ttl-seconds: 30
+       terminal-ttl-hours: 24
+       idempotency-ttl-hours: 24
+       null-ttl-seconds: 15
+       key-prefix: diary:dev:ai
+     limit:
+       submit-per-user-per-minute: 10
+       model-local-concurrency: 2
+       local-permit-wait-ms: 1000
+
 # 使用 rocketmq-v5-client-spring-boot-starter 的正确配置
 rocketmq:
   # 启用生产者, 从而触发 RocketMQClientTemplate 的自动创建

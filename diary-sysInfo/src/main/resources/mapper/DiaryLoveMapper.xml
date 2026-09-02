@@ -42,20 +42,16 @@
     </resultMap>
 
     <sql id="loveCoupleColumns">
-        id, owner_user_id, partner_user_id, partner_name, start_date,
-        status, deleted, create_time, update_time
+        id, owner_user_id, partner_user_id, partner_name, start_date, status, deleted, create_time, update_time
     </sql>
     <sql id="loveAnniversaryColumns">
-        id, couple_id, creator_user_id, name, event_date, repeat_type,
-        remind_days, pinned, sort, deleted, create_time, update_time
+        id, couple_id, creator_user_id, name, event_date, repeat_type, remind_days, pinned, sort, deleted, create_time, update_time
     </sql>
     <sql id="loveLocationColumns">
-        id, couple_id, name, address, longitude, latitude, city_code,
-        city_name, deleted, create_time, update_time
+        id, couple_id, name, address, longitude, latitude, city_code, city_name, deleted, create_time, update_time
     </sql>
     <sql id="loveRecordColumns">
-        id, couple_id, creator_user_id, location_id, title, content,
-        record_date, category_code, important, sort, deleted, create_time, update_time
+        id, couple_id, creator_user_id, location_id, title, content, record_date, category_code, important, sort, deleted, create_time, update_time
     </sql>
     <sql id="loveRecordImageColumns">
         id, record_id, image_id, is_cover, sort, create_time
@@ -67,38 +63,52 @@
         id, record_id, mood_id, sort, create_time
     </sql>
     <sql id="loveTagColumns">
-        id, couple_id, creator_user_id, tag_name, color, use_count,
-        deleted, create_time, update_time
+        id, couple_id, creator_user_id, tag_name, color, use_count, deleted, create_time, update_time
     </sql>
     <sql id="loveRecordTagColumns">
         id, record_id, tag_id, sort, create_time
     </sql>
 
     <insert id="insertLoveMood">
-        INSERT INTO love_mood
-        (id, mood_code, mood_name, emoji, sort, enabled)
-        VALUES
-        (#{id}, #{moodCode}, #{moodName}, #{emoji}, #{sort}, #{enabled})
-    </insert>
-
-    <insert id="insertLoveRecordMood">
-        INSERT INTO love_record_mood
-        (id, record_id, mood_id, sort)
-        VALUES
-        (#{id}, #{recordId}, #{moodId}, #{sort})
+        INSERT INTO love_mood (id, mood_code, mood_name, emoji, sort, enabled)
+        VALUES (#{id}, #{moodCode}, #{moodName}, #{emoji}, #{sort}, #{enabled})
     </insert>
 
     <insert id="insertLoveTag">
-        INSERT INTO love_tag
-        (id, couple_id, creator_user_id, tag_name, color, use_count)
-        VALUES
-        (#{id}, #{coupleId}, #{creatorUserId}, #{tagName}, #{color}, #{useCount})
+        INSERT INTO love_tag (id, couple_id, creator_user_id, tag_name, color, use_count)
+        VALUES (#{id}, #{coupleId}, #{creatorUserId}, #{tagName}, #{color}, #{useCount})
     </insert>
 
-    <insert id="insertLoveRecordTag">
-        INSERT INTO love_record_tag
-        (id, record_id, tag_id, sort)
-        VALUES
-        (#{id}, #{recordId}, #{tagId}, #{sort})
-    </insert>
+    <select id="selectLoveMoods" resultMap="loveMoodResultMap">
+        SELECT <include refid="loveMoodColumns"/> FROM love_mood
+        <if test="enabled != null">WHERE enabled = #{enabled}</if>
+        ORDER BY sort ASC, id ASC
+    </select>
+
+    <select id="selectLoveTagsByCoupleId" resultMap="loveTagResultMap">
+        SELECT <include refid="loveTagColumns"/> FROM love_tag
+        WHERE couple_id = #{coupleId} AND deleted = 0 ORDER BY use_count DESC, update_time DESC, id DESC
+    </select>
+
+    <update id="updateLoveMood">
+        UPDATE love_mood SET
+            mood_code = #{moodCode}, mood_name = #{moodName}, emoji = #{emoji}, sort = #{sort},
+            enabled = #{enabled}, update_time = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateLoveTag">
+        UPDATE love_tag SET
+            couple_id = #{coupleId}, creator_user_id = #{creatorUserId}, tag_name = #{tagName},
+            color = #{color}, use_count = #{useCount}, update_time = CURRENT_TIMESTAMP
+        WHERE id = #{id} AND deleted = 0
+    </update>
+
+    <delete id="deleteLoveMood">
+        DELETE FROM love_mood WHERE id = #{id}
+    </delete>
+
+    <update id="deleteLoveTag">
+        UPDATE love_tag SET deleted = 1, update_time = CURRENT_TIMESTAMP WHERE id = #{id} AND deleted = 0
+    </update>
 </mapper>
