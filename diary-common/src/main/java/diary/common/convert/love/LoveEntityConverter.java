@@ -127,12 +127,6 @@ public final class LoveEntityConverter {
                 .coupleId(source.getCoupleId())
                 .name(source.getName())
                 .address(source.getAddress())
-                .longitude(source.getLongitude())
-                .latitude(source.getLatitude())
-                .cityCode(source.getCityCode())
-                .cityName(source.getCityName())
-                .createTime(source.getCreateTime())
-                .updateTime(source.getUpdateTime())
                 .build();
     }
 
@@ -232,11 +226,12 @@ public final class LoveEntityConverter {
     public static LoveTagPO toPo(LoveTagDTO source) {
         return source == null ? null : LoveTagPO.builder()
                 .id(source.getId())
+                .recordId(source.getRecordId())
                 .coupleId(source.getCoupleId())
                 .creatorUserId(source.getCreatorUserId())
                 .tagName(source.getTagName())
                 .color(source.getColor())
-                .useCount(source.getUseCount())
+                .sort(source.getSort())
                 .build();
     }
 
@@ -247,7 +242,6 @@ public final class LoveEntityConverter {
                 .creatorUserId(source.getCreatorUserId())
                 .tagName(source.getTagName())
                 .color(source.getColor())
-                .useCount(source.getUseCount())
                 .createTime(source.getCreateTime())
                 .updateTime(source.getUpdateTime())
                 .build();

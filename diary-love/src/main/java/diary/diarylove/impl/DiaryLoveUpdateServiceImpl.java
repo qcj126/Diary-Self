@@ -47,6 +47,8 @@ public class DiaryLoveUpdateServiceImpl implements DiaryLoveUpdateService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ApiResponse<String> updateRecord(UpdateLoveRecordDto dto) {
+        MyUtils.check().notNull(dto, "updateLoveRecordDto")
+                .notNull(dto.getCreatorUserId(), "creatorUserId");
         if (dto.getImportant() == null) dto.setImportant(false);
         if (dto.getSort() == null) dto.setSort(0);
         // TODO 接入缓存后，在事务提交成功后删除详情缓存并推进 coupleId 对应的缓存版本；TTL 应增加随机抖动。

@@ -3,10 +3,10 @@ package diary.diarylove.impl;
 import diary.common.convert.love.DtoConvertToPo;
 import diary.common.entity.love.dto.*;
 import diary.common.entity.love.po.LoveRecordImagePO;
+import diary.common.entity.love.po.LoveTagPO;
 import diary.common.exception.NullResultException;
 import diary.common.exception.SameDataException;
 import diary.common.result.ApiResponse;
-import diary.common.util.MyUtil;
 import diary.diarylove.mapper.DiaryLoveMapper;
 import diary.diarylove.service.DiaryLoveAddService;
 import diary.utils.commonutil.MyUtils;
@@ -81,6 +81,8 @@ public class DiaryLoveAddServiceImpl implements DiaryLoveAddService {
         LoveRecordDTO loveRecordDTO = convertLoveRecord(dto);
         // 构建recordImageDto
         List<LoveRecordImageDTO> loveRecordImageDTOS = convertLoveRecordImage(dto, loveRecordDTO);
+        // 构建tagDto
+        List<LoveTagDTO> loveTagDTOS = convertLoveTag(dto, loveRecordDTO);
 
         // 将dto转为po，然后插入数据库
         int locationCnt = 1;
@@ -93,13 +95,19 @@ public class DiaryLoveAddServiceImpl implements DiaryLoveAddService {
         for (LoveRecordImageDTO loveRecordImageDTO : loveRecordImageDTOS) {
             recordImagePOList.add(DtoConvertToPo.convertToPo(loveRecordImageDTO));
         }
+        List<LoveTagPO> loveTagPOList = new ArrayList<>();
+        for (LoveTagDTO loveTagDTO : loveTagDTOS) {
+            loveTagPOList.add(DtoConvertToPo.convertToPo(loveTagDTO));
+        }
         int recordImageCnt = diaryLoveMapper.insertLoveRecordImage(recordImagePOList);
+        int tagCnt = diaryLoveMapper.insertLoveTags(loveTagPOList);
 
-        if (locationCnt > 0 && recordCnt > 0 && recordImageCnt > 0) {
+        if (locationCnt > 0 && recordCnt > 0 && recordImageCnt > 0 && tagCnt > 0) {
             return ApiResponse.success("添加记录成功");
         }
-        log.info("添加记录失败: locationCnt={}, recordCnt={}, recordImageCnt={}", locationCnt, recordCnt, recordImageCnt);
-        return ApiResponse.addFail();
+        log.info("添加记录失败: locationCnt={}, recordCnt={}, recordImageCnt={}, tagCnt={}",
+                locationCnt, recordCnt, recordImageCnt, tagCnt);
+        throw new IllegalStateException("添加记录失败");
     }
 
     void validateCouple(LoveCoupleDTO dto) {
@@ -120,7 +128,10 @@ public class DiaryLoveAddServiceImpl implements DiaryLoveAddService {
     void validateLocation(LoveLocationDTO dto) {
         MyUtils.check().notNull(dto, "loveLocationDTO")
                 .notNull(dto.getCoupleId(), "coupleId")
-                .notEmpty(dto.getName(), "name");
+                .notEmpty(dto.getName(), "name")
+                .notEmpty(dto.getAddress(), "address")
+                .notEmpty(dto.getCityName(), "cityName")
+                .notEmpty(dto.getCityCode(), "cityCode");
         if ((dto.getLongitude() == null) != (dto.getLatitude() == null)) {
             throw new IllegalArgumentException("longitude 和 latitude 必须同时填写或同时为空");
         }
@@ -134,6 +145,9 @@ public class DiaryLoveAddServiceImpl implements DiaryLoveAddService {
                 .notEmpty(dto.getCategoryCode(), "categoryCode");
         if (!RECORD_CATEGORIES.contains(dto.getCategoryCode())) {
             throw new IllegalArgumentException("categoryCode 只能是 DATE、DAILY、TRAVEL 或 ANNIVERSARY");
+        }
+        if (dto.getLocationId() != null && dto.getNewLocation() != null) {
+            throw new IllegalArgumentException("locationId 和 newLocation 只能填写一个");
         }
     }
 

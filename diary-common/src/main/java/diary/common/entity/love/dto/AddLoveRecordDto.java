@@ -50,10 +50,7 @@ public class AddLoveRecordDto {
     /** 已有心情字典ID */
     private List<@NotNull Long> moodIds;
 
-    /** 已有标签ID */
-    private List<@NotNull Long> tagIds;
-
-    /** 用户在新增记录时临时创建的新标签 */
+    /** 用户在新增记录时携带的标签 */
     @Valid
-    private List<NewTagDto> newTags;
+    private List<NewLoveTag> newTags;
 }

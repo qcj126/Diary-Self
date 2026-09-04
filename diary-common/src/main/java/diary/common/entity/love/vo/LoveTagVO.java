@@ -23,7 +23,6 @@ public class LoveTagVO {
     private Long creatorUserId;
     private String tagName;
     private String color;
-    private Integer useCount;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 }

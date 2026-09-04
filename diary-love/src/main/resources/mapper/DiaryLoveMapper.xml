@@ -89,12 +89,12 @@
 
     <resultMap id="loveTagResultMap" type="diary.common.entity.love.po.LoveTagPO">
         <id property="id"                   column="id"/>
+        <result property="recordId"         column="record_id"/>
         <result property="coupleId"         column="couple_id"/>
         <result property="creatorUserId"    column="creator_user_id"/>
         <result property="tagName"          column="tag_name"/>
         <result property="color"            column="color"/>
-        <result property="useCount"         column="use_count"/>
-        <result property="deleted"          column="deleted"/>
+        <result property="sort"             column="sort"/>
         <result property="createTime"       column="create_time"/>
         <result property="updateTime"       column="update_time"/>
     </resultMap>
@@ -129,7 +129,7 @@
         id, record_id, mood_id, sort, create_time
     </sql>
     <sql id="loveTagColumns">
-        id, couple_id, creator_user_id, tag_name, color, use_count, deleted, create_time, update_time
+        id, record_id, couple_id, creator_user_id, tag_name, color, sort, create_time, update_time
     </sql>
     <sql id="loveRecordTagColumns">
         id, record_id, tag_id, sort, create_time
@@ -192,7 +192,8 @@
     </insert>
 
     <select id="selectLoveLocationsByCoupleId" resultMap="loveLocationResultMap">
-        SELECT <include refid="loveLocationColumns"/> FROM love_location WHERE couple_id = #{coupleId} AND deleted = 0 ORDER BY update_time DESC, id DESC
+        SELECT id, couple_id, name, address FROM love_location
+        WHERE couple_id = #{coupleId} AND deleted = 0 ORDER BY update_time DESC, id DESC
     </select>
 
     <update id="updateLoveLocation">
@@ -243,6 +244,14 @@
         INSERT INTO love_record_image (id, record_id, image_id, is_cover, sort) VALUES
         <foreach collection="loveRecordImagePOList" item="item" separator=",">
             (#{item.id}, #{item.recordId}, #{item.imageId}, #{item.isCover}, #{item.sort})
+        </foreach>
+    </insert>
+
+    <insert id="insertLoveTags">
+        INSERT INTO love_tag (id, record_id, couple_id, creator_user_id, tag_name, color, sort) VALUES
+        <foreach collection="tags" item="item" separator=",">
+            (#{item.id}, #{item.recordId}, #{item.coupleId}, #{item.creatorUserId}, #{item.tagName},
+             #{item.color}, #{item.sort})
         </foreach>
     </insert>
 

@@ -2,11 +2,7 @@ package diary.diaryinfo.controller;
 
 import diary.common.entity.file.dto.IconDTO;
 import diary.common.entity.love.dto.LoveMoodDTO;
-import diary.common.entity.love.dto.LoveRecordMoodDTO;
-import diary.common.entity.love.dto.LoveRecordTagDTO;
-import diary.common.entity.love.dto.LoveTagDTO;
 import diary.common.entity.love.vo.LoveMoodVO;
-import diary.common.entity.love.vo.LoveTagVO;
 import diary.common.entity.sysInfo.dto.IngredientReqDto;
 import diary.common.entity.sysInfo.vo.CookWayVo;
 import diary.common.entity.sysInfo.vo.IngredientCategoryVo;
@@ -114,22 +110,10 @@ public class DiarySysInfoController {
         return diaryLoveAddService.addMood(dto);
     }
 
-    @OperLog(module = "系统数据", description = "新增标签", operationType = "INSERT", saveResult = true)
-    @PostMapping("/add/tags")
-    public ApiResponse<String> addTag(@RequestBody LoveTagDTO dto) {
-        return diaryLoveAddService.addTag(dto);
-    }
-
     @OperLog(module = "系统数据", description = "修改心情", operationType = "UPDATE", saveResult = true)
     @PostMapping("/update/moods")
     public ApiResponse<String> updateMood(@RequestBody LoveMoodDTO dto) {
         return diaryLoveUpdateService.updateMood(dto);
-    }
-
-    @OperLog(module = "系统数据", description = "修改标签", operationType = "UPDATE", saveResult = true)
-    @PostMapping("/update/tags")
-    public ApiResponse<String> updateTag(@RequestBody LoveTagDTO dto) {
-        return diaryLoveUpdateService.updateTag(dto);
     }
 
     @OperLog(module = "系统数据", description = "查询心情", operationType = "SELECT", saveResult = true)
@@ -138,21 +122,10 @@ public class DiarySysInfoController {
         return diaryLoveQueryService.queryMoods(enabled);
     }
 
-    @OperLog(module = "系统数据", description = "查询标签", operationType = "SELECT", saveResult = true)
-    @GetMapping("/query/tags/{coupleId}")
-    public ApiResponse<List<LoveTagVO>> queryTags(@PathVariable Long coupleId) {
-        return diaryLoveQueryService.queryTags(coupleId);
-    }
-
     @OperLog(module = "系统数据", description = "删除心情", operationType = "DELETE", saveResult = true)
     @PostMapping("/delete/moods/{id}")
     public ApiResponse<String> deleteMood(@PathVariable Long id) {
         return diaryLoveDeleteService.deleteMood(id);
     }
 
-    @OperLog(module = "系统数据", description = "删除标签", operationType = "DELETE", saveResult = true)
-    @PostMapping("/delete/tags/{id}")
-    public ApiResponse<String> deleteTag(@PathVariable Long id) {
-        return diaryLoveDeleteService.deleteTag(id);
-    }
 }

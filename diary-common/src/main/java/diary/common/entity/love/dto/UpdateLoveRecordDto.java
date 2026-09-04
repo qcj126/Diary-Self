@@ -19,6 +19,9 @@ public class UpdateLoveRecordDto {
     @NotNull
     private Long coupleId;
 
+    @NotNull
+    private Long creatorUserId;
+
     @NotBlank
     private String title;
 

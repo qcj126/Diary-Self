@@ -87,11 +87,12 @@ public class DtoConvertToPo {
     public static LoveTagPO convertToPo(LoveTagDTO loveTagDTO) {
         return LoveTagPO.builder()
                 .id(loveTagDTO.getId())
+                .recordId(loveTagDTO.getRecordId())
                 .coupleId(loveTagDTO.getCoupleId())
                 .creatorUserId(loveTagDTO.getCreatorUserId())
                 .tagName(loveTagDTO.getTagName())
                 .color(loveTagDTO.getColor())
-                .useCount(loveTagDTO.getUseCount())
+                .sort(loveTagDTO.getSort())
                 .build();
     }
     public static LoveRecordTagPO convertToPo(LoveRecordTagDTO loveTagDTO) {
@@ -106,6 +107,7 @@ public class DtoConvertToPo {
         return LoveRecordPO.builder()
                 .id(updateLoveRecordDto.getRecordId())
                 .coupleId(updateLoveRecordDto.getCoupleId())
+                .creatorUserId(updateLoveRecordDto.getCreatorUserId())
                 .locationId(updateLoveRecordDto.getLocationId())
                 .title(updateLoveRecordDto.getTitle())
                 .content(updateLoveRecordDto.getContent())

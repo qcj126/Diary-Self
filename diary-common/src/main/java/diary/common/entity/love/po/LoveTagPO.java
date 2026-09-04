@@ -14,12 +14,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class LoveTagPO {
     private Long id;
+    private Long recordId;
     private Long coupleId;
     private Long creatorUserId;
     private String tagName;
     private String color;
-    private Integer useCount;
-    private Boolean deleted;
+    private Integer sort;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 }

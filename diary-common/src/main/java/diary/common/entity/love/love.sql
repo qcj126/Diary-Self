@@ -109,18 +109,6 @@ CREATE TABLE IF NOT EXISTS `love_mood` (
     UNIQUE KEY `uk_love_mood_code` (`mood_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='恋爱记录心情字典表';
 
--- 此表删除
-CREATE TABLE IF NOT EXISTS `love_record_mood` (
-    `id`          BIGINT UNSIGNED NOT NULL COMMENT '主键',
-    `record_id`   BIGINT UNSIGNED NOT NULL COMMENT '恋爱记录ID',
-    `mood_id`     BIGINT UNSIGNED NOT NULL COMMENT '心情ID',
-    `sort`        INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '展示排序值',
-    `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_love_record_mood` (`record_id`, `mood_id`),
-    KEY `idx_love_record_mood_mood` (`mood_id`, `record_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='恋爱记录心情关联表';
-
 CREATE TABLE IF NOT EXISTS `love_tag` (
     `id`              BIGINT UNSIGNED NOT NULL COMMENT '主键',
     `record_id`       BIGINT UNSIGNED NOT NULL COMMENT '恋爱记录ID',
@@ -129,25 +117,12 @@ CREATE TABLE IF NOT EXISTS `love_tag` (
     `tag_name`        VARCHAR(32) NOT NULL COMMENT '标签名称，不包含#',
     `color`           VARCHAR(16) NULL COMMENT '展示颜色，例如 #FF6B81',
     `sort`            INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '展示排序值',
-    `use_count`       INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '使用次数缓存，由业务层维护',
     `create_time`     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time`     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
-    KEY `idx_love_tag_couple` (`couple_id`, `deleted`, `use_count` DESC),
-    KEY `idx_love_tag_name` (`couple_id`, `tag_name`, `deleted`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='恋爱记录自定义标签表';
-
--- 此表删除
-CREATE TABLE IF NOT EXISTS `love_record_tag` (
-    `id`          BIGINT UNSIGNED NOT NULL COMMENT '主键',
-    `record_id`   BIGINT UNSIGNED NOT NULL COMMENT '恋爱记录ID',
-    `tag_id`      BIGINT UNSIGNED NOT NULL COMMENT '自定义标签ID',
-    `sort`        INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '展示排序值',
-    `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_love_record_tag` (`record_id`, `tag_id`),
-    KEY `idx_love_record_tag_tag` (`tag_id`, `record_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='恋爱记录标签关联表';
+    KEY `idx_love_tag_couple` (`couple_id`),
+    KEY `idx_love_tag_name` (`couple_id`, `tag_name`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='恋爱记录自定义标签表';
 
 CREATE TABLE IF NOT EXISTS `love_menstrual_cycle` (
     `id`                BIGINT UNSIGNED NOT NULL COMMENT '主键',

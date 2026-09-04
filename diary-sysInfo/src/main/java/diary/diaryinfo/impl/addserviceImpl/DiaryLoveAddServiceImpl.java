@@ -27,27 +27,10 @@ public class DiaryLoveAddServiceImpl implements DiaryLoveAddService {
         return addResult(diaryLoveMapper.insertLoveMood(DtoConvertToPo.convertToPo(dto)), "添加心情成功");
     }
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public ApiResponse<String> addTag(LoveTagDTO dto) {
-        validateTag(dto);
-        dto.setId(MyUtils.getPrimaryKey());
-        if (dto.getUseCount() == null) dto.setUseCount(0);
-        return addResult(diaryLoveMapper.insertLoveTag(DtoConvertToPo.convertToPo(dto)), "添加标签成功");
-    }
-
     void validateMood(LoveMoodDTO dto) {
         MyUtils.check().notNull(dto, "loveMoodDTO")
                 .notNull(dto.getId(), "id")
                 .notEmpty(dto.getMoodName(), "moodName");
-    }
-
-    void validateTag(LoveTagDTO dto) {
-        MyUtils.check().notNull(dto, "loveTagDTO")
-                .notNull(dto.getId(), "id")
-                .notNull(dto.getCoupleId(), "coupleId")
-                .notNull(dto.getCreatorUserId(), "creatorUserId")
-                .notEmpty(dto.getTagName(), "tagName");
     }
 
     private ApiResponse<String> addResult(int affectedRows, String message) {

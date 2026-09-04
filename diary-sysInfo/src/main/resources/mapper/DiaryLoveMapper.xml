@@ -21,26 +21,6 @@
         <result property="createTime" column="create_time"/>
     </resultMap>
 
-    <resultMap id="loveTagResultMap" type="diary.common.entity.love.po.LoveTagPO">
-        <id property="id" column="id"/>
-        <result property="coupleId" column="couple_id"/>
-        <result property="creatorUserId" column="creator_user_id"/>
-        <result property="tagName" column="tag_name"/>
-        <result property="color" column="color"/>
-        <result property="useCount" column="use_count"/>
-        <result property="deleted" column="deleted"/>
-        <result property="createTime" column="create_time"/>
-        <result property="updateTime" column="update_time"/>
-    </resultMap>
-
-    <resultMap id="loveRecordTagResultMap" type="diary.common.entity.love.po.LoveRecordTagPO">
-        <id property="id" column="id"/>
-        <result property="recordId" column="record_id"/>
-        <result property="tagId" column="tag_id"/>
-        <result property="sort" column="sort"/>
-        <result property="createTime" column="create_time"/>
-    </resultMap>
-
     <sql id="loveCoupleColumns">
         id, owner_user_id, partner_user_id, partner_name, start_date, status, deleted, create_time, update_time
     </sql>
@@ -62,32 +42,15 @@
     <sql id="loveRecordMoodColumns">
         id, record_id, mood_id, sort, create_time
     </sql>
-    <sql id="loveTagColumns">
-        id, couple_id, creator_user_id, tag_name, color, use_count, deleted, create_time, update_time
-    </sql>
-    <sql id="loveRecordTagColumns">
-        id, record_id, tag_id, sort, create_time
-    </sql>
-
     <insert id="insertLoveMood">
         INSERT INTO love_mood (id, mood_code, mood_name, emoji, sort, enabled)
         VALUES (#{id}, #{moodCode}, #{moodName}, #{emoji}, #{sort}, #{enabled})
-    </insert>
-
-    <insert id="insertLoveTag">
-        INSERT INTO love_tag (id, couple_id, creator_user_id, tag_name, color, use_count)
-        VALUES (#{id}, #{coupleId}, #{creatorUserId}, #{tagName}, #{color}, #{useCount})
     </insert>
 
     <select id="selectLoveMoods" resultMap="loveMoodResultMap">
         SELECT <include refid="loveMoodColumns"/> FROM love_mood
         <if test="enabled != null">WHERE enabled = #{enabled}</if>
         ORDER BY sort ASC, id ASC
-    </select>
-
-    <select id="selectLoveTagsByCoupleId" resultMap="loveTagResultMap">
-        SELECT <include refid="loveTagColumns"/> FROM love_tag
-        WHERE couple_id = #{coupleId} AND deleted = 0 ORDER BY use_count DESC, update_time DESC, id DESC
     </select>
 
     <update id="updateLoveMood">
@@ -97,18 +60,8 @@
         WHERE id = #{id}
     </update>
 
-    <update id="updateLoveTag">
-        UPDATE love_tag SET
-            couple_id = #{coupleId}, creator_user_id = #{creatorUserId}, tag_name = #{tagName},
-            color = #{color}, use_count = #{useCount}, update_time = CURRENT_TIMESTAMP
-        WHERE id = #{id} AND deleted = 0
-    </update>
-
     <delete id="deleteLoveMood">
         DELETE FROM love_mood WHERE id = #{id}
     </delete>
 
-    <update id="deleteLoveTag">
-        UPDATE love_tag SET deleted = 1, update_time = CURRENT_TIMESTAMP WHERE id = #{id} AND deleted = 0
-    </update>
 </mapper>

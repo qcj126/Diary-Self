@@ -21,12 +21,6 @@ public class DiaryLoveDeleteServiceImpl implements DiaryLoveDeleteService {
         return deleteResult(id, diaryLoveMapper::deleteLoveMood, "删除心情成功");
     }
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public ApiResponse<String> deleteTag(Long id) {
-        return deleteResult(id, diaryLoveMapper::deleteLoveTag, "删除标签成功");
-    }
-
     private ApiResponse<String> deleteResult(Long id, DeleteOperation operation, String message) {
         MyUtils.check().notNull(id, "id");
         return operation.delete(id) > 0 ? ApiResponse.success(message) : ApiResponse.delFail();

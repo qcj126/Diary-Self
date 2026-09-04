@@ -12,6 +12,7 @@ import diary.diarylove.service.DiaryLoveAddService;
 import diary.diarylove.service.DiaryLoveDeleteService;
 import diary.diarylove.service.DiaryLoveQueryService;
 import diary.diarylove.service.DiaryLoveUpdateService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,80 +33,80 @@ public class DiaryLoveController {
     private final DiaryLoveUpdateService diaryLoveUpdateService;
 
     @OperLog(module = "恋爱记录", description = "创建情侣关系", operationType = "INSERT", saveResult = true)
-    @PostMapping("/add/couples")
+    @PostMapping("/add/couples") // 已测
     public ApiResponse<String> addCouples(@RequestBody LoveCoupleDTO dto) {
         return diaryLoveAddService.addCouples(dto);
     }
 
     @OperLog(module = "恋爱记录", description = "新增纪念日", operationType = "INSERT", saveResult = true)
-    @PostMapping("/add/anniversaries")
+    @PostMapping("/add/anniversaries") // 已测
     public ApiResponse<String> addAnniversary(@RequestBody LoveAnniversaryDTO dto) {
         return diaryLoveAddService.addAnniversary(dto);
     }
 
     @OperLog(module = "恋爱记录", description = "新增恋爱记录", operationType = "INSERT", saveResult = true)
-    @PostMapping("/add/records")
-    public ApiResponse<String> addRecord(@RequestBody AddLoveRecordDto dto) {
+    @PostMapping("/add/records") // 已测
+    public ApiResponse<String> addRecord(@Valid @RequestBody AddLoveRecordDto dto) {
         return diaryLoveAddService.addRecord(dto);
     }
 
     @OperLog(module = "恋爱记录", description = "查询情侣关系", operationType = "SELECT", saveResult = true)
-    @PostMapping("/query/couples")
+    @PostMapping("/query/couples") // 已测
     public ApiResponse<LoveCoupleVO> queryCouples(@RequestBody LoveCoupleDTO loveCoupleDTO) {
         return diaryLoveQueryService.queryCouples(loveCoupleDTO);
     }
 
     @OperLog(module = "恋爱记录", description = "查询纪念日", operationType = "SELECT", saveResult = true)
-    @GetMapping("/query/anniversaries/{coupleId}")
+    @GetMapping("/query/anniversaries/{coupleId}") // 已测
     public ApiResponse<List<LoveAnniversaryVO>> queryAnniversaries(@PathVariable Long coupleId) {
         return diaryLoveQueryService.queryAnniversaries(coupleId);
     }
 
     @OperLog(module = "恋爱记录", description = "查询地点", operationType = "SELECT", saveResult = true)
-    @GetMapping("/query/locations/{coupleId}")
+    @GetMapping("/query/locations/{coupleId}") // 已测
     public ApiResponse<List<LoveLocationVO>> queryLocations(@PathVariable Long coupleId) {
         return diaryLoveQueryService.queryLocations(coupleId);
     }
 
     @OperLog(module = "恋爱记录", description = "查询恋爱记录详情", operationType = "SELECT", saveResult = true)
-    @GetMapping("/query/records/{id}")
+    @GetMapping("/query/records/{id}") // 已测
     public ApiResponse<LoveRecordVO> queryRecord(@PathVariable Long id) {
         return diaryLoveQueryService.queryRecord(id);
     }
 
     @OperLog(module = "恋爱记录", description = "查询恋爱记录列表", operationType = "SELECT", saveResult = true)
-    @PostMapping("/query/records")
+    @PostMapping("/query/records") // 已测
     public ApiResponse<List<LoveRecordVO>> queryRecords(@RequestBody LoveRecordDTO query) {
         return diaryLoveQueryService.queryRecords(query);
     }
 
     @OperLog(module = "恋爱记录", description = "查询记录图片", operationType = "SELECT", saveResult = true)
-    @GetMapping("/query/record-images/{recordId}")
+    @GetMapping("/query/record-images/{recordId}") // 已测
     public ApiResponse<List<LoveRecordImageVO>> queryRecordImages(@PathVariable Long recordId) {
         return diaryLoveQueryService.queryRecordImages(recordId);
     }
 
     @OperLog(module = "恋爱记录", description = "修改情侣关系", operationType = "UPDATE", saveResult = true)
-    @PostMapping("/update/couples")
+    @PostMapping("/update/couples") // 已测
     public ApiResponse<String> updateCouple(@RequestBody LoveCoupleDTO dto) {
         return diaryLoveUpdateService.updateCouple(dto);
     }
 
     @OperLog(module = "恋爱记录", description = "修改纪念日", operationType = "UPDATE", saveResult = true)
-    @PostMapping("/update/anniversaries")
+    @PostMapping("/update/anniversaries") // 已测
     public ApiResponse<String> updateAnniversary(@RequestBody LoveAnniversaryDTO dto) {
         return diaryLoveUpdateService.updateAnniversary(dto);
     }
 
     @OperLog(module = "恋爱记录", description = "修改地点", operationType = "UPDATE", saveResult = true)
-    @PostMapping("/update/locations")
+    @PostMapping("/update/locations") // 已测
     public ApiResponse<String> updateLocation(@RequestBody LoveLocationDTO dto) {
         return diaryLoveUpdateService.updateLocation(dto);
     }
 
     @OperLog(module = "恋爱记录", description = "修改恋爱记录", operationType = "UPDATE", saveResult = true)
-    @PostMapping("/update/records")
-    public ApiResponse<String> updateRecord(@RequestBody UpdateLoveRecordDto dto) {
+    @PostMapping("/update/records") // 已测
+    public ApiResponse<String> updateRecord(@Valid @RequestBody UpdateLoveRecordDto dto) {
         return diaryLoveUpdateService.updateRecord(dto);
     }
 
@@ -134,13 +135,13 @@ public class DiaryLoveController {
     }
 
     @OperLog(module = "恋爱记录", description = "删除恋爱记录", operationType = "DELETE", saveResult = true)
-    @PostMapping("/delete/records/{id}")
+    @PostMapping("/delete/records/{id}") // 已测
     public ApiResponse<String> deleteRecord(@PathVariable Long id) {
         return diaryLoveDeleteService.deleteRecord(id);
     }
 
     @OperLog(module = "恋爱记录", description = "删除记录图片关联", operationType = "DELETE", saveResult = true)
-    @PostMapping("/delete/record-images/{id}")
+    @PostMapping("/delete/record-images/{id}") // 已测
     public ApiResponse<String> deleteRecordImage(@PathVariable Long id) {
         return diaryLoveDeleteService.deleteRecordImage(id);
     }

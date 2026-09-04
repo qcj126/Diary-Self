@@ -43,12 +43,6 @@ public class PoConvertToVo {
                 .coupleId(loveLocationPO.getCoupleId())
                 .name(loveLocationPO.getName())
                 .address(loveLocationPO.getAddress())
-                .longitude(loveLocationPO.getLongitude())
-                .latitude(loveLocationPO.getLatitude())
-                .cityCode(loveLocationPO.getCityCode())
-                .cityName(loveLocationPO.getCityName())
-                .createTime(loveLocationPO.getCreateTime())
-                .updateTime(loveLocationPO.getUpdateTime())
                 .build();
     }
     public static LoveRecordVO convertToVo(LoveRecordPO loveRecordPO) {
@@ -105,7 +99,6 @@ public class PoConvertToVo {
                 .creatorUserId(loveTagPO.getCreatorUserId())
                 .tagName(loveTagPO.getTagName())
                 .color(loveTagPO.getColor())
-                .useCount(loveTagPO.getUseCount())
                 .createTime(loveTagPO.getCreateTime())
                 .updateTime(loveTagPO.getUpdateTime())
                 .build();

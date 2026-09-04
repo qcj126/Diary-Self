@@ -7,9 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
 /** 恋爱足迹地点响应对象。 */
 @Data
 @Builder
@@ -22,10 +19,4 @@ public class LoveLocationVO {
     private Long coupleId;
     private String name;
     private String address;
-    private BigDecimal longitude;
-    private BigDecimal latitude;
-    private String cityCode;
-    private String cityName;
-    private LocalDateTime createTime;
-    private LocalDateTime updateTime;
 }

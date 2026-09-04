@@ -5,6 +5,4 @@ import diary.common.result.ApiResponse;
 
 public interface DiaryLoveAddService {
     ApiResponse<String> addMood(LoveMoodDTO dto);
-
-    ApiResponse<String> addTag(LoveTagDTO dto);
 }

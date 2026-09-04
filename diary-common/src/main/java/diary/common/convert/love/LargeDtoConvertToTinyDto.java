@@ -40,16 +40,36 @@ public class LargeDtoConvertToTinyDto {
     // 构建recordImage
     public static List<LoveRecordImageDTO> convertLoveRecordImage(AddLoveRecordDto dto, LoveRecordDTO loveRecordDTO) {
         List<LoveRecordImageDTO> recordImageDTOS = new ArrayList<>();
+        if (dto.getImages() == null) return recordImageDTOS;
         for (NewRecordImageDto image : dto.getImages()) {
             LoveRecordImageDTO recordImageDTO = LoveRecordImageDTO.builder()
                     .id(MyUtil.getPrimaryKey())
                     .recordId(loveRecordDTO.getId())
                     .imageId(image.getImageId())
-                    .isCover(image.getIsCover())
-                    .sort(image.getSort())
+                    .isCover(image.getIsCover() == null ? false : image.getIsCover())
+                    .sort(image.getSort() == null ? 0 : image.getSort())
                     .build();
             recordImageDTOS.add(recordImageDTO);
         }
         return recordImageDTOS;
+    }
+
+    // 构建recordTag
+    public static List<LoveTagDTO> convertLoveTag(AddLoveRecordDto dto, LoveRecordDTO loveRecordDTO) {
+        List<LoveTagDTO> loveTagDTOS = new ArrayList<>();
+        if (dto.getNewTags() == null) return loveTagDTOS;
+        for (int index = 0; index < dto.getNewTags().size(); index++) {
+            NewLoveTag source = dto.getNewTags().get(index);
+            LoveTagDTO loveTagDTO = new LoveTagDTO();
+            loveTagDTO.setId(MyUtil.getPrimaryKey());
+            loveTagDTO.setRecordId(loveRecordDTO.getId());
+            loveTagDTO.setCoupleId(dto.getCoupleId());
+            loveTagDTO.setCreatorUserId(loveRecordDTO.getCreatorUserId());
+            loveTagDTO.setTagName(source.getTagName());
+            loveTagDTO.setColor(source.getColor());
+            loveTagDTO.setSort(source.getSort() == null ? index : source.getSort());
+            loveTagDTOS.add(loveTagDTO);
+        }
+        return loveTagDTOS;
     }
 }

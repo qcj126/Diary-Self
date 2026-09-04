@@ -48,6 +48,8 @@ public interface DiaryLoveMapper {
 
     int insertLoveRecordImage(@Param("loveRecordImagePOList") List<LoveRecordImagePO> loveRecordImagePOList);
 
+    int insertLoveTags(@Param("tags") List<LoveTagPO> tags);
+
     List<LoveRecordImagePO> selectLoveRecordImagesByRecordId(@Param("recordId") Long recordId);
 
     int updateLoveRecordImage(LoveRecordImagePO loveRecordImagePO);
