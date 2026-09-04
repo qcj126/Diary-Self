@@ -3,7 +3,10 @@ package diary.diarylove.impl;
 import diary.common.convert.love.DtoConvertToPo;
 import diary.common.entity.love.dto.*;
 import diary.common.entity.love.po.LoveRecordImagePO;
+import diary.common.exception.NullResultException;
+import diary.common.exception.SameDataException;
 import diary.common.result.ApiResponse;
+import diary.common.util.MyUtil;
 import diary.diarylove.mapper.DiaryLoveMapper;
 import diary.diarylove.service.DiaryLoveAddService;
 import diary.utils.commonutil.MyUtils;
@@ -30,6 +33,17 @@ public class DiaryLoveAddServiceImpl implements DiaryLoveAddService {
         validateCouple(dto);
         dto.setId(MyUtils.getPrimaryKey());
         if (dto.getStatus() == null) dto.setStatus(1);
+        // 根据partnerName查询partnerUserId
+        Long partnerUserId = diaryLoveMapper.selectUserIdByPartnerName(dto.getPartnerName());
+        if (partnerUserId == null) {
+            throw new NullResultException("伴侣账号未注册，未查到此人");
+        }
+        // 查看当前用户是否已存在情侣关系
+        int coupleCnt = diaryLoveMapper.selectExistLoveCouple(dto.getOwnerUserId());
+        if (coupleCnt > 0) {
+            throw new SameDataException("当前用户已存在情侣关系");
+        }
+        dto.setPartnerUserId(partnerUserId);
         return addResult(diaryLoveMapper.insertLoveCouple(DtoConvertToPo.convertToPo(dto)), "添加情侣关系成功");
     }
 

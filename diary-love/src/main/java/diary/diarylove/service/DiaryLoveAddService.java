@@ -4,7 +4,7 @@ import diary.common.entity.love.dto.*;
 import diary.common.result.ApiResponse;
 
 public interface DiaryLoveAddService {
-    ApiResponse<String> addCouples(LoveCoupleDTO loveCoupleDTO);
+    ApiResponse<String> addCouples(LoveCoupleDTO dto);
 
     ApiResponse<String> addAnniversary(LoveAnniversaryDTO dto);
 

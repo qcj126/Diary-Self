@@ -10,6 +10,8 @@ import diary.common.entity.love.dto.LoveMenstrualCycleDTO;
 import diary.common.entity.love.dto.LoveMoodDTO;
 import diary.common.entity.love.dto.LoveRecordDTO;
 import diary.common.entity.love.dto.LoveRecordImageDTO;
+import diary.common.entity.love.dto.LoveRecordMoodDTO;
+import diary.common.entity.love.dto.LoveRecordTagDTO;
 import diary.common.entity.love.dto.LoveTagDTO;
 import diary.common.entity.love.po.LoveAnniversaryPO;
 import diary.common.entity.love.po.LoveCouplePO;
@@ -18,6 +20,7 @@ import diary.common.entity.love.po.LoveMenstrualCyclePO;
 import diary.common.entity.love.po.LoveMoodPO;
 import diary.common.entity.love.po.LoveRecordImagePO;
 import diary.common.entity.love.po.LoveRecordPO;
+import diary.common.entity.love.po.LoveRecordTagPO;
 import diary.common.entity.love.po.LoveTagPO;
 import diary.common.entity.love.vo.LoveAnniversaryVO;
 import diary.common.entity.love.vo.LoveCoupleVO;
@@ -25,6 +28,8 @@ import diary.common.entity.love.vo.LoveLocationVO;
 import diary.common.entity.love.vo.LoveMenstrualCycleVO;
 import diary.common.entity.love.vo.LoveMoodVO;
 import diary.common.entity.love.vo.LoveRecordImageVO;
+import diary.common.entity.love.vo.LoveRecordMoodVO;
+import diary.common.entity.love.vo.LoveRecordTagVO;
 import diary.common.entity.love.vo.LoveRecordVO;
 import diary.common.entity.love.vo.LoveTagVO;
 
@@ -221,29 +226,6 @@ public final class LoveEntityConverter {
     }
 
     public static LoveMoodVO toVo(LoveMoodDTO source) {
-        return toVo(toPo(source));
-    }
-
-    public static LoveRecordMoodPO toPo(LoveRecordMoodDTO source) {
-        return source == null ? null : LoveRecordMoodPO.builder()
-                .id(source.getId())
-                .recordId(source.getRecordId())
-                .moodId(source.getMoodId())
-                .sort(source.getSort())
-                .build();
-    }
-
-    public static LoveRecordMoodVO toVo(LoveRecordMoodPO source) {
-        return source == null ? null : LoveRecordMoodVO.builder()
-                .id(source.getId())
-                .recordId(source.getRecordId())
-                .moodId(source.getMoodId())
-                .sort(source.getSort())
-                .createTime(source.getCreateTime())
-                .build();
-    }
-
-    public static LoveRecordMoodVO toVo(LoveRecordMoodDTO source) {
         return toVo(toPo(source));
     }
 

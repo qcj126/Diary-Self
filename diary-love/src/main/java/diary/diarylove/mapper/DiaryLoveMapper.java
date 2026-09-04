@@ -4,6 +4,7 @@ import diary.common.entity.love.dto.LoveCoupleDTO;
 import diary.common.entity.love.dto.LoveRecordDTO;
 import diary.common.entity.love.po.*;
 import diary.common.entity.mq.po.MqOutboxPO;
+import jakarta.validation.constraints.NotNull;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -58,4 +59,8 @@ public interface DiaryLoveMapper {
     int claimOutbox(Long id, Integer versionId);
 
     int markOutboxSent(Long id, Integer versionId, String brokerMessageId);
+
+    Long selectUserIdByPartnerName(String partnerName);
+
+    int selectExistLoveCouple(@Param("ownerUserId") Long ownerUserId);
 }

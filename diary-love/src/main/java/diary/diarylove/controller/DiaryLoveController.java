@@ -33,8 +33,8 @@ public class DiaryLoveController {
 
     @OperLog(module = "恋爱记录", description = "创建情侣关系", operationType = "INSERT", saveResult = true)
     @PostMapping("/add/couples")
-    public ApiResponse<String> addCouples(@RequestBody LoveCoupleDTO loveCoupleDTO) {
-        return diaryLoveAddService.addCouples(loveCoupleDTO);
+    public ApiResponse<String> addCouples(@RequestBody LoveCoupleDTO dto) {
+        return diaryLoveAddService.addCouples(dto);
     }
 
     @OperLog(module = "恋爱记录", description = "新增纪念日", operationType = "INSERT", saveResult = true)

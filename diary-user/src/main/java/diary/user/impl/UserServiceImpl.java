@@ -49,8 +49,11 @@ public class UserServiceImpl implements UserService {
         List<String> roles = loadRoleCodes(user.getUserId());
         TokenPairVO tokenPair = tokenService.issueTokenPair(user.getUserId(), user.getUsername(), roles);
 
-        // OAuth2-style Bearer tokens: access token for APIs, refresh token for renewal.
+        // Return Snowflake userId as text to avoid precision loss in JavaScript clients.
         return Map.of(
+                "userId", user.getUserId().toString(),
+                "username", user.getUsername(),
+                "roles", roles,
                 "tokenType", tokenPair.getTokenType(),
                 "accessToken", tokenPair.getAccessToken(),
                 "accessTokenExpiresIn", tokenPair.getAccessTokenExpiresIn(),

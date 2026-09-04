@@ -277,4 +277,12 @@
             sent_time = current_timestamp, update_time = CURRENT_TIMESTAMP
         where status = 'SENDING' and id = #{id} and version_id = #{versionId}
     </update>
+
+    <select id="selectUserIdByPartnerName" resultType="java.lang.Long">
+        SELECT user_id  as userId FROM user WHERE username like concat('%', #{partnerName}, '%')
+    </select>
+
+    <select id="selectExistLoveCouple" resultType="int">
+        select count(id) from love_couple where owner_user_id = #{ownerUserId} and deleted = 0 and status = 1
+    </select>
 </mapper>

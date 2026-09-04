@@ -22,6 +22,11 @@ import java.util.List;
 @Component
 public class JwtAuthFilter implements GlobalFilter, Ordered {
     private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
+    private static final List<String> ADMIN_PATHS = List.of(
+            "/user/add",
+            "/user/delete",
+            "/user/token/**"
+    );
 
     @Resource
     private JwtUtil jwtUtil;
@@ -107,7 +112,7 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
     }
 
     private boolean requiresAdmin(String path) {
-        return path.contains("/add") || path.contains("/delete");
+        return ADMIN_PATHS.stream().anyMatch(adminPath -> PATH_MATCHER.match(adminPath, path));
     }
 
     private Mono<Void> unauthorized(ServerWebExchange exchange) {
