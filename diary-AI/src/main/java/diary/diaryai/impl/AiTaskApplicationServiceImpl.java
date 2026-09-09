@@ -1,6 +1,5 @@
 package diary.diaryai.impl;
 
-import diary.common.convert.ai.ConvertPoToVo;
 import diary.common.entity.ai.dto.AiInvokeDTO;
 import diary.common.entity.ai.po.AiTaskPO;
 import diary.common.entity.ai.vo.AiTaskSubmitVo;
@@ -10,56 +9,35 @@ import diary.common.exception.AiSubmitRateLimitException;
 import diary.common.exception.IdempotencyConflictException;
 import diary.diaryai.idempotency.AiRequestFingerprint;
 import diary.diaryai.mapper.DiaryAiMapper;
-import diary.diaryai.redis.AiIdempotencyCacheService;
 import diary.diaryai.redis.AiSubmitRateLimiter;
-import diary.diaryai.redis.AiTaskCacheService;
 import diary.diaryai.service.AiTaskApplicationService;
 import diary.diaryai.service.AiTaskCommandService;
 import diary.utils.commonutil.MyUtils;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AiTaskApplicationServiceImpl implements AiTaskApplicationService {
     private final DiaryAiMapper diaryAiMapper;
     private final AiTaskCommandService aiTaskCommandService;
-    private final AiIdempotencyCacheService aiIdempotencyCacheService;
     private final AiSubmitRateLimiter aiSubmitRateLimiter;
-    private final AiTaskCacheService aiTaskCacheService;
     private final AiRequestFingerprint requestFingerprint;
 
     // 提交任务时，仅让task状态为Pending即可，当定时任务提取了消息并发送时，再改为queued
     @Override
-    public AiTaskSubmitVo submitTask(AiInvokeDTO aiInvokeDTO) {
+    public AiTaskSubmitVo submitTask(AiInvokeDTO aiInvokeDTO, Long userId) {
         validateAndNormalizeRequest(aiInvokeDTO);
-        Long userId = 10000L;
         MyUtils.check().notNull(userId, "userId");
         String clientRequestId = aiInvokeDTO.getClientRequestId();
         String requestHash = requestFingerprint.fingerprint(aiInvokeDTO);
-        // 幂等判断这一步，最终必须要落到mysql中进行判断，然后删除redis数据，防止脏数据影响
-        if (aiIdempotencyCacheService.get(userId, clientRequestId).isPresent()) {
-            // 若有缓存数据，那么查询数据库中有无数据，防止脏缓存影响结果
-            AiTaskPO aiTaskPO = diaryAiMapper.selectByUserIdAndClientRequestId(userId, clientRequestId);
-            if (aiTaskPO != null) {
-                assertSameRequest(aiTaskPO, requestHash);
-                return toSubmitVo(aiTaskPO, "该请求已提交");
-            }
-            // 若数据库没有数据，则删除脏缓存
-            aiIdempotencyCacheService.evict(userId, clientRequestId);
-        }
 
-        // 已存在的任务直接返回，未创建的任务继续处理
-        // 通过userId与clientRequestId联合唯一索引查询任务
+        // MySQL 联合唯一索引是幂等性的唯一权威，避免再维护一套 Redis 幂等缓存。
         AiTaskPO existingTask = diaryAiMapper.selectByUserIdAndClientRequestId(userId, clientRequestId);
         if (existingTask != null) {
             assertSameRequest(existingTask, requestHash);
-            // 添加缓存信息
-            aiIdempotencyCacheService.put(userId, clientRequestId, existingTask.getId());
             return toSubmitVo(existingTask, "该请求已提交");
         }
 
@@ -76,8 +54,6 @@ public class AiTaskApplicationServiceImpl implements AiTaskApplicationService {
             if (aiTaskPO == null) {
                 throw new IllegalStateException("AI任务创建失败");
             }
-            aiIdempotencyCacheService.put(userId, clientRequestId, aiTaskPO.getId());
-            aiTaskCacheService.put(ConvertPoToVo.convertToVo(aiTaskPO), userId);
         } catch (DuplicateKeyException duplicateKeyException) {
             // aiTask表有userId和clientRequestId联合唯一索引
             // 当并发请求同时插入时，后插入的请求会抛出 DuplicateKeyException

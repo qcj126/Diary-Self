@@ -41,11 +41,7 @@ diary:
       max-attempts: 3
       execution-lease-seconds: 330
       recovery-interval-ms: 30000
-    cache:
-      running-ttl-seconds: 30
-      terminal-ttl-hours: 24
-      idempotency-ttl-hours: 24
-      null-ttl-seconds: 15
+    redis:
       key-prefix: diary:dev:ai
     limit:
       submit-per-user-per-minute: 10

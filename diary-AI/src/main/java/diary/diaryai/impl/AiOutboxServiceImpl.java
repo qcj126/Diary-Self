@@ -69,10 +69,7 @@ public class AiOutboxServiceImpl implements AiOutboxService {
         String lastError = truncate(error.getMessage(), 1000);
 
         int changed;
-        /*
-         * 改前：maxRetries=3 时原始发送加起来总共只执行 3 次，字段名“最大重试次数”与实际语义不一致。
-         * 改后：首次发送不算重试，失败次数超过 maxRetries 才进入 DEAD，即总尝试次数为 1 + maxRetries。
-         */
+        // maxRetries 不包含首次发送，总尝试次数为 1 + maxRetries。
         if (nextRetryCount > outbox.getMaxRetries()) {
             changed = diaryAiMapper.markOutboxDead(outbox.getId(), outbox.getVersionId(), lastError);
         } else {
@@ -84,12 +81,7 @@ public class AiOutboxServiceImpl implements AiOutboxService {
         }
 
         if (nextRetryCount > outbox.getMaxRetries() && isTaskDispatchEvent(outbox)) {
-            /*
-             * 改前：AI_TASK_CREATED/AI_TASK_RETRY Outbox 进入 DEAD 后，task 不发生变化，永久卡在等待态。
-             * 改后：同一事务内将仍处于 PENDING/QUEUED/RETRY_WAIT 的任务收敛到 DEAD_LETTER，
-             * 并追加 AI_FAILED Outbox；若任务已 RUNNING/终态，CAS 不会覆盖其新状态。
-             * 效果：投递失败具有明确业务终态，同时保留“Broker 实际已收到但生产者未知”场景下的并发安全。
-             */
+            // 仅将尚未执行的任务收敛为 DEAD_LETTER，不覆盖 RUNNING 或终态。
             AiTaskPO task = diaryAiMapper.selectAiTaskByTaskId(outbox.getAggregateId());
             if (task != null) {
                 boolean deadLettered = aiTaskCommandService.deadLetterDispatchTask(task,

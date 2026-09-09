@@ -39,7 +39,6 @@
         <result column="input_snapshot" property="inputSnapshot" jdbcType="LONGVARCHAR"/>
         <result column="attempt_count" property="attemptCount" jdbcType="INTEGER"/>
         <result column="max_attempts" property="maxAttempts" jdbcType="INTEGER"/>
-        <result column="recovery_count" property="recoveryCount" jdbcType="INTEGER"/>
         <result column="worker_id" property="workerId" jdbcType="VARCHAR"/>
         <result column="lease_until" property="leaseUntil" jdbcType="TIMESTAMP"/>
         <result column="ai_info_id" property="aiInfoId" jdbcType="BIGINT"/>
@@ -105,10 +104,10 @@
         -->
         INSERT INTO ai_task
             (id, user_id, client_request_id, request_hash, task_type, status, input_snapshot,
-             attempt_count, max_attempts, recovery_count, create_time, update_time, version_id)
+             attempt_count, max_attempts, create_time, update_time, version_id)
         VALUES
             (#{id}, #{userId}, #{clientRequestId}, #{requestHash}, #{taskType}, #{status}, #{inputSnapshot},
-             #{attemptCount}, #{maxAttempts}, #{recoveryCount}, #{createTime}, #{updateTime}, #{versionId})
+             #{attemptCount}, #{maxAttempts}, #{createTime}, #{updateTime}, #{versionId})
     </insert>
 
     <select id="selectAiTaskByTaskId" resultMap="AiTaskResultMap">
@@ -261,10 +260,7 @@
     </update>
 
     <update id="markDeadLetterIfDispatchable" parameterType="diary.common.entity.ai.dto.AiTaskProcessDto">
-        <!--
-            改前：任务投递 Outbox 进入 DEAD 后只修改 Outbox，任务会永久停在 PENDING/QUEUED/RETRY_WAIT。
-            改后：只允许尚未被 Worker 持有的等待态任务收敛到 DEAD_LETTER；RUNNING/终态不会被旧投递结果覆盖。
-        -->
+        <!-- 仅收敛尚未执行的任务，不覆盖 RUNNING 或终态。 -->
         UPDATE ai_task
         SET status = 'DEAD_LETTER',
             worker_id = NULL,
@@ -292,25 +288,6 @@
           AND version_id = #{versionId}
     </update>
 
-    <update id="recoverStaleWaiting">
-        <!--
-            改前：Recovery Job 只处理过期 RUNNING，消息进 DLQ 后 QUEUED/RETRY_WAIT 会永久卡住。
-            改后：对长期无活动 Outbox 的等待态任务做 CAS 恢复，并在同一事务追加新的重投 Outbox。
-        -->
-        UPDATE ai_task
-        SET status = 'RETRY_WAIT',
-            error_code = #{errorCode},
-            error_message = #{errorMessage},
-            recovery_count = recovery_count + 1,
-            update_time = CURRENT_TIMESTAMP,
-            version_id = version_id + 1
-        WHERE id = #{taskId}
-          AND status IN ('PENDING', 'QUEUED', 'RETRY_WAIT')
-          AND update_time &lt; TIMESTAMPADD(SECOND, -#{waitingRecoverySeconds}, CURRENT_TIMESTAMP)
-          AND recovery_count &lt; #{maxRecoveryMessages}
-          AND version_id = #{versionId}
-    </update>
-
     <insert id="insertOutbox" parameterType="diary.common.entity.mq.po.MqOutboxPO">
         INSERT INTO mq_outbox
         (id, event_id, aggregate_type, aggregate_id, event_type,
@@ -330,10 +307,6 @@
         AND next_retry_time &lt;= CURRENT_TIMESTAMP
         ORDER BY next_retry_time ASC, id ASC
         LIMIT #{limit}
-    </select>
-
-    <select id="selectOutboxById" resultMap="MqOutboxResultMap">
-        select <include refid="mqOutboxColumns"/> FROM mq_outbox WHERE id = #{id} LIMIT 1
     </select>
 
     <select id="selectTimedOutbox" resultMap="MqOutboxResultMap">
@@ -388,25 +361,6 @@
         WHERE id = #{taskId}
           AND request_hash IS NULL
     </update>
-
-    <select id="selectStaleWaitingTasks" resultMap="AiTaskResultMap">
-        SELECT *
-        FROM ai_task
-        WHERE status IN ('PENDING', 'QUEUED', 'RETRY_WAIT')
-          AND update_time &lt; TIMESTAMPADD(SECOND, -#{waitingRecoverySeconds}, CURRENT_TIMESTAMP)
-          AND recovery_count &lt; #{maxRecoveryMessages}
-        ORDER BY update_time ASC, id ASC
-        LIMIT #{limit}
-    </select>
-
-    <select id="countActiveTaskDispatchOutbox" resultType="int">
-        SELECT COUNT(*)
-        FROM mq_outbox
-        WHERE aggregate_type = 'AI-TASK'
-          AND aggregate_id = #{taskId}
-          AND event_type IN ('AI_TASK_CREATED', 'AI_TASK_RETRY')
-          AND status IN ('NEW', 'SENDING', 'RETRY_WAIT')
-    </select>
 
     <select id="selectAiNutrientByTaskId" resultMap="AiNutrientResultMap">
         SELECT *

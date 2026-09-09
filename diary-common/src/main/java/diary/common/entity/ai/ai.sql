@@ -45,7 +45,6 @@ create table ai_task(
     input_snapshot    longtext                           not null comment '实体类的json数据',
     attempt_count     int                                not null comment '消息尝试消费次数',
     max_attempts      int                                not null comment '消息最大消费次数',
-    recovery_count    int      default 0                 not null comment '等待态消息补发次数',
     worker_id         varchar(128)                       null comment '实例工作id',
     lease_until       datetime                           null comment '占有此消息的持续时间',
     ai_info_id        bigint unsigned                    null comment '与aiInFo主键关联',
@@ -60,7 +59,5 @@ create table ai_task(
     constraint uk_ai_task_user_client_request unique (user_id, client_request_id)
 ) engine=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='AI任务表';
 
--- 改前：恢复任务只能依赖主键/唯一索引扫描 RUNNING，数据量增大后会全表扫描；
--- 改后：状态与更新时间组成恢复索引，同时覆盖 RUNNING 租约扫描和等待态对账扫描。
+-- 只保留 RUNNING 租约恢复所需索引。
 create index idx_ai_task_status_lease on ai_task (status, lease_until, id);
-create index idx_ai_task_status_update on ai_task (status, update_time, id);

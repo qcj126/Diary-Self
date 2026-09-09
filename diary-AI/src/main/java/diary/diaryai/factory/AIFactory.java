@@ -2,34 +2,37 @@ package diary.diaryai.factory;
 
 import diary.diaryai.strategy.service.InvokeAIService;
 import jakarta.annotation.PostConstruct;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class AIFactory {
-    @Resource
-    private List<InvokeAIService> aiServiceList;
+    private final List<InvokeAIService> aiServiceList;
 
-    private final Map<Integer, InvokeAIService> aiServiceCache = new ConcurrentHashMap<>();
-
-    public AIFactory() {}
+    private final Map<Integer, InvokeAIService> aiServiceCache = new HashMap<>();
 
     @PostConstruct
     public void init() {
-        if (aiServiceList != null) {
-            for (InvokeAIService exporter : this.aiServiceList) {
-                Integer type = exporter.getCode();
-                aiServiceCache.put(type, exporter);
-                log.info("注册AI: {} -> {}", type, exporter.getClass().getSimpleName());
+        for (InvokeAIService service : aiServiceList) {
+            Integer type = service.getCode();
+            if (type == null) {
+                throw new IllegalStateException("AI模型编码不能为null: "
+                        + service.getClass().getSimpleName());
             }
-        } else {
-            log.warn("aiServiceList is null in AIFactory@PostConstruct");
+            InvokeAIService existing = aiServiceCache.putIfAbsent(type, service);
+            if (existing != null) {
+                throw new IllegalStateException("AI模型编码重复: " + type
+                        + " (" + existing.getClass().getSimpleName()
+                        + ", " + service.getClass().getSimpleName() + ")");
+            }
+            log.info("注册AI: {} -> {}", type, service.getClass().getSimpleName());
         }
     }
 
@@ -40,7 +43,7 @@ public class AIFactory {
         InvokeAIService exporter = aiServiceCache.get(typeCode);
         if (exporter == null) {
             throw new IllegalArgumentException(
-                    String.format("不支持的导出类型: %s，支持的类型: %s",
+                    String.format("不支持的AI模型编码: %s，已注册编码: %s",
                             typeCode, aiServiceCache.keySet())
             );
         }

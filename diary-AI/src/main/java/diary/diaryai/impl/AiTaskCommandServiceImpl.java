@@ -60,7 +60,6 @@ public class AiTaskCommandServiceImpl implements AiTaskCommandService {
                 .status(AiTaskStatusEnum.PENDING.name())
                 .inputSnapshot(inputSnapshot)
                 .attemptCount(0)
-                .recoveryCount(0)
                 .maxAttempts(properties.getTask().getMaxAttempts())
                 .createTime(now)
                 .updateTime(now)
@@ -233,12 +232,6 @@ public class AiTaskCommandServiceImpl implements AiTaskCommandService {
                 .build();
 
         if (permanentError || attemptsExhausted) {
-            /*
-             * 改前：虽然 FAILED 与 Outbox 在同一事务，但 Outbox payload 直接复用了原任务消息，导致
-             * mq_outbox.event_id 与 payload.eventId 不一致，失败消息的 taskType/Tag 也仍是任务或完成事件。
-             * 改后：FAILED 条件更新成功后，统一通过 appendTerminalEvent 创建全新的失败事件消息。
-             * 效果：数据库事件 ID、payload 事件 ID、eventType 和 AI_FAILED Tag 完全一致，下游可可靠去重与路由。
-             */
             int failed = diaryAiMapper.markFailedIfOwned(failureRequest);
             if (failed != 1) {
                 return handleOwnershipLost(message.getTaskId());
@@ -276,12 +269,7 @@ public class AiTaskCommandServiceImpl implements AiTaskCommandService {
                 .errorMessage(truncateErrorMessage(errorMessage))
                 .build();
 
-        /*
-         * 改前：Consumer 在“次数耗尽”分支只把 task 改成 FAILED 后就 ACK，Recovery Job 因此再也扫描不到它，
-         * 最终不会产生 AI_FAILED Outbox。
-         * 改后：FAILED 状态迁移和失败事件 Outbox 统一放进本事务；任一步失败都会整体回滚。
-         * 效果：无论 Consumer 还是 Recovery Job 先处理到任务，终态与终态事件都不会只成功一半。
-         */
+        // FAILED 与 AI_FAILED Outbox 在同一事务中提交。
         if (diaryAiMapper.markFailedIfAttemptsExhausted(failed) != 1) {
             return false;
         }

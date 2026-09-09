@@ -7,40 +7,27 @@ import diary.common.entity.ai.vo.AiTaskResultVo;
 import diary.common.entity.ai.vo.AiTaskStatusVo;
 import diary.common.enums.aienum.AiTaskStatusEnum;
 import diary.diaryai.mapper.DiaryAiMapper;
-import diary.diaryai.redis.AiTaskCacheService;
 import diary.diaryai.service.AiTaskQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class AiTaskQueryServiceImpl implements AiTaskQueryService {
     private final DiaryAiMapper diaryAiMapper;
-    private final AiTaskCacheService taskCache;
 
     @Override
-    public AiTaskStatusVo getTaskStatus(Long taskId) {
-        Long userId = 10000L;
-        Optional<AiTaskStatusVo> cached = taskCache.get(taskId, userId);
-        if (cached.isPresent()) {
-            return cached.get();
-        }
-
+    public AiTaskStatusVo getTaskStatus(Long taskId, Long userId) {
         AiTaskPO aiTaskPO = diaryAiMapper.selectAiTaskByTaskIdAndUserId(taskId, userId);
         if (aiTaskPO == null) {
             throw new IllegalArgumentException("AI任务不存在: " + taskId);
         }
 
-        AiTaskStatusVo result = ConvertPoToVo.convertToVo(aiTaskPO);
-        taskCache.put(result, userId);
-        return result;
+        return ConvertPoToVo.convertToVo(aiTaskPO);
     }
 
     @Override
-    public AiTaskResultVo getTaskResult(Long taskId) {
-        Long userId = 10000L;
+    public AiTaskResultVo getTaskResult(Long taskId, Long userId) {
         AiTaskPO aiTaskPO = diaryAiMapper.selectAiTaskByTaskIdAndUserId(taskId, userId);
         if (aiTaskPO == null) {
             throw new IllegalArgumentException("AI任务不存在: " + taskId);

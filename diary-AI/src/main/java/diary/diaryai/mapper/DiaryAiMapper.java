@@ -51,15 +51,6 @@ public interface DiaryAiMapper {
 
     int renewExecutionLease(AiTaskProcessDto aiTaskProcessDto);
 
-    int recoverStaleWaiting(
-            @Param("taskId") Long taskId,
-            @Param("versionId") Integer versionId,
-            @Param("waitingRecoverySeconds") long waitingRecoverySeconds,
-            @Param("maxRecoveryMessages") int maxRecoveryMessages,
-            @Param("errorCode") String errorCode,
-            @Param("errorMessage") String errorMessage
-    );
-
     int updateRequestHashIfNull(
             @Param("taskId") Long taskId,
             @Param("requestHash") String requestHash
@@ -68,8 +59,6 @@ public interface DiaryAiMapper {
     int insertOutbox(MqOutboxPO outbox);
 
     List<MqOutboxPO> selectReadyOutbox(@Param("limit") int limit);
-
-    MqOutboxPO selectOutboxById(@Param("id") Long id);
 
     List<MqOutboxPO> selectTimedOutbox(
             @Param("timeoutSeconds") long timeoutSeconds,
@@ -103,14 +92,6 @@ public interface DiaryAiMapper {
     int markQueuedByTaskIdIfWaiting(@Param("taskId") Long taskId);
 
     List<AiTaskPO> selectExpiredRunningTasks(@Param("limit") int limit);
-
-    List<AiTaskPO> selectStaleWaitingTasks(
-            @Param("waitingRecoverySeconds") long waitingRecoverySeconds,
-            @Param("maxRecoveryMessages") int maxRecoveryMessages,
-            @Param("limit") int limit
-    );
-
-    int countActiveTaskDispatchOutbox(@Param("taskId") Long taskId);
 
     AiNutrientPO selectAiNutrientByTaskId(@Param("taskId") Long taskId);
 

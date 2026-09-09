@@ -10,7 +10,6 @@ import diary.diaryai.guard.LocalAiConcurrencyGuard;
 import diary.diaryai.guard.AiTaskLeaseRenewer;
 import diary.diaryai.mapper.DiaryAiMapper;
 import diary.diaryai.properties.AiTaskProperties;
-import diary.diaryai.redis.AiTaskCacheService;
 import diary.diaryai.service.AiTaskCommandService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +39,6 @@ public class AiOutboxConsumer implements RocketMQListener {
     private final ObjectMapper objectMapper;
     private final AiTaskExecutor aiTaskExecutor;
     private final DiaryAiMapper diaryAiMapper;
-    private final AiTaskCacheService aiTaskCacheService;
     private final LocalAiConcurrencyGuard localAiConcurrencyGuard;
     private final AiTaskLeaseRenewer aiTaskLeaseRenewer;
     private final AiTaskCommandService aiTaskCommandService;
@@ -91,7 +89,6 @@ public class AiOutboxConsumer implements RocketMQListener {
             if (claimed != 1) {
                 return handleUnclaimedMessage(message);
             }
-            aiTaskCacheService.evict(message.getTaskId());
             // 再一次确认此任务属于当前的workId
             final AiTaskPO claimedTask;
             try {
@@ -109,21 +106,15 @@ public class AiOutboxConsumer implements RocketMQListener {
                 return ConsumeResult.FAILURE;
             }
 
-            /*
-             * 改前：RUNNING 租约只在抢占时写一次；AI调用超过固定租约后，Recovery 会启动第二个昂贵的模型调用。
-             * 改后：执行期间按租约的 1/3 周期续期，且续期必须匹配 workerId + versionId。
-             * 效果：正常长任务不会被误接管；旧 Worker 仍无法覆盖新 Worker 的结果。
-             */
+            // 长时间模型调用期间持续续租，提交结果仍校验 workerId + versionId。
             try (AiTaskLeaseRenewer.LeaseRenewalHandle ignored = aiTaskLeaseRenewer.start(
                     claimedTask.getId(), workerId, claimedTask.getVersionId())) {
                 boolean executed = aiTaskExecutor.execute(message, claimedTask);
-                aiTaskCacheService.evict(message.getTaskId());
                 return executed ? ConsumeResult.SUCCESS : handleOwnershipLost(message.getTaskId());
             } catch (Exception executionException) {
                 try {
                     ConsumeResult result = aiTaskCommandService.handleExecutionFailure(
                             message, claimedTask, workerId, executionException);
-                    aiTaskCacheService.evict(message.getTaskId());
                     return result;
                 } catch (RuntimeException failureStateException) {
                     /*
@@ -156,13 +147,8 @@ public class AiOutboxConsumer implements RocketMQListener {
         if (currentTask.getAttemptCount() != null
                 && currentTask.getMaxAttempts() != null
                 && currentTask.getAttemptCount() >= currentTask.getMaxAttempts()) {
-            /*
-             * 改前：这里直接 UPDATE FAILED 后 ACK，没有创建 AI_FAILED Outbox，形成“有终态、无终态事件”。
-             * 改后：调用统一事务服务，同时完成 FAILED 与 AI_FAILED Outbox；CAS 失败说明其他 Worker 已接管。
-             */
             if (aiTaskCommandService.failExhaustedTask(
                     currentTask, "消息重投到达时任务执行次数已耗尽")) {
-                aiTaskCacheService.evict(currentTask.getId());
                 return ConsumeResult.SUCCESS;
             }
         }
