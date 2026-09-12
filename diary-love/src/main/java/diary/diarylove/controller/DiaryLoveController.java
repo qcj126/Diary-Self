@@ -4,6 +4,7 @@ import diary.common.entity.love.dto.*;
 import diary.common.entity.love.vo.LoveAnniversaryVO;
 import diary.common.entity.love.vo.LoveCoupleVO;
 import diary.common.entity.love.vo.LoveLocationVO;
+import diary.common.entity.love.vo.LoveMoodRecordVO;
 import diary.common.entity.love.vo.LoveRecordImageVO;
 import diary.common.entity.love.vo.LoveRecordVO;
 import diary.common.result.ApiResponse;
@@ -86,6 +87,12 @@ public class DiaryLoveController {
         return diaryLoveQueryService.queryRecordImages(recordId);
     }
 
+    @OperLog(module = "恋爱记录", description = "查询记录心情", operationType = "SELECT", saveResult = true)
+    @GetMapping("/query/record-moods/{recordId}")
+    public ApiResponse<List<LoveMoodRecordVO>> queryRecordMoods(@PathVariable Long recordId) {
+        return diaryLoveQueryService.queryRecordMoods(recordId);
+    }
+
     @OperLog(module = "恋爱记录", description = "修改情侣关系", operationType = "UPDATE", saveResult = true)
     @PostMapping("/update/couples") // 已测
     public ApiResponse<String> updateCouple(@RequestBody LoveCoupleDTO dto) {
@@ -117,13 +124,13 @@ public class DiaryLoveController {
     }
 
     @OperLog(module = "恋爱记录", description = "删除情侣关系", operationType = "DELETE", saveResult = true)
-    @PostMapping("/delete/couples/{id}")
+    @PostMapping("/delete/couples/{id}") // 已测
     public ApiResponse<String> deleteCouple(@PathVariable Long id) {
         return diaryLoveDeleteService.deleteCouple(id);
     }
 
     @OperLog(module = "恋爱记录", description = "删除纪念日", operationType = "DELETE", saveResult = true)
-    @PostMapping("/delete/anniversaries/{id}")
+    @PostMapping("/delete/anniversaries/{id}") // 已测
     public ApiResponse<String> deleteAnniversary(@PathVariable Long id) {
         return diaryLoveDeleteService.deleteAnniversary(id);
     }

@@ -84,6 +84,14 @@ public class DtoConvertToPo {
                 .sort(loveMoodDTO.getSort())
                 .build();
     }
+    public static LoveMoodRecordPO convertToPo(LoveMoodRecordDTO loveMoodRecordDTO) {
+        return LoveMoodRecordPO.builder()
+                .id(loveMoodRecordDTO.getId())
+                .moodId(loveMoodRecordDTO.getMoodId())
+                .recordId(loveMoodRecordDTO.getRecordId())
+                .coupleId(loveMoodRecordDTO.getCoupleId())
+                .build();
+    }
     public static LoveTagPO convertToPo(LoveTagDTO loveTagDTO) {
         return LoveTagPO.builder()
                 .id(loveTagDTO.getId())

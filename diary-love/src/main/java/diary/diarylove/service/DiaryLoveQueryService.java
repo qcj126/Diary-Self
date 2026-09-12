@@ -19,4 +19,6 @@ public interface DiaryLoveQueryService {
     ApiResponse<List<LoveRecordVO>> queryRecords(LoveRecordDTO query);
 
     ApiResponse<List<LoveRecordImageVO>> queryRecordImages(Long recordId);
+
+    ApiResponse<List<LoveMoodRecordVO>> queryRecordMoods(Long recordId);
 }

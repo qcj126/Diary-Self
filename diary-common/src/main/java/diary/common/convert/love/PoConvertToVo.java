@@ -43,6 +43,10 @@ public class PoConvertToVo {
                 .coupleId(loveLocationPO.getCoupleId())
                 .name(loveLocationPO.getName())
                 .address(loveLocationPO.getAddress())
+                .longitude(loveLocationPO.getLongitude())
+                .latitude(loveLocationPO.getLatitude())
+                .cityCode(loveLocationPO.getCityCode())
+                .cityName(loveLocationPO.getCityName())
                 .build();
     }
     public static LoveRecordVO convertToVo(LoveRecordPO loveRecordPO) {
@@ -90,6 +94,21 @@ public class PoConvertToVo {
                 .moodId(loveRecordMoodPO.getMoodId())
                 .sort(loveRecordMoodPO.getSort())
                 .createTime(loveRecordMoodPO.getCreateTime())
+                .build();
+    }
+    public static LoveMoodRecordVO convertToVo(LoveMoodRecordPO loveMoodRecordPO) {
+        return LoveMoodRecordVO.builder()
+                .id(loveMoodRecordPO.getId())
+                .moodId(loveMoodRecordPO.getMoodId())
+                .recordId(loveMoodRecordPO.getRecordId())
+                .coupleId(loveMoodRecordPO.getCoupleId())
+                .moodCode(loveMoodRecordPO.getMoodCode())
+                .moodName(loveMoodRecordPO.getMoodName())
+                .emoji(loveMoodRecordPO.getEmoji())
+                .sort(loveMoodRecordPO.getSort())
+                .enabled(loveMoodRecordPO.getEnabled())
+                .createTime(loveMoodRecordPO.getCreateTime())
+                .updateTime(loveMoodRecordPO.getUpdateTime())
                 .build();
     }
     public static LoveTagVO convertToVo(LoveTagPO loveTagPO) {

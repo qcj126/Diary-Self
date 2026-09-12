@@ -4,6 +4,7 @@ import diary.common.entity.ai.dto.AiTaskProcessDto;
 import diary.common.entity.ai.po.AiInfoPO;
 import diary.common.entity.ai.po.AiNutrientPO;
 import diary.common.entity.ai.po.AiTaskPO;
+import diary.common.entity.ai.vo.AiTaskResultVo;
 import diary.common.entity.mq.po.MqOutboxPO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -93,12 +94,19 @@ public interface DiaryAiMapper {
 
     List<AiTaskPO> selectExpiredRunningTasks(@Param("limit") int limit);
 
-    AiNutrientPO selectAiNutrientByTaskId(@Param("taskId") Long taskId);
-
     int insertRetryTaskOutbox(MqOutboxPO outbox);
 
     int deleteExpiredSentOutbox(
             @Param("retentionDays") int retentionDays,
             @Param("limit") int limit
     );
+
+    List<AiTaskResultVo> selectAiTaskList(@Param("userId") Long userId,
+                                          @Param("taskStatus") String taskStatus,
+                                          @Param("applicationCode") Integer applicationCode,
+                                          @Param("title") String title,
+                                          @Param("pageSize") Integer pageSize,
+                                          @Param("offset") Integer offset);
+
+    AiTaskResultVo selectAiTaskResult(Long taskId, Long userId);
 }

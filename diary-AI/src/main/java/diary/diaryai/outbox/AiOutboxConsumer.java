@@ -113,9 +113,8 @@ public class AiOutboxConsumer implements RocketMQListener {
                 return executed ? ConsumeResult.SUCCESS : handleOwnershipLost(message.getTaskId());
             } catch (Exception executionException) {
                 try {
-                    ConsumeResult result = aiTaskCommandService.handleExecutionFailure(
+                    return aiTaskCommandService.handleExecutionFailure(
                             message, claimedTask, workerId, executionException);
-                    return result;
                 } catch (RuntimeException failureStateException) {
                     /*
                      * handleExecutionFailure 的事务已在异常抛出前完成回滚。

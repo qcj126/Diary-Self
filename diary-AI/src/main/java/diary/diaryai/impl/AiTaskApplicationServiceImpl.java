@@ -3,6 +3,7 @@ package diary.diaryai.impl;
 import diary.common.entity.ai.dto.AiInvokeDTO;
 import diary.common.entity.ai.po.AiTaskPO;
 import diary.common.entity.ai.vo.AiTaskSubmitVo;
+import diary.common.enums.aienum.AIEnum;
 import diary.common.enums.aienum.AiApplicationEnum;
 import diary.common.enums.aienum.AiFlagEnum;
 import diary.common.exception.AiSubmitRateLimitException;
@@ -30,6 +31,7 @@ public class AiTaskApplicationServiceImpl implements AiTaskApplicationService {
     @Override
     public AiTaskSubmitVo submitTask(AiInvokeDTO aiInvokeDTO, Long userId) {
         validateAndNormalizeRequest(aiInvokeDTO);
+
         MyUtils.check().notNull(userId, "userId");
         String clientRequestId = aiInvokeDTO.getClientRequestId();
         String requestHash = requestFingerprint.fingerprint(aiInvokeDTO);
@@ -98,6 +100,9 @@ public class AiTaskApplicationServiceImpl implements AiTaskApplicationService {
                 .notNull(request.getMaterials(), "materials")
                 .stringKeyMapNotContainsEmpty(request.getMaterials(), "materials")
                 .notNull(request.getUniversalId(), "universalId");
+        if (!AIEnum.isSupport(request.getAiType())) {
+            throw new IllegalArgumentException("不支持的AI类型");
+        }
         AiFlagEnum.isTrueFlag(request.getFlag());
         AiApplicationEnum.isTrueApplication(request.getAiApplication());
         request.setClientRequestId(request.getClientRequestId().trim());

@@ -7,22 +7,26 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
-/** 恋爱足迹地点响应对象。 */
+/** 恋爱记录心情响应对象。 */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoveLocationVO {
+public class LoveMoodRecordVO {
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
+    private String moodId;
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long recordId;
     @JsonSerialize(using = ToStringSerializer.class)
     private Long coupleId;
-    private String name;
-    private String address;
-    private BigDecimal longitude;
-    private BigDecimal latitude;
-    private String cityCode;
-    private String cityName;
+    private String moodCode;
+    private String moodName;
+    private String emoji;
+    private Integer sort;
+    private Boolean enabled;
+    private LocalDateTime createTime;
+    private LocalDateTime updateTime;
 }

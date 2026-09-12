@@ -78,10 +78,6 @@ gateway:
       - /user/register
       - /user/verifycode
       - /user/resetPw
-      - /file/download/image
-      - /file/icon/**
-      - /sys/info/**
-      - /actuator/**
       - /favicon.ico
 # JWT configuration
 jwt:

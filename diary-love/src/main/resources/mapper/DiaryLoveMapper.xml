@@ -87,6 +87,20 @@
         <result property="createTime"       column="create_time"/>
     </resultMap>
 
+    <resultMap id="loveMoodRecordResultMap" type="diary.common.entity.love.po.LoveMoodRecordPO">
+        <id property="id"                   column="id"/>
+        <result property="moodId"           column="mood_id"/>
+        <result property="recordId"         column="record_id"/>
+        <result property="coupleId"         column="couple_id"/>
+        <result property="moodCode"         column="mood_code"/>
+        <result property="moodName"         column="mood_name"/>
+        <result property="emoji"            column="emoji"/>
+        <result property="sort"             column="sort"/>
+        <result property="enabled"          column="enabled"/>
+        <result property="createTime"       column="create_time"/>
+        <result property="updateTime"       column="update_time"/>
+    </resultMap>
+
     <resultMap id="loveTagResultMap" type="diary.common.entity.love.po.LoveTagPO">
         <id property="id"                   column="id"/>
         <result property="recordId"         column="record_id"/>
@@ -192,7 +206,7 @@
     </insert>
 
     <select id="selectLoveLocationsByCoupleId" resultMap="loveLocationResultMap">
-        SELECT id, couple_id, name, address FROM love_location
+        SELECT id, couple_id, name, address, longitude, latitude, city_code, city_name FROM love_location
         WHERE couple_id = #{coupleId} AND deleted = 0 ORDER BY update_time DESC, id DESC
     </select>
 
@@ -254,6 +268,30 @@
              #{item.color}, #{item.sort})
         </foreach>
     </insert>
+
+    <select id="selectLoveMoodsByIds" resultMap="loveMoodResultMap">
+        SELECT <include refid="loveMoodColumns"/> FROM love_mood
+        WHERE enabled = 1 AND id IN
+        <foreach collection="moodIds" item="moodId" open="(" separator="," close=")">
+            #{moodId}
+        </foreach>
+    </select>
+
+    <insert id="insertLoveMoodRecords">
+        INSERT INTO love_mood_record (id, mood_id, record_id, couple_id) VALUES
+        <foreach collection="loveMoodRecordPOList" item="item" separator=",">
+            (#{item.id}, #{item.moodId}, #{item.recordId}, #{item.coupleId})
+        </foreach>
+    </insert>
+
+    <select id="selectLoveMoodRecordsByRecordId" resultMap="loveMoodRecordResultMap">
+        SELECT lmr.id, lmr.mood_id, lmr.record_id, lmr.couple_id, lmr.create_time, lmr.update_time,
+               lm.mood_code, lm.mood_name, lm.emoji, lm.sort, lm.enabled
+        FROM love_mood_record lmr
+        INNER JOIN love_mood lm ON lm.id = lmr.mood_id
+        WHERE lmr.record_id = #{recordId}
+        ORDER BY lm.sort ASC, lmr.id ASC
+    </select>
 
     <select id="selectLoveRecordImagesByRecordId" resultMap="loveRecordImageResultMap">
         SELECT <include refid="loveRecordImageColumns"/> FROM love_record_image

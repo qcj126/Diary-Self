@@ -4,6 +4,7 @@ import diary.common.convert.love.PoConvertToVo;
 import diary.common.entity.love.dto.LoveCoupleDTO;
 import diary.common.entity.love.dto.LoveRecordDTO;
 import diary.common.entity.love.po.LoveCouplePO;
+import diary.common.entity.love.po.LoveLocationPO;
 import diary.common.entity.love.po.LoveRecordPO;
 import diary.common.entity.love.vo.*;
 import diary.common.result.ApiResponse;
@@ -42,9 +43,11 @@ public class DiaryLoveQueryServiceImpl implements DiaryLoveQueryService {
     @Override
     public ApiResponse<List<LoveLocationVO>> queryLocations(Long coupleId) {
         MyUtils.check().notNull(coupleId, "coupleId");
-        return ApiResponse.success(diaryLoveMapper.selectLoveLocationsByCoupleId(coupleId).stream()
+        List<LoveLocationPO> loveLocationPOS = diaryLoveMapper.selectLoveLocationsByCoupleId(coupleId);
+        List<LoveLocationVO> loveLocationVOS = loveLocationPOS.stream()
                 .map(PoConvertToVo::convertToVo)
-                .toList());
+                .toList();
+        return ApiResponse.success(loveLocationVOS);
     }
 
     @Override
@@ -72,6 +75,14 @@ public class DiaryLoveQueryServiceImpl implements DiaryLoveQueryService {
     public ApiResponse<List<LoveRecordImageVO>> queryRecordImages(Long recordId) {
         MyUtils.check().notNull(recordId, "recordId");
         return ApiResponse.success(diaryLoveMapper.selectLoveRecordImagesByRecordId(recordId).stream()
+                .map(PoConvertToVo::convertToVo)
+                .toList());
+    }
+
+    @Override
+    public ApiResponse<List<LoveMoodRecordVO>> queryRecordMoods(Long recordId) {
+        MyUtils.check().notNull(recordId, "recordId");
+        return ApiResponse.success(diaryLoveMapper.selectLoveMoodRecordsByRecordId(recordId).stream()
                 .map(PoConvertToVo::convertToVo)
                 .toList());
     }
