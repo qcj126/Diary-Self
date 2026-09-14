@@ -2,6 +2,8 @@ package diary.diarylove.impl;
 
 import diary.common.convert.love.DtoConvertToPo;
 import diary.common.entity.love.dto.*;
+import diary.common.entity.love.po.LoveMoodPO;
+import diary.common.entity.love.po.LoveMoodRecordPO;
 import diary.common.entity.love.po.LoveRecordImagePO;
 import diary.common.entity.love.po.LoveTagPO;
 import diary.common.exception.NullResultException;
@@ -83,6 +85,13 @@ public class DiaryLoveAddServiceImpl implements DiaryLoveAddService {
         List<LoveRecordImageDTO> loveRecordImageDTOS = convertLoveRecordImage(dto, loveRecordDTO);
         // 构建tagDto
         List<LoveTagDTO> loveTagDTOS = convertLoveTag(dto, loveRecordDTO);
+        // 根据moodIds查询心情数据，再构建moodRecordDto
+        List<Long> moodIds = dto.getMoodIds() == null ? List.of() : dto.getMoodIds().stream().distinct().toList();
+        List<LoveMoodPO> loveMoodPOS = moodIds.isEmpty() ? List.of() : diaryLoveMapper.selectLoveMoodsByIds(moodIds);
+        if (loveMoodPOS.size() != moodIds.size()) {
+            throw new IllegalArgumentException("moodIds 中存在无效或未启用的心情ID");
+        }
+        List<LoveMoodRecordDTO> loveMoodRecordDTOS = convertLoveMoodRecord(dto, loveRecordDTO, loveMoodPOS);
 
         // 将dto转为po，然后插入数据库
         int locationCnt = 1;
@@ -99,14 +108,22 @@ public class DiaryLoveAddServiceImpl implements DiaryLoveAddService {
         for (LoveTagDTO loveTagDTO : loveTagDTOS) {
             loveTagPOList.add(DtoConvertToPo.convertToPo(loveTagDTO));
         }
+        List<LoveMoodRecordPO> loveMoodRecordPOList = new ArrayList<>();
+        for (LoveMoodRecordDTO loveMoodRecordDTO : loveMoodRecordDTOS) {
+            loveMoodRecordPOList.add(DtoConvertToPo.convertToPo(loveMoodRecordDTO));
+        }
         int recordImageCnt = diaryLoveMapper.insertLoveRecordImage(recordImagePOList);
         int tagCnt = diaryLoveMapper.insertLoveTags(loveTagPOList);
+        int moodRecordCnt = 1;
+        if (!loveMoodRecordPOList.isEmpty()) {
+            moodRecordCnt = diaryLoveMapper.insertLoveMoodRecords(loveMoodRecordPOList);
+        }
 
-        if (locationCnt > 0 && recordCnt > 0 && recordImageCnt > 0 && tagCnt > 0) {
+        if (locationCnt > 0 && recordCnt > 0 && recordImageCnt > 0 && tagCnt > 0 && moodRecordCnt > 0) {
             return ApiResponse.success("添加记录成功");
         }
-        log.info("添加记录失败: locationCnt={}, recordCnt={}, recordImageCnt={}, tagCnt={}",
-                locationCnt, recordCnt, recordImageCnt, tagCnt);
+        log.info("添加记录失败: locationCnt={}, recordCnt={}, recordImageCnt={}, tagCnt={}, moodRecordCnt={}",
+                locationCnt, recordCnt, recordImageCnt, tagCnt, moodRecordCnt);
         throw new IllegalStateException("添加记录失败");
     }
 

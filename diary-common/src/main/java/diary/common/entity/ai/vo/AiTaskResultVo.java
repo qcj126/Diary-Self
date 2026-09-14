@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -12,6 +14,8 @@ import lombok.NoArgsConstructor;
 public class AiTaskResultVo {
     private Long taskId;
     private String status;
+    private String title;
+    private Integer aiApplication;
     private Long aiInfoId;
     private Long universalId;
     private String flag;
@@ -23,4 +27,6 @@ public class AiTaskResultVo {
     private String sodium;
     private String errorCode;
     private String errorMessage;
+    private LocalDateTime createTime;
+    private LocalDateTime finishTime;
 }

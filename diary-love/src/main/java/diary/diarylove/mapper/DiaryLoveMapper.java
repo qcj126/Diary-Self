@@ -50,6 +50,12 @@ public interface DiaryLoveMapper {
 
     int insertLoveTags(@Param("tags") List<LoveTagPO> tags);
 
+    List<LoveMoodPO> selectLoveMoodsByIds(@Param("moodIds") List<Long> moodIds);
+
+    int insertLoveMoodRecords(@Param("loveMoodRecordPOList") List<LoveMoodRecordPO> loveMoodRecordPOList);
+
+    List<LoveMoodRecordPO> selectLoveMoodRecordsByRecordId(@Param("recordId") Long recordId);
+
     List<LoveRecordImagePO> selectLoveRecordImagesByRecordId(@Param("recordId") Long recordId);
 
     int updateLoveRecordImage(LoveRecordImagePO loveRecordImagePO);

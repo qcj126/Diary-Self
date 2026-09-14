@@ -41,7 +41,7 @@ public class InvokeQwenPlus extends InvokeAITemplate implements InvokeAIService 
         Object prompt = buildPrompt(data);
         MultiModalConversationResult aiResult = invokeAi(prompt, model);
         Map<String, String> result = extractResult(aiResult, model, prompt);
-        validateResult(result);
+        UsualMethod.validateResult(result);
         /*
          * 以前生产日志打印完整 AI 结果和用户食材，可能暴露用户饮食内容。现在只记录任务及返回字段，
          * 既能排查响应契约，也避免把完整输入输出写入日志。
@@ -107,19 +107,6 @@ public class InvokeQwenPlus extends InvokeAITemplate implements InvokeAIService 
             return gson.fromJson(aiContent, type);
         } catch (RuntimeException responseException) {
             throw new CustomException("Qwen Plus 响应不是约定的单个 JSON 对象: " + responseException.getMessage());
-        }
-    }
-
-    private void validateResult(Map<String, String> result) {
-        if (result == null) {
-            throw new CustomException("Qwen Plus 返回空的营养分析结果");
-        }
-        List<String> requiredFields = List.of("卡路里", "蛋白质", "脂肪", "碳水化合物", "糖", "钠");
-        for (String field : requiredFields) {
-            String value = result.get(field);
-            if (value == null || value.isBlank()) {
-                throw new CustomException("Qwen Plus 营养分析结果缺少字段: " + field);
-            }
         }
     }
 }

@@ -74,6 +74,25 @@
         <result column="update_time" property="updateTime"/>
         <result column="version_id" property="versionId"/>
     </resultMap>
+    <resultMap id="AiTaskResultVo" type="diary.common.entity.ai.vo.AiTaskResultVo">
+        <id column="id" property="taskId" jdbcType="BIGINT"/>
+        <result column="status" property="status" jdbcType="VARCHAR"/>
+        <result column="ai_info_id" property="aiInfoId" jdbcType="BIGINT"/>
+        <result column="title" property="title" jdbcType="VARCHAR"/>
+        <result column="universal_id" property="universalId" jdbcType="BIGINT"/>
+        <result column="flag" property="flag" jdbcType="VARCHAR"/>
+        <result column="calory" property="calory" jdbcType="VARCHAR"/>
+        <result column="protein" property="protein" jdbcType="VARCHAR"/>
+        <result column="fat" property="fat" jdbcType="VARCHAR"/>
+        <result column="carbohydrate" property="carbohydrate" jdbcType="VARCHAR"/>
+        <result column="sugar" property="sugar" jdbcType="VARCHAR"/>
+        <result column="sodium" property="sodium" jdbcType="VARCHAR"/>
+        <result column="error_code" property="errorCode" jdbcType="VARCHAR"/>
+        <result column="error_message" property="errorMessage" jdbcType="LONGVARCHAR"/>
+        <result column="ai_application" property="aiApplication" jdbcType="TINYINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="finish_time" property="finishTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
 
     <sql id="mqOutboxColumns">
         id, event_id, aggregate_type, aggregate_id, event_type, topic, tag, message_key, payload,
@@ -362,13 +381,6 @@
           AND request_hash IS NULL
     </update>
 
-    <select id="selectAiNutrientByTaskId" resultMap="AiNutrientResultMap">
-        SELECT *
-        FROM ai_nutrient
-        WHERE ai_task_id = #{taskId}
-            LIMIT 1
-    </select>
-
     <insert id="insertRetryTaskOutbox" parameterType="diary.common.entity.mq.po.MqOutboxPO">
         INSERT INTO mq_outbox
         (id, event_id, aggregate_type, aggregate_id, event_type,
@@ -390,4 +402,35 @@
         ORDER BY update_time ASC, id ASC
         LIMIT #{limit}
     </delete>
+
+    <select id="selectAiTaskList" resultMap="AiTaskResultVo">
+        select a.id, a.status, a.ai_info_id, c.universal_id, c.flag, c.calory, c.protein, d.title,
+        c.fat, c.carbohydrate, c.sugar, c.sodium, a.error_code, a.error_message, b.ai_application, a.create_time, a.finish_time
+        from ai_task a
+        inner join ai_info b on a.ai_info_id = b.id and b.user_id = a.user_id
+        inner join ai_nutrient c on c.ai_info_id = b.id and c.user_id = a.user_id
+        inner join recipe d on d.id = c.universal_id and d.user_id = a.user_id
+        where a.user_id = #{userId}
+        <if test="taskStatus != null and taskStatus != ''">
+            and a.status = #{taskStatus}
+        </if>
+        <if test="applicationCode != null">
+            and b.ai_application = #{applicationCode}
+        </if>
+        <if test="title != null and title != ''">
+            and d.title like CONCAT('%', #{title}, '%')
+        </if>
+        order by a.create_time desc limit #{pageSize} offset #{offset}
+    </select>
+
+    <select id="selectAiTaskResult" resultMap="AiTaskResultVo">
+        select a.id, a.status, a.ai_info_id, c.universal_id, c.flag, c.calory, c.protein, d.title,
+        c.fat, c.carbohydrate, c.sugar, c.sodium, a.error_code, a.error_message, b.ai_application, a.create_time, a.finish_time
+        from ai_task a
+        inner join ai_info b on a.ai_info_id = b.id and b.user_id = a.user_id
+        inner join ai_nutrient c on c.ai_info_id = b.id and c.user_id = a.user_id
+        inner join recipe d on d.id = c.universal_id and d.user_id = a.user_id
+        where a.user_id = #{userId} and a.id = #{taskId}
+        order by a.create_time desc
+    </select>
 </mapper>

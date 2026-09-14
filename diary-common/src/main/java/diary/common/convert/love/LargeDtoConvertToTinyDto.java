@@ -1,6 +1,7 @@
 package diary.common.convert.love;
 
 import diary.common.entity.love.dto.*;
+import diary.common.entity.love.po.LoveMoodPO;
 import diary.common.util.MyUtil;
 
 import java.util.ArrayList;
@@ -71,5 +72,21 @@ public class LargeDtoConvertToTinyDto {
             loveTagDTOS.add(loveTagDTO);
         }
         return loveTagDTOS;
+    }
+
+    // 构建moodRecord
+    public static List<LoveMoodRecordDTO> convertLoveMoodRecord(AddLoveRecordDto dto, LoveRecordDTO loveRecordDTO,
+                                                                 List<LoveMoodPO> loveMoodPOS) {
+        List<LoveMoodRecordDTO> loveMoodRecordDTOS = new ArrayList<>();
+        for (LoveMoodPO loveMoodPO : loveMoodPOS) {
+            LoveMoodRecordDTO loveMoodRecordDTO = LoveMoodRecordDTO.builder()
+                    .id(MyUtil.getPrimaryKey())
+                    .moodId(String.valueOf(loveMoodPO.getId()))
+                    .recordId(loveRecordDTO.getId())
+                    .coupleId(dto.getCoupleId())
+                    .build();
+            loveMoodRecordDTOS.add(loveMoodRecordDTO);
+        }
+        return loveMoodRecordDTOS;
     }
 }

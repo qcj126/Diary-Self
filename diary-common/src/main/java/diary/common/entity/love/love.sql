@@ -109,6 +109,17 @@ CREATE TABLE IF NOT EXISTS `love_mood` (
     UNIQUE KEY `uk_love_mood_code` (`mood_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='恋爱记录心情字典表';
 
+create table love_mood_record
+(
+    id          bigint unsigned                        not null comment '主键'
+        primary key,
+    mood_id     varchar(32)                            not null comment '心情配置id',
+    record_id   bigint unsigned                        not null comment '记录id',
+    couple_id   BIGINT UNSIGNED                        NOT NULL COMMENT '恋爱关系ID',
+    create_time datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
+    update_time datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='恋爱记录心情表';
+
 CREATE TABLE IF NOT EXISTS `love_tag` (
     `id`              BIGINT UNSIGNED NOT NULL COMMENT '主键',
     `record_id`       BIGINT UNSIGNED NOT NULL COMMENT '恋爱记录ID',

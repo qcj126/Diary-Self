@@ -127,6 +127,10 @@ public final class LoveEntityConverter {
                 .coupleId(source.getCoupleId())
                 .name(source.getName())
                 .address(source.getAddress())
+                .longitude(source.getLongitude())
+                .latitude(source.getLatitude())
+                .cityCode(source.getCityCode())
+                .cityName(source.getCityName())
                 .build();
     }
 
