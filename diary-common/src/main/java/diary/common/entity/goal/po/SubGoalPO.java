@@ -14,9 +14,11 @@ public class SubGoalPO {
     private Long userId;
     private String title;
     private String content;
+    private Integer status;
     private BigDecimal learnedHours;
     private BigDecimal estimatedHours;
     private LocalDateTime endTime;
+    private LocalDateTime completedTime;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 }

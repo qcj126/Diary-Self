@@ -3,6 +3,7 @@ package diary.diarygoal.impl.delete;
 import diary.common.entity.goal.po.StageGoalPO;
 import diary.common.result.ApiResponse;
 import diary.diarygoal.mapper.GoalMapper;
+import diary.diarygoal.mapper.GoalCheckinMapper;
 import diary.diarygoal.service.delete.GoalDeleteService;
 import diary.utils.commonutil.MyUtils;
 import jakarta.annotation.Resource;
@@ -14,6 +15,8 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 public class GoalDeleteServiceImpl implements GoalDeleteService {
     @Resource
     private GoalMapper goalMapper;
+    @Resource
+    private GoalCheckinMapper goalCheckinMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -24,6 +27,7 @@ public class GoalDeleteServiceImpl implements GoalDeleteService {
             if (stageGoalPO == null) {
                 return ApiResponse.delFail();
             }
+            goalCheckinMapper.softDeleteCheckinsByStageGoalId(id, stageGoalPO.getUserId());
             goalMapper.deleteSubGoalsByStageId(id);
             if (goalMapper.deleteStageGoalById(id) <= 0) {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();

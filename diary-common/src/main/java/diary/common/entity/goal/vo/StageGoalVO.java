@@ -20,11 +20,13 @@ public class StageGoalVO {
     private String category;
     private String title;
     private String description;
+    private Integer status;
     private BigDecimal learnedHours;
     private BigDecimal estimatedHours;
     private BigDecimal remainingHours;
     private Integer progress;
     private LocalDateTime ddl;
+    private LocalDateTime completedTime;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
     private Long daysSinceUpdate;

@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="diary.diarygoal.mapper.GoalCheckinMapper">
+    <resultMap id="GoalCheckinResultMap" type="diary.common.entity.goal.po.GoalCheckinPO">
+        <id column="id" property="id"/>
+        <result column="request_id" property="requestId"/>
+        <result column="user_id" property="userId"/>
+        <result column="stage_goal_id" property="stageGoalId"/>
+        <result column="sub_goal_id" property="subGoalId"/>
+        <result column="checkin_type" property="checkinType"/>
+        <result column="spent_hours" property="spentHours"/>
+        <result column="content" property="content"/>
+        <result column="evidence_urls" property="evidenceUrls"/>
+        <result column="checkin_date" property="checkinDate"/>
+        <result column="source" property="source"/>
+        <result column="is_deleted" property="deleted"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <resultMap id="StageGoalResultMap" type="diary.common.entity.goal.po.StageGoalPO">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="category" property="category"/>
+        <result column="title" property="title"/>
+        <result column="description" property="description"/>
+        <result column="status" property="status"/>
+        <result column="end_time" property="endTime"/>
+        <result column="completed_time" property="completedTime"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <resultMap id="SubGoalResultMap" type="diary.common.entity.goal.po.SubGoalPO">
+        <id column="id" property="id"/>
+        <result column="stage_id" property="stageId"/>
+        <result column="user_id" property="userId"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="status" property="status"/>
+        <result column="learned_hours" property="learnedHours"/>
+        <result column="estimated_hours" property="estimatedHours"/>
+        <result column="end_time" property="endTime"/>
+        <result column="completed_time" property="completedTime"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <sql id="GoalCheckinColumns">
+        id, request_id, user_id, stage_goal_id, sub_goal_id, checkin_type, spent_hours, content,
+        evidence_urls, checkin_date, source, is_deleted, create_time, update_time
+    </sql>
+
+    <insert id="insertCheckin" parameterType="diary.common.entity.goal.po.GoalCheckinPO">
+        INSERT INTO goal_checkin
+        (id, request_id, user_id, stage_goal_id, sub_goal_id, checkin_type, spent_hours,
+         content, evidence_urls, checkin_date, source, is_deleted)
+        VALUES
+        (#{id}, #{requestId}, #{userId}, #{stageGoalId}, #{subGoalId}, #{checkinType}, #{spentHours},
+         #{content}, #{evidenceUrls}, #{checkinDate}, #{source}, 0)
+    </insert>
+
+    <select id="selectCheckinById" resultMap="GoalCheckinResultMap">
+        SELECT <include refid="GoalCheckinColumns"/>
+        FROM goal_checkin
+        WHERE id = #{id}
+          AND user_id = #{userId}
+          AND is_deleted = 0
+    </select>
+
+    <select id="selectCheckinByRequestId" resultMap="GoalCheckinResultMap">
+        SELECT <include refid="GoalCheckinColumns"/>
+        FROM goal_checkin
+        WHERE request_id = #{requestId}
+          AND user_id = #{userId}
+          AND is_deleted = 0
+    </select>
+
+    <select id="selectCheckins" resultMap="GoalCheckinResultMap">
+        SELECT <include refid="GoalCheckinColumns"/>
+        FROM goal_checkin
+        WHERE user_id = #{userId}
+          AND is_deleted = 0
+        <if test="query.stageGoalId != null">
+            AND stage_goal_id = #{query.stageGoalId}
+        </if>
+        <if test="query.subGoalId != null">
+            AND sub_goal_id = #{query.subGoalId}
+        </if>
+        <if test="query.checkinType != null">
+            AND checkin_type = #{query.checkinType}
+        </if>
+        <if test="query.startDate != null">
+            AND checkin_date &gt;= #{query.startDate}
+        </if>
+        <if test="query.endDate != null">
+            AND checkin_date &lt;= #{query.endDate}
+        </if>
+        ORDER BY checkin_date DESC, create_time DESC, id DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <update id="updateCheckin" parameterType="diary.common.entity.goal.po.GoalCheckinPO">
+        UPDATE goal_checkin
+        SET checkin_type = #{checkinType},
+            spent_hours = #{spentHours},
+            content = #{content},
+            evidence_urls = #{evidenceUrls},
+            checkin_date = #{checkinDate},
+            source = #{source},
+            update_time = CURRENT_TIMESTAMP(3)
+        WHERE id = #{id}
+          AND user_id = #{userId}
+          AND is_deleted = 0
+    </update>
+
+    <update id="softDeleteCheckin">
+        UPDATE goal_checkin
+        SET is_deleted = 1,
+            update_time = CURRENT_TIMESTAMP(3)
+        WHERE id = #{id}
+          AND user_id = #{userId}
+          AND is_deleted = 0
+    </update>
+
+    <update id="softDeleteCheckinsByStageGoalId">
+        UPDATE goal_checkin
+        SET is_deleted = 1,
+            update_time = CURRENT_TIMESTAMP(3)
+        WHERE stage_goal_id = #{stageGoalId}
+          AND user_id = #{userId}
+          AND is_deleted = 0
+    </update>
+
+    <select id="selectStageGoalForUpdate" resultMap="StageGoalResultMap">
+        SELECT id, user_id, category, title, description, status, end_time, completed_time,
+               create_time, update_time
+        FROM stage_goal
+        WHERE id = #{stageGoalId}
+          AND user_id = #{userId}
+        FOR UPDATE
+    </select>
+
+    <select id="selectSubGoalForUpdate" resultMap="SubGoalResultMap">
+        SELECT id, stage_id, user_id, title, content, status, learned_hours, estimated_hours,
+               end_time, completed_time, create_time, update_time
+        FROM sub_goal
+        WHERE id = #{subGoalId}
+          AND stage_id = #{stageGoalId}
+          AND user_id = #{userId}
+        FOR UPDATE
+    </select>
+
+    <update id="adjustSubGoalLearnedHours">
+        UPDATE sub_goal
+        SET learned_hours = GREATEST(0, COALESCE(learned_hours, 0) + #{hoursDelta}),
+            update_time = NOW()
+        WHERE id = #{subGoalId}
+          AND stage_id = #{stageGoalId}
+          AND user_id = #{userId}
+    </update>
+
+    <update id="updateSubGoalStatus">
+        UPDATE sub_goal
+        SET status = #{status},
+            completed_time = #{completedTime},
+            update_time = NOW()
+        WHERE id = #{subGoalId}
+          AND stage_id = #{stageGoalId}
+          AND user_id = #{userId}
+    </update>
+
+    <update id="updateStageGoalStatus">
+        UPDATE stage_goal
+        SET status = #{status},
+            completed_time = #{completedTime},
+            update_time = NOW()
+        WHERE id = #{stageGoalId}
+          AND user_id = #{userId}
+    </update>
+
+    <select id="selectLatestSubGoalActionType" resultType="java.lang.Integer">
+        SELECT checkin_type
+        FROM goal_checkin
+        WHERE sub_goal_id = #{subGoalId}
+          AND stage_goal_id = #{stageGoalId}
+          AND user_id = #{userId}
+          AND is_deleted = 0
+          AND checkin_type IN (2, 3)
+        ORDER BY checkin_date DESC, create_time DESC, id DESC
+        LIMIT 1
+    </select>
+
+    <select id="selectLatestStageGoalActionType" resultType="java.lang.Integer">
+        SELECT checkin_type
+        FROM goal_checkin
+        WHERE stage_goal_id = #{stageGoalId}
+          AND sub_goal_id IS NULL
+          AND user_id = #{userId}
+          AND is_deleted = 0
+          AND checkin_type IN (2, 3)
+        ORDER BY checkin_date DESC, create_time DESC, id DESC
+        LIMIT 1
+    </select>
+
+    <select id="countSubGoalCheckins" resultType="int">
+        SELECT COUNT(*)
+        FROM goal_checkin
+        WHERE sub_goal_id = #{subGoalId}
+          AND stage_goal_id = #{stageGoalId}
+          AND user_id = #{userId}
+          AND is_deleted = 0
+    </select>
+
+    <select id="countStageGoalCheckins" resultType="int">
+        SELECT COUNT(*)
+        FROM goal_checkin
+        WHERE stage_goal_id = #{stageGoalId}
+          AND user_id = #{userId}
+          AND is_deleted = 0
+    </select>
+
+    <select id="countSubGoals" resultType="int">
+        SELECT COUNT(*)
+        FROM sub_goal
+        WHERE stage_id = #{stageGoalId}
+          AND user_id = #{userId}
+    </select>
+
+    <select id="countIncompleteSubGoals" resultType="int">
+        SELECT COUNT(*)
+        FROM sub_goal
+        WHERE stage_id = #{stageGoalId}
+          AND user_id = #{userId}
+          AND status != 3
+    </select>
+</mapper>

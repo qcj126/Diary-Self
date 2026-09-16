@@ -8,7 +8,9 @@
         <result column="category" property="category"/>
         <result column="title" property="title"/>
         <result column="description" property="description"/>
+        <result column="status" property="status"/>
         <result column="end_time" property="endTime"/>
+        <result column="completed_time" property="completedTime"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
     </resultMap>
@@ -19,19 +21,22 @@
         <result column="user_id" property="userId"/>
         <result column="title" property="title"/>
         <result column="content" property="content"/>
+        <result column="status" property="status"/>
         <result column="learned_hours" property="learnedHours"/>
         <result column="estimated_hours" property="estimatedHours"/>
         <result column="end_time" property="endTime"/>
+        <result column="completed_time" property="completedTime"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
     </resultMap>
 
     <sql id="StageGoalColumns">
-        id, user_id, category, title, description, end_time, create_time, update_time
+        id, user_id, category, title, description, status, end_time, completed_time, create_time, update_time
     </sql>
 
     <sql id="SubGoalColumns">
-        id, stage_id, user_id, title, content, learned_hours, estimated_hours, end_time, create_time, update_time
+        id, stage_id, user_id, title, content, status, learned_hours, estimated_hours, end_time, completed_time,
+        create_time, update_time
     </sql>
 
     <insert id="insertStageGoal" parameterType="diary.common.entity.goal.po.StageGoalPO">

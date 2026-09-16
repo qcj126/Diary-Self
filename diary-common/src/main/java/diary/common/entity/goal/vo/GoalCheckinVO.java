@@ -6,25 +6,27 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SubGoalVO {
+public class GoalCheckinVO {
     private Long id;
-    private Long stageGoalId;
+    private String requestId;
     private Long userId;
-    private String title;
+    private Long stageGoalId;
+    private Long subGoalId;
+    private Integer checkinType;
+    private String checkinTypeName;
+    private BigDecimal spentHours;
     private String content;
-    private Integer status;
-    private BigDecimal learnedHours;
-    private BigDecimal estimatedHours;
-    private BigDecimal remainingHours;
-    private Integer progress;
-    private LocalDateTime ddl;
-    private LocalDateTime completedTime;
+    private List<String> evidenceUrls;
+    private LocalDate checkinDate;
+    private Integer source;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 }
