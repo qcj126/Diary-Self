@@ -1,10 +1,16 @@
 package com.executor.consts;
 
 /**
- * 重庆地区城市编码枚举
+ * 天气任务支持的城市编码枚举
  */
 public enum CityLocationInfos {
 
+    BEI_JING(101010100, "北京"),
+    SHANG_HAI(101020100, "上海"),
+    HANG_ZHOU(101210101, "杭州"),
+    CHENG_DU(101270101, "成都"),
+    GUANG_ZHOU(101280101, "广州"),
+    SHEN_ZHEN(101280601, "深圳"),
     CHONG_QING(101040100, "重庆"),
     YONG_CHUAN(101040200, "永川"),
     HE_CHUAN(101040300, "合川"),
@@ -62,5 +68,9 @@ public enum CityLocationInfos {
             }
         }
         return null;
+    }
+
+    public String getName() {
+        return name;
     }
 }

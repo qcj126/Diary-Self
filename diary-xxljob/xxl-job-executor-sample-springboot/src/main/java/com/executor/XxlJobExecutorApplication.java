@@ -10,7 +10,7 @@ import org.springframework.context.annotation.ComponentScan;
  */
 @SpringBootApplication
 @MapperScan("com.executor.mapper")
-@ComponentScan(basePackages = {"diary.common"})
+@ComponentScan(basePackages = {"com.executor", "diary.common"})
 public class XxlJobExecutorApplication {
 	public static void main(String[] args) {
         SpringApplication.run(XxlJobExecutorApplication.class, args);

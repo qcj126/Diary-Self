@@ -8,13 +8,45 @@
     </resultMap>
 
     <select id="selectUnreferencedImages" resultMap="ImageCleanupResultMap">
-        <!-- TODO: 填写扫描 image 表中未被其他业务表关联图片的 SQL，需返回 id、object_key。 -->
-        SELECT id, object_key
-        FROM image
-        WHERE 1 = 0
+        SELECT i.id, i.object_key
+        FROM image i
+        WHERE i.mime_type LIKE 'image/%'
+          AND i.create_time &lt; TIMESTAMPADD(HOUR, -#{retentionHours}, CURRENT_TIMESTAMP)
+          AND NOT EXISTS (
+            SELECT 1 FROM time_card tc WHERE tc.image_id = i.id
+          )
+          AND NOT EXISTS (
+            SELECT 1 FROM recipe r WHERE r.image_id = i.id
+          )
+          AND NOT EXISTS (
+            SELECT 1 FROM love_record_image lri WHERE lri.image_id = i.id
+          )
+        ORDER BY i.create_time, i.id
+        LIMIT #{batchSize}
     </select>
 
-    <delete id="deleteImageById">
-        DELETE FROM image WHERE id = #{id}
+    <select id="selectImagesByObjectKeys" resultMap="ImageCleanupResultMap">
+        SELECT id, object_key
+        FROM image
+        WHERE object_key IN
+        <foreach collection="objectKeys" item="objectKey" open="(" separator="," close=")">
+            #{objectKey}
+        </foreach>
+    </select>
+
+    <delete id="deleteImageByIdIfUnreferenced">
+        DELETE FROM image
+        WHERE id = #{id}
+          AND mime_type LIKE 'image/%'
+          AND create_time &lt; TIMESTAMPADD(HOUR, -#{retentionHours}, CURRENT_TIMESTAMP)
+          AND NOT EXISTS (
+            SELECT 1 FROM time_card tc WHERE tc.image_id = image.id
+          )
+          AND NOT EXISTS (
+            SELECT 1 FROM recipe r WHERE r.image_id = image.id
+          )
+          AND NOT EXISTS (
+            SELECT 1 FROM love_record_image lri WHERE lri.image_id = image.id
+          )
     </delete>
 </mapper>

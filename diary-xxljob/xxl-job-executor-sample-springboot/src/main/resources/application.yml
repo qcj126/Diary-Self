@@ -13,3 +13,19 @@ spring:
       config:
         server-addr: 192.168.101.128:8848
         namespace: b78c8d52-3fc3-4276-9cbb-0f2efd326481
+
+# 敏感值请通过 Nacos 或环境变量配置，不要写入源码。
+weather:
+  qweather:
+    api-host: ${QWEATHER_API_HOST:https://n37h2tkmw4.re.qweatherapi.com}
+    api-key: ${QWEATHER_API_KEY:}
+  # XXL-Job 每 6 小时刷新一次，TTL 略长于调度周期以容忍调度延迟。
+  cache-ttl-hours: 7
+
+image:
+  cleanup:
+    # 避免删除刚上传、尚未来得及绑定业务数据的图片。
+    retention-hours: 24
+    batch-size: 200
+    # 仅扫描系统图片上传使用的前缀，防止误删同一 bucket 中的其他对象。
+    oss-prefixes: food_path_,cook_path_,ingredient_path_,bean_matching_path_,gift_path_,snack_path_,tea_path_,travel_path_,daily_path_,exercise_path_,walk_path
