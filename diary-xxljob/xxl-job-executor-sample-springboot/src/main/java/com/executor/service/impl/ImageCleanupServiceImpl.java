@@ -22,14 +22,12 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class ImageCleanupServiceImpl implements ImageCleanupService {
 
-    private static final int MAX_DELETE_ATTEMPTS = 3;
     private static final int OSS_LIST_PAGE_SIZE = 1_000;
 
     private final ImageCleanupMapper imageCleanupMapper;
@@ -61,12 +59,6 @@ public class ImageCleanupServiceImpl implements ImageCleanupService {
     @Override
     public ImageCleanUpResultDTO cleanupUnreferencedImages() {
         CleanupCounter counter = new CleanupCounter();
-        cleanupDatabaseOrphans(counter);
-        cleanupOssOrphans(counter);
-        return new ImageCleanUpResultDTO(counter.scannedCount, counter.deletedCount, counter.failedCount);
-    }
-
-    private void cleanupDatabaseOrphans(CleanupCounter counter) {
         List<ImageCleanupRecord> images = imageCleanupMapper.selectUnreferencedImages(retentionHours, batchSize);
         counter.scannedCount += images.size();
 
@@ -83,37 +75,12 @@ public class ImageCleanupServiceImpl implements ImageCleanupService {
                 XxlJobHelper.log("图片清理失败，id: " + imageId + "，原因: " + e.getMessage());
             }
         }
-    }
-
-    private boolean deleteDatabaseOrphan(ImageCleanupRecord image) {
-        if (image == null || image.getId() == null) {
-            throw new IllegalArgumentException("image id must not be null");
-        }
-
-        int deleted = imageCleanupMapper.deleteImageByIdIfUnreferenced(image.getId(), retentionHours);
-        if (deleted <= 0) {
-            XxlJobHelper.log("图片在清理期间已被业务关联，跳过清理，id: " + image.getId());
-            return false;
-        }
-
-        String objectKey = image.getObjectKey();
-        if (StringUtils.hasText(objectKey)) {
-            deleteOssObjectWithRetry(objectKey);
-        } else {
-            XxlJobHelper.log("图片 objectKey 为空，仅删除数据库记录，id: " + image.getId());
-        }
-
-        XxlJobHelper.log("图片清理成功，id: " + image.getId() + "，objectKey: " + objectKey);
-        return true;
-    }
-
-    private void cleanupOssOrphans(CleanupCounter counter) {
         int remainingDeletes = batchSize;
         Instant expireBefore = Instant.now().minus(retentionHours, ChronoUnit.HOURS);
 
         for (String prefix : ossPrefixes) {
             if (remainingDeletes <= 0) {
-                return;
+                return new ImageCleanUpResultDTO(counter.scannedCount, counter.deletedCount, counter.failedCount);
             }
             try {
                 remainingDeletes = cleanupOssPrefix(prefix, expireBefore, remainingDeletes, counter);
@@ -123,6 +90,25 @@ public class ImageCleanupServiceImpl implements ImageCleanupService {
                 XxlJobHelper.log("扫描 OSS 前缀失败，prefix: " + prefix + "，原因: " + e.getMessage());
             }
         }
+        return new ImageCleanUpResultDTO(counter.scannedCount, counter.deletedCount, counter.failedCount);
+    }
+
+    private boolean deleteDatabaseOrphan(ImageCleanupRecord image) {
+        int deleted = imageCleanupMapper.deleteImageByIdIfUnreferenced(image.getId(), retentionHours);
+         if (deleted <= 0) {
+            XxlJobHelper.log("图片在清理期间已被业务关联，跳过清理，id: " + image.getId());
+            return false;
+        }
+
+        String objectKey = image.getObjectKey();
+        if (StringUtils.hasText(objectKey)) {
+            deleteOssObject(objectKey);
+        } else {
+            XxlJobHelper.log("图片 objectKey 为空，仅删除数据库记录，id: " + image.getId());
+        }
+
+        XxlJobHelper.log("图片清理成功，id: " + image.getId() + "，objectKey: " + objectKey);
+        return true;
     }
 
     private int cleanupOssPrefix(String prefix, Instant expireBefore, int remainingDeletes,
@@ -136,20 +122,24 @@ public class ImageCleanupServiceImpl implements ImageCleanupService {
 
             ListObjectsV2Result result = ossClient.listObjectsV2(request);
             List<String> staleObjectKeys = result.getObjectSummaries().stream()
-                    .filter(summary -> isExpired(summary, expireBefore))
+                    .filter(summary -> summary.getLastModified() != null && summary.getLastModified().toInstant().isBefore(expireBefore))
                     .map(OSSObjectSummary::getKey)
                     .filter(StringUtils::hasText)
                     .toList();
             counter.scannedCount += staleObjectKeys.size();
 
-            Set<String> registeredObjectKeys = selectRegisteredObjectKeys(staleObjectKeys);
+            Set<String> registeredObjectKeys = imageCleanupMapper.selectImagesByObjectKeys(List.copyOf(staleObjectKeys)).stream()
+                    .map(ImageCleanupRecord::getObjectKey)
+                    .filter(StringUtils::hasText)
+                    .collect(Collectors.toCollection(HashSet::new));;
+
             for (String objectKey : staleObjectKeys) {
                 if (remainingDeletes <= 0) {
                     return 0;
                 }
                 if (!registeredObjectKeys.contains(objectKey)) {
                     try {
-                        deleteOssObjectWithRetry(objectKey);
+                        deleteOssObject(objectKey);
                         counter.deletedCount++;
                         remainingDeletes--;
                         XxlJobHelper.log("已删除 OSS 未登记图片，objectKey: " + objectKey);
@@ -167,52 +157,14 @@ public class ImageCleanupServiceImpl implements ImageCleanupService {
         return remainingDeletes;
     }
 
-    private boolean isExpired(OSSObjectSummary summary, Instant expireBefore) {
-        return summary.getLastModified() != null && summary.getLastModified().toInstant().isBefore(expireBefore);
-    }
-
-    private Set<String> selectRegisteredObjectKeys(Collection<String> objectKeys) {
-        if (objectKeys.isEmpty()) {
-            return Set.of();
-        }
-        return imageCleanupMapper.selectImagesByObjectKeys(List.copyOf(objectKeys)).stream()
-                .map(ImageCleanupRecord::getObjectKey)
-                .filter(StringUtils::hasText)
-                .collect(Collectors.toCollection(HashSet::new));
-    }
-
-    private void deleteOssObjectWithRetry(String objectKey) {
-        for (int attempt = 1; attempt <= MAX_DELETE_ATTEMPTS; attempt++) {
-            try {
-                ossClient.deleteObject(bucketName, objectKey);
-                return;
-            } catch (OSSException e) {
-                if ("NoSuchKey".equals(e.getErrorCode())) {
-                    XxlJobHelper.log("OSS 文件不存在，继续删除数据库记录，objectKey: " + objectKey);
-                    return;
-                }
-                if ("AccessDenied".equals(e.getErrorCode()) || "NoSuchBucket".equals(e.getErrorCode())) {
-                    throw new IllegalStateException("OSS delete failed and cannot retry, objectKey: " + objectKey, e);
-                }
-                if (attempt == MAX_DELETE_ATTEMPTS) {
-                    throw new IllegalStateException("OSS delete failed after retries, objectKey: " + objectKey, e);
-                }
-            } catch (ClientException e) {
-                if (attempt == MAX_DELETE_ATTEMPTS) {
-                    throw new IllegalStateException("OSS delete failed after retries, objectKey: " + objectKey, e);
-                }
-            }
-
-            waitBeforeRetry(attempt);
-        }
-    }
-
-    private void waitBeforeRetry(int attempt) {
+    private void deleteOssObject(String objectKey) {
         try {
-            TimeUnit.SECONDS.sleep(1L << (attempt - 1));
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException("OSS delete retry interrupted", e);
+            ossClient.deleteObject(bucketName, objectKey);
+        } catch (OSSException | ClientException e) {
+            throw new IllegalStateException(
+                    "删除 OSS 文件失败，bucketName: " + bucketName + "，objectKey: " + objectKey,
+                    e
+            );
         }
     }
 

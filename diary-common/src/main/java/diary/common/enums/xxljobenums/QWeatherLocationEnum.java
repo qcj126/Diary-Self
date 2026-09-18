@@ -1,9 +1,9 @@
-package com.executor.consts;
+package diary.common.enums.xxljobenums;
 
 /**
- * 天气任务支持的城市编码枚举
+ * 和风天气城市 Location ID 枚举。
  */
-public enum CityLocationInfos {
+public enum QWeatherLocationEnum {
 
     BEI_JING(101010100, "北京"),
     SHANG_HAI(101020100, "上海"),
@@ -53,16 +53,19 @@ public enum CityLocationInfos {
     private final int code;
     private final String name;
 
-    CityLocationInfos(int code, String name) {
+    QWeatherLocationEnum(int code, String name) {
         this.code = code;
         this.name = name;
     }
 
     /**
-     * 根据城市名称查找枚举
+     * 根据城市名称获取和风天气 Location ID。
+     *
+     * @param name 城市名称
+     * @return Location ID；未配置时返回 {@code null}
      */
     public static Integer fromName(String name) {
-        for (CityLocationInfos city : values()) {
+        for (QWeatherLocationEnum city : values()) {
             if (city.name.equals(name)) {
                 return city.code;
             }

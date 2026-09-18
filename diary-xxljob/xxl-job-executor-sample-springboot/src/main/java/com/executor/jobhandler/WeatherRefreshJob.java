@@ -1,10 +1,10 @@
 package com.executor.jobhandler;
 
-import com.executor.consts.CityLocationInfos;
 import com.executor.service.WeatherService;
 import com.executor.service.WeatherService.WeatherRefreshResult;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
+import diary.common.enums.xxljobenums.QWeatherLocationEnum;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -21,8 +21,8 @@ public class WeatherRefreshJob {
 
     @XxlJob("weatherRefreshHandler")
     public void weatherRefreshHandler() {
-        List<String> cities = Arrays.stream(CityLocationInfos.values())
-                .map(CityLocationInfos::getName)
+        List<String> cities = Arrays.stream(QWeatherLocationEnum.values())
+                .map(QWeatherLocationEnum::getName)
                 .toList();
         XxlJobHelper.log("开始刷新天气缓存，城市数: " + cities.size());
 

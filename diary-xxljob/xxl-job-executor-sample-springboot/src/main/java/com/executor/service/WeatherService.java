@@ -1,9 +1,9 @@
 package com.executor.service;
 
-import com.executor.consts.CityLocationInfos;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import diary.common.entity.xxlJob.WeatherInfo;
+import diary.common.enums.xxljobenums.QWeatherLocationEnum;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -176,7 +176,7 @@ public class WeatherService {
         if (!StringUtils.hasText(city)) {
             throw new IllegalArgumentException("city 不能为空");
         }
-        Integer locationId = CityLocationInfos.fromName(city.trim());
+        Integer locationId = QWeatherLocationEnum.fromName(city.trim());
         if (locationId == null) {
             throw new IllegalArgumentException("未配置城市编码，city: " + city);
         }

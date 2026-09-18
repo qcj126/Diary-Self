@@ -4,18 +4,16 @@ import com.executor.service.ImageCleanupService;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import diary.common.entity.xxlJob.ImageCleanUpResultDTO;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class SpareImageCleanUpJob {
 
     private final ImageCleanupService imageCleanupService;
-
-    public SpareImageCleanUpJob(ImageCleanupService imageCleanupService) {
-        this.imageCleanupService = imageCleanupService;
-    }
 
     @XxlJob("spareImageCleanUpHandler")
     public void unusedImageCleanupHandler() {
