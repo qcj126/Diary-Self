@@ -4,6 +4,6 @@ import diary.common.entity.xxlJob.ImageCleanUpResultDTO;
 
 public interface ImageCleanupService {
 
-    ImageCleanUpResultDTO cleanupUnreferencedImages();
+    Integer cleanupUnreferencedImages();
 
 }

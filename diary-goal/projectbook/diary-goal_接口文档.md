@@ -47,6 +47,7 @@
 | 10 | POST | /goal/checkin/delete/{id} | 逻辑删除目标打卡 |
 | 11 | GET | /goal/checkin/query/{id} | 查询打卡详情 |
 | 12 | POST | /goal/checkin/query | 分页查询打卡列表 |
+| 13 | POST | /goal/dashboard/review | 查询周报或月报仪表盘 |
 
 ## 数据结构
 
@@ -186,3 +187,38 @@ Authorization: Bearer <access-token>
 ```
 
 `pageNum` 从 0 开始，`pageSize` 最大为 100。查询结果只包含当前登录用户的数据。
+
+## 目标仪表盘与周期复盘
+
+仪表盘接口必须经过网关访问。用户 ID 从网关注入的 `X-Auth-User-Id` 请求头取得，客户端不能通过请求体指定用户。
+
+```http
+POST /goal/dashboard/review
+Content-Type: application/json
+Authorization: Bearer <access-token>
+
+{
+  "periodType": 1,
+  "anchorDate": "2026-09-20",
+  "staleDays": 7
+}
+```
+
+| 字段 | 类型 | 必填 | 说明 |
+|---|---|---:|---|
+| periodType | Integer | 否 | `1` 周报、`2` 月报，默认 `1` |
+| anchorDate | LocalDate | 否 | 周期锚点，默认当天且不能晚于当天；周报从周一开始，月报按自然月 |
+| staleDays | Integer | 否 | 长期未更新阈值，范围 `1-3650`，默认 `7` |
+
+请求体可以为空。当前周期的 `dataThroughDate` 为当天，历史周期为周期结束日，不会将未来日期纳入统计。
+
+统计口径：
+
+- 完成率分母为周期开始至 `dataThroughDate` 已到期的阶段目标，分子为其中截至统计日已完成的目标。
+- 逾期包括超过自身 DDL 后完成，以及截至统计日仍未完成的目标。
+- 周期投入、分类占比和连续打卡均以未删除的 `goal_checkin` 流水为准；零时长的状态打卡同样计为打卡日。
+- 预计/实际偏差以周期内完成的阶段目标为范围，预计值汇总其子目标预计时长，实际值汇总完成前的有效打卡时长。
+- 燃尽图以周期内有效目标的子目标预计时长减去周期开始前投入作为初始剩余量，按日扣减打卡投入。
+- 长期未更新仅返回未开始、进行中、暂停状态的目标，按未活动天数倒序，最多 100 条。
+
+响应 `data` 包含：`summary`、`timeTrend`、`categoryDistribution`、`burndown`、`staleGoals`。其中周报的 `timeTrend` 按日返回，月报按自然周返回。

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="diary.diarygoal.mapper.GoalDashboardMapper">
+    <resultMap id="GoalStatsResultMap" type="diary.common.entity.goal.po.GoalDashboardGoalStatsPO">
+        <result column="due_goal_count" property="dueGoalCount"/>
+        <result column="completed_goal_count" property="completedGoalCount"/>
+        <result column="overdue_goal_count" property="overdueGoalCount"/>
+    </resultMap>
+
+    <resultMap id="WorkloadResultMap" type="diary.common.entity.goal.po.GoalDashboardWorkloadPO">
+        <result column="total_estimated_hours" property="totalEstimatedHours"/>
+        <result column="invested_before_period_hours" property="investedBeforePeriodHours"/>
+        <result column="completed_estimated_hours" property="completedEstimatedHours"/>
+        <result column="completed_actual_hours" property="completedActualHours"/>
+    </resultMap>
+
+    <resultMap id="TimeEntryResultMap" type="diary.common.entity.goal.po.GoalDashboardTimeEntryPO">
+        <result column="checkin_date" property="checkinDate"/>
+        <result column="spent_hours" property="spentHours"/>
+    </resultMap>
+
+    <resultMap id="CategoryHoursResultMap" type="diary.common.entity.goal.po.GoalDashboardCategoryHoursPO">
+        <result column="category" property="category"/>
+        <result column="spent_hours" property="spentHours"/>
+    </resultMap>
+
+    <resultMap id="StaleGoalResultMap" type="diary.common.entity.goal.po.GoalDashboardStaleGoalPO">
+        <id column="goal_id" property="goalId"/>
+        <result column="title" property="title"/>
+        <result column="category" property="category"/>
+        <result column="status" property="status"/>
+        <result column="last_activity_date" property="lastActivityDate"/>
+        <result column="inactive_days" property="inactiveDays"/>
+    </resultMap>
+
+    <select id="selectGoalStats" resultMap="GoalStatsResultMap">
+        SELECT COUNT(*) AS due_goal_count,
+               COALESCE(SUM(CASE
+                                WHEN completed_time IS NOT NULL
+                                    AND completed_time &lt; LEAST(#{cutoffExclusiveDate}, NOW())
+                                    THEN 1 ELSE 0 END), 0) AS completed_goal_count,
+               COALESCE(SUM(CASE
+                                WHEN completed_time IS NULL OR completed_time &gt; end_time
+                                    THEN 1 ELSE 0 END), 0) AS overdue_goal_count
+        FROM stage_goal
+        WHERE user_id = #{userId}
+          AND end_time &gt;= #{startDate}
+          AND end_time &lt; LEAST(#{cutoffExclusiveDate}, NOW())
+    </select>
+
+    <select id="selectWorkload" resultMap="WorkloadResultMap">
+        SELECT
+            (SELECT COALESCE(SUM(COALESCE(sub.estimated_hours, 0)), 0)
+             FROM sub_goal sub
+                      INNER JOIN stage_goal stage ON stage.id = sub.stage_id
+             WHERE stage.user_id = #{userId}
+               AND sub.user_id = #{userId}
+               AND stage.create_time &lt; #{cutoffExclusiveDate}
+               AND (stage.completed_time IS NULL OR stage.completed_time &gt;= #{startDate})
+               AND stage.status != 4) AS total_estimated_hours,
+            (SELECT COALESCE(SUM(checkin.spent_hours), 0)
+             FROM goal_checkin checkin
+                      INNER JOIN stage_goal stage ON stage.id = checkin.stage_goal_id
+             WHERE checkin.user_id = #{userId}
+               AND stage.user_id = #{userId}
+               AND checkin.is_deleted = 0
+               AND checkin.checkin_date &lt; #{startDate}
+               AND stage.create_time &lt; #{cutoffExclusiveDate}
+               AND (stage.completed_time IS NULL OR stage.completed_time &gt;= #{startDate})
+               AND stage.status != 4) AS invested_before_period_hours,
+            (SELECT COALESCE(SUM(COALESCE(sub.estimated_hours, 0)), 0)
+             FROM sub_goal sub
+                      INNER JOIN stage_goal stage ON stage.id = sub.stage_id
+             WHERE stage.user_id = #{userId}
+               AND sub.user_id = #{userId}
+               AND stage.completed_time &gt;= #{startDate}
+               AND stage.completed_time &lt; #{cutoffExclusiveDate}) AS completed_estimated_hours,
+            (SELECT COALESCE(SUM(checkin.spent_hours), 0)
+             FROM goal_checkin checkin
+                      INNER JOIN stage_goal stage ON stage.id = checkin.stage_goal_id
+             WHERE checkin.user_id = #{userId}
+               AND stage.user_id = #{userId}
+               AND checkin.is_deleted = 0
+               AND stage.completed_time &gt;= #{startDate}
+               AND stage.completed_time &lt; #{cutoffExclusiveDate}
+               AND checkin.checkin_date &lt;= DATE(stage.completed_time)) AS completed_actual_hours
+    </select>
+
+    <select id="selectDailySpentHours" resultMap="TimeEntryResultMap">
+        SELECT checkin_date,
+               COALESCE(SUM(spent_hours), 0) AS spent_hours
+        FROM goal_checkin
+        WHERE user_id = #{userId}
+          AND is_deleted = 0
+          AND checkin_date &gt;= #{startDate}
+          AND checkin_date &lt;= #{cutoffDate}
+        GROUP BY checkin_date
+        ORDER BY checkin_date
+    </select>
+
+    <select id="selectCategoryHours" resultMap="CategoryHoursResultMap">
+        SELECT stage.category,
+               COALESCE(SUM(checkin.spent_hours), 0) AS spent_hours
+        FROM goal_checkin checkin
+                 INNER JOIN stage_goal stage ON stage.id = checkin.stage_goal_id
+        WHERE checkin.user_id = #{userId}
+          AND stage.user_id = #{userId}
+          AND checkin.is_deleted = 0
+          AND checkin.checkin_date &gt;= #{startDate}
+          AND checkin.checkin_date &lt;= #{cutoffDate}
+        GROUP BY stage.category
+        ORDER BY spent_hours DESC, stage.category ASC
+    </select>
+
+    <select id="selectStaleGoals" resultMap="StaleGoalResultMap">
+        SELECT stage.id AS goal_id,
+               stage.title,
+               stage.category,
+               stage.status,
+               GREATEST(
+                       COALESCE(MAX(checkin.checkin_date), DATE(stage.create_time)),
+                       CASE
+                           WHEN DATE(stage.update_time) &lt;= #{cutoffDate} THEN DATE(stage.update_time)
+                           ELSE DATE(stage.create_time)
+                       END
+               ) AS last_activity_date,
+               DATEDIFF(
+                       #{cutoffDate},
+                       GREATEST(
+                               COALESCE(MAX(checkin.checkin_date), DATE(stage.create_time)),
+                               CASE
+                                   WHEN DATE(stage.update_time) &lt;= #{cutoffDate} THEN DATE(stage.update_time)
+                                   ELSE DATE(stage.create_time)
+                               END
+                       )
+               ) AS inactive_days
+        FROM stage_goal stage
+                 LEFT JOIN goal_checkin checkin
+                           ON checkin.stage_goal_id = stage.id
+                               AND checkin.user_id = #{userId}
+                               AND checkin.is_deleted = 0
+                               AND checkin.checkin_date &lt;= #{cutoffDate}
+        WHERE stage.user_id = #{userId}
+          AND stage.status IN (0, 1, 2)
+          AND DATE(stage.create_time) &lt;= #{cutoffDate}
+        GROUP BY stage.id, stage.title, stage.category, stage.status, stage.create_time, stage.update_time
+        HAVING last_activity_date &lt;= #{staleBeforeDate}
+        ORDER BY inactive_days DESC, stage.id DESC
+        LIMIT 100
+    </select>
+</mapper>

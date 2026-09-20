@@ -18,20 +18,8 @@ public class SpareImageCleanUpJob {
     @XxlJob("spareImageCleanUpHandler")
     public void unusedImageCleanupHandler() {
         XxlJobHelper.log("开始清理未被业务表关联的图片");
-
-        ImageCleanUpResultDTO result = imageCleanupService.cleanupUnreferencedImages();
-
-        String message = String.format(
-                "未关联图片清理完成，扫描: %d，删除成功: %d，删除失败: %d",
-                result.getScannedCount(),
-                result.getDeletedCount(),
-                result.getFailedCount()
-        );
-//        log.info(message);
+        Integer deletedCnt = imageCleanupService.cleanupUnreferencedImages();
+        String message = String.format("未关联图片清理完成，删除成功: %d", deletedCnt);
         XxlJobHelper.log(message);
-
-        if (result.getFailedCount() > 0) {
-            XxlJobHelper.handleFail(message);
-        }
     }
 }

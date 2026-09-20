@@ -62,8 +62,6 @@ public class WeatherService {
     }
 
     public WeatherInfo getWeather(String city) {
-        requireSupportedCity(city);
-
         WeatherInfo cached = readCache(city);
         if (cached != null) {
             return cached;
@@ -74,8 +72,7 @@ public class WeatherService {
             writeCache(city, weather);
             return weather;
         } catch (Exception exception) {
-            log.error("获取天气失败，使用临时降级数据，city: {}", city, exception);
-            return fallbackWeather(city);
+            throw new RuntimeException("获取天气失败，使用临时降级数据，city: " + city, exception);
         }
     }
 
@@ -96,7 +93,6 @@ public class WeatherService {
 
         for (String city : uniqueCities) {
             try {
-                requireSupportedCity(city);
                 WeatherInfo weather = callWeatherApi(city);
                 writeCache(city, weather);
                 successCount++;
@@ -156,20 +152,6 @@ public class WeatherService {
         } catch (Exception exception) {
             throw new IllegalStateException("调用和风天气 API 异常，city: " + city, exception);
         }
-    }
-
-    private WeatherInfo fallbackWeather(String city) {
-        MockWeather mock = MOCK_WEATHER.getOrDefault(city,
-                new MockWeather("晴", "25", "55", "26", "微风", "1"));
-        WeatherInfo info = new WeatherInfo();
-        info.setObsTime(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-        info.setText(mock.condition());
-        info.setTemp(mock.temp());
-        info.setFeelsLike(mock.feelsLike());
-        info.setHumidity(mock.humidity());
-        info.setWindDir(mock.windDirection());
-        info.setWindScale(mock.windScale());
-        return info;
     }
 
     private Integer requireSupportedCity(String city) {

@@ -18,7 +18,6 @@ import java.util.Map;
 
 /**
  * 天气推送任务
- * 支持分片广播模式，多执行器并发处理不同用户分片
  */
 @Component
 public class WeatherPushJob {
@@ -36,14 +35,10 @@ public class WeatherPushJob {
 
     @XxlJob("weatherPushHandler")
     public void weatherPushHandler() throws Exception {
-        // 获取分片参数（如果使用分片广播模式）
-        int shardIndex = XxlJobHelper.getShardIndex();
-        int shardTotal = XxlJobHelper.getShardTotal();
+        log.info("天气推送任务开始执行");
 
-        log.info("天气推送任务开始执行，分片参数：{}/{}", shardIndex, shardTotal);
-
-        // 1. 获取需要推送的用户列表（支持分片处理）
-        List<UserPushConfig> users = userMapper.selectByShard(shardTotal, shardIndex);
+        // 1. 获取需要推送的全部用户
+        List<UserPushConfig> users = userMapper.selectAll();
 
         // 2. 批量获取天气数据（按城市聚合，减少API调用）
         Map<String, WeatherInfo> weatherCache = new HashMap<>();
@@ -51,9 +46,7 @@ public class WeatherPushJob {
         for (UserPushConfig user : users) {
             try {
                 // 获取天气数据（带缓存）
-                WeatherInfo weather = weatherCache.computeIfAbsent(
-                        user.getCity(),
-                        city -> weatherService.getWeather(city)
+                WeatherInfo weather = weatherCache.computeIfAbsent(user.getCity(), city -> weatherService.getWeather(city)
                 );
 
                 // 组装消息

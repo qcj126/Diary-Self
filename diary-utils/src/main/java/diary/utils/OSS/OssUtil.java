@@ -1,7 +1,9 @@
 package diary.utils.OSS;
 
+import com.aliyun.oss.ClientException;
 import com.aliyun.oss.HttpMethod;
 import com.aliyun.oss.OSS;
+import com.aliyun.oss.OSSException;
 import com.aliyun.oss.model.GeneratePresignedUrlRequest;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -108,6 +110,19 @@ public class OssUtil {
             urlMap.put(imageId, null);
         }
         return urlMap;
+    }
+
+    /**
+     * 删除OSS对象
+     *
+     * @param objectKey OSS对象键
+     */
+    public void deleteOssObject(String objectKey) {
+        try {
+            ossClient.deleteObject(bucketName, objectKey);
+        } catch (OSSException | ClientException e) {
+            throw new IllegalStateException("删除 OSS 文件失败，bucketName: " + bucketName + "，objectKey: " + objectKey, e);
+        }
     }
 
 }
