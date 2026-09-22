@@ -11,4 +11,6 @@ public class GoalQueryDTO {
     private Integer recentDays;
     private String exactDate;
     private Integer ddl;
+    /** 仅用于导出时限制结果数量。 */
+    private Integer exportSize;
 }

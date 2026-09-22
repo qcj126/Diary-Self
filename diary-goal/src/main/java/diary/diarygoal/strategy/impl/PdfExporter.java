@@ -15,6 +15,9 @@ import org.springframework.stereotype.Component;
 
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,6 +31,19 @@ public class PdfExporter implements Exporter {
     /** 表头列定义 */
     private static final String[] HEADERS = {"序号", "子目标", "内容", "已学时长(h)", "预估时长(h)"};
 
+    /**
+     * OpenPDF 不会自动提供中文 CID 字体，必须从操作系统加载可用字体。
+     * 可通过 JVM 参数 -Dgoal.export.pdf.font-path=字体文件路径 覆盖默认字体。
+     */
+    private static final List<String> DEFAULT_CHINESE_FONT_PATHS = List.of(
+            "C:\\Windows\\Fonts\\simhei.ttf",
+            "C:\\Windows\\Fonts\\msyh.ttc,0",
+            "C:\\Windows\\Fonts\\simsun.ttc,0",
+            "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc,0",
+            "/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc",
+            "/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc"
+    );
+
     @Override
     public ByteArrayOutputStream export(StageGoalDTO stageGoalDTO) {
         try {
@@ -36,8 +52,7 @@ public class PdfExporter implements Exporter {
             PdfWriter.getInstance(document, os);
             document.open();
 
-            // 使用系统默认中文字体
-            BaseFont bfChinese = BaseFont.createFont("STSong-Light", "UniGB-UTF16-H", BaseFont.NOT_EMBEDDED);
+            BaseFont bfChinese = loadChineseFont();
             Font titleFont = new Font(bfChinese, 18, Font.BOLD);
             Font infoFont = new Font(bfChinese, 12, Font.NORMAL);
             Font headerFont = new Font(bfChinese, 11, Font.BOLD, Color.WHITE);
@@ -119,6 +134,34 @@ public class PdfExporter implements Exporter {
 
     private String nullSafe(String value) {
         return value != null ? value : "";
+    }
+
+    private BaseFont loadChineseFont() {
+        List<String> candidates = new ArrayList<>();
+        String configuredFontPath = System.getProperty("goal.export.pdf.font-path");
+        if (configuredFontPath != null && !configuredFontPath.isBlank()) {
+            candidates.add(configuredFontPath.trim());
+        }
+        candidates.addAll(DEFAULT_CHINESE_FONT_PATHS);
+
+        for (String fontPath : candidates) {
+            if (!Files.isRegularFile(Path.of(getFontFilePath(fontPath)))) {
+                continue;
+            }
+            try {
+                return BaseFont.createFont(fontPath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            } catch (Exception e) {
+                log.warn("PDF 中文字体加载失败: {}", fontPath, e);
+            }
+        }
+
+        throw new IllegalStateException("未找到可用的中文字体，请通过 -Dgoal.export.pdf.font-path 指定 TTF/TTC 字体文件路径");
+    }
+
+    /** TTC 字体使用“文件路径,字体索引”格式，文件存在性检查时需要移除索引。 */
+    private String getFontFilePath(String fontPath) {
+        int separatorIndex = fontPath.lastIndexOf(',');
+        return separatorIndex >= 0 ? fontPath.substring(0, separatorIndex) : fontPath;
     }
 
     @Override

@@ -14,6 +14,8 @@ public interface GoalMapper {
 
     StageGoalPO selectStageGoalById(@Param("id") Long id);
 
+    SubGoalPO selectSubGoalById(@Param("id") Long id);
+
     List<SubGoalPO> selectSubGoalsByStageId(@Param("stageId") Long stageId);
 
     List<SubGoalPO> selectSubGoalsByStageIds(@Param("stageIds") List<Long> stageIds);
@@ -27,8 +29,6 @@ public interface GoalMapper {
     int deleteStageGoalById(@Param("id") Long id);
 
     int deleteSubGoalsByStageId(@Param("stageId") Long stageId);
-
-    List<StageGoalPO> queryGoalData(@Param("lastDays") Integer lastDays, @Param("exportSize") Integer exportSize);
 
     int batchInsertSubGoal(@Param("subGoalPOS") List<SubGoalPO> subGoalPOS);
 

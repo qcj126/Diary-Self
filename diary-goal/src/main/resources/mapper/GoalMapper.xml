@@ -5,6 +5,7 @@
     <resultMap id="StageGoalResultMap" type="diary.common.entity.goal.po.StageGoalPO">
         <id column="id" property="id"/>
         <result column="user_id" property="userId"/>
+        <result column="creator" property="creator"/>
         <result column="category" property="category"/>
         <result column="title" property="title"/>
         <result column="description" property="description"/>
@@ -31,7 +32,8 @@
     </resultMap>
 
     <sql id="StageGoalColumns">
-        id, user_id, category, title, description, status, end_time, completed_time, create_time, update_time
+        sg.id, sg.user_id, u.username AS creator, sg.category, sg.title, sg.description, sg.status,
+        sg.end_time, sg.completed_time, sg.create_time, sg.update_time
     </sql>
 
     <sql id="SubGoalColumns">
@@ -65,7 +67,14 @@
 
     <select id="selectStageGoalById" resultMap="StageGoalResultMap">
         SELECT <include refid="StageGoalColumns"/>
-        FROM stage_goal
+        FROM stage_goal sg
+        LEFT JOIN user u ON u.user_id = sg.user_id
+        WHERE sg.id = #{id}
+    </select>
+
+    <select id="selectSubGoalById" resultMap="SubGoalResultMap">
+        SELECT <include refid="SubGoalColumns"/>
+        FROM sub_goal
         WHERE id = #{id}
     </select>
 
@@ -89,34 +98,41 @@
 
     <select id="selectStageGoals" resultMap="StageGoalResultMap" parameterType="diary.common.entity.goal.dto.GoalQueryDTO">
         SELECT <include refid="StageGoalColumns"/>
-        FROM stage_goal
+        FROM stage_goal sg
+        LEFT JOIN user u ON u.user_id = sg.user_id
         WHERE 1=1
         <if test="userId != null">
-            AND user_id = #{userId}
+            AND sg.user_id = #{userId}
+        </if>
+        <if test="creator != null and creator != ''">
+            AND u.username LIKE CONCAT('%', #{creator}, '%')
         </if>
         <if test="category != null and category != ''">
-            AND category = #{category}
+            AND sg.category = #{category}
         </if>
         <if test="title != null and title != ''">
-            AND title LIKE CONCAT('%', #{title}, '%')
+            AND sg.title LIKE CONCAT('%', #{title}, '%')
         </if>
         <if test="recentDays != null and recentDays &gt; 0">
-            AND update_time &gt;= DATE_SUB(NOW(), INTERVAL #{recentDays} DAY)
+            AND sg.update_time &gt;= DATE_SUB(NOW(), INTERVAL #{recentDays} DAY)
         </if>
         <if test="exactDate != null and exactDate != ''">
-            AND DATE(create_time) = DATE(#{exactDate})
+            AND DATE(sg.create_time) = DATE(#{exactDate})
         </if>
         <if test="ddl != null and ddl == 2">
-            AND end_time &gt;= DATE_ADD(NOW(), INTERVAL 3 DAY)
+            AND sg.end_time &gt;= DATE_ADD(NOW(), INTERVAL 3 DAY)
         </if>
         <if test="ddl != null and ddl == 3">
-            AND end_time &gt;= NOW()
-            AND end_time &lt; DATE_ADD(NOW(), INTERVAL 3 DAY)
+            AND sg.end_time &gt;= NOW()
+            AND sg.end_time &lt; DATE_ADD(NOW(), INTERVAL 3 DAY)
         </if>
         <if test="ddl != null and ddl == 4">
-            AND end_time &lt; NOW()
+            AND sg.end_time &lt; NOW()
         </if>
-        ORDER BY update_time DESC, create_time DESC, id DESC
+        ORDER BY sg.update_time DESC, sg.create_time DESC, sg.id DESC
+        <if test="exportSize != null and exportSize &gt; 0">
+            LIMIT #{exportSize}
+        </if>
     </select>
 
     <update id="updateStageGoalById" parameterType="diary.common.entity.goal.po.StageGoalPO">
@@ -126,6 +142,8 @@
             <if test="category != null and category != ''">category = #{category},</if>
             <if test="title != null and title != ''">title = #{title},</if>
             <if test="description != null">description = #{description},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="completedTime != null">completed_time = #{completedTime},</if>
             <if test="endTime != null">end_time = #{endTime},</if>
             update_time = NOW()
         </set>
@@ -141,6 +159,8 @@
             <if test="content != null">content = #{content},</if>
             <if test="learnedHours != null">learned_hours = #{learnedHours},</if>
             <if test="estimatedHours != null">estimated_hours = #{estimatedHours},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="completedTime != null">completed_time = #{completedTime},</if>
             update_time = NOW()
         </set>
         WHERE id = #{id}
@@ -158,19 +178,6 @@
     <update id="deleteSubGoalById">
         delete from sub_goal WHERE id = #{id}
     </update>
-
-    <select id="queryGoalData" resultMap="StageGoalResultMap">
-        SELECT <include refid="StageGoalColumns"/>
-        FROM stage_goal
-        WHERE 1=1
-        <if test="lastDays != null">
-            AND update_time &gt;= DATE_SUB(NOW(), INTERVAL #{lastDays} DAY)
-        </if>
-        ORDER BY update_time DESC, create_time DESC, id DESC
-        <if test="exportSize != null and exportSize &gt; 0">
-            LIMIT #{exportSize}
-        </if>
-    </select>
 
     <insert id="batchInsertSubGoal">
         INSERT INTO sub_goal

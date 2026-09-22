@@ -41,13 +41,25 @@
 | 4 | POST | /goal/update | 修改阶段目标 |
 | 5 | POST | /goal/query | 条件查询阶段目标列表 |
 | 6 | GET | /goal/query/{id} | 根据 ID 查询阶段目标详情 |
-| 7 | POST | /goal/export?exportType=1&lastDays=7&exportSize=10 | 导出目标数据 |
+| 7 | POST | /goal/export?exportType=1&ddl=1&category=1&lastDays=7&exportSize=10 | 导出目标数据并下载文件 |
 | 8 | POST | /goal/checkin/add | 新增目标打卡 |
 | 9 | POST | /goal/checkin/update | 修改目标打卡 |
 | 10 | POST | /goal/checkin/delete/{id} | 逻辑删除目标打卡 |
 | 11 | GET | /goal/checkin/query/{id} | 查询打卡详情 |
 | 12 | POST | /goal/checkin/query | 分页查询打卡列表 |
 | 13 | POST | /goal/dashboard/review | 查询周报或月报仪表盘 |
+
+### 导出参数
+
+`POST /goal/export` 通过网关认证后的 `X-Auth-User-Id` 导出当前用户的数据，并以附件响应返回文件。
+
+| 参数 | 默认值 | 说明 |
+|---|---:|---|
+| exportType | 1 | `1` Excel，`2` PDF，`3` PNG 图片 |
+| ddl | 1 | `1` 全部，`2` 正常，`3` 即将到期，`4` 已到期 |
+| category | 1 | `1` 全部，`2` 技术，`3` 学习，`4` 健康，`5` 生活 |
+| lastDays | 7 | 最近更新天数；传 `0` 表示不限制 |
+| exportSize | 10 | 导出条数，范围 `1` 到 `100`；一条直接返回文件，多条返回 ZIP 包 |
 
 ## 数据结构
 
@@ -56,11 +68,13 @@
 | 字段 | 类型 | 说明 |
 |---|---|---|
 | id | Long | 阶段目标 ID，更新时必传 |
+| flag | Integer | 修改目标类型：`1` 阶段目标、`2` 小目标 |
 | userId | Long | 用户 ID |
-| creator | String | 创建者显示名 |
+| creator | String | 新增无需传；查询时根据 `userId` 关联 `user.username` 返回 |
 | category | String | 目标分类 |
 | title | String | 目标标题 |
 | description | String | 目标描述 |
+| status | Integer | 目标状态；完成操作传 `3` |
 | subGoals | List<SubGoalDTO> | 子目标列表 |
 
 ### SubGoalDTO
@@ -80,6 +94,7 @@
 | 字段 | 类型 | 说明 |
 |---|---|---|
 | userId | Long | 用户 ID |
+| creator | String | 创建人关键字 |
 | category | String | 分类筛选 |
 | title | String | 标题关键字 |
 | recentDays | Integer | 查询最近 N 天更新的数据 |
@@ -92,7 +107,6 @@ Content-Type: application/json
 
 {
   "userId": 10000,
-  "creator": "demo",
   "category": "学习",
   "title": "掌握算法",
   "description": "三个月完成算法训练",
@@ -107,6 +121,36 @@ Content-Type: application/json
 ```
 
 /goal/query 的请求体可为空；响应 data 为 List<StageGoalVO>，每个阶段目标包含 subGoals。
+
+### 完成阶段目标或小目标
+
+完成没有子目标的阶段目标：
+
+```http
+POST /goal/update
+Content-Type: application/json
+
+{
+  "id": 10001,
+  "flag": 1,
+  "status": 3
+}
+```
+
+完成小目标：
+
+```http
+POST /goal/update
+Content-Type: application/json
+
+{
+  "id": 20001,
+  "flag": 2,
+  "status": 3
+}
+```
+
+当同一阶段目标下的全部小目标状态均为 `3` 时，后端会在同一事务中自动将阶段目标状态更新为 `3`。包含未完成小目标的阶段目标不能直接完成。
 
 ## 目标打卡
 

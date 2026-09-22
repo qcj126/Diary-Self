@@ -9,6 +9,7 @@ import diary.config.logconfig.OperLog;
 import diary.diarygoal.service.add.GoalAddService;
 import diary.diarygoal.service.delete.GoalDeleteService;
 import diary.diarygoal.service.export.ExportService;
+import diary.diarygoal.service.export.GoalExportFile;
 import diary.diarygoal.service.query.GoalQueryService;
 import diary.diarygoal.service.update.GoalUpdateService;
 import jakarta.annotation.Resource;
@@ -18,8 +19,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
@@ -74,11 +84,44 @@ public class GoalController {
 
     @OperLog(module = "阶段目标", description = "导出阶段目标", operationType = "EXPORT", saveResult = false)
     @PostMapping("/export")
-    public ApiResponse<String> exportGoal(
+    public ResponseEntity<byte[]> exportGoal(
+            @RequestHeader(value = "X-Auth-User-Id", required = false) Long userId,
             @RequestParam(defaultValue = "1") Integer exportType,
+            @RequestParam(defaultValue = "1") Integer ddl,
+            @RequestParam(defaultValue = "1") Integer category,
             @RequestParam(defaultValue = "7") Integer lastDays,
             @RequestParam(defaultValue = "10") Integer exportSize) {
-        exportService.export(exportType, lastDays, exportSize);
-        return ApiResponse.success("Export successful");
+        validateExportParams(userId, exportType, ddl, category, lastDays, exportSize);
+        GoalExportFile file = exportService.export(userId, exportType, ddl, category, lastDays, exportSize);
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(file.contentType()))
+                .contentLength(file.content().length)
+                .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment()
+                        .filename(file.filename(), StandardCharsets.UTF_8)
+                        .build()
+                        .toString())
+                .body(file.content());
+    }
+
+    private void validateExportParams(Long userId, Integer exportType, Integer ddl, Integer category,
+                                      Integer lastDays, Integer exportSize) {
+        if (userId == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "缺少登录用户信息");
+        }
+        if (exportType == null || exportType < 1 || exportType > 3) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "exportType 只能是 1、2 或 3");
+        }
+        if (ddl == null || ddl < 1 || ddl > 4) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ddl 只能是 1 到 4");
+        }
+        if (category == null || category < 1 || category > 5) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "category 只能是 1 到 5");
+        }
+        if (lastDays == null || lastDays < 0 || lastDays > 3650) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "lastDays 必须在 0 到 3650 之间");
+        }
+        if (exportSize == null || exportSize < 1 || exportSize > 100) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "exportSize 必须在 1 到 100 之间");
+        }
     }
 }

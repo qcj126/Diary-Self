@@ -1,5 +1,6 @@
 package diary.diarygoal.service.export;
 
 public interface ExportService {
-    void export(Integer exportType, Integer lastDays, Integer exportSize);
+    GoalExportFile export(Long userId, Integer exportType, Integer ddl, Integer category,
+                          Integer lastDays, Integer exportSize);
 }

@@ -23,6 +23,9 @@ import java.util.List;
 public class GoalUpdateServiceImpl implements GoalUpdateService {
     private static final Long DEFAULT_USER_ID = 10000L;
     private static final long DEFAULT_DDL_DAYS = 7L;
+    private static final int STAGE_GOAL_FLAG = 1;
+    private static final int SUB_GOAL_FLAG = 2;
+    private static final int COMPLETED_STATUS = 3;
 
     @Resource
     private GoalMapper goalMapper;
@@ -32,6 +35,17 @@ public class GoalUpdateServiceImpl implements GoalUpdateService {
     public ApiResponse<String> updateGoal(StageGoalDTO stageGoalDTO) {
         try {
             MyUtils.check().notNull(stageGoalDTO, "stageGoal").notNull(stageGoalDTO.getId(), "id");
+
+            int flag = stageGoalDTO.getFlag() == null ? STAGE_GOAL_FLAG : stageGoalDTO.getFlag();
+            if (flag == SUB_GOAL_FLAG) {
+                return completeSubGoal(stageGoalDTO);
+            }
+            if (flag != STAGE_GOAL_FLAG) {
+                return ApiResponse.fail(400, "flag 只能是 1 或 2");
+            }
+            if (stageGoalDTO.getStatus() != null) {
+                return completeStageGoal(stageGoalDTO);
+            }
 
             StageGoalPO existGoal = goalMapper.selectStageGoalById(stageGoalDTO.getId());
             if (existGoal == null) {
@@ -55,6 +69,74 @@ public class GoalUpdateServiceImpl implements GoalUpdateService {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return ApiResponse.updateFail();
         }
+    }
+
+    private ApiResponse<String> completeStageGoal(StageGoalDTO stageGoalDTO) {
+        if (stageGoalDTO.getStatus() != COMPLETED_STATUS) {
+            return ApiResponse.fail(400, "完成操作的 status 必须为 3");
+        }
+
+        StageGoalPO existGoal = goalMapper.selectStageGoalById(stageGoalDTO.getId());
+        if (existGoal == null) {
+            return ApiResponse.updateFail();
+        }
+        if (existGoal.getStatus() != null && existGoal.getStatus() == COMPLETED_STATUS) {
+            return ApiResponse.success("stage goal already completed");
+        }
+
+        List<SubGoalPO> subGoals = goalMapper.selectSubGoalsByStageId(stageGoalDTO.getId());
+        if (!subGoals.isEmpty() && subGoals.stream().anyMatch(item -> item.getStatus() == null || item.getStatus() != COMPLETED_STATUS)) {
+            return ApiResponse.fail(400, "请先完成该阶段目标下的全部小目标");
+        }
+
+        StageGoalPO completedGoal = StageGoalPO.builder()
+                .id(stageGoalDTO.getId())
+                .status(COMPLETED_STATUS)
+                .completedTime(LocalDateTime.now())
+                .build();
+        if (goalMapper.updateStageGoalById(completedGoal) <= 0) {
+            return ApiResponse.updateFail();
+        }
+        return ApiResponse.success("stage goal completed successfully");
+    }
+
+    private ApiResponse<String> completeSubGoal(StageGoalDTO stageGoalDTO) {
+        if (stageGoalDTO.getStatus() == null || stageGoalDTO.getStatus() != COMPLETED_STATUS) {
+            return ApiResponse.fail(400, "完成操作的 status 必须为 3");
+        }
+
+        SubGoalPO existSubGoal = goalMapper.selectSubGoalById(stageGoalDTO.getId());
+        if (existSubGoal == null) {
+            return ApiResponse.updateFail();
+        }
+        if (existSubGoal.getStatus() == null || existSubGoal.getStatus() != COMPLETED_STATUS) {
+            SubGoalPO completedSubGoal = SubGoalPO.builder()
+                    .id(existSubGoal.getId())
+                    .stageId(existSubGoal.getStageId())
+                    .status(COMPLETED_STATUS)
+                    .completedTime(LocalDateTime.now())
+                    .build();
+            if (goalMapper.updateSubGoalById(completedSubGoal) <= 0) {
+                return ApiResponse.updateFail();
+            }
+        }
+
+        List<SubGoalPO> siblingGoals = goalMapper.selectSubGoalsByStageId(existSubGoal.getStageId());
+        boolean allCompleted = !siblingGoals.isEmpty()
+                && siblingGoals.stream().allMatch(item -> item.getStatus() != null && item.getStatus() == COMPLETED_STATUS);
+        if (allCompleted) {
+            StageGoalPO completedStageGoal = StageGoalPO.builder()
+                    .id(existSubGoal.getStageId())
+                    .status(COMPLETED_STATUS)
+                    .completedTime(LocalDateTime.now())
+                    .build();
+            if (goalMapper.updateStageGoalById(completedStageGoal) <= 0) {
+                throw new IllegalStateException("failed to complete stage goal");
+            }
+        }
+        return ApiResponse.success(allCompleted
+                ? "sub goal and stage goal completed successfully"
+                : "sub goal completed successfully");
     }
 
     private ApiResponse<String> saveSubGoals(List<SubGoalDTO> subGoalsDTO, Long stageGoalId, Long userId) {

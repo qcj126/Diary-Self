@@ -30,6 +30,7 @@ public class POConvertToVO {
         return StageGoalVO.builder()
                 .id(po.getId())
                 .userId(po.getUserId())
+                .creator(po.getCreator())
                 .category(po.getCategory())
                 .title(po.getTitle())
                 .description(po.getDescription())

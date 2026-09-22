@@ -16,6 +16,7 @@ public class DTOConvertToPO {
                 .category(stageGoalDTO.getCategory())
                 .title(stageGoalDTO.getTitle())
                 .description(stageGoalDTO.getDescription() == null ? "" : stageGoalDTO.getDescription())
+                .status(stageGoalDTO.getStatus())
                 .endTime(resolveEndTime(stageGoalDTO.getEndTime(), stageGoalDTO.getDdl()))
                 .build();
     }
