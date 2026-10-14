@@ -514,11 +514,7 @@ ORDER BY id;
 mvn -pl diary-AI -am -DskipTests compile
 ```
 
-手工与联调用例见：
-
-```text
-diary-AI简化版测试用例.md
-```
+手工、联调和故障用例统一收录在本文第 22 节。
 
 核心验收项：
 
@@ -550,3 +546,155 @@ diary-AI简化版测试用例.md
 - 实例级指标与优雅停机。
 
 版本 2 的原则是：先让单实例业务闭环简单、可读、可恢复，不为尚未发生的集群问题提前付出复杂度。
+
+## 20. 当前单实例最终边界
+
+版本 2 采用：
+
+```text
+MySQL 本地事务
+  + Outbox
+  + RocketMQ 至少一次投递
+  + 数据库条件更新
+```
+
+这是最终一致性模型，不是全局分布式事务。MySQL 是任务状态和提交幂等的唯一权威；Redis 只用于每用户提交限流，不缓存任务状态，也不保存幂等映射。
+
+任务和 Outbox 是两套相互关联但含义不同的状态机：
+
+- `ai_task.status` 表示 AI 任务的业务执行事实。
+- `mq_outbox.status` 表示某一条事件到 RocketMQ 的投递事实。
+
+修改状态机时必须同时核对枚举、Mapper 条件、事务边界、Outbox 投递死亡处理和 Recovery 扫描范围。任何异步回调都不能无条件覆盖较新的状态。
+
+当前明确不包含：
+
+- 多实例调度锁。
+- 集群级模型信号量。
+- 多实例缓存一致性。
+- 取消任务链路。
+- diary-notify 对终态事件的完整消费闭环。
+
+## 21. 状态流转修复记录
+
+版本 2 在形成当前边界前完成了以下修复。
+
+### 21.1 Task 与 Outbox 终态一致性
+
+- 执行次数耗尽统一提交 `FAILED + AI_FAILED Outbox`。
+- 任务投递 Outbox 重试耗尽时，只把仍处于等待态的任务更新为 `DEAD_LETTER`，并创建失败事件。
+- 已经进入 `RUNNING/SUCCESS/FAILED` 的任务不会被旧 Outbox 覆盖。
+- task 终态和终态事件要么一起提交，要么一起回滚。
+
+### 21.2 失败事件协议
+
+- 完成和失败事件统一使用 `AiTaskEventDto`。
+- Outbox `event_id` 与 payload `eventId` 使用同一个值。
+- 成功与失败分别使用 `AI_COMPLETED`、`AI_FAILED` Tag。
+- 失败事件携带 `errorCode/errorMessage`，成功事件携带 `resultId`。
+
+### 21.3 租约和 Recovery
+
+- 抢占成功时写入 `worker_id` 和 `lease_until`。
+- 长时间模型调用期间按租约的三分之一周期续期。
+- 续期和结果回写必须匹配 `taskId + workerId + versionId`。
+- Recovery 只扫描租约过期的 `RUNNING`。
+- 过期任务通过同一事务提交 `RETRY_WAIT + AI_TASK_RETRY Outbox`。
+- 普通等待态不再生成无法判断的第三层补发消息，应排查 Outbox、Consumer Lag 和 DLQ。
+
+### 21.4 用户归属和查询
+
+- JWT 携带 `user_id`，Gateway 删除客户端可能伪造的身份头，再注入 `X-Auth-User-Id`。
+- AI 服务不接受请求体中的 userId。
+- 状态和结果查询使用 `taskId + userId`，防止跨用户读取。
+- 处理中返回 HTTP 202，终态返回 HTTP 200，业务状态由响应体表达。
+
+## 22. 接口与联调约定
+
+- 模块基础路径：`/ai`。
+- 网关路由：`/ai/** → lb://diary-ai`。
+- 所有业务接口应通过 Gateway 访问，不应直接对外暴露 AI 服务端口。
+
+| 方法 | 路径 | 说明 | 正常 HTTP 状态 |
+| --- | --- | --- | --- |
+| POST | `/ai/tasks` | 提交异步任务 | 202 |
+| GET | `/ai/tasks/{taskId}` | 查询任务状态 | 200 |
+| GET | `/ai/tasks/{taskId}/result` | 查询任务结果 | 处理中 202，终态 200 |
+
+提交字段包括：
+
+| 字段 | 必填 | 说明 |
+| --- | --- | --- |
+| `clientRequestId` | 是 | 同一用户内唯一的客户端幂等键 |
+| `aiType` | 是 | 大模型工厂 code |
+| `materials` | 是 | 食材名称与数量 |
+| `aiApplication` | 是 | AI 应用类型 |
+| `cookWay` | 否 | 烹饪方式 |
+| `flag` | 是 | `DIET/RECIPE/GOAL` |
+| `universalId` | 是 | 对应业务数据 ID |
+
+相同幂等键和相同内容重复提交时返回原 taskId；相同幂等键对应不同内容时返回幂等冲突。Snowflake ID 传给 JavaScript 客户端时建议使用字符串，避免精度丢失。
+
+## 23. 完整测试矩阵
+
+### 23.1 基础提交和查询
+
+- 正常提交任务并返回 202、Location、taskId 和 PENDING。
+- 查询任务状态和成功结果。
+- 处理中结果返回 202。
+- 终态结果返回 200。
+- 其他用户不能查询当前任务。
+
+### 23.2 幂等和限流
+
+- 相同请求重复提交只创建一个任务。
+- 相同幂等键、不同请求内容返回冲突。
+- 多个并发请求使用同一幂等键时只保留一个任务事实。
+- 单用户超过每分钟额度时被限流。
+- Redis 不可用时符合既定 fail-open/fail-close 策略，不能制造错误的任务事实。
+
+### 23.3 Outbox 可靠投递
+
+- 初始 Outbox 成功发送并迁移到 SENT。
+- Broker 短暂不可用时进入有界退避重试。
+- 重试耗尽后 Outbox 进入 DEAD，等待态任务收敛到 DEAD_LETTER。
+- SENDING 超时能够恢复。
+- SUCCESS/FAILED 终态事件能够通过独立 Outbox 投递。
+
+### 23.4 Consumer、重试和租约
+
+- 正常抢占、执行和结果提交。
+- 重复消息不重复调用模型、不重复保存结果。
+- 可重试异常进入 RETRY_WAIT，不可重试异常进入 FAILED。
+- 实际执行次数达到上限后停止模型调用。
+- 本地 Semaphore 限制单实例模型并发。
+- 长时间模型调用能够续租。
+- 进程崩溃后，过期 RUNNING 能够恢复。
+- 普通等待态不会自动产生额外补发世代。
+
+### 23.5 多模型工厂
+
+- Qwen Plus 使用唯一 code 注册。
+- 第二个模型能够通过 `AIFactory` 选择。
+- 重复 code 导致启动失败。
+- 不支持的 code 返回明确错误。
+
+### 23.6 数据库迁移和回归
+
+- 存量库迁移后约束、索引和状态值正确。
+- 新库建表能够直接得到当前结构。
+- `ai_nutrient.ai_task_id` 唯一约束能够阻止重复结果。
+- 任务、结果和终态事件在同一事务失败时整体回滚。
+
+## 24. 排障和维护规则
+
+| 现象 | 首先检查 |
+| --- | --- |
+| `PENDING` 很久 | 初始 Outbox、Publisher 日志、RocketMQ 连接 |
+| `QUEUED` 很久 | Consumer 在线状态、Consumer Lag、DLQ |
+| `RUNNING` 很久 | `lease_until` 续期、模型请求是否卡死 |
+| `RETRY_WAIT` 很久 | RocketMQ 重投、DLQ、`attempt_count` |
+| `DEAD_LETTER` | 任务 Outbox 的 `last_error` |
+| 终态但下游未收到 | `AI_COMPLETED/AI_FAILED` Outbox 和下游日志 |
+
+维护版本 2 时，必须同步更新本文中的接口、状态机、事务边界、测试矩阵和排障规则。版本 3 是从该单实例基线继续演进到多实例分布式服务的说明书。
