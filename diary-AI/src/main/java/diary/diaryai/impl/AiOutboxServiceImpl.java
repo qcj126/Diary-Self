@@ -7,7 +7,7 @@ import diary.common.enums.outbox.OutboxStatusEnum;
 import diary.diaryai.mapper.DiaryAiMapper;
 import diary.diaryai.properties.AiTaskProperties;
 import diary.diaryai.service.AiOutboxService;
-import diary.diaryai.service.AiTaskCommandService;
+import diary.diaryai.service.AiTransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,11 +22,10 @@ import static org.springframework.util.StringUtils.truncate;
 @Slf4j
 public class AiOutboxServiceImpl implements AiOutboxService {
     private final DiaryAiMapper diaryAiMapper;
-    private final AiTaskProperties properties;
-    private final AiTaskCommandService aiTaskCommandService;
+    private final AiTransactionService aiTransactionService;
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean claim(MqOutboxPO outbox) {
+    public boolean claimSending(MqOutboxPO outbox) {
         int changed = diaryAiMapper.claimOutbox(outbox.getId(), outbox.getVersionId());
         if (changed == 1) {
             // 数据库中已经将outbox状态改为sending，为后续步骤，需要设置outbox状态为sending，并且版本号+1
@@ -66,7 +65,7 @@ public class AiOutboxServiceImpl implements AiOutboxService {
 
     private void transitionFailure(MqOutboxPO outbox, Throwable error) {
         int nextRetryCount = outbox.getRetryCount() + 1;
-        String lastError = truncate(error.getMessage(), 1000);
+        String lastError = truncate(error.getMessage(), 500);
 
         int changed;
         // maxRetries 不包含首次发送，总尝试次数为 1 + maxRetries。
@@ -84,7 +83,7 @@ public class AiOutboxServiceImpl implements AiOutboxService {
             // 仅将尚未执行的任务收敛为 DEAD_LETTER，不覆盖 RUNNING 或终态。
             AiTaskPO task = diaryAiMapper.selectAiTaskByTaskId(outbox.getAggregateId());
             if (task != null) {
-                boolean deadLettered = aiTaskCommandService.deadLetterDispatchTask(task,
+                boolean deadLettered = aiTransactionService.deadLetterDispatchTask(task,
                         "任务消息Outbox重试耗尽, outboxId=" + outbox.getId()
                 );
                 log.error("任务投递Outbox已进入DEAD, outboxId={}, taskId={}, taskDeadLettered={}",

@@ -17,56 +17,63 @@ public class AiTaskProperties {
     @Valid
     private Task task = new Task();
     @Valid
-    private Redis redis = new Redis();
+    private Cache redis = new Cache();
     @Valid
     private Limit limit = new Limit();
 
     @Data
     public static class Rocketmq {
-        private String taskTopic = "diary-ai-task";
-        private String taskTag = "QWEN_PLUS_NUTRIENT";
-        private String taskConsumerGroup = "diary-ai-qwen-plus-worker-v2";
-        private String eventTopic = "diary-ai-event";
-        private String completedTag = "AI_COMPLETED";
-        private String failedTag = "AI_FAILED";
+        private String completedTag;
+        private String failedTag;
+        private String taskTopic;
+        private String taskNutrientTag;
+        private String taskSentimentTag;
+        private String taskConsumerNutrientGroup;
+        private String taskConsumerSentimentGroup;
+        private String eventTopic;
         @Min(1)
-        private int publisherBatchSize = 20;
+        private int publisherBatchSize;
         @Min(100)
-        private long publisherIntervalMs = 1000;
+        // Outbox 发布器扫描并发送待投递消息的间隔
+        private long publisherIntervalMs;
         @Min(1)
-        private long publisherSendingTimeoutSeconds = 60;
+        private long publisherSendingTimeoutSeconds;
         @Min(0)
-        private int outboxMaxRetries = 10;
+        private int outboxMaxRetries;
         @Min(1)
-        private int sentRetentionDays = 7;
+        private int sentRetentionDays;
         @Min(1)
-        private int cleanupBatchSize = 500;
+        private int cleanupBatchSize;
     }
 
     @Data
     public static class Task {
         @Min(1)
-        private int maxAttempts = 3;
+        private int maxAttempts;
         @Min(3)
-        private long executionLeaseSeconds = 330;
+        private long executionLeaseSeconds;
         @Min(1000)
-        private long recoveryIntervalMs = 30000;
+        private long recoveryIntervalMs;
         @Min(1)
-        private int recoveryBatchSize = 50;
+        private int recoveryBatchSize;
     }
 
     @Data
-    public static class Redis {
+    public static class Cache {
         private String keyPrefix = "diary:dev:ai";
+        private Integer runningTtlSeconds = 30;
+        private Integer terminalTtlHours = 24;
+        private Integer idempotencyTtlHours = 24;
+        private Integer nullTtlSeconds = 15;
     }
 
     @Data
     public static class Limit {
         @Min(1)
-        private int submitPerUserPerMinute = 10;
+        private int submitPerUserPerMinute;
         @Min(1)
-        private int modelLocalConcurrency = 2;
+        private int modelLocalConcurrency;
         @Min(0)
-        private long localPermitWaitMs = 1000;
+        private long localPermitWaitMs;
     }
 }

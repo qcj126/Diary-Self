@@ -3,7 +3,6 @@ package diary.diaryai.strategy.nutrientanlalyze;
 import com.alibaba.dashscope.aigc.generation.Generation;
 import com.alibaba.dashscope.aigc.generation.GenerationParam;
 import com.alibaba.dashscope.aigc.generation.GenerationResult;
-import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationResult;
 import com.alibaba.dashscope.common.Message;
 import com.alibaba.dashscope.common.Role;
 import com.alibaba.dashscope.exception.InputRequiredException;
@@ -15,7 +14,7 @@ import diary.common.enums.aienum.AIEnum;
 import diary.common.exception.CustomException;
 import diary.diaryai.prompt.PromptContext;
 import diary.diaryai.properties.AliCloudProperty;
-import diary.diaryai.service.AiTaskCommandService;
+import diary.diaryai.service.AiTransactionService;
 import diary.diaryai.strategy.service.InvokeAIService;
 import diary.diaryai.template.InvokeAITemplate;
 import lombok.RequiredArgsConstructor;
@@ -35,8 +34,7 @@ public class InvokeDeepseekPro extends InvokeAITemplate implements InvokeAIServi
     private final AliCloudProperty aliCloudProperty;
     private final PromptContext promptContext;
     private final Generation gen = new Generation();
-    private final AiTaskCommandService aiTaskCommandService;
-    private static int i = 1;
+    private final AiTransactionService aiTransactionService;
 
     @Override
     public void getAiResultAndSave(Object data, Long taskId, Long userId, String workerId, Integer versionId) {
@@ -51,7 +49,7 @@ public class InvokeDeepseekPro extends InvokeAITemplate implements InvokeAIServi
          * 既能排查响应契约，也避免把完整输入输出写入日志。
          */
         log.info("AI nutrient result parsed, taskId={}, fields={}", taskId, result.keySet());
-        aiTaskCommandService.processData(taskId, data, model, result, temperature, userId, workerId, versionId);
+        aiTransactionService.processData(taskId, data, model, result, temperature, userId, workerId, versionId);
     }
 
     @Override
@@ -66,9 +64,9 @@ public class InvokeDeepseekPro extends InvokeAITemplate implements InvokeAIServi
 
     @Override
     public GenerationResult invokeAi(Object prompt, String model) {
-        /**
-         * 纯文本任务仍使用多模态调用类
-         * 当前没有图片输入，仍使用 MultiModalConversation。如果 Qwen Plus 的普通文本接口满足需求，建议换成文本 Generation API；暂时继续使用也能接受，但命名和 Prompt 不应再体现图片或多模态业务。
+        /*
+          纯文本任务仍使用多模态调用类
+          当前没有图片输入，仍使用 MultiModalConversation。如果 Qwen Plus 的普通文本接口满足需求，建议换成文本 Generation API；暂时继续使用也能接受，但命名和 Prompt 不应再体现图片或多模态业务。
          */
         Constants.baseHttpApiUrl = aliCloudProperty.getUrl();
         String apiKey = aliCloudProperty.getApiKey();

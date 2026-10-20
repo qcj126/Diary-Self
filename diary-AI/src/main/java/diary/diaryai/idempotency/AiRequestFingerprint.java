@@ -21,16 +21,17 @@ import java.util.TreeMap;
 public class AiRequestFingerprint {
     private final ObjectMapper objectMapper;
 
-    public String canonicalSnapshot(AiInvokeDTO request) {
-        try {
-            return objectMapper.writeValueAsString(canonicalForm(request));
-        } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException("AI任务输入快照序列化失败", e);
-        }
-    }
-
     public String fingerprint(AiInvokeDTO request) {
-        return sha256(canonicalSnapshot(request));
+        try {
+            String value = objectMapper.writeValueAsString(canonicalForm(request));
+            byte[] digest = MessageDigest.getInstance("SHA-256")
+                    .digest(value.getBytes(StandardCharsets.UTF_8));
+            return HexFormat.of().formatHex(digest);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("JVM不支持SHA-256", e);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public String fingerprintSnapshot(String snapshot) {
@@ -41,7 +42,7 @@ public class AiRequestFingerprint {
         }
     }
 
-    private Map<String, Object> canonicalForm(AiInvokeDTO request) {
+    public Map<String, Object> canonicalForm(AiInvokeDTO request) {
         Map<String, Object> value = new TreeMap<>();
         value.put("aiApplication", request.getAiApplication());
         value.put("aiType", request.getAiType());
@@ -51,15 +52,5 @@ public class AiRequestFingerprint {
         value.put("materials", request.getMaterials() == null ? null : new TreeMap<>(request.getMaterials()));
         value.put("universalId", request.getUniversalId());
         return value;
-    }
-
-    private String sha256(String value) {
-        try {
-            byte[] digest = MessageDigest.getInstance("SHA-256")
-                    .digest(value.getBytes(StandardCharsets.UTF_8));
-            return HexFormat.of().formatHex(digest);
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("JVM不支持SHA-256", e);
-        }
     }
 }

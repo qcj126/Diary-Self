@@ -1,5 +1,7 @@
 package diary.diaryai.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import diary.common.entity.ai.dto.AiInvokeDTO;
 import diary.common.entity.ai.dto.AiTaskMessageDto;
 import diary.common.entity.ai.dto.AiTaskEventDto;
@@ -16,7 +18,7 @@ import diary.common.enums.outbox.OutboxStatusEnum;
 import diary.diaryai.idempotency.AiRequestFingerprint;
 import diary.diaryai.mapper.DiaryAiMapper;
 import diary.diaryai.properties.AiTaskProperties;
-import diary.diaryai.service.AiTaskCommandService;
+import diary.diaryai.service.AiTransactionService;
 import diary.utils.commonutil.MyUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,10 +37,11 @@ import static diary.utils.commonutil.MyUtils.writeJson;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class AiTaskCommandServiceImpl implements AiTaskCommandService {
+public class AiTransactionServiceImpl implements AiTransactionService {
     private final DiaryAiMapper diaryAiMapper;
     private final AiTaskProperties properties;
     private final AiRequestFingerprint requestFingerprint;
+    private final ObjectMapper objectMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -48,15 +51,27 @@ public class AiTaskCommandServiceImpl implements AiTaskCommandService {
         // mq消息和outbox数据使用同一个eventId，保证事件的一致性
         // 不会出现mq消息属于另一个outbox数据的情况
         String eventId = OUTBOX_EVENT_ID + MyUtils.getPrimaryKey();
-        String inputSnapshot = requestFingerprint.canonicalSnapshot(request);
+
+        String inputSnapshot;
+        try {
+            // 将入参作为快照数据存入任务中
+            inputSnapshot = objectMapper.writeValueAsString(requestFingerprint.canonicalForm(request));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
         String requestHash = requestFingerprint.fingerprint(request);
+        String taskTagType = null;
+        switch (request.getAiApplication()) {
+            case 1 -> taskTagType = properties.getRocketmq().getTaskNutrientTag();
+            case 2 -> taskTagType = properties.getRocketmq().getTaskSentimentTag();
+        }
 
         AiTaskPO task = AiTaskPO.builder()
                 .id(taskId)
                 .userId(userId)
                 .clientRequestId(request.getClientRequestId())
                 .requestHash(requestHash)
-                .taskType(properties.getRocketmq().getTaskTag())
+                .taskType(taskTagType)
                 .status(AiTaskStatusEnum.PENDING.name())
                 .inputSnapshot(inputSnapshot)
                 .attemptCount(0)
@@ -71,7 +86,7 @@ public class AiTaskCommandServiceImpl implements AiTaskCommandService {
                 .taskId(taskId)
                 .userId(userId)
                 .clientRequestId(request.getClientRequestId())
-                .taskType(properties.getRocketmq().getTaskTag())
+                .taskType(taskTagType)
                 .eventType(OutboxEventTypeEnum.AI_TASK_CREATED.name())
                 .taskStatus(AiTaskStatusEnum.PENDING.name())
                 .schemaVersion(OUTBOX_SCHEMA_VERSION)
@@ -86,7 +101,7 @@ public class AiTaskCommandServiceImpl implements AiTaskCommandService {
                 .aggregateId(taskId)
                 .eventType(OutboxEventTypeEnum.AI_TASK_CREATED.name())
                 .topic(properties.getRocketmq().getTaskTopic())
-                .tag(properties.getRocketmq().getTaskTag())
+                .tag(taskTagType)
                 .messageKey(taskId.toString())
                 .payload(writeJson(message, "AI任务消息序列化失败"))
                 .schemaVersion(OUTBOX_SCHEMA_VERSION)

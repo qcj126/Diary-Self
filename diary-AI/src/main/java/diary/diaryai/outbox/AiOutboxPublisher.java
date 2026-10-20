@@ -27,11 +27,13 @@ public class AiOutboxPublisher {
 
     @Scheduled(fixedDelayString = "${diary.ai.rocketmq.publisher-interval-ms:1000}")
     public void publishReadyMessages() {
+        // 优先尝试恢复超时的消息
         recoverTimedOutMessages();
+        // 状态为new和retry-wait的outbox消息，是ready消息
         List<MqOutboxPO> batch = diaryAiMapper.selectReadyOutbox(properties.getRocketmq().getPublisherBatchSize());
 
         for (MqOutboxPO outbox : batch) {
-            if (!aiOutboxService.claim(outbox)) {
+            if (!aiOutboxService.claimSending(outbox)) {
                 continue;
             }
             try {

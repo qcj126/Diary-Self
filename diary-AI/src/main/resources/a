@@ -22,17 +22,22 @@ diary:
       completed-tag: AI_COMPLETED
       failed-tag: AI_FAILED
       task-topic: diary-ai-task
-      task-tag: NUTRIENT_ANALYSE
-      task-consumer-group: diary-ai-nutrient-group
+      task-nutrient-tag: NUTRIENT_ANALYSE
+      task-sentiment-tag: SENTIMENT_ANALYSIS
+      task-consumer-nutrient-group: diary-ai-nutrient-workers
+      task-consumer-sentiment-group: diary-ai-sentiment-workers
       event-topic: diary-ai-event
       publisher-batch-size: 20
       publisher-interval-ms: 1000
       publisher-sending-timeout-seconds: 60
-      outbox-max-retries: 10
+      outbox-max-retries: 5
+      sent-retention-days: 7
+      cleanup-batch-size: 500
     task:
       max-attempts: 3
       execution-lease-seconds: 330
       recovery-interval-ms: 30000
+      recovery-batch-size: 50
     cache:
       running-ttl-seconds: 30
       terminal-ttl-hours: 24
@@ -41,7 +46,7 @@ diary:
       key-prefix: diary:dev:ai
     limit:
       submit-per-user-per-minute: 10
-      model-local-concurrency: 2
+      model-local-concurrency: 5
       local-permit-wait-ms: 1000
 
 # 使用 rocketmq-v5-client-spring-boot-starter 的正确配置

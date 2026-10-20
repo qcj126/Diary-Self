@@ -10,7 +10,7 @@ import diary.diaryai.guard.LocalAiConcurrencyGuard;
 import diary.diaryai.guard.AiTaskLeaseRenewer;
 import diary.diaryai.mapper.DiaryAiMapper;
 import diary.diaryai.properties.AiTaskProperties;
-import diary.diaryai.service.AiTaskCommandService;
+import diary.diaryai.service.AiTransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.annotation.RocketMQMessageListener;
@@ -27,9 +27,9 @@ import static diary.common.consts.MqTaskConst.OUTBOX_SCHEMA_VERSION;
 
 @Service
 @RocketMQMessageListener(
-        consumerGroup = "${diary.ai.rocketmq.task-consumer-group:diary-ai-qwen-plus-worker-v2}",
+        consumerGroup = "${diary.ai.rocketmq.task-consumer-nutrient-group:diary-ai-nutrient-workers}",
         topic = "${diary.ai.rocketmq.task-topic:diary-ai-task}",
-        tag = "${diary.ai.rocketmq.task-tag:QWEN_PLUS_NUTRIENT}",
+        tag = "${diary.ai.rocketmq.task-nutrient-tag:NUTRIENT_ANALYSE}",
         sslEnabled = false
 )
 @RequiredArgsConstructor
@@ -41,7 +41,7 @@ public class AiOutboxConsumer implements RocketMQListener {
     private final DiaryAiMapper diaryAiMapper;
     private final LocalAiConcurrencyGuard localAiConcurrencyGuard;
     private final AiTaskLeaseRenewer aiTaskLeaseRenewer;
-    private final AiTaskCommandService aiTaskCommandService;
+    private final AiTransactionService aiTransactionService;
 
     @Override
     public ConsumeResult consume(MessageView messageView) {
@@ -107,13 +107,24 @@ public class AiOutboxConsumer implements RocketMQListener {
             }
 
             // 长时间模型调用期间持续续租，提交结果仍校验 workerId + versionId。
+            /*
+            * 续租中的定时任务与关闭时序：
+            *   进入 try 块
+            *   → start() 创建定时续租 future
+            *   → 开始同步调用模型
+            *   → 模型调用结束，execute() 返回
+            *   → 离开 try 块
+            *   → Java 自动调用 ignored.close()
+            *   → close() 执行 future.cancel(false)
+            *   → 后续不再续租
+            * */
             try (AiTaskLeaseRenewer.LeaseRenewalHandle ignored = aiTaskLeaseRenewer.start(
                     claimedTask.getId(), workerId, claimedTask.getVersionId())) {
                 boolean executed = aiTaskExecutor.execute(message, claimedTask);
                 return executed ? ConsumeResult.SUCCESS : handleOwnershipLost(message.getTaskId());
             } catch (Exception executionException) {
                 try {
-                    return aiTaskCommandService.handleExecutionFailure(
+                    return aiTransactionService.handleExecutionFailure(
                             message, claimedTask, workerId, executionException);
                 } catch (RuntimeException failureStateException) {
                     /*
@@ -133,28 +144,90 @@ public class AiOutboxConsumer implements RocketMQListener {
     private ConsumeResult handleUnclaimedMessage(AiTaskMessageDto message) {
         AiTaskPO currentTask = diaryAiMapper.selectAiTaskByTaskId(message.getTaskId());
         if (currentTask == null) {
-            // 另一个消费者尝试抢占此条消息但是失败了
+            /*
+            * 消息引用的 AI 任务不存在：可能是误投、跨环境消息、数据被清理或读库延迟
+            * 可能的异常场景包括：
+            *       - 消息是其他服务、测试脚本或人工误投到该 Topic 的；
+            *       - 消息体的 taskId 错误、被篡改或协议版本不兼容；
+            *       - 有人手工删除/清理了 ai_task，但 Broker 中仍保留旧消息；
+            *       - 消息来自另一套环境，却误连到了当前环境的 Broker；
+            *       - 读写分离时，查询误读到了尚未同步的从库；
+            *       - 极少见的数据损坏或历史迁移遗漏。
+            * */
             log.error("AI task does not exist, taskId={}", message.getTaskId());
             return ConsumeResult.FAILURE;
         }
 
         if (isTerminal(currentTask.getStatus())) {
-            /* 重复消息遇到终态直接 ACK，避免 SUCCESS/FAILED 任务再次调用模型。 */
+            /* 重复消息遇到任务终态直接 ACK，避免 SUCCESS/FAILED 任务再次调用模型。 */
+            /*
+            * 如果这里返回 ConsumeResult.FAILURE，RocketMQ 会认为“消费者处理失败”，然后：
+            * 同一条消息重投
+            *    → 又查到任务是 SUCCESS / FAILED
+            *    → 又返回 FAILURE
+            *    → 不断重试
+            *    → 达到重试上限后进入 DLQ
+            * 这不会带来任何新的业务进展，只会造成：
+            *    - 无意义的消息重投和日志噪声；
+            *    - 消费积压；
+            *    - 无意义的 DLQ 告警和人工排查；
+            *    - 某些情况下占用 Consumer 处理能力。
+            * */
             return ConsumeResult.SUCCESS;
         }
 
         if (currentTask.getAttemptCount() != null
                 && currentTask.getMaxAttempts() != null
                 && currentTask.getAttemptCount() >= currentTask.getMaxAttempts()) {
-            if (aiTaskCommandService.failExhaustedTask(
+            if (aiTransactionService.failExhaustedTask(
                     currentTask, "消息重投到达时任务执行次数已耗尽")) {
                 return ConsumeResult.SUCCESS;
             }
         }
 
         /*
+         * 多consumer的情况下：
          * 抢占失败通常意味着另一个 Consumer 已持有有效租约。当前消息只是重复副本，ACK 不会丢失任务，
          * 因为真正的持有者仍在执行；若持有者宕机，租约过期后的后续重投/恢复任务仍可接管。
+         *
+         * 什么情况下会进行重投：
+         *      1：RocketMQ 自己的重投
+         *          触发条件是 Broker 没有得到这条消息的成功消费确认，例如：
+         *              - Consumer A 返回 ConsumeResult.FAILURE；
+         *              - Consumer A 调用过程中进程崩溃；
+         *              - Consumer A 已处理完，但成功确认因网络中断没有到达 Broker；
+         *              - Consumer A 与 Broker 断连，Consumer Group 发生 Rebalance，Queue 被分配给 Consumer B；
+         *              - 消费超时、客户端异常等。
+         *      2：租约过期后的应用层恢复
+         *          租约过期后，代码中将任务的状态由RUNNING改为RETRY_WAIT
+         *          然后新建一条重试的outbox消息进行投递
+         *          所以租约过期 ≠ RocketMQ 自动重投
+         *          租约过期
+         *              → diary-ai 恢复任务生成新的重试消息
+         *              → RocketMQ 再投递
+         *      3：Outbox 发送重试
+         *          典型故障窗口：
+         *              Publisher → Broker 发送消息成功
+         *              Broker 已落盘
+         *              ↓
+         *              Publisher 在写 mq_outbox = SENT 前宕机或网络超时
+         *              ↓
+         *              Publisher 不知道 Broker 到底有没有收到
+         *              ↓
+         *              SENDING 超时后，Outbox 重试发送
+         *              ↓
+         *              Broker 可能收到第二条指向同一 taskId 的消息
+         *          典型故障结果：
+         *              消息 M1 → Consumer A → A 抢占并执行
+         *              消息 M2 → Consumer B → B 抢占失败
+         *              → B 发现任务属于 A
+         *              → handleOwnershipLost()
+         *              → B ACK M2
+         *      4：消息人工重投
+         *          运维通过 RocketMQ 控制台重发；
+         *          管理后台提供“重新执行 AI 任务”；
+         *          补偿程序重新写入 Retry Outbox；
+         *          Consumer Group 的 Offset 被重置，重新消费历史消息。
          */
         return handleOwnershipLost(message.getTaskId());
     }
@@ -178,7 +251,7 @@ public class AiOutboxConsumer implements RocketMQListener {
                 || message.getClientRequestId() == null
                 || message.getClientRequestId().isBlank()
                 || !Objects.equals(OUTBOX_SCHEMA_VERSION, message.getSchemaVersion())
-                || !aiTaskProperties.getRocketmq().getTaskTag().equals(message.getTaskType())) {
+                || !aiTaskProperties.getRocketmq().getTaskNutrientTag().equals(message.getTaskType())) {
             throw new IllegalArgumentException("AI任务消息字段或协议版本不合法");
         }
     }

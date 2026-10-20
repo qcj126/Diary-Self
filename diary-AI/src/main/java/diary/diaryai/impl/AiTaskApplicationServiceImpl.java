@@ -12,7 +12,7 @@ import diary.diaryai.idempotency.AiRequestFingerprint;
 import diary.diaryai.mapper.DiaryAiMapper;
 import diary.diaryai.redis.AiSubmitRateLimiter;
 import diary.diaryai.service.AiTaskApplicationService;
-import diary.diaryai.service.AiTaskCommandService;
+import diary.diaryai.service.AiTransactionService;
 import diary.utils.commonutil.MyUtils;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AiTaskApplicationServiceImpl implements AiTaskApplicationService {
     private final DiaryAiMapper diaryAiMapper;
-    private final AiTaskCommandService aiTaskCommandService;
+    private final AiTransactionService aiTransactionService;
     private final AiSubmitRateLimiter aiSubmitRateLimiter;
     private final AiRequestFingerprint requestFingerprint;
 
@@ -34,6 +34,9 @@ public class AiTaskApplicationServiceImpl implements AiTaskApplicationService {
 
         MyUtils.check().notNull(userId, "userId");
         String clientRequestId = aiInvokeDTO.getClientRequestId();
+        // 不信任前端传来的数据
+        // 校验clientRequestId---是否是同一次提交
+        // 校验requestHash---是否是同一份数据
         String requestHash = requestFingerprint.fingerprint(aiInvokeDTO);
 
         // MySQL 联合唯一索引是幂等性的唯一权威，避免再维护一套 Redis 幂等缓存。
@@ -52,7 +55,7 @@ public class AiTaskApplicationServiceImpl implements AiTaskApplicationService {
         AiTaskPO aiTaskPO;
         try {
             // 异步创建aiTask和outbox，绑定同一最小事务，确保数据的一致性
-            aiTaskPO = aiTaskCommandService.createTaskAndOutbox(aiInvokeDTO, userId);
+            aiTaskPO = aiTransactionService.createTaskAndOutbox(aiInvokeDTO, userId);
             if (aiTaskPO == null) {
                 throw new IllegalStateException("AI任务创建失败");
             }
@@ -71,6 +74,7 @@ public class AiTaskApplicationServiceImpl implements AiTaskApplicationService {
         return toSubmitVo(aiTaskPO, "AI分析任务已受理");
     }
 
+    // 使用CAS比较并替换思想，获取不同设备的相同数据请求下的最新数据
     private void assertSameRequest(AiTaskPO existingTask, String requestHash) {
         String storedHash = existingTask.getRequestHash();
         if (storedHash == null || storedHash.isBlank()) {

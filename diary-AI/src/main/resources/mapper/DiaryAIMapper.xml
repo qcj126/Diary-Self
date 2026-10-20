@@ -97,7 +97,7 @@
     <sql id="mqOutboxColumns">
         id, event_id, aggregate_type, aggregate_id, event_type, topic, tag, message_key, payload,
         schema_version, status, retry_count, max_retries, next_retry_time, broker_message_id,
-        last_error, sent_time, create_time, update_time, version_id
+        last_error, sent_time, create_time, update_time, version_id FROM mq_outbox
     </sql>
 
     <insert id="insertAiNutrient">
@@ -146,7 +146,6 @@
         FROM ai_task
         WHERE user_id = #{userId}
           AND client_request_id = #{clientRequestId}
-        LIMIT 1
     </select>
 
     <update id="claimForExecution" parameterType="diary.common.entity.ai.dto.AiTaskProcessDto">
@@ -321,7 +320,7 @@
     </insert>
 
     <select id="selectReadyOutbox" resultMap="MqOutboxResultMap">
-        select <include refid="mqOutboxColumns"/> from mq_outbox
+        select <include refid="mqOutboxColumns"/>
         WHERE status IN ('NEW', 'RETRY_WAIT')
         AND next_retry_time &lt;= CURRENT_TIMESTAMP
         ORDER BY next_retry_time ASC, id ASC
@@ -329,7 +328,7 @@
     </select>
 
     <select id="selectTimedOutbox" resultMap="MqOutboxResultMap">
-        select <include refid="mqOutboxColumns"/> FROM mq_outbox
+        select <include refid="mqOutboxColumns"/>
         WHERE status = 'SENDING' AND update_time &lt; TIMESTAMPADD(SECOND, -#{timeoutSeconds}, CURRENT_TIMESTAMP)
         ORDER BY update_time ASC, id ASC LIMIT #{limit}
     </select>

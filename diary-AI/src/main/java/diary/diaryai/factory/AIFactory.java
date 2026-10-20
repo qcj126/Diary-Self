@@ -44,7 +44,7 @@ public class AIFactory {
         if (exporter == null) {
             throw new IllegalArgumentException(
                     String.format("不支持的AI模型编码: %s，已注册编码: %s",
-                            typeCode, aiServiceCache.keySet())
+                    typeCode, aiServiceCache.keySet())
             );
         }
         return exporter;

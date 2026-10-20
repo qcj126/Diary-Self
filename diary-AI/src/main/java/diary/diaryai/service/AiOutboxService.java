@@ -3,7 +3,7 @@ package diary.diaryai.service;
 import diary.common.entity.mq.po.MqOutboxPO;
 
 public interface AiOutboxService {
-    boolean claim(MqOutboxPO outbox);
+    boolean claimSending(MqOutboxPO outbox);
 
     void confirmSent(MqOutboxPO sendingOutbox, String brokerMessageId);
 

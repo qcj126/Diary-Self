@@ -61,6 +61,7 @@ public interface DiaryAiMapper {
 
     List<MqOutboxPO> selectReadyOutbox(@Param("limit") int limit);
 
+    // 当前时间-更新时间 = 过渡时间    过渡时间 - 超时时间 > 0 超时
     List<MqOutboxPO> selectTimedOutbox(
             @Param("timeoutSeconds") long timeoutSeconds,
             @Param("limit") int limit

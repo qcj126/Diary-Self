@@ -26,6 +26,7 @@ public class AiSubmitRateLimiter {
     private final AiRedisKeyFactory keyFactory;
     private final AiTaskProperties properties;
 
+    // 每分钟10次提交，redis的缓存2分钟删除一次
     public boolean allow(Long userId) {
         try {
             long epochMinute = Instant.now().getEpochSecond() / 60;

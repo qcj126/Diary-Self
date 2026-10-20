@@ -12,7 +12,10 @@ import java.util.concurrent.TimeUnit;
         private final long waitMs;
 
         public LocalAiConcurrencyGuard(AiTaskProperties properties) {
-            this.semaphore = new Semaphore(properties.getLimit().getModelLocalConcurrency(), true);
+            this.semaphore = new Semaphore(
+                    properties.getLimit().getModelLocalConcurrency(),
+                    true
+            );
             this.waitMs = properties.getLimit().getLocalPermitWaitMs();
         }
 

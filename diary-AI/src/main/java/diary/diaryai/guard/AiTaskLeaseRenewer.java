@@ -45,6 +45,8 @@ public class AiTaskLeaseRenewer {
                 // 单次续租失败不能中断正在执行的模型调用；后续周期继续尝试，最终仍由 version CAS 保护结果提交。
                 log.warn("AI任务租约续期失败, taskId={}, workerId={}", taskId, workerId, e);
             }
+            // scheduler.scheduleAtFixedRate(..., time1, time2, timeunit)
+            // 表示延迟time1后，以time2恒定运行
         }, renewalIntervalSeconds, renewalIntervalSeconds, TimeUnit.SECONDS);
         return () -> future.cancel(false);
     }

@@ -10,8 +10,8 @@ import diary.common.enums.outbox.OutboxEventTypeEnum;
 import diary.common.enums.outbox.OutboxStatusEnum;
 import diary.diaryai.mapper.DiaryAiMapper;
 import diary.diaryai.properties.AiTaskProperties;
-import diary.diaryai.service.AiTaskCommandService;
 import diary.diaryai.service.AiTaskRecoveryService;
+import diary.diaryai.service.AiTransactionService;
 import diary.utils.commonutil.MyUtils;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.MDC;
@@ -30,7 +30,7 @@ import static diary.utils.commonutil.MyUtils.writeJson;
 public class AiTaskRecoveryServiceImpl implements AiTaskRecoveryService {
     private final DiaryAiMapper diaryAiMapper;
     private final AiTaskProperties properties;
-    private final AiTaskCommandService aiTaskCommandService;
+    private final AiTransactionService aiTransactionService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -38,7 +38,7 @@ public class AiTaskRecoveryServiceImpl implements AiTaskRecoveryService {
         LocalDateTime now = LocalDateTime.now();
 
         if (task.getAttemptCount() >= task.getMaxAttempts()) {
-            aiTaskCommandService.failExhaustedTask(task, "RUNNING租约过期且尝试次数已耗尽");
+            aiTransactionService.failExhaustedTask(task, "RUNNING租约过期且尝试次数已耗尽");
             return;
         }
 
@@ -58,6 +58,13 @@ public class AiTaskRecoveryServiceImpl implements AiTaskRecoveryService {
 
     private void insertRetryTaskOutbox(AiTaskPO task, LocalDateTime now) {
         String eventId = OUTBOX_EVENT_ID + MyUtils.getPrimaryKey();
+
+        String taskTagType = null;
+        switch (request.getAiApplication()) {
+            case 1 -> taskTagType = properties.getRocketmq().getTaskNutrientTag();
+            case 2 -> taskTagType = properties.getRocketmq().getTaskSentimentTag();
+        }
+
         AiTaskMessageDto retryMessage = AiTaskMessageDto.builder()
                 .clientRequestId(task.getClientRequestId())
                 .eventId(eventId)
