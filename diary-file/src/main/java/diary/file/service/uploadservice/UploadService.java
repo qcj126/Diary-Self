@@ -1,11 +1,8 @@
 package diary.file.service.uploadservice;
 
-import diary.common.entity.image.dto.ImageDTO;
-import diary.common.entity.image.vo.ImageVO;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Map;
 
 public interface UploadService {
     /**

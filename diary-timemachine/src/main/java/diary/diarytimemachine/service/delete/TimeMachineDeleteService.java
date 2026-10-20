@@ -1,9 +1,7 @@
 package diary.diarytimemachine.service.delete;
 
-import diary.common.entity.timemachine.dto.TimeCardDTO;
-import diary.common.entity.timemachine.dto.TimeCategoryDTO;
-
-import java.util.List;
+import diary.diarytimemachine.entity.dto.TimeCardDTO;
+import diary.diarytimemachine.entity.dto.TimeCategoryDTO;
 
 public interface TimeMachineDeleteService {
     String categoryDelete(TimeCategoryDTO categoryDTO);

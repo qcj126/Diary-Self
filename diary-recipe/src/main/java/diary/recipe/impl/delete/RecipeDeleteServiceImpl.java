@@ -1,8 +1,8 @@
 package diary.recipe.impl.delete;
 
-import diary.common.entity.recipe.dto.req.RecipeCategoryDto;
-import diary.common.entity.recipe.dto.req.RecipeReqDto;
-import diary.common.entity.recipe.po.RecipePO;
+import diary.recipe.entity.dto.req.RecipeCategoryDto;
+import diary.recipe.entity.dto.req.RecipeReqDto;
+import diary.recipe.entity.po.RecipePO;
 import diary.common.result.ApiResponse;
 import diary.recipe.mapper.RecipeCategoryMapper;
 import diary.recipe.mapper.RecipeIngredientMapper;

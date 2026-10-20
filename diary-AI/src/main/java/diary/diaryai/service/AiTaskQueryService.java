@@ -1,7 +1,7 @@
 package diary.diaryai.service;
 
-import diary.common.entity.ai.vo.AiTaskResultVo;
-import diary.common.entity.ai.vo.AiTaskStatusVo;
+import diary.diaryai.entity.ai.vo.AiTaskResultVo;
+import diary.diaryai.entity.ai.vo.AiTaskStatusVo;
 
 import java.util.List;
 

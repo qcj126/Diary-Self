@@ -1,0 +1,27 @@
+package diary.diaryai.entity.ai.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class AiTaskMessageDto {
+    private String clientRequestId;
+    private String eventId;
+    private Long taskId;
+    private Long userId;
+    private String taskType;
+    private String eventType;
+    private String taskStatus;
+    private String errorCode;
+    private String errorMessage;
+    private Integer schemaVersion;
+    private LocalDateTime occurTime;
+    private String traceId;
+}

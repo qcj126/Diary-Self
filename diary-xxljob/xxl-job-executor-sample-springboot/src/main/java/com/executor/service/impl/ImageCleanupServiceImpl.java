@@ -1,17 +1,13 @@
 package com.executor.service.impl;
 
-import com.aliyun.oss.ClientException;
 import com.aliyun.oss.OSS;
-import com.aliyun.oss.OSSException;
-import com.aliyun.oss.internal.OSSUtils;
 import com.aliyun.oss.model.ListObjectsV2Request;
 import com.aliyun.oss.model.ListObjectsV2Result;
 import com.aliyun.oss.model.OSSObjectSummary;
 import com.executor.mapper.ImageCleanupMapper;
 import com.executor.service.ImageCleanupService;
 import com.xxl.job.core.context.XxlJobHelper;
-import diary.common.entity.xxlJob.ImageCleanUpResultDTO;
-import diary.common.entity.xxlJob.ImageCleanupRecord;
+import com.executor.entity.ImageCleanupRecord;
 import diary.utils.OSS.OssUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +17,6 @@ import org.springframework.util.StringUtils;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

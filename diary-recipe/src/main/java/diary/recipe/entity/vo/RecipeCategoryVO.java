@@ -1,0 +1,18 @@
+package diary.recipe.entity.vo;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+public class RecipeCategoryVO {
+    private Long id;
+    private Long userId;
+    private String categoryName;
+    private Long iconId;
+    private String iconPath;
+    private Integer sort;
+    private Integer categoryNum;
+}

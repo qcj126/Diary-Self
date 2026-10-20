@@ -1,6 +1,6 @@
 package com.executor.mapper;
 
-import diary.common.entity.xxlJob.ImageCleanupRecord;
+import com.executor.entity.ImageCleanupRecord;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

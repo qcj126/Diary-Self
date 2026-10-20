@@ -1,6 +1,6 @@
 package com.executor.mapper;
 
-import diary.common.entity.xxlJob.UserPushConfig;
+import com.executor.entity.UserPushConfig;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

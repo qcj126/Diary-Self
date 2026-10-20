@@ -1,6 +1,6 @@
 package diary.file.mapper;
 
-import diary.common.entity.image.po.ImagePO;
+import diary.file.entity.po.ImagePO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

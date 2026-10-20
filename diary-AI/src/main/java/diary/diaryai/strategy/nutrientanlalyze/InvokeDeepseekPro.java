@@ -10,7 +10,7 @@ import com.alibaba.dashscope.exception.NoApiKeyException;
 import com.alibaba.dashscope.utils.Constants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import diary.common.enums.aienum.AIEnum;
+import diary.diaryai.enums.aienum.AIEnum;
 import diary.common.exception.CustomException;
 import diary.diaryai.prompt.PromptContext;
 import diary.diaryai.properties.AliCloudProperty;

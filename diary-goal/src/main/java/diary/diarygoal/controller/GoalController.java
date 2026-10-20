@@ -1,9 +1,9 @@
 package diary.diarygoal.controller;
 
-import diary.common.entity.goal.dto.GoalQueryDTO;
-import diary.common.entity.goal.dto.StageGoalDTO;
-import diary.common.entity.goal.dto.SubGoalDTO;
-import diary.common.entity.goal.vo.StageGoalVO;
+import diary.diarygoal.entity.dto.GoalQueryDTO;
+import diary.diarygoal.entity.dto.StageGoalDTO;
+import diary.diarygoal.entity.dto.SubGoalDTO;
+import diary.diarygoal.entity.vo.StageGoalVO;
 import diary.common.result.ApiResponse;
 import diary.config.logconfig.OperLog;
 import diary.diarygoal.service.add.GoalAddService;

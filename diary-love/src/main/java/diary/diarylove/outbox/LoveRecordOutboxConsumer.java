@@ -14,7 +14,7 @@
 //import java.nio.ByteBuffer;
 //import java.util.Objects;
 //
-//import static diary.common.consts.MqTaskConst.OUTBOX_SCHEMA_VERSION;
+//import static diary.diaryai.consts.MqTaskConst.OUTBOX_SCHEMA_VERSION;
 //
 //@Component
 //@Slf4j

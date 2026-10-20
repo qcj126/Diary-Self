@@ -1,7 +1,7 @@
 package diary.user.service;
 
-import diary.common.entity.user.vo.TokenInfoVO;
-import diary.common.entity.user.vo.TokenPairVO;
+import diary.user.entity.vo.TokenInfoVO;
+import diary.user.entity.vo.TokenPairVO;
 
 import java.util.List;
 

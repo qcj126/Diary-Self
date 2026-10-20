@@ -1,12 +1,19 @@
 package diary.diarylove.controller;
 
 import diary.common.entity.love.dto.*;
-import diary.common.entity.love.vo.LoveAnniversaryVO;
-import diary.common.entity.love.vo.LoveCoupleVO;
-import diary.common.entity.love.vo.LoveLocationVO;
-import diary.common.entity.love.vo.LoveMoodRecordVO;
-import diary.common.entity.love.vo.LoveRecordImageVO;
-import diary.common.entity.love.vo.LoveRecordVO;
+import diary.diarylove.entity.dto.AddLoveRecordDto;
+import diary.diarylove.entity.dto.LoveAnniversaryDTO;
+import diary.diarylove.entity.dto.LoveCoupleDTO;
+import diary.diarylove.entity.dto.LoveLocationDTO;
+import diary.diarylove.entity.dto.LoveRecordDTO;
+import diary.diarylove.entity.dto.LoveRecordImageDTO;
+import diary.diarylove.entity.dto.UpdateLoveRecordDto;
+import diary.diarylove.entity.vo.LoveAnniversaryVO;
+import diary.diarylove.entity.vo.LoveCoupleVO;
+import diary.diarylove.entity.vo.LoveLocationVO;
+import diary.diarylove.entity.vo.LoveMoodRecordVO;
+import diary.diarylove.entity.vo.LoveRecordImageVO;
+import diary.diarylove.entity.vo.LoveRecordVO;
 import diary.common.result.ApiResponse;
 import diary.config.logconfig.OperLog;
 import diary.diarylove.service.DiaryLoveAddService;

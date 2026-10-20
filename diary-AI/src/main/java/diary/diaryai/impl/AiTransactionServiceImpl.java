@@ -2,18 +2,18 @@ package diary.diaryai.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import diary.common.entity.ai.dto.AiInvokeDTO;
-import diary.common.entity.ai.dto.AiTaskMessageDto;
-import diary.common.entity.ai.dto.AiTaskEventDto;
-import diary.common.entity.ai.dto.AiTaskProcessDto;
-import diary.common.entity.ai.po.AiInfoPO;
-import diary.common.entity.ai.po.AiNutrientPO;
-import diary.common.entity.ai.po.AiTaskPO;
-import diary.common.entity.mq.po.MqOutboxPO;
-import diary.common.enums.aienum.AiTaskErrorCodeEnum;
-import diary.common.enums.aienum.AiTaskStatusEnum;
-import diary.common.enums.outbox.OutboxEventTypeEnum;
-import diary.common.enums.outbox.OutboxStatusEnum;
+import diary.diaryai.entity.ai.dto.AiInvokeDTO;
+import diary.diaryai.entity.ai.dto.AiTaskMessageDto;
+import diary.diaryai.entity.ai.dto.AiTaskEventDto;
+import diary.diaryai.entity.ai.dto.AiTaskProcessDto;
+import diary.diaryai.entity.ai.po.AiInfoPO;
+import diary.diaryai.entity.ai.po.AiNutrientPO;
+import diary.diaryai.entity.ai.po.AiTaskPO;
+import diary.diaryai.entity.mq.po.MqOutboxPO;
+import diary.diaryai.enums.aienum.AiTaskErrorCodeEnum;
+import diary.diaryai.enums.aienum.AiTaskStatusEnum;
+import diary.diaryai.enums.outbox.OutboxEventTypeEnum;
+import diary.diaryai.enums.outbox.OutboxStatusEnum;
 
 import diary.diaryai.idempotency.AiRequestFingerprint;
 import diary.diaryai.mapper.DiaryAiMapper;
@@ -31,7 +31,7 @@ import org.slf4j.MDC;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-import static diary.common.consts.MqTaskConst.*;
+import static diary.diaryai.consts.MqTaskConst.*;
 import static diary.utils.commonutil.MyUtils.writeJson;
 
 @Service

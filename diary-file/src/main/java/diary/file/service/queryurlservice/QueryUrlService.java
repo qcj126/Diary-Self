@@ -1,6 +1,6 @@
 package diary.file.service.queryurlservice;
 
-import diary.common.entity.image.vo.ImageVO;
+import diary.file.entity.vo.ImageVO;
 
 import java.util.List;
 

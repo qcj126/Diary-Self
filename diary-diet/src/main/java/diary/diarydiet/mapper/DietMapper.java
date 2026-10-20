@@ -1,7 +1,7 @@
 package diary.diarydiet.mapper;
 
-import diary.common.entity.diet.dto.DietQueryDTO;
-import diary.common.entity.diet.po.DietRecordPO;
+import diary.diarydiet.entity.dto.DietQueryDTO;
+import diary.diarydiet.entity.po.DietRecordPO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

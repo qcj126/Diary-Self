@@ -1,8 +1,8 @@
 package diary.diarygoal.strategy.impl;
 
-import diary.common.entity.goal.dto.StageGoalDTO;
-import diary.common.entity.goal.dto.SubGoalDTO;
-import diary.common.enums.exportenum.ExportEnum;
+import diary.diarygoal.entity.dto.StageGoalDTO;
+import diary.diarygoal.entity.dto.SubGoalDTO;
+import diary.diarygoal.enums.ExportEnum;
 import diary.diarygoal.strategy.service.Exporter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;

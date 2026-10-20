@@ -1,13 +1,13 @@
 package diary.diaryai.impl;
 
-import diary.common.entity.ai.dto.AiInvokeDTO;
-import diary.common.entity.ai.po.AiTaskPO;
-import diary.common.entity.ai.vo.AiTaskSubmitVo;
-import diary.common.enums.aienum.AIEnum;
-import diary.common.enums.aienum.AiApplicationEnum;
-import diary.common.enums.aienum.AiFlagEnum;
-import diary.common.exception.AiSubmitRateLimitException;
-import diary.common.exception.IdempotencyConflictException;
+import diary.diaryai.entity.ai.dto.AiInvokeDTO;
+import diary.diaryai.entity.ai.po.AiTaskPO;
+import diary.diaryai.entity.ai.vo.AiTaskSubmitVo;
+import diary.diaryai.enums.aienum.AIEnum;
+import diary.diaryai.enums.aienum.AiApplicationEnum;
+import diary.diaryai.enums.aienum.AiFlagEnum;
+import diary.diaryai.exceptions.AiSubmitRateLimitException;
+import diary.diaryai.exceptions.IdempotencyConflictException;
 import diary.diaryai.idempotency.AiRequestFingerprint;
 import diary.diaryai.mapper.DiaryAiMapper;
 import diary.diaryai.redis.AiSubmitRateLimiter;

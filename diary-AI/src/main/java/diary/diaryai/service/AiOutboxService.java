@@ -1,6 +1,6 @@
 package diary.diaryai.service;
 
-import diary.common.entity.mq.po.MqOutboxPO;
+import diary.diaryai.entity.mq.po.MqOutboxPO;
 
 public interface AiOutboxService {
     boolean claimSending(MqOutboxPO outbox);

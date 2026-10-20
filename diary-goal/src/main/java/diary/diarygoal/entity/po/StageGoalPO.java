@@ -1,0 +1,22 @@
+package diary.diarygoal.entity.po;
+
+import lombok.Builder;
+import lombok.Data;
+
+import java.time.LocalDateTime;
+
+@Data
+@Builder
+public class StageGoalPO {
+    private Long id;
+    private Long userId;
+    private String creator;
+    private String category;
+    private String title;
+    private String description;
+    private Integer status;
+    private LocalDateTime endTime;
+    private LocalDateTime completedTime;
+    private LocalDateTime createTime;
+    private LocalDateTime updateTime;
+}

@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="diary.diaryinfo.mapper.DiaryLoveMapper">
-    <resultMap id="loveMoodResultMap" type="diary.common.entity.love.po.LoveMoodPO">
+    <resultMap id="loveMoodResultMap" type="diary.diarylove.entity.po.LoveMoodPO">
         <id property="id" column="id"/>
         <result property="moodCode" column="mood_code"/>
         <result property="moodName" column="mood_name"/>
@@ -13,7 +13,7 @@
         <result property="updateTime" column="update_time"/>
     </resultMap>
 
-    <resultMap id="loveRecordMoodResultMap" type="diary.common.entity.love.po.LoveRecordMoodPO">
+    <resultMap id="loveRecordMoodResultMap" type="diary.diarylove.entity.po.LoveRecordMoodPO">
         <id property="id" column="id"/>
         <result property="recordId" column="record_id"/>
         <result property="moodId" column="mood_id"/>

@@ -2,7 +2,7 @@ package diary.diaryai.idempotency;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import diary.common.entity.ai.dto.AiInvokeDTO;
+import diary.diaryai.entity.ai.dto.AiInvokeDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

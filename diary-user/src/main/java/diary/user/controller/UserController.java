@@ -1,11 +1,11 @@
 package diary.user.controller;
 
-import diary.common.entity.user.dto.KickOutDTO;
-import diary.common.entity.user.dto.RefreshTokenDTO;
-import diary.common.entity.user.dto.UserReqDTO;
-import diary.common.entity.user.vo.TokenInfoVO;
-import diary.common.entity.user.vo.TokenPairVO;
-import diary.common.entity.user.vo.UserVO;
+import diary.user.entity.dto.KickOutDTO;
+import diary.user.entity.dto.RefreshTokenDTO;
+import diary.user.entity.dto.UserReqDTO;
+import diary.user.entity.vo.TokenInfoVO;
+import diary.user.entity.vo.TokenPairVO;
+import diary.user.entity.vo.UserVO;
 import diary.common.result.ApiResponse;
 import diary.config.logconfig.OperLog;
 import diary.user.service.TokenService;

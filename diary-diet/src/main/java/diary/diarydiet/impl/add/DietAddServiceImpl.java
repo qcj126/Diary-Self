@@ -1,8 +1,8 @@
 package diary.diarydiet.impl.add;
 
-import diary.common.convert.diet.DTOConvertToPO;
-import diary.common.entity.diet.dto.DietRecordDTO;
-import diary.common.entity.diet.po.DietRecordPO;
+import diary.diarydiet.entity.convert.DTOConvertToPO;
+import diary.diarydiet.entity.dto.DietRecordDTO;
+import diary.diarydiet.entity.po.DietRecordPO;
 import diary.common.result.ApiResponse;
 import diary.diarydiet.support.DietRecordValidator;
 import diary.utils.commonutil.MyUtils;

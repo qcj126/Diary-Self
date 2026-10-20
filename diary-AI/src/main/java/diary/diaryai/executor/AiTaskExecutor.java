@@ -2,9 +2,9 @@ package diary.diaryai.executor;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import diary.common.entity.ai.dto.AiInvokeDTO;
-import diary.common.entity.ai.dto.AiTaskMessageDto;
-import diary.common.entity.ai.po.AiTaskPO;
+import diary.diaryai.entity.ai.dto.AiInvokeDTO;
+import diary.diaryai.entity.ai.dto.AiTaskMessageDto;
+import diary.diaryai.entity.ai.po.AiTaskPO;
 import diary.diaryai.factory.AIFactory;
 import diary.diaryai.strategy.service.InvokeAIService;
 import lombok.RequiredArgsConstructor;

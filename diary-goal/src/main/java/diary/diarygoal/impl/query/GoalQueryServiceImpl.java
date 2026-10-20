@@ -1,10 +1,10 @@
 package diary.diarygoal.impl.query;
 
-import diary.common.convert.goal.POConvertToVO;
-import diary.common.entity.goal.dto.GoalQueryDTO;
-import diary.common.entity.goal.po.StageGoalPO;
-import diary.common.entity.goal.po.SubGoalPO;
-import diary.common.entity.goal.vo.StageGoalVO;
+import diary.diarygoal.entity.convert.POConvertToVO;
+import diary.diarygoal.entity.dto.GoalQueryDTO;
+import diary.diarygoal.entity.po.StageGoalPO;
+import diary.diarygoal.entity.po.SubGoalPO;
+import diary.diarygoal.entity.vo.StageGoalVO;
 import diary.common.result.ApiResponse;
 import diary.diarygoal.mapper.GoalMapper;
 import diary.diarygoal.service.query.GoalQueryService;

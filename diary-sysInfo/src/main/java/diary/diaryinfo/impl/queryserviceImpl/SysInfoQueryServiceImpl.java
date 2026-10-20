@@ -1,15 +1,15 @@
 package diary.diaryinfo.impl.queryserviceImpl;
 
-import diary.common.convert.sysInfo.DtoConvertToPo;
-import diary.common.convert.sysInfo.DtoConvertToVo;
-import diary.common.convert.sysInfo.PoConvertToVo;
-import diary.common.entity.sysInfo.dto.IngredientIconDto;
-import diary.common.entity.sysInfo.dto.IngredientReqDto;
-import diary.common.entity.sysInfo.po.CookWayPo;
-import diary.common.entity.sysInfo.po.IngredientPo;
-import diary.common.entity.sysInfo.vo.CookWayVo;
-import diary.common.entity.sysInfo.vo.IngredientCategoryVo;
-import diary.common.entity.sysInfo.vo.IngredientVo;
+import diary.diaryinfo.entity.convert.DtoConvertToPo;
+import diary.diaryinfo.entity.convert.DtoConvertToVo;
+import diary.diaryinfo.entity.convert.PoConvertToVo;
+import diary.diaryinfo.entity.dto.IngredientIconDto;
+import diary.diaryinfo.entity.dto.IngredientReqDto;
+import diary.diaryinfo.entity.po.CookWayPo;
+import diary.diaryinfo.entity.po.IngredientPo;
+import diary.diaryinfo.entity.vo.CookWayVo;
+import diary.diaryinfo.entity.vo.IngredientCategoryVo;
+import diary.diaryinfo.entity.vo.IngredientVo;
 import diary.common.result.ApiResponse;
 import diary.diaryinfo.mapper.SysInfoMapper;
 import diary.diaryinfo.service.queryservice.SysInfoQueryService;

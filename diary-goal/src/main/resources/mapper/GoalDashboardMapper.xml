@@ -2,30 +2,30 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="diary.diarygoal.mapper.GoalDashboardMapper">
-    <resultMap id="GoalStatsResultMap" type="diary.common.entity.goal.po.GoalDashboardGoalStatsPO">
+    <resultMap id="GoalStatsResultMap" type="diary.diarygoal.entity.po.GoalDashboardGoalStatsPO">
         <result column="due_goal_count" property="dueGoalCount"/>
         <result column="completed_goal_count" property="completedGoalCount"/>
         <result column="overdue_goal_count" property="overdueGoalCount"/>
     </resultMap>
 
-    <resultMap id="WorkloadResultMap" type="diary.common.entity.goal.po.GoalDashboardWorkloadPO">
+    <resultMap id="WorkloadResultMap" type="diary.diarygoal.entity.po.GoalDashboardWorkloadPO">
         <result column="total_estimated_hours" property="totalEstimatedHours"/>
         <result column="invested_before_period_hours" property="investedBeforePeriodHours"/>
         <result column="completed_estimated_hours" property="completedEstimatedHours"/>
         <result column="completed_actual_hours" property="completedActualHours"/>
     </resultMap>
 
-    <resultMap id="TimeEntryResultMap" type="diary.common.entity.goal.po.GoalDashboardTimeEntryPO">
+    <resultMap id="TimeEntryResultMap" type="diary.diarygoal.entity.po.GoalDashboardTimeEntryPO">
         <result column="checkin_date" property="checkinDate"/>
         <result column="spent_hours" property="spentHours"/>
     </resultMap>
 
-    <resultMap id="CategoryHoursResultMap" type="diary.common.entity.goal.po.GoalDashboardCategoryHoursPO">
+    <resultMap id="CategoryHoursResultMap" type="diary.diarygoal.entity.po.GoalDashboardCategoryHoursPO">
         <result column="category" property="category"/>
         <result column="spent_hours" property="spentHours"/>
     </resultMap>
 
-    <resultMap id="StaleGoalResultMap" type="diary.common.entity.goal.po.GoalDashboardStaleGoalPO">
+    <resultMap id="StaleGoalResultMap" type="diary.diarygoal.entity.po.GoalDashboardStaleGoalPO">
         <id column="goal_id" property="goalId"/>
         <result column="title" property="title"/>
         <result column="category" property="category"/>

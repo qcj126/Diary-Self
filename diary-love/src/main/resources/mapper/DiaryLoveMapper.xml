@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="diary.diarylove.mapper.DiaryLoveMapper">
-    <resultMap id="loveCoupleResultMap" type="diary.common.entity.love.po.LoveCouplePO">
+    <resultMap id="loveCoupleResultMap" type="diary.diarylove.entity.po.LoveCouplePO">
         <id property="id"                   column="id"/>
         <result property="ownerUserId"      column="owner_user_id"/>
         <result property="partnerUserId"    column="partner_user_id"/>
@@ -14,7 +14,7 @@
         <result property="updateTime"       column="update_time"/>
     </resultMap>
 
-    <resultMap id="loveAnniversaryResultMap" type="diary.common.entity.love.po.LoveAnniversaryPO">
+    <resultMap id="loveAnniversaryResultMap" type="diary.diarylove.entity.po.LoveAnniversaryPO">
         <id property="id"                   column="id"/>
         <result property="coupleId"         column="couple_id"/>
         <result property="creatorUserId"    column="creator_user_id"/>
@@ -29,7 +29,7 @@
         <result property="updateTime"       column="update_time"/>
     </resultMap>
 
-    <resultMap id="loveLocationResultMap" type="diary.common.entity.love.po.LoveLocationPO">
+    <resultMap id="loveLocationResultMap" type="diary.diarylove.entity.po.LoveLocationPO">
         <id property="id"                   column="id"/>
         <result property="coupleId"         column="couple_id"/>
         <result property="name"             column="name"/>
@@ -43,7 +43,7 @@
         <result property="updateTime"       column="update_time"/>
     </resultMap>
 
-    <resultMap id="loveRecordResultMap" type="diary.common.entity.love.po.LoveRecordPO">
+    <resultMap id="loveRecordResultMap" type="diary.diarylove.entity.po.LoveRecordPO">
         <id property="id"                   column="id"/>
         <result property="coupleId"         column="couple_id"/>
         <result property="creatorUserId"    column="creator_user_id"/>
@@ -59,7 +59,7 @@
         <result property="updateTime"       column="update_time"/>
     </resultMap>
 
-    <resultMap id="loveRecordImageResultMap" type="diary.common.entity.love.po.LoveRecordImagePO">
+    <resultMap id="loveRecordImageResultMap" type="diary.diarylove.entity.po.LoveRecordImagePO">
         <id property="id"                   column="id"/>
         <result property="recordId"         column="record_id"/>
         <result property="imageId"          column="image_id"/>
@@ -68,7 +68,7 @@
         <result property="createTime"       column="create_time"/>
     </resultMap>
 
-    <resultMap id="loveMoodResultMap" type="diary.common.entity.love.po.LoveMoodPO">
+    <resultMap id="loveMoodResultMap" type="diary.diarylove.entity.po.LoveMoodPO">
         <id property="id"                   column="id"/>
         <result property="moodCode"         column="mood_code"/>
         <result property="moodName"         column="mood_name"/>
@@ -79,7 +79,7 @@
         <result property="updateTime"       column="update_time"/>
     </resultMap>
 
-    <resultMap id="loveRecordMoodResultMap" type="diary.common.entity.love.po.LoveRecordMoodPO">
+    <resultMap id="loveRecordMoodResultMap" type="diary.diarylove.entity.po.LoveRecordMoodPO">
         <id property="id"                   column="id"/>
         <result property="recordId"         column="record_id"/>
         <result property="moodId"           column="mood_id"/>
@@ -87,7 +87,7 @@
         <result property="createTime"       column="create_time"/>
     </resultMap>
 
-    <resultMap id="loveMoodRecordResultMap" type="diary.common.entity.love.po.LoveMoodRecordPO">
+    <resultMap id="loveMoodRecordResultMap" type="diary.diarylove.entity.po.LoveMoodRecordPO">
         <id property="id"                   column="id"/>
         <result property="moodId"           column="mood_id"/>
         <result property="recordId"         column="record_id"/>
@@ -101,7 +101,7 @@
         <result property="updateTime"       column="update_time"/>
     </resultMap>
 
-    <resultMap id="loveTagResultMap" type="diary.common.entity.love.po.LoveTagPO">
+    <resultMap id="loveTagResultMap" type="diary.diarylove.entity.po.LoveTagPO">
         <id property="id"                   column="id"/>
         <result property="recordId"         column="record_id"/>
         <result property="coupleId"         column="couple_id"/>
@@ -113,7 +113,7 @@
         <result property="updateTime"       column="update_time"/>
     </resultMap>
 
-    <resultMap id="loveRecordTagResultMap" type="diary.common.entity.love.po.LoveRecordTagPO">
+    <resultMap id="loveRecordTagResultMap" type="diary.diarylove.entity.po.LoveRecordTagPO">
         <id property="id"                   column="id"/>
         <result property="recordId"         column="record_id"/>
         <result property="tagId"            column="tag_id"/>
@@ -254,7 +254,7 @@
         UPDATE love_record SET deleted = 1, update_time = CURRENT_TIMESTAMP WHERE id = #{id} AND deleted = 0
     </update>
 
-    <insert id="insertLoveRecordImage" parameterType="diary.common.entity.love.po.LoveRecordImagePO">
+    <insert id="insertLoveRecordImage" parameterType="diary.diarylove.entity.po.LoveRecordImagePO">
         INSERT INTO love_record_image (id, record_id, image_id, is_cover, sort) VALUES
         <foreach collection="loveRecordImagePOList" item="item" separator=",">
             (#{item.id}, #{item.recordId}, #{item.imageId}, #{item.isCover}, #{item.sort})
@@ -307,7 +307,7 @@
         DELETE FROM love_record_image WHERE id = #{id}
     </delete>
 
-    <select id="selectReadyOutbox" resultType="diary.common.entity.mq.po.MqOutboxPO">
+    <select id="selectReadyOutbox" resultType="diary.diaryai.entity.mq.po.MqOutboxPO">
         select <include refid="mqOutboxColumns"/> from mq_outbox
         where status in ('NEW', 'RETRY_WAIT') and next_retry_time &lt;= CURRENT_TIMESTAMP
         order by next_retry_time asc, id asc limit publisherBatchSize

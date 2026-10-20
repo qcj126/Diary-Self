@@ -1,14 +1,13 @@
 package diary.diarytimemachine.mapper;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import diary.common.entity.timemachine.dto.TimeCardDTO;
-import diary.common.entity.timemachine.dto.TimeCategoryIconDTO;
-import diary.common.entity.timemachine.po.TimeCardPO;
-import diary.common.entity.timemachine.po.TimeCategoryPO;
-import diary.common.entity.timemachine.vo.TimeCardVO;
+import diary.diarytimemachine.entity.dto.TimeCardDTO;
+import diary.diarytimemachine.entity.dto.TimeCategoryIconDTO;
+import diary.diarytimemachine.entity.po.TimeCardPO;
+import diary.diarytimemachine.entity.po.TimeCategoryPO;
+import diary.diarytimemachine.entity.vo.TimeCardVO;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper

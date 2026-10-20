@@ -2,8 +2,8 @@ package com.executor.jobhandler;
 
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
-import diary.common.entity.xxlJob.UserPushConfig;
-import diary.common.entity.xxlJob.WeatherInfo;
+import com.executor.entity.UserPushConfig;
+import com.executor.entity.WeatherInfo;
 import com.executor.mapper.UserMapper;
 import com.executor.service.PushService;
 import com.executor.service.WeatherService;

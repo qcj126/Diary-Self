@@ -1,8 +1,8 @@
 package diary.diarygoal.controller;
 
 import diary.common.auth.CurrentUser;
-import diary.common.entity.goal.dto.GoalDashboardQueryDTO;
-import diary.common.entity.goal.vo.GoalDashboardVO;
+import diary.diarygoal.entity.dto.GoalDashboardQueryDTO;
+import diary.diarygoal.entity.vo.GoalDashboardVO;
 import diary.common.result.ApiResponse;
 import diary.config.logconfig.OperLog;
 import diary.diarygoal.service.dashboard.GoalDashboardService;

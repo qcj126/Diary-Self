@@ -1,8 +1,8 @@
 package diary.diaryai.service;
 
-import diary.common.entity.ai.dto.AiInvokeDTO;
-import diary.common.entity.ai.dto.AiTaskMessageDto;
-import diary.common.entity.ai.po.AiTaskPO;
+import diary.diaryai.entity.ai.dto.AiInvokeDTO;
+import diary.diaryai.entity.ai.dto.AiTaskMessageDto;
+import diary.diaryai.entity.ai.po.AiTaskPO;
 import org.apache.rocketmq.client.apis.consumer.ConsumeResult;
 
 import java.util.Map;

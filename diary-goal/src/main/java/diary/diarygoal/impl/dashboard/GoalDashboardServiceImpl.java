@@ -1,13 +1,13 @@
 package diary.diarygoal.impl.dashboard;
 
-import diary.common.entity.goal.dto.GoalDashboardQueryDTO;
-import diary.common.entity.goal.po.GoalDashboardCategoryHoursPO;
-import diary.common.entity.goal.po.GoalDashboardGoalStatsPO;
-import diary.common.entity.goal.po.GoalDashboardStaleGoalPO;
-import diary.common.entity.goal.po.GoalDashboardTimeEntryPO;
-import diary.common.entity.goal.po.GoalDashboardWorkloadPO;
-import diary.common.entity.goal.vo.GoalDashboardVO;
-import diary.common.enums.goalenum.GoalStatusEnum;
+import diary.diarygoal.entity.dto.GoalDashboardQueryDTO;
+import diary.diarygoal.entity.po.GoalDashboardCategoryHoursPO;
+import diary.diarygoal.entity.po.GoalDashboardGoalStatsPO;
+import diary.diarygoal.entity.po.GoalDashboardStaleGoalPO;
+import diary.diarygoal.entity.po.GoalDashboardTimeEntryPO;
+import diary.diarygoal.entity.po.GoalDashboardWorkloadPO;
+import diary.diarygoal.entity.vo.GoalDashboardVO;
+import diary.diarygoal.enums.GoalStatusEnum;
 import diary.common.result.ApiResponse;
 import diary.diarygoal.mapper.GoalDashboardMapper;
 import diary.diarygoal.service.dashboard.GoalDashboardService;

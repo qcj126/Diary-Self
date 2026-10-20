@@ -2,8 +2,8 @@ package diary.user.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import diary.common.consts.RedisKeyConst;
-import diary.common.entity.user.vo.TokenInfoVO;
-import diary.common.entity.user.vo.TokenPairVO;
+import diary.user.entity.vo.TokenInfoVO;
+import diary.user.entity.vo.TokenPairVO;
 import diary.common.exception.CustomException;
 import diary.user.service.TokenService;
 import diary.utils.jwt.JwtUtil;

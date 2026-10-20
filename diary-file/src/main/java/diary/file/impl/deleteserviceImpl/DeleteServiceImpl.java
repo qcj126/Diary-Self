@@ -3,7 +3,7 @@ package diary.file.impl.deleteserviceImpl;
 import com.aliyun.oss.ClientException;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSException;
-import diary.common.entity.image.po.ImagePO;
+import diary.file.entity.po.ImagePO;
 import diary.common.exception.NullResultException;
 import diary.common.exception.ParamIllegalException;
 import diary.file.mapper.ImageMapper;

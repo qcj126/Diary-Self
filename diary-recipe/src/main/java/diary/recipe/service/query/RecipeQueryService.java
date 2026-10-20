@@ -1,9 +1,9 @@
 package diary.recipe.service.query;
 
-import diary.common.entity.recipe.dto.req.RecipePageReqDto;
-import diary.common.entity.recipe.vo.PageRecipeVO;
-import diary.common.entity.recipe.vo.RecipeCategoryVO;
-import diary.common.entity.recipe.vo.RecipeVO;
+import diary.recipe.entity.dto.req.RecipePageReqDto;
+import diary.recipe.entity.vo.PageRecipeVO;
+import diary.recipe.entity.vo.RecipeCategoryVO;
+import diary.recipe.entity.vo.RecipeVO;
 import diary.common.result.ApiResponse;
 
 import java.util.List;

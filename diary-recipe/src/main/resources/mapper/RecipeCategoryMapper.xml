@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="diary.recipe.mapper.RecipeCategoryMapper">
-    <resultMap id="recipeCategoryMap" type="diary.common.entity.recipe.po.RecipeCategoryPO">
+    <resultMap id="recipeCategoryMap" type="diary.recipe.entity.po.RecipeCategoryPO">
         <id property="id" column="id"/>
         <result property="userId" column="user_id"/>
         <result property="categoryName" column="category_name"/>
@@ -17,7 +17,7 @@
         id, user_id, category_name, category_num, sort, icon_id, create_time, update_time
     </sql>
 
-    <select id="queryRecipeCategory" resultType="diary.common.entity.recipe.dto.db.RecipeCategoryIconDto">
+    <select id="queryRecipeCategory" resultType="diary.recipe.entity.dto.db.RecipeCategoryIconDto">
         SELECT
         a.id as categoryId,
         a.category_name as categoryName,
@@ -35,7 +35,7 @@
         SELECT MAX(category_num) FROM recipe_category
     </select>
 
-    <insert id="insert" parameterType="diary.common.entity.recipe.po.RecipeCategoryPO">
+    <insert id="insert" parameterType="diary.recipe.entity.po.RecipeCategoryPO">
         INSERT INTO recipe_category
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
@@ -66,7 +66,7 @@
         </foreach>
     </delete>
 
-    <update id="updateCategoryById" parameterType="diary.common.entity.recipe.po.RecipeCategoryPO">
+    <update id="updateCategoryById" parameterType="diary.recipe.entity.po.RecipeCategoryPO">
         UPDATE recipe_category
         <set>
             <if test="userId != null">

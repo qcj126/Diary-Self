@@ -1,6 +1,6 @@
 package diary.diaryai.recovery.job;
 
-import diary.common.entity.ai.po.AiTaskPO;
+import diary.diaryai.entity.ai.po.AiTaskPO;
 import diary.diaryai.mapper.DiaryAiMapper;
 import diary.diaryai.properties.AiTaskProperties;
 import diary.diaryai.service.AiTaskRecoveryService;

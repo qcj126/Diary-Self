@@ -1,8 +1,7 @@
 package diary.diarygoal.service.query;
 
-import diary.common.entity.goal.dto.GoalQueryDTO;
-import diary.common.entity.goal.dto.StageGoalDTO;
-import diary.common.entity.goal.vo.StageGoalVO;
+import diary.diarygoal.entity.dto.GoalQueryDTO;
+import diary.diarygoal.entity.vo.StageGoalVO;
 import diary.common.result.ApiResponse;
 
 import java.util.List;

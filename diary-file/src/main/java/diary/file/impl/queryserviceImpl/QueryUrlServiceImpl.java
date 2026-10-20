@@ -1,7 +1,7 @@
 package diary.file.impl.queryserviceImpl;
 
-import diary.common.entity.image.po.ImagePO;
-import diary.common.entity.image.vo.ImageVO;
+import diary.file.entity.po.ImagePO;
+import diary.file.entity.vo.ImageVO;
 import diary.file.mapper.ImageMapper;
 import diary.file.service.queryurlservice.QueryUrlService;
 import diary.utils.OSS.OssUtil;

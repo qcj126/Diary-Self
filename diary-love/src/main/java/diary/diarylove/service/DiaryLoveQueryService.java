@@ -1,9 +1,15 @@
 package diary.diarylove.service;
 
-import diary.common.entity.love.dto.LoveRecordDTO;
+import diary.diarylove.entity.dto.LoveRecordDTO;
 import diary.common.entity.love.vo.*;
-import diary.common.entity.love.dto.LoveCoupleDTO;
+import diary.diarylove.entity.dto.LoveCoupleDTO;
 import diary.common.result.ApiResponse;
+import diary.diarylove.entity.vo.LoveAnniversaryVO;
+import diary.diarylove.entity.vo.LoveCoupleVO;
+import diary.diarylove.entity.vo.LoveLocationVO;
+import diary.diarylove.entity.vo.LoveMoodRecordVO;
+import diary.diarylove.entity.vo.LoveRecordImageVO;
+import diary.diarylove.entity.vo.LoveRecordVO;
 
 import java.util.List;
 

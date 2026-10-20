@@ -1,11 +1,10 @@
 package diary.diaryai.impl;
 
-import diary.common.entity.mq.po.MqOutboxPO;
-import diary.common.entity.ai.po.AiTaskPO;
-import diary.common.enums.outbox.OutboxEventTypeEnum;
-import diary.common.enums.outbox.OutboxStatusEnum;
+import diary.diaryai.entity.mq.po.MqOutboxPO;
+import diary.diaryai.entity.ai.po.AiTaskPO;
+import diary.diaryai.enums.outbox.OutboxEventTypeEnum;
+import diary.diaryai.enums.outbox.OutboxStatusEnum;
 import diary.diaryai.mapper.DiaryAiMapper;
-import diary.diaryai.properties.AiTaskProperties;
 import diary.diaryai.service.AiOutboxService;
 import diary.diaryai.service.AiTransactionService;
 import lombok.RequiredArgsConstructor;

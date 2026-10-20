@@ -1,8 +1,8 @@
 package diary.user.service;
 
-import diary.common.entity.user.dto.UserReqDTO;
-import diary.common.entity.user.vo.TokenPairVO;
-import diary.common.entity.user.vo.UserVO;
+import diary.user.entity.dto.UserReqDTO;
+import diary.user.entity.vo.TokenPairVO;
+import diary.user.entity.vo.UserVO;
 
 import java.util.List;
 import java.util.Map;

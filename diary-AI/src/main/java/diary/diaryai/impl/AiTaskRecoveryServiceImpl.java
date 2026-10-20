@@ -1,13 +1,13 @@
 package diary.diaryai.impl;
 
-import diary.common.entity.ai.dto.AiTaskMessageDto;
-import diary.common.entity.ai.dto.AiTaskProcessDto;
-import diary.common.entity.ai.po.AiTaskPO;
-import diary.common.entity.mq.po.MqOutboxPO;
-import diary.common.enums.aienum.AiTaskErrorCodeEnum;
-import diary.common.enums.aienum.AiTaskStatusEnum;
-import diary.common.enums.outbox.OutboxEventTypeEnum;
-import diary.common.enums.outbox.OutboxStatusEnum;
+import diary.diaryai.entity.ai.dto.AiTaskMessageDto;
+import diary.diaryai.entity.ai.dto.AiTaskProcessDto;
+import diary.diaryai.entity.ai.po.AiTaskPO;
+import diary.diaryai.entity.mq.po.MqOutboxPO;
+import diary.diaryai.enums.aienum.AiTaskErrorCodeEnum;
+import diary.diaryai.enums.aienum.AiTaskStatusEnum;
+import diary.diaryai.enums.outbox.OutboxEventTypeEnum;
+import diary.diaryai.enums.outbox.OutboxStatusEnum;
 import diary.diaryai.mapper.DiaryAiMapper;
 import diary.diaryai.properties.AiTaskProperties;
 import diary.diaryai.service.AiTaskRecoveryService;
@@ -20,9 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
-import static diary.common.consts.MqTaskConst.AI_TASK_AGGREGATE_TYPE;
-import static diary.common.consts.MqTaskConst.OUTBOX_EVENT_ID;
-import static diary.common.consts.MqTaskConst.OUTBOX_SCHEMA_VERSION;
+import static diary.diaryai.consts.MqTaskConst.AI_TASK_AGGREGATE_TYPE;
+import static diary.diaryai.consts.MqTaskConst.OUTBOX_EVENT_ID;
+import static diary.diaryai.consts.MqTaskConst.OUTBOX_SCHEMA_VERSION;
 import static diary.utils.commonutil.MyUtils.writeJson;
 
 @Service
@@ -60,10 +60,10 @@ public class AiTaskRecoveryServiceImpl implements AiTaskRecoveryService {
         String eventId = OUTBOX_EVENT_ID + MyUtils.getPrimaryKey();
 
         String taskTagType = null;
-        switch (request.getAiApplication()) {
-            case 1 -> taskTagType = properties.getRocketmq().getTaskNutrientTag();
-            case 2 -> taskTagType = properties.getRocketmq().getTaskSentimentTag();
-        }
+//        switch (request.getAiApplication()) {
+//            case 1 -> taskTagType = properties.getRocketmq().getTaskNutrientTag();
+//            case 2 -> taskTagType = properties.getRocketmq().getTaskSentimentTag();
+//        }
 
         AiTaskMessageDto retryMessage = AiTaskMessageDto.builder()
                 .clientRequestId(task.getClientRequestId())
@@ -85,7 +85,7 @@ public class AiTaskRecoveryServiceImpl implements AiTaskRecoveryService {
                 .aggregateId(task.getId())
                 .eventType(OutboxEventTypeEnum.AI_TASK_RETRY.name())
                 .topic(properties.getRocketmq().getTaskTopic())
-                .tag(properties.getRocketmq().getTaskTag())
+                .tag(taskTagType)
                 .messageKey(String.valueOf(task.getId()))
                 .payload(writeJson(retryMessage, "AI任务恢复消息序列化失败"))
                 .schemaVersion(OUTBOX_SCHEMA_VERSION)

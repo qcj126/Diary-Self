@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="diary.diaryai.mapper.DiaryAiMapper">
-    <resultMap id="AiInfoResultMap" type="diary.common.entity.ai.po.AiInfoPO">
+    <resultMap id="AiInfoResultMap" type="diary.diaryai.entity.ai.po.AiInfoPO">
         <id column="id" property="id" jdbcType="BIGINT"/>
         <result column="user_id" property="userId" jdbcType="BIGINT"/>
         <result column="model" property="model" jdbcType="VARCHAR"/>
@@ -12,7 +12,7 @@
         <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
     </resultMap>
 
-    <resultMap id="AiNutrientResultMap" type="diary.common.entity.ai.po.AiNutrientPO">
+    <resultMap id="AiNutrientResultMap" type="diary.diaryai.entity.ai.po.AiNutrientPO">
         <id column="id" property="id" jdbcType="BIGINT"/>
         <result column="user_id" property="userId" jdbcType="BIGINT"/>
         <result column="universal_id" property="universalId" jdbcType="BIGINT"/>
@@ -29,7 +29,7 @@
         <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
     </resultMap>
 
-    <resultMap id="AiTaskResultMap" type="diary.common.entity.ai.po.AiTaskPO">
+    <resultMap id="AiTaskResultMap" type="diary.diaryai.entity.ai.po.AiTaskPO">
         <id column="id" property="id" jdbcType="BIGINT"/>
         <result column="user_id" property="userId" jdbcType="BIGINT"/>
         <result column="client_request_id" property="clientRequestId" jdbcType="VARCHAR"/>
@@ -52,7 +52,7 @@
         <result column="version_id" property="versionId" jdbcType="INTEGER"/>
     </resultMap>
 
-    <resultMap id="MqOutboxResultMap" type="diary.common.entity.mq.po.MqOutboxPO">
+    <resultMap id="MqOutboxResultMap" type="diary.diaryai.entity.mq.po.MqOutboxPO">
         <id column="id" property="id"/>
         <result column="event_id" property="eventId"/>
         <result column="aggregate_type" property="aggregateType"/>
@@ -74,7 +74,7 @@
         <result column="update_time" property="updateTime"/>
         <result column="version_id" property="versionId"/>
     </resultMap>
-    <resultMap id="AiTaskResultVo" type="diary.common.entity.ai.vo.AiTaskResultVo">
+    <resultMap id="AiTaskResultVo" type="diary.diaryai.entity.ai.vo.AiTaskResultVo">
         <id column="id" property="taskId" jdbcType="BIGINT"/>
         <result column="status" property="status" jdbcType="VARCHAR"/>
         <result column="ai_info_id" property="aiInfoId" jdbcType="BIGINT"/>
@@ -116,7 +116,7 @@
         values (#{id}, #{userId}, #{model}, #{temperature}, #{aiType}, #{aiApplication})
     </insert>
 
-    <insert id="insertAiTask" parameterType="diary.common.entity.ai.po.AiTaskPO">
+    <insert id="insertAiTask" parameterType="diary.diaryai.entity.ai.po.AiTaskPO">
         <!--
             以前列部分判断 id，值部分却判断不存在的 taskId 属性，MyBatis 可能抛属性读取异常，
             也可能生成列和值数量不一致的 SQL。任务创建字段均为第一版必填项，因此改为静态、对称的插入语句。
@@ -148,7 +148,7 @@
           AND client_request_id = #{clientRequestId}
     </select>
 
-    <update id="claimForExecution" parameterType="diary.common.entity.ai.dto.AiTaskProcessDto">
+    <update id="claimForExecution" parameterType="diary.diaryai.entity.ai.dto.AiTaskProcessDto">
         <!--
             以前 Consumer 先做普通 RUNNING 更新、再无条件调用模型，重复消息会并发计费。
             现在状态抢占、attempt_count/version_id 递增、Worker 和租约写入在一条 SQL 中原子完成。
@@ -180,7 +180,7 @@
           )
     </update>
 
-    <update id="markRetryWaitIfOwned" parameterType="diary.common.entity.ai.dto.AiTaskProcessDto">
+    <update id="markRetryWaitIfOwned" parameterType="diary.diaryai.entity.ai.dto.AiTaskProcessDto">
         UPDATE ai_task
         SET status = 'RETRY_WAIT',
             worker_id = NULL,
@@ -197,7 +197,7 @@
           AND version_id = #{versionId}
     </update>
 
-    <update id="markSuccessIfOwned" parameterType="diary.common.entity.ai.dto.AiTaskProcessDto">
+    <update id="markSuccessIfOwned" parameterType="diary.diaryai.entity.ai.dto.AiTaskProcessDto">
         <!-- 旧 Worker 必须同时匹配 worker_id 和抢占后的 version_id，避免租约恢复后覆盖新 Worker 的结果。 -->
         UPDATE ai_task
         SET status = 'SUCCESS',
@@ -217,7 +217,7 @@
           AND version_id = #{versionId}
     </update>
 
-    <update id="markFailedIfOwned" parameterType="diary.common.entity.ai.dto.AiTaskProcessDto">
+    <update id="markFailedIfOwned" parameterType="diary.diaryai.entity.ai.dto.AiTaskProcessDto">
         UPDATE ai_task
         SET status = 'FAILED',
             worker_id = NULL,
@@ -235,7 +235,7 @@
           AND version_id = #{versionId}
     </update>
 
-    <update id="markFailedIfAttemptsExhausted" parameterType="diary.common.entity.ai.dto.AiTaskProcessDto">
+    <update id="markFailedIfAttemptsExhausted" parameterType="diary.diaryai.entity.ai.dto.AiTaskProcessDto">
         <!--
             Worker 可能在最后一次尝试中宕机，attempt_count 已到上限但没有机会写 FAILED。
             以前这类任务既不能再次抢占，也没有终态，会永久卡住。现在重复投递可在租约过期后收敛为 FAILED。
@@ -260,7 +260,7 @@
           )
     </update>
 
-    <update id="recoverExpiredRunning" parameterType="diary.common.entity.ai.dto.AiTaskProcessDto">
+    <update id="recoverExpiredRunning" parameterType="diary.diaryai.entity.ai.dto.AiTaskProcessDto">
         <!-- 供后续恢复任务调用；只恢复确实过期且仍有剩余尝试次数的 RUNNING 任务。 -->
         UPDATE ai_task
         SET status = 'RETRY_WAIT',
@@ -277,7 +277,7 @@
           AND version_id = #{versionId}
     </update>
 
-    <update id="markDeadLetterIfDispatchable" parameterType="diary.common.entity.ai.dto.AiTaskProcessDto">
+    <update id="markDeadLetterIfDispatchable" parameterType="diary.diaryai.entity.ai.dto.AiTaskProcessDto">
         <!-- 仅收敛尚未执行的任务，不覆盖 RUNNING 或终态。 -->
         UPDATE ai_task
         SET status = 'DEAD_LETTER',
@@ -295,7 +295,7 @@
           AND version_id = #{versionId}
     </update>
 
-    <update id="renewExecutionLease" parameterType="diary.common.entity.ai.dto.AiTaskProcessDto">
+    <update id="renewExecutionLease" parameterType="diary.diaryai.entity.ai.dto.AiTaskProcessDto">
         <!-- 租约续期不是状态迁移，因此不递增 version_id；提交结果仍使用抢占时的同一所有权版本。 -->
         UPDATE ai_task
         SET lease_until = TIMESTAMPADD(SECOND, #{leaseSeconds}, CURRENT_TIMESTAMP),
@@ -306,7 +306,7 @@
           AND version_id = #{versionId}
     </update>
 
-    <insert id="insertOutbox" parameterType="diary.common.entity.mq.po.MqOutboxPO">
+    <insert id="insertOutbox" parameterType="diary.diaryai.entity.mq.po.MqOutboxPO">
         INSERT INTO mq_outbox
         (id, event_id, aggregate_type, aggregate_id, event_type,
          topic, tag, message_key, payload, schema_version,
@@ -380,7 +380,7 @@
           AND request_hash IS NULL
     </update>
 
-    <insert id="insertRetryTaskOutbox" parameterType="diary.common.entity.mq.po.MqOutboxPO">
+    <insert id="insertRetryTaskOutbox" parameterType="diary.diaryai.entity.mq.po.MqOutboxPO">
         INSERT INTO mq_outbox
         (id, event_id, aggregate_type, aggregate_id, event_type,
         topic, tag, message_key, payload, schema_version,

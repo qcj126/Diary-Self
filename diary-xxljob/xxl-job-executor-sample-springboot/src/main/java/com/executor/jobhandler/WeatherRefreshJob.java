@@ -4,7 +4,7 @@ import com.executor.service.WeatherService;
 import com.executor.service.WeatherService.WeatherRefreshResult;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
-import diary.common.enums.xxljobenums.QWeatherLocationEnum;
+import com.executor.enums.QWeatherLocationEnum;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;

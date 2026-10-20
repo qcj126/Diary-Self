@@ -1,6 +1,6 @@
 package diary.recipe.mapper;
 
-import diary.common.entity.recipe.po.RecipeIngredientPO;
+import diary.recipe.entity.po.RecipeIngredientPO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

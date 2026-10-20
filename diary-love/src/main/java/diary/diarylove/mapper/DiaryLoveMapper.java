@@ -1,10 +1,17 @@
 package diary.diarylove.mapper;
 
-import diary.common.entity.love.dto.LoveCoupleDTO;
-import diary.common.entity.love.dto.LoveRecordDTO;
+import diary.diarylove.entity.dto.LoveCoupleDTO;
+import diary.diarylove.entity.dto.LoveRecordDTO;
 import diary.common.entity.love.po.*;
 import diary.common.entity.mq.po.MqOutboxPO;
-import jakarta.validation.constraints.NotNull;
+import diary.diarylove.entity.po.LoveAnniversaryPO;
+import diary.diarylove.entity.po.LoveCouplePO;
+import diary.diarylove.entity.po.LoveLocationPO;
+import diary.diarylove.entity.po.LoveMoodPO;
+import diary.diarylove.entity.po.LoveMoodRecordPO;
+import diary.diarylove.entity.po.LoveRecordImagePO;
+import diary.diarylove.entity.po.LoveRecordPO;
+import diary.diarylove.entity.po.LoveTagPO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

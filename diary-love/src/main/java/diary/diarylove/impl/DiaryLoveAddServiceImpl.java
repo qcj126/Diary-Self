@@ -1,11 +1,19 @@
 package diary.diarylove.impl;
 
-import diary.common.convert.love.DtoConvertToPo;
+import diary.diarylove.entity.convert.DtoConvertToPo;
 import diary.common.entity.love.dto.*;
-import diary.common.entity.love.po.LoveMoodPO;
-import diary.common.entity.love.po.LoveMoodRecordPO;
-import diary.common.entity.love.po.LoveRecordImagePO;
-import diary.common.entity.love.po.LoveTagPO;
+import diary.diarylove.entity.dto.AddLoveRecordDto;
+import diary.diarylove.entity.dto.LoveAnniversaryDTO;
+import diary.diarylove.entity.dto.LoveCoupleDTO;
+import diary.diarylove.entity.dto.LoveLocationDTO;
+import diary.diarylove.entity.dto.LoveMoodRecordDTO;
+import diary.diarylove.entity.dto.LoveRecordDTO;
+import diary.diarylove.entity.dto.LoveRecordImageDTO;
+import diary.diarylove.entity.dto.LoveTagDTO;
+import diary.diarylove.entity.po.LoveMoodPO;
+import diary.diarylove.entity.po.LoveMoodRecordPO;
+import diary.diarylove.entity.po.LoveRecordImagePO;
+import diary.diarylove.entity.po.LoveTagPO;
 import diary.common.exception.NullResultException;
 import diary.common.exception.SameDataException;
 import diary.common.result.ApiResponse;
@@ -19,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import static diary.common.convert.love.LargeDtoConvertToTinyDto.*;
+import static diary.diarylove.entity.convert.LargeDtoConvertToTinyDto.*;
 
 @Service
 @RequiredArgsConstructor

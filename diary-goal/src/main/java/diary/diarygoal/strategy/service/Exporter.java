@@ -1,6 +1,6 @@
 package diary.diarygoal.strategy.service;
 
-import diary.common.entity.goal.dto.StageGoalDTO;
+import diary.diarygoal.entity.dto.StageGoalDTO;
 
 import java.io.ByteArrayOutputStream;
 

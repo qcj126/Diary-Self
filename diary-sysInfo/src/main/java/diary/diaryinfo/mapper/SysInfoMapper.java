@@ -1,11 +1,10 @@
 package diary.diaryinfo.mapper;
 
-import diary.common.entity.sysInfo.dto.IngredientIconDto;
-import diary.common.entity.sysInfo.po.CookWayPo;
-import diary.common.entity.sysInfo.po.IngredientPo;
+import diary.diaryinfo.entity.dto.IngredientIconDto;
+import diary.diaryinfo.entity.po.CookWayPo;
+import diary.diaryinfo.entity.po.IngredientPo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 

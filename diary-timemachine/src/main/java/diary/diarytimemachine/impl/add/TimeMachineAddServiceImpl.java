@@ -1,10 +1,10 @@
 package diary.diarytimemachine.impl.add;
 
-import diary.common.convert.timemachine.DtoConvertToPo;
-import diary.common.entity.timemachine.dto.TimeCardDTO;
-import diary.common.entity.timemachine.dto.TimeCategoryDTO;
-import diary.common.entity.timemachine.po.TimeCardPO;
-import diary.common.entity.timemachine.po.TimeCategoryPO;
+import diary.diarytimemachine.entity.convert.DtoConvertToPo;
+import diary.diarytimemachine.entity.dto.TimeCardDTO;
+import diary.diarytimemachine.entity.dto.TimeCategoryDTO;
+import diary.diarytimemachine.entity.po.TimeCardPO;
+import diary.diarytimemachine.entity.po.TimeCategoryPO;
 import diary.common.exception.ParamIllegalException;
 import diary.common.exception.SameDataException;
 import diary.diarytimemachine.mapper.TimeMachineMapper;

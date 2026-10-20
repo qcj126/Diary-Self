@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="diary.diaryinfo.mapper.SysInfoMapper">
-    <resultMap id="IngredientPoResultMap" type="diary.common.entity.sysInfo.po.IngredientPo">
+    <resultMap id="IngredientPoResultMap" type="diary.diaryinfo.entity.po.IngredientPo">
         <id property="id" column="id"/>
         <result property="name" column="name"/>
         <result property="category" column="category"/>
@@ -13,7 +13,7 @@
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
     </resultMap>
-    <resultMap id="IngredientIconDtoResultMap" type="diary.common.entity.sysInfo.dto.IngredientIconDto">
+    <resultMap id="IngredientIconDtoResultMap" type="diary.diaryinfo.entity.dto.IngredientIconDto">
         <id property="id" column="id"/>
         <result property="name" column="name"/>
         <result property="category" column="category"/>
@@ -27,7 +27,7 @@
         <result property="updateTime" column="update_time"/>
     </resultMap>
 
-    <resultMap id="CookWayPoResultMap" type="diary.common.entity.sysInfo.po.CookWayPo">
+    <resultMap id="CookWayPoResultMap" type="diary.diaryinfo.entity.po.CookWayPo">
         <id property="id" column="id"/>
         <result property="name" column="name"/>
         <result property="description" column="description"/>

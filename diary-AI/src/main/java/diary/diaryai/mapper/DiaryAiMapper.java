@@ -1,11 +1,11 @@
 package diary.diaryai.mapper;
 
-import diary.common.entity.ai.dto.AiTaskProcessDto;
-import diary.common.entity.ai.po.AiInfoPO;
-import diary.common.entity.ai.po.AiNutrientPO;
-import diary.common.entity.ai.po.AiTaskPO;
-import diary.common.entity.ai.vo.AiTaskResultVo;
-import diary.common.entity.mq.po.MqOutboxPO;
+import diary.diaryai.entity.ai.dto.AiTaskProcessDto;
+import diary.diaryai.entity.ai.po.AiInfoPO;
+import diary.diaryai.entity.ai.po.AiNutrientPO;
+import diary.diaryai.entity.ai.po.AiTaskPO;
+import diary.diaryai.entity.ai.vo.AiTaskResultVo;
+import diary.diaryai.entity.mq.po.MqOutboxPO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

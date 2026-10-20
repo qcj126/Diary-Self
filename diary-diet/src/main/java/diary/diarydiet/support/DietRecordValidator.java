@@ -1,7 +1,7 @@
 package diary.diarydiet.support;
 
-import diary.common.entity.diet.dto.DietQueryDTO;
-import diary.common.entity.diet.dto.DietRecordDTO;
+import diary.diarydiet.entity.dto.DietQueryDTO;
+import diary.diarydiet.entity.dto.DietRecordDTO;
 import diary.common.exception.ParamIllegalException;
 import diary.utils.commonutil.MyUtils;
 

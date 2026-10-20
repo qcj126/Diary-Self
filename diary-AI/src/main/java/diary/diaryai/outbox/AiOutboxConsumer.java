@@ -1,10 +1,10 @@
 package diary.diaryai.outbox;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import diary.common.entity.ai.dto.AiTaskMessageDto;
-import diary.common.entity.ai.dto.AiTaskProcessDto;
-import diary.common.entity.ai.po.AiTaskPO;
-import diary.common.enums.aienum.AiTaskStatusEnum;
+import diary.diaryai.entity.ai.dto.AiTaskMessageDto;
+import diary.diaryai.entity.ai.dto.AiTaskProcessDto;
+import diary.diaryai.entity.ai.po.AiTaskPO;
+import diary.diaryai.enums.aienum.AiTaskStatusEnum;
 import diary.diaryai.executor.AiTaskExecutor;
 import diary.diaryai.guard.LocalAiConcurrencyGuard;
 import diary.diaryai.guard.AiTaskLeaseRenewer;
@@ -23,7 +23,7 @@ import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.UUID;
 
-import static diary.common.consts.MqTaskConst.OUTBOX_SCHEMA_VERSION;
+import static diary.diaryai.consts.MqTaskConst.OUTBOX_SCHEMA_VERSION;
 
 @Service
 @RocketMQMessageListener(

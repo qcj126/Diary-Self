@@ -1,10 +1,10 @@
 package diary.diarytimemachine.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import diary.common.entity.timemachine.dto.TimeCardDTO;
-import diary.common.entity.timemachine.dto.TimeCategoryDTO;
-import diary.common.entity.timemachine.vo.TimeCardVO;
-import diary.common.entity.timemachine.vo.TimeCategoryVO;
+import diary.diarytimemachine.entity.dto.TimeCardDTO;
+import diary.diarytimemachine.entity.dto.TimeCategoryDTO;
+import diary.diarytimemachine.entity.vo.TimeCardVO;
+import diary.diarytimemachine.entity.vo.TimeCategoryVO;
 import diary.common.result.ApiResponse;
 import diary.config.logconfig.OperLog;
 import diary.diarytimemachine.service.add.TimeMachineAddService;
@@ -15,7 +15,6 @@ import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;

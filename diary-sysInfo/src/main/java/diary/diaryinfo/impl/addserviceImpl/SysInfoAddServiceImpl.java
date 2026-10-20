@@ -1,9 +1,9 @@
 package diary.diaryinfo.impl.addserviceImpl;
 
-import diary.common.convert.sysInfo.DtoConvertToPo;
+import diary.diaryinfo.entity.convert.DtoConvertToPo;
 import diary.common.entity.file.po.IconPO;
-import diary.common.entity.sysInfo.dto.IngredientReqDto;
-import diary.common.entity.sysInfo.po.IngredientPo;
+import diary.diaryinfo.entity.dto.IngredientReqDto;
+import diary.diaryinfo.entity.po.IngredientPo;
 import diary.common.exception.NullResultException;
 import diary.common.result.ApiResponse;
 import diary.diaryinfo.mapper.IconMapper;

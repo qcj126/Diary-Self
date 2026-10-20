@@ -1,10 +1,10 @@
 package diary.diarygoal.mapper;
 
-import diary.common.entity.goal.po.GoalDashboardCategoryHoursPO;
-import diary.common.entity.goal.po.GoalDashboardGoalStatsPO;
-import diary.common.entity.goal.po.GoalDashboardStaleGoalPO;
-import diary.common.entity.goal.po.GoalDashboardTimeEntryPO;
-import diary.common.entity.goal.po.GoalDashboardWorkloadPO;
+import diary.diarygoal.entity.po.GoalDashboardCategoryHoursPO;
+import diary.diarygoal.entity.po.GoalDashboardGoalStatsPO;
+import diary.diarygoal.entity.po.GoalDashboardStaleGoalPO;
+import diary.diarygoal.entity.po.GoalDashboardTimeEntryPO;
+import diary.diarygoal.entity.po.GoalDashboardWorkloadPO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

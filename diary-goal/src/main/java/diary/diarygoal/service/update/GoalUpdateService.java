@@ -1,6 +1,6 @@
 package diary.diarygoal.service.update;
 
-import diary.common.entity.goal.dto.StageGoalDTO;
+import diary.diarygoal.entity.dto.StageGoalDTO;
 import diary.common.result.ApiResponse;
 
 public interface GoalUpdateService {

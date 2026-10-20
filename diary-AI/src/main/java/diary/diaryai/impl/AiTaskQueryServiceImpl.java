@@ -1,9 +1,9 @@
 package diary.diaryai.impl;
 
-import diary.common.convert.ai.ConvertPoToVo;
-import diary.common.entity.ai.po.AiTaskPO;
-import diary.common.entity.ai.vo.AiTaskResultVo;
-import diary.common.entity.ai.vo.AiTaskStatusVo;
+import diary.diaryai.entity.ai.convert.ConvertPoToVo;
+import diary.diaryai.entity.ai.po.AiTaskPO;
+import diary.diaryai.entity.ai.vo.AiTaskResultVo;
+import diary.diaryai.entity.ai.vo.AiTaskStatusVo;
 import diary.diaryai.mapper.DiaryAiMapper;
 import diary.diaryai.service.AiTaskQueryService;
 import lombok.RequiredArgsConstructor;

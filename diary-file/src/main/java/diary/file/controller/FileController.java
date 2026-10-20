@@ -1,6 +1,6 @@
 package diary.file.controller;
 
-import diary.common.entity.image.vo.ImageVO;
+import diary.file.entity.vo.ImageVO;
 import diary.common.result.ApiResponse;
 import diary.config.logconfig.OperLog;
 import diary.file.service.VideoFileService;

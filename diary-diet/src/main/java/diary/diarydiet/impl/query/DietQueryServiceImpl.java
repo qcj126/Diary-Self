@@ -1,9 +1,9 @@
 package diary.diarydiet.impl.query;
 
-import diary.common.convert.diet.POConvertToVO;
-import diary.common.entity.diet.dto.DietQueryDTO;
-import diary.common.entity.diet.po.DietRecordPO;
-import diary.common.entity.diet.vo.DietRecordVO;
+import diary.diarydiet.entity.convert.POConvertToVO;
+import diary.diarydiet.entity.dto.DietQueryDTO;
+import diary.diarydiet.entity.po.DietRecordPO;
+import diary.diarydiet.entity.vo.DietRecordVO;
 import diary.common.result.ApiResponse;
 import diary.diarydiet.support.DietRecordValidator;
 import jakarta.annotation.Resource;

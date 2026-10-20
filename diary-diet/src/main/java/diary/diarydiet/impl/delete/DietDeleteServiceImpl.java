@@ -1,6 +1,6 @@
 package diary.diarydiet.impl.delete;
 
-import diary.common.entity.diet.po.DietRecordPO;
+import diary.diarydiet.entity.po.DietRecordPO;
 import diary.common.result.ApiResponse;
 import diary.diarydiet.support.DietRecordValidator;
 import jakarta.annotation.Resource;

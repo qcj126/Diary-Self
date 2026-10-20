@@ -2,8 +2,8 @@ package com.executor.service;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import diary.common.entity.xxlJob.WeatherInfo;
-import diary.common.enums.xxljobenums.QWeatherLocationEnum;
+import com.executor.entity.WeatherInfo;
+import com.executor.enums.QWeatherLocationEnum;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -16,8 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Map;

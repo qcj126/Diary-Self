@@ -3,7 +3,6 @@ package com.executor.jobhandler;
 import com.executor.service.ImageCleanupService;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
-import diary.common.entity.xxlJob.ImageCleanUpResultDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

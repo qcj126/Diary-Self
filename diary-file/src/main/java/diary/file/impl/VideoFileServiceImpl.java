@@ -2,8 +2,8 @@ package diary.file.impl;
 
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.model.*;
-import diary.common.entity.file.po.OssUploadSuccessMsg;
-import diary.common.consts.FileTypeConst;
+import diary.file.entity.po.OssUploadSuccessMsg;
+import diary.file.consts.FileTypeConst;
 
 import diary.config.mqconfig.RabbitMqConfig;
 import diary.file.mapper.ImageMapper;
@@ -23,7 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;

@@ -1,6 +1,5 @@
 package diary.config.logconfig;
 
-import diary.common.entity.log.OperLogPO;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -48,7 +47,7 @@ public class OperLogAspect {
         OperLog operationLog = method.getAnnotation(OperLog.class);
 
         // 构建日志对象
-        OperLogPO logEntity = new OperLogPO();
+        OperLogRecord logEntity = new OperLogRecord();
         logEntity.setModule(operationLog.module());
         logEntity.setDescription(operationLog.description());
         logEntity.setOperationType(operationLog.operationType());
@@ -120,7 +119,7 @@ public class OperLogAspect {
     /**
      * 保存日志到数据库
      */
-    private void saveLog(OperLogPO logEntity) {
+    private void saveLog(OperLogRecord logEntity) {
         // 注入Service保存到数据库
         // operationLogService.save(logEntity);
         log.info("操作日志：{}", JSON.toJSONString(logEntity));

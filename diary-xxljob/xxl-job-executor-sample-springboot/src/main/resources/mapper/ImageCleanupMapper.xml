@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.executor.mapper.ImageCleanupMapper">
 
-    <resultMap id="ImageCleanupResultMap" type="diary.common.entity.xxlJob.ImageCleanupRecord">
+    <resultMap id="ImageCleanupResultMap" type="com.executor.entity.ImageCleanupRecord">
         <id property="id" column="id" jdbcType="BIGINT"/>
         <result property="objectKey" column="object_key" jdbcType="VARCHAR"/>
     </resultMap>

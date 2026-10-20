@@ -1,9 +1,9 @@
 package diary.user.impl;
 
-import diary.common.entity.user.dto.UserReqDTO;
-import diary.common.entity.user.po.User;
-import diary.common.entity.user.vo.TokenPairVO;
-import diary.common.entity.user.vo.UserVO;
+import diary.user.entity.dto.UserReqDTO;
+import diary.user.entity.po.User;
+import diary.user.entity.vo.TokenPairVO;
+import diary.user.entity.vo.UserVO;
 import diary.common.exception.CustomException;
 import diary.common.exception.ParamIllegalException;
 import diary.common.exception.SameDataException;
@@ -11,7 +11,7 @@ import diary.user.mapper.UserMapper;
 import diary.user.service.TokenService;
 import diary.user.service.UserService;
 import diary.utils.commonutil.MyUtils;
-import diary.utils.redis.ValidatUtil;
+import diary.user.utils.ValidatUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

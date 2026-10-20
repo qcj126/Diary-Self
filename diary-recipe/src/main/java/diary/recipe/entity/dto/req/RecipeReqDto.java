@@ -1,0 +1,53 @@
+package diary.recipe.entity.dto.req;
+
+import diary.recipe.entity.ao.RecipeIngredientAO;
+import diary.recipe.entity.ao.RecipeStepAO;
+import lombok.Data;
+
+import java.util.List;
+
+@Data
+public class RecipeReqDto {
+    private Long recipeId;
+    /** 创建者用户ID（Controller层从token获取后传入） */
+    private Long authorId;
+
+    /** 标题 */
+    private String title;
+
+    /** 封面图 */
+    private Long imageId;
+
+    /** 简介 */
+    private String description;
+
+    /** 分类 */
+    private Integer categoryNum;
+
+    /** 餐别 */
+    private Integer mealType;
+
+    /** 难度 1-3 */
+    private Integer difficulty;
+
+    /** 烹饪方式 */
+    private String cookWay;
+
+    /** 烹饪时长（分钟） */
+    private Integer cookingTime;
+
+    /** 情感故事 */
+    private String story;
+
+    /** 家庭用餐人数 */
+    private Integer familyMember;
+
+    /** 是否红心 */
+    private Integer redHeart;
+
+    /** 食材列表 */
+    private List<RecipeIngredientAO> ingredients;
+
+    /** 步骤列表 */
+    private List<RecipeStepAO> steps;
+}

@@ -1,6 +1,6 @@
 package diary.diarygoal.impl.delete;
 
-import diary.common.entity.goal.po.StageGoalPO;
+import diary.diarygoal.entity.po.StageGoalPO;
 import diary.common.result.ApiResponse;
 import diary.diarygoal.mapper.GoalMapper;
 import diary.diarygoal.mapper.GoalCheckinMapper;

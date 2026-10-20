@@ -1,9 +1,9 @@
 package diary.diarygoal.mapper;
 
-import diary.common.entity.goal.dto.GoalCheckinQueryDTO;
-import diary.common.entity.goal.po.GoalCheckinPO;
-import diary.common.entity.goal.po.StageGoalPO;
-import diary.common.entity.goal.po.SubGoalPO;
+import diary.diarygoal.entity.dto.GoalCheckinQueryDTO;
+import diary.diarygoal.entity.po.GoalCheckinPO;
+import diary.diarygoal.entity.po.StageGoalPO;
+import diary.diarygoal.entity.po.SubGoalPO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

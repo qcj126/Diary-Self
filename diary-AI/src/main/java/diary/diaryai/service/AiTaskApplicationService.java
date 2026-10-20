@@ -1,7 +1,7 @@
 package diary.diaryai.service;
 
-import diary.common.entity.ai.dto.AiInvokeDTO;
-import diary.common.entity.ai.vo.AiTaskSubmitVo;
+import diary.diaryai.entity.ai.dto.AiInvokeDTO;
+import diary.diaryai.entity.ai.vo.AiTaskSubmitVo;
 
 public interface AiTaskApplicationService {
 

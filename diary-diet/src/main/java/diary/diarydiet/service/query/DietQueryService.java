@@ -1,7 +1,7 @@
 package diary.diarydiet.service.query;
 
-import diary.common.entity.diet.dto.DietQueryDTO;
-import diary.common.entity.diet.vo.DietRecordVO;
+import diary.diarydiet.entity.dto.DietQueryDTO;
+import diary.diarydiet.entity.vo.DietRecordVO;
 import diary.common.result.ApiResponse;
 
 import java.util.List;

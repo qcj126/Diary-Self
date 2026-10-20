@@ -1,6 +1,6 @@
 package diary.diaryai.guard;
 
-import diary.common.entity.ai.dto.AiTaskProcessDto;
+import diary.diaryai.entity.ai.dto.AiTaskProcessDto;
 import diary.diaryai.mapper.DiaryAiMapper;
 import diary.diaryai.properties.AiTaskProperties;
 import jakarta.annotation.PreDestroy;

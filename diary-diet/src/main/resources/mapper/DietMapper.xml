@@ -4,7 +4,7 @@
 <mapper namespace="diary.diarydiet.mapper.DietMapper">
 
     <!-- 结果映射 -->
-    <resultMap id="BaseResultMap" type="diary.common.entity.diet.po.DietRecordPO">
+    <resultMap id="BaseResultMap" type="diary.diarydiet.entity.po.DietRecordPO">
         <id column="id" property="id"/>
         <result column="user_id" property="userId"/>
         <result column="eat_time" property="eatTime"/>
@@ -33,7 +33,7 @@
     </sql>
 
     <!-- 插入饮食记录 -->
-    <insert id="insert" parameterType="diary.common.entity.diet.po.DietRecordPO">
+    <insert id="insert" parameterType="diary.diarydiet.entity.po.DietRecordPO">
         INSERT INTO diet_record (
             id, user_id, eat_time, meal_type, food_name, calories,
             protein, fat, carbohydrate, sugar, sodium, fullness_score, location, note, image_url,
@@ -54,7 +54,7 @@
     </select>
 
     <!-- 根据ID更新 -->
-    <update id="updateById" parameterType="diary.common.entity.diet.po.DietRecordPO">
+    <update id="updateById" parameterType="diary.diarydiet.entity.po.DietRecordPO">
         UPDATE diet_record
         <set>
             <if test="userId != null">user_id = #{userId},</if>

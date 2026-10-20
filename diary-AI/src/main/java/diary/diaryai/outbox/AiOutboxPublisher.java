@@ -1,6 +1,6 @@
 package diary.diaryai.outbox;
 
-import diary.common.entity.mq.po.MqOutboxPO;
+import diary.diaryai.entity.mq.po.MqOutboxPO;
 import diary.diaryai.mapper.DiaryAiMapper;
 import diary.diaryai.properties.AiTaskProperties;
 import diary.diaryai.service.AiOutboxService;

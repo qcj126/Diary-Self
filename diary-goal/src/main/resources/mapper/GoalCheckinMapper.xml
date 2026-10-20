@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="diary.diarygoal.mapper.GoalCheckinMapper">
-    <resultMap id="GoalCheckinResultMap" type="diary.common.entity.goal.po.GoalCheckinPO">
+    <resultMap id="GoalCheckinResultMap" type="diary.diarygoal.entity.po.GoalCheckinPO">
         <id column="id" property="id"/>
         <result column="request_id" property="requestId"/>
         <result column="user_id" property="userId"/>
@@ -19,7 +19,7 @@
         <result column="update_time" property="updateTime"/>
     </resultMap>
 
-    <resultMap id="StageGoalResultMap" type="diary.common.entity.goal.po.StageGoalPO">
+    <resultMap id="StageGoalResultMap" type="diary.diarygoal.entity.po.StageGoalPO">
         <id column="id" property="id"/>
         <result column="user_id" property="userId"/>
         <result column="category" property="category"/>
@@ -32,7 +32,7 @@
         <result column="update_time" property="updateTime"/>
     </resultMap>
 
-    <resultMap id="SubGoalResultMap" type="diary.common.entity.goal.po.SubGoalPO">
+    <resultMap id="SubGoalResultMap" type="diary.diarygoal.entity.po.SubGoalPO">
         <id column="id" property="id"/>
         <result column="stage_id" property="stageId"/>
         <result column="user_id" property="userId"/>
@@ -52,7 +52,7 @@
         evidence_urls, checkin_date, source, is_deleted, create_time, update_time
     </sql>
 
-    <insert id="insertCheckin" parameterType="diary.common.entity.goal.po.GoalCheckinPO">
+    <insert id="insertCheckin" parameterType="diary.diarygoal.entity.po.GoalCheckinPO">
         INSERT INTO goal_checkin
         (id, request_id, user_id, stage_goal_id, sub_goal_id, checkin_type, spent_hours,
          content, evidence_urls, checkin_date, source, is_deleted)
@@ -101,7 +101,7 @@
         LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
-    <update id="updateCheckin" parameterType="diary.common.entity.goal.po.GoalCheckinPO">
+    <update id="updateCheckin" parameterType="diary.diarygoal.entity.po.GoalCheckinPO">
         UPDATE goal_checkin
         SET checkin_type = #{checkinType},
             spent_hours = #{spentHours},

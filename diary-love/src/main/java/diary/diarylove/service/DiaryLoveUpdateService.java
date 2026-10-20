@@ -2,6 +2,11 @@ package diary.diarylove.service;
 
 import diary.common.entity.love.dto.*;
 import diary.common.result.ApiResponse;
+import diary.diarylove.entity.dto.LoveAnniversaryDTO;
+import diary.diarylove.entity.dto.LoveCoupleDTO;
+import diary.diarylove.entity.dto.LoveLocationDTO;
+import diary.diarylove.entity.dto.LoveRecordImageDTO;
+import diary.diarylove.entity.dto.UpdateLoveRecordDto;
 
 public interface DiaryLoveUpdateService {
     ApiResponse<String> updateCouple(LoveCoupleDTO dto);

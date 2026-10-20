@@ -1,6 +1,6 @@
 package diary.user.mapper;
 
-import diary.common.entity.user.po.User;
+import diary.user.entity.po.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

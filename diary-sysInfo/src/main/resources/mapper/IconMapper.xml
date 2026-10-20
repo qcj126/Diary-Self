@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="diary.diaryinfo.mapper.IconMapper">
 
-    <resultMap id="IconResultMap" type="diary.common.entity.file.po.IconPO">
+    <resultMap id="IconResultMap" type="diary.file.entity.po.IconPO">
         <id property="id" column="id"/>
         <result property="iconName" column="icon_name"/>
         <result property="iconType" column="icon_type"/>
@@ -14,7 +14,7 @@
         <result property="updateTime" column="update_time"/>
     </resultMap>
 
-    <insert id="insertIcon" parameterType="diary.common.entity.file.po.IconPO">
+    <insert id="insertIcon" parameterType="diary.file.entity.po.IconPO">
         INSERT INTO icon (
             id,
             icon_name,
@@ -78,7 +78,7 @@
         WHERE id = #{id}
     </select>
 
-    <update id="updateIcon" parameterType="diary.common.entity.file.po.IconPO">
+    <update id="updateIcon" parameterType="diary.file.entity.po.IconPO">
         UPDATE icon
         <set>
             <if test="iconName != null and iconName != ''">

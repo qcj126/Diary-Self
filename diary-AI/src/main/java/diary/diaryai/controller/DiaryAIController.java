@@ -1,11 +1,11 @@
 package diary.diaryai.controller;
 
 import diary.common.auth.CurrentUser;
-import diary.common.entity.ai.dto.AiInvokeDTO;
-import diary.common.entity.ai.vo.AiTaskResultVo;
-import diary.common.entity.ai.vo.AiTaskStatusVo;
-import diary.common.entity.ai.vo.AiTaskSubmitVo;
-import diary.common.enums.aienum.AiTaskStatusEnum;
+import diary.diaryai.entity.ai.dto.AiInvokeDTO;
+import diary.diaryai.entity.ai.vo.AiTaskResultVo;
+import diary.diaryai.entity.ai.vo.AiTaskStatusVo;
+import diary.diaryai.entity.ai.vo.AiTaskSubmitVo;
+import diary.diaryai.enums.aienum.AiTaskStatusEnum;
 import diary.common.result.ApiResponse;
 import diary.config.logconfig.OperLog;
 import diary.diaryai.service.AiTaskApplicationService;

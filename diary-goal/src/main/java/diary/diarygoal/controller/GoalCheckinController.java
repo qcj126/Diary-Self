@@ -1,9 +1,9 @@
 package diary.diarygoal.controller;
 
 import diary.common.auth.CurrentUser;
-import diary.common.entity.goal.dto.GoalCheckinDTO;
-import diary.common.entity.goal.dto.GoalCheckinQueryDTO;
-import diary.common.entity.goal.vo.GoalCheckinVO;
+import diary.diarygoal.entity.dto.GoalCheckinDTO;
+import diary.diarygoal.entity.dto.GoalCheckinQueryDTO;
+import diary.diarygoal.entity.vo.GoalCheckinVO;
 import diary.common.result.ApiResponse;
 import diary.config.logconfig.OperLog;
 import diary.diarygoal.service.checkin.GoalCheckinService;

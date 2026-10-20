@@ -1,8 +1,8 @@
 package diary.diarydiet.controller;
 
-import diary.common.entity.diet.dto.DietQueryDTO;
-import diary.common.entity.diet.dto.DietRecordDTO;
-import diary.common.entity.diet.vo.DietRecordVO;
+import diary.diarydiet.entity.dto.DietQueryDTO;
+import diary.diarydiet.entity.dto.DietRecordDTO;
+import diary.diarydiet.entity.vo.DietRecordVO;
 import diary.common.result.ApiResponse;
 import diary.config.logconfig.OperLog;
 import jakarta.annotation.Resource;
