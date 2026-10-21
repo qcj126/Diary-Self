@@ -1,5 +1,6 @@
 package diary.diaryai.impl;
 
+import diary.common.exception.ParamIllegalException;
 import diary.diaryai.entity.ai.dto.AiInvokeDTO;
 import diary.diaryai.entity.ai.po.AiTaskPO;
 import diary.diaryai.entity.ai.vo.AiTaskSubmitVo;
@@ -109,6 +110,10 @@ public class AiTaskApplicationServiceImpl implements AiTaskApplicationService {
         }
         AiFlagEnum.isTrueFlag(request.getFlag());
         AiApplicationEnum.isTrueApplication(request.getAiApplication());
+        if (1 != request.getAiApplication() && ("DIET".equals(request.getFlag()) || "RECIPE".equals(request.getFlag()))) {
+            throw new IllegalArgumentException("AI用途与AI标志不匹配，请检查数据后重试！");
+        }
+
         request.setClientRequestId(request.getClientRequestId().trim());
         request.setFlag(request.getFlag().trim().toUpperCase());
     }

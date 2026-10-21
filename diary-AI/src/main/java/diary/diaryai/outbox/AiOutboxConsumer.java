@@ -5,6 +5,7 @@ import diary.diaryai.entity.ai.dto.AiTaskMessageDto;
 import diary.diaryai.entity.ai.dto.AiTaskProcessDto;
 import diary.diaryai.entity.ai.po.AiTaskPO;
 import diary.diaryai.enums.aienum.AiTaskStatusEnum;
+import diary.diaryai.enums.aienum.AiTaskTypeEnum;
 import diary.diaryai.executor.AiTaskExecutor;
 import diary.diaryai.guard.LocalAiConcurrencyGuard;
 import diary.diaryai.guard.AiTaskLeaseRenewer;
@@ -251,7 +252,7 @@ public class AiOutboxConsumer implements RocketMQListener {
                 || message.getClientRequestId() == null
                 || message.getClientRequestId().isBlank()
                 || !Objects.equals(OUTBOX_SCHEMA_VERSION, message.getSchemaVersion())
-                || !aiTaskProperties.getRocketmq().getTaskNutrientTag().equals(message.getTaskType())) {
+                || !AiTaskTypeEnum.isTrueTaskType(message.getTaskType())) {
             throw new IllegalArgumentException("AI任务消息字段或协议版本不合法");
         }
     }

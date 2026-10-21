@@ -12,6 +12,7 @@ import diary.diaryai.entity.ai.po.AiTaskPO;
 import diary.diaryai.entity.mq.po.MqOutboxPO;
 import diary.diaryai.enums.aienum.AiTaskErrorCodeEnum;
 import diary.diaryai.enums.aienum.AiTaskStatusEnum;
+import diary.diaryai.enums.aienum.AiTaskTypeEnum;
 import diary.diaryai.enums.outbox.OutboxEventTypeEnum;
 import diary.diaryai.enums.outbox.OutboxStatusEnum;
 
@@ -19,6 +20,7 @@ import diary.diaryai.idempotency.AiRequestFingerprint;
 import diary.diaryai.mapper.DiaryAiMapper;
 import diary.diaryai.properties.AiTaskProperties;
 import diary.diaryai.service.AiTransactionService;
+import diary.diaryai.utils.MyUtil;
 import diary.utils.commonutil.MyUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +44,7 @@ public class AiTransactionServiceImpl implements AiTransactionService {
     private final AiTaskProperties properties;
     private final AiRequestFingerprint requestFingerprint;
     private final ObjectMapper objectMapper;
+    private final MyUtil myUtil;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -60,11 +63,6 @@ public class AiTransactionServiceImpl implements AiTransactionService {
             throw new RuntimeException(e);
         }
         String requestHash = requestFingerprint.fingerprint(request);
-        String taskTagType = null;
-        switch (request.getAiApplication()) {
-            case 1 -> taskTagType = properties.getRocketmq().getTaskNutrientTag();
-            case 2 -> taskTagType = properties.getRocketmq().getTaskSentimentTag();
-        }
 
         AiTaskPO task = AiTaskPO.builder()
                 .id(taskId)
@@ -72,7 +70,7 @@ public class AiTransactionServiceImpl implements AiTransactionService {
                 .userId(userId)
                 .clientRequestId(request.getClientRequestId())
                 .requestHash(requestHash)
-                .taskType(taskTagType)
+                .taskType(AiTaskTypeEnum.getAiTaskType(request.getFlag()))
                 .status(AiTaskStatusEnum.PENDING.name())
                 .inputSnapshot(inputSnapshot)
                 .attemptCount(0)
@@ -87,7 +85,7 @@ public class AiTransactionServiceImpl implements AiTransactionService {
                 .taskId(taskId)
                 .userId(userId)
                 .clientRequestId(request.getClientRequestId())
-                .taskType(taskTagType)
+                .taskType(AiTaskTypeEnum.getAiTaskType(request.getFlag()))
                 .eventType(OutboxEventTypeEnum.AI_TASK_CREATED.name())
                 .taskStatus(AiTaskStatusEnum.PENDING.name())
                 .schemaVersion(OUTBOX_SCHEMA_VERSION)
@@ -102,7 +100,7 @@ public class AiTransactionServiceImpl implements AiTransactionService {
                 .aggregateId(taskId)
                 .eventType(OutboxEventTypeEnum.AI_TASK_CREATED.name())
                 .topic(properties.getRocketmq().getTaskTopic())
-                .tag(taskTagType)
+                .tag(myUtil.getOutboxTag(request.getAiApplication()))
                 .messageKey(taskId.toString())
                 .payload(writeJson(message, "AI任务消息序列化失败"))
                 .schemaVersion(OUTBOX_SCHEMA_VERSION)

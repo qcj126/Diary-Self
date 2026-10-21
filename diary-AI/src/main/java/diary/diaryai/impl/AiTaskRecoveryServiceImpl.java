@@ -12,6 +12,7 @@ import diary.diaryai.mapper.DiaryAiMapper;
 import diary.diaryai.properties.AiTaskProperties;
 import diary.diaryai.service.AiTaskRecoveryService;
 import diary.diaryai.service.AiTransactionService;
+import diary.diaryai.utils.MyUtil;
 import diary.utils.commonutil.MyUtils;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.MDC;
@@ -31,6 +32,7 @@ public class AiTaskRecoveryServiceImpl implements AiTaskRecoveryService {
     private final DiaryAiMapper diaryAiMapper;
     private final AiTaskProperties properties;
     private final AiTransactionService aiTransactionService;
+    private final MyUtil myUtil;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -59,12 +61,6 @@ public class AiTaskRecoveryServiceImpl implements AiTaskRecoveryService {
     private void insertRetryTaskOutbox(AiTaskPO task, LocalDateTime now) {
         String eventId = OUTBOX_EVENT_ID + MyUtils.getPrimaryKey();
 
-        String taskTagType = null;
-//        switch (request.getAiApplication()) {
-//            case 1 -> taskTagType = properties.getRocketmq().getTaskNutrientTag();
-//            case 2 -> taskTagType = properties.getRocketmq().getTaskSentimentTag();
-//        }
-
         AiTaskMessageDto retryMessage = AiTaskMessageDto.builder()
                 .clientRequestId(task.getClientRequestId())
                 .eventId(eventId)
@@ -85,7 +81,7 @@ public class AiTaskRecoveryServiceImpl implements AiTaskRecoveryService {
                 .aggregateId(task.getId())
                 .eventType(OutboxEventTypeEnum.AI_TASK_RETRY.name())
                 .topic(properties.getRocketmq().getTaskTopic())
-                .tag(taskTagType)
+                .tag(myUtil.getOutboxTag(task.getAiApplication()))
                 .messageKey(String.valueOf(task.getId()))
                 .payload(writeJson(retryMessage, "AI任务恢复消息序列化失败"))
                 .schemaVersion(OUTBOX_SCHEMA_VERSION)

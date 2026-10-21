@@ -34,7 +34,8 @@ create index idx_ai_nutrient_user_time
 
 CREATE UNIQUE INDEX uk_ai_nutrient_task_id ON ai_nutrient (ai_task_id);
 
-create table ai_task(
+create table ai_task
+(
     id                bigint unsigned                    not null comment 'primary key'
         primary key,
     user_id           bigint unsigned                    not null comment 'user id',
@@ -45,6 +46,7 @@ create table ai_task(
     input_snapshot    longtext                           not null comment '实体类的json数据',
     attempt_count     int                                not null comment '消息尝试消费次数',
     max_attempts      int                                not null comment '消息最大消费次数',
+    recovery_count    int      default 0                 not null comment '等待态消息补发次数',
     worker_id         varchar(128)                       null comment '实例工作id',
     lease_until       datetime                           null comment '占有此消息的持续时间',
     ai_info_id        bigint unsigned                    null comment '与aiInFo主键关联',
@@ -56,8 +58,17 @@ create table ai_task(
     finish_time       datetime                           null comment 'finish time',
     update_time       datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '最近一次状态更新时间',
     version_id        int unsigned                       not null comment 'version id',
-    constraint uk_ai_task_user_client_request unique (user_id, client_request_id)
-) engine=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='AI任务表';
+    ai_application    tinyint                            not null comment 'AI用途：如鉴别营养成分，每日推荐菜品等',
+    constraint uk_ai_task_user_client_request
+        unique (user_id, client_request_id)
+)
+    comment 'AI任务表' charset = utf8mb4;
+
+create index idx_ai_task_status_lease
+    on ai_task (status, lease_until, id);
+
+create index idx_ai_task_status_update
+    on ai_task (status, update_time, id);
 
 -- 只保留 RUNNING 租约恢复所需索引。
 create index idx_ai_task_status_lease on ai_task (status, lease_until, id);

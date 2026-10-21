@@ -40,6 +40,7 @@
         <result column="attempt_count" property="attemptCount" jdbcType="INTEGER"/>
         <result column="max_attempts" property="maxAttempts" jdbcType="INTEGER"/>
         <result column="worker_id" property="workerId" jdbcType="VARCHAR"/>
+        <result column="ai_application" property="aiApplication" jdbcType="TINYINT"/>
         <result column="lease_until" property="leaseUntil" jdbcType="TIMESTAMP"/>
         <result column="ai_info_id" property="aiInfoId" jdbcType="BIGINT"/>
         <result column="error_code" property="errorCode" jdbcType="VARCHAR"/>
@@ -123,10 +124,10 @@
         -->
         INSERT INTO ai_task
             (id, user_id, client_request_id, request_hash, task_type, status, input_snapshot,
-             attempt_count, max_attempts, create_time, update_time, version_id)
+             attempt_count, max_attempts, create_time, update_time, version_id, ai_application)
         VALUES
             (#{id}, #{userId}, #{clientRequestId}, #{requestHash}, #{taskType}, #{status}, #{inputSnapshot},
-             #{attemptCount}, #{maxAttempts}, #{createTime}, #{updateTime}, #{versionId})
+             #{attemptCount}, #{maxAttempts}, #{createTime}, #{updateTime}, #{versionId}, #{aiApplication})
     </insert>
 
     <select id="selectAiTaskByTaskId" resultMap="AiTaskResultMap">
@@ -404,7 +405,7 @@
 
     <select id="selectAiTaskList" resultMap="AiTaskResultVo">
         select a.id, a.status, a.ai_info_id, c.universal_id, c.flag, c.calory, c.protein, d.title,
-        c.fat, c.carbohydrate, c.sugar, c.sodium, a.error_code, a.error_message, b.ai_application, a.create_time, a.finish_time
+        c.fat, c.carbohydrate, c.sugar, c.sodium, a.error_code, a.error_message, a.ai_application, a.create_time, a.finish_time
         from ai_task a
         inner join ai_info b on a.ai_info_id = b.id and b.user_id = a.user_id
         inner join ai_nutrient c on c.ai_info_id = b.id and c.user_id = a.user_id
@@ -414,7 +415,7 @@
             and a.status = #{taskStatus}
         </if>
         <if test="applicationCode != null">
-            and b.ai_application = #{applicationCode}
+            and a.ai_application = #{applicationCode}
         </if>
         <if test="title != null and title != ''">
             and d.title like CONCAT('%', #{title}, '%')
@@ -424,7 +425,7 @@
 
     <select id="selectAiTaskResult" resultMap="AiTaskResultVo">
         select a.id, a.status, a.ai_info_id, c.universal_id, c.flag, c.calory, c.protein, d.title,
-        c.fat, c.carbohydrate, c.sugar, c.sodium, a.error_code, a.error_message, b.ai_application, a.create_time, a.finish_time
+        c.fat, c.carbohydrate, c.sugar, c.sodium, a.error_code, a.error_message, a.ai_application, a.create_time, a.finish_time
         from ai_task a
         inner join ai_info b on a.ai_info_id = b.id and b.user_id = a.user_id
         inner join ai_nutrient c on c.ai_info_id = b.id and c.user_id = a.user_id
