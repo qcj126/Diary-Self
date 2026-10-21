@@ -1,11 +1,11 @@
 package diary.diarylove.impl;
 
 import diary.diarylove.entity.convert.DtoConvertToPo;
-import diary.common.entity.love.dto.*;
 import diary.diarylove.entity.dto.AddLoveRecordDto;
 import diary.diarylove.entity.dto.LoveAnniversaryDTO;
 import diary.diarylove.entity.dto.LoveCoupleDTO;
 import diary.diarylove.entity.dto.LoveLocationDTO;
+import diary.diarylove.entity.dto.LoveMoodDTO;
 import diary.diarylove.entity.dto.LoveMoodRecordDTO;
 import diary.diarylove.entity.dto.LoveRecordDTO;
 import diary.diarylove.entity.dto.LoveRecordImageDTO;
@@ -135,6 +135,26 @@ public class DiaryLoveAddServiceImpl implements DiaryLoveAddService {
         throw new IllegalStateException("添加记录失败");
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ApiResponse<String> addMood(LoveMoodDTO dto) {
+        validateMood(dto);
+        dto.setId(MyUtils.getPrimaryKey());
+        if (dto.getSort() == null) dto.setSort(0);
+        if (dto.getEnabled() == null) dto.setEnabled(true);
+        return addResult(diaryLoveMapper.insertLoveMood(DtoConvertToPo.convertToPo(dto)), "添加心情成功");
+    }
+
+    void validateMood(LoveMoodDTO dto) {
+        MyUtils.check().notNull(dto, "loveMoodDTO")
+                .notNull(dto.getId(), "id")
+                .notEmpty(dto.getMoodName(), "moodName");
+    }
+
+    private ApiResponse<String> addResult(int affectedRows, String message) {
+        return affectedRows > 0 ? ApiResponse.success(message) : ApiResponse.addFail();
+    }
+
     void validateCouple(LoveCoupleDTO dto) {
         MyUtils.check().notNull(dto, "loveCoupleDTO")
                 .notNull(dto.getOwnerUserId(), "ownerUserId")
@@ -174,9 +194,5 @@ public class DiaryLoveAddServiceImpl implements DiaryLoveAddService {
         if (dto.getLocationId() != null && dto.getNewLocation() != null) {
             throw new IllegalArgumentException("locationId 和 newLocation 只能填写一个");
         }
-    }
-
-    private ApiResponse<String> addResult(int affectedRows, String message) {
-        return affectedRows > 0 ? ApiResponse.success(message) : ApiResponse.addFail();
     }
 }

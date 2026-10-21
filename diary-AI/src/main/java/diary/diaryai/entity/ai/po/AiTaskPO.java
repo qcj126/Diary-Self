@@ -24,6 +24,7 @@ public class AiTaskPO {
     private String workerId;                // 当前处理任务的实例
     private LocalDateTime leaseUntil;       // RUNNING 任务租约截止时间
     private Long aiInfoId;                  // 成功后关联现有 AI 信息记录
+    private Integer aiApplication;          // AI用途：如鉴别营养成分，每日推荐菜品等
     private String errorCode;               // 稳定错误码
     private String errorMessage;            // 截断后的错误摘要
     private LocalDateTime createTime;       // 创建时间

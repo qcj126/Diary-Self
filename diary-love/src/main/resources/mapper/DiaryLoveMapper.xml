@@ -121,6 +121,10 @@
         <result property="createTime"       column="create_time"/>
     </resultMap>
 
+
+
+
+
     <sql id="loveCoupleColumns">
         id, owner_user_id, partner_user_id, partner_name, start_date, status, deleted, create_time, update_time
     </sql>
@@ -307,12 +311,6 @@
         DELETE FROM love_record_image WHERE id = #{id}
     </delete>
 
-    <select id="selectReadyOutbox" resultType="diary.diaryai.entity.mq.po.MqOutboxPO">
-        select <include refid="mqOutboxColumns"/> from mq_outbox
-        where status in ('NEW', 'RETRY_WAIT') and next_retry_time &lt;= CURRENT_TIMESTAMP
-        order by next_retry_time asc, id asc limit publisherBatchSize
-    </select>
-
     <update id="claimOutbox">
         update mq_outbox set status = 'SENDING', version_id = version_id + 1, update_time = CURRENT_TIMESTAMP
         where status in ('NEW', 'RETRY_WAIT') and id = #{id} and version_id = #{versionId}
@@ -332,4 +330,26 @@
     <select id="selectExistLoveCouple" resultType="int">
         select count(id) from love_couple where owner_user_id = #{ownerUserId} and deleted = 0 and status = 1
     </select>
+
+    <insert id="insertLoveMood">
+        INSERT INTO love_mood (id, mood_code, mood_name, emoji, sort, enabled)
+        VALUES (#{id}, #{moodCode}, #{moodName}, #{emoji}, #{sort}, #{enabled})
+    </insert>
+
+    <select id="selectLoveMoods" resultMap="loveMoodResultMap">
+        SELECT <include refid="loveMoodColumns"/> FROM love_mood
+        <if test="enabled != null">WHERE enabled = #{enabled}</if>
+        ORDER BY sort ASC, id ASC
+    </select>
+
+    <update id="updateLoveMood">
+        UPDATE love_mood SET
+                             mood_code = #{moodCode}, mood_name = #{moodName}, emoji = #{emoji}, sort = #{sort},
+                             enabled = #{enabled}, update_time = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteLoveMood">
+        DELETE FROM love_mood WHERE id = #{id}
+    </delete>
 </mapper>

@@ -1,13 +1,13 @@
 package diary.diarylove.service;
 
 import diary.diarylove.entity.dto.LoveRecordDTO;
-import diary.common.entity.love.vo.*;
 import diary.diarylove.entity.dto.LoveCoupleDTO;
 import diary.common.result.ApiResponse;
 import diary.diarylove.entity.vo.LoveAnniversaryVO;
 import diary.diarylove.entity.vo.LoveCoupleVO;
 import diary.diarylove.entity.vo.LoveLocationVO;
 import diary.diarylove.entity.vo.LoveMoodRecordVO;
+import diary.diarylove.entity.vo.LoveMoodVO;
 import diary.diarylove.entity.vo.LoveRecordImageVO;
 import diary.diarylove.entity.vo.LoveRecordVO;
 
@@ -27,4 +27,6 @@ public interface DiaryLoveQueryService {
     ApiResponse<List<LoveRecordImageVO>> queryRecordImages(Long recordId);
 
     ApiResponse<List<LoveMoodRecordVO>> queryRecordMoods(Long recordId);
+
+    ApiResponse<List<LoveMoodVO>> queryMoods(Boolean enabled);
 }

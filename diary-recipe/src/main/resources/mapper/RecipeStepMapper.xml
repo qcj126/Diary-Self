@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="diary.recipe.mapper.RecipeStepMapper">
+<mapper namespace="diary.diaryrecipe.mapper.RecipeStepMapper">
 
-    <resultMap id="BaseResultMap" type="diary.recipe.entity.po.RecipeStepPO">
+    <resultMap id="BaseResultMap" type="diary.diaryrecipe.entity.po.RecipeStepPO">
         <id column="id" property="id"/>
         <result column="recipe_id" property="recipeId"/>
         <result column="user_id" property="userId"/>

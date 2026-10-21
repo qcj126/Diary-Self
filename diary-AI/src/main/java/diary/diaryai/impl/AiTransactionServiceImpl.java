@@ -68,6 +68,7 @@ public class AiTransactionServiceImpl implements AiTransactionService {
 
         AiTaskPO task = AiTaskPO.builder()
                 .id(taskId)
+                .aiApplication(request.getAiApplication())
                 .userId(userId)
                 .clientRequestId(request.getClientRequestId())
                 .requestHash(requestHash)

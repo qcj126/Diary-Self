@@ -19,7 +19,7 @@ public class AiTaskRecoveryJob {
     private final AiTaskRecoveryService aiTaskRecoveryService;
     private final AiTaskProperties aiTaskProperties;
 
-    @Scheduled(fixedDelayString = "${diary.ai.task.recovery-interval-ms:30000}")
+//    @Scheduled(fixedDelayString = "${diary.ai.task.recovery-interval-ms:30000}")
     public void recoverExpiredRunning() {
         List<AiTaskPO> tasks = diaryAiMapper.selectExpiredRunningTasks(
                 aiTaskProperties.getTask().getRecoveryBatchSize());

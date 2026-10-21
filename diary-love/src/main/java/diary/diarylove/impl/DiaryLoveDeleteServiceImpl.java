@@ -56,4 +56,10 @@ public class DiaryLoveDeleteServiceImpl implements DiaryLoveDeleteService {
     private interface DeleteOperation {
         int delete(Long id);
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ApiResponse<String> deleteMood(Long id) {
+        return deleteResult(id, diaryLoveMapper::deleteLoveMood, "删除心情成功");
+    }
 }

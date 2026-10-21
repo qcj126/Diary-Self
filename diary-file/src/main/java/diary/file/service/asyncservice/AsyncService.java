@@ -1,5 +1,6 @@
 package diary.file.service.asyncservice;
 
+import diary.file.entity.dto.ImageDTO;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;

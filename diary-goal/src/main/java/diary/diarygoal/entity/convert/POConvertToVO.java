@@ -1,9 +1,9 @@
 package diary.diarygoal.entity.convert;
 
-import diary.common.entity.goal.po.StageGoalPO;
-import diary.common.entity.goal.po.SubGoalPO;
-import diary.common.entity.goal.vo.StageGoalVO;
-import diary.common.entity.goal.vo.SubGoalVO;
+import diary.diarygoal.entity.po.StageGoalPO;
+import diary.diarygoal.entity.po.SubGoalPO;
+import diary.diarygoal.entity.vo.StageGoalVO;
+import diary.diarygoal.entity.vo.SubGoalVO;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

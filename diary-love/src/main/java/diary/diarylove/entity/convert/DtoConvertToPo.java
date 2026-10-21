@@ -1,7 +1,26 @@
 package diary.diarylove.entity.convert;
 
-import diary.common.entity.love.dto.*;
-import diary.common.entity.love.po.*;
+import diary.diarylove.entity.dto.LoveAnniversaryDTO;
+import diary.diarylove.entity.dto.LoveCoupleDTO;
+import diary.diarylove.entity.dto.LoveLocationDTO;
+import diary.diarylove.entity.dto.LoveMoodDTO;
+import diary.diarylove.entity.dto.LoveMoodRecordDTO;
+import diary.diarylove.entity.dto.LoveRecordDTO;
+import diary.diarylove.entity.dto.LoveRecordImageDTO;
+import diary.diarylove.entity.dto.LoveRecordMoodDTO;
+import diary.diarylove.entity.dto.LoveRecordTagDTO;
+import diary.diarylove.entity.dto.LoveTagDTO;
+import diary.diarylove.entity.dto.UpdateLoveRecordDto;
+import diary.diarylove.entity.po.LoveAnniversaryPO;
+import diary.diarylove.entity.po.LoveCouplePO;
+import diary.diarylove.entity.po.LoveLocationPO;
+import diary.diarylove.entity.po.LoveMoodPO;
+import diary.diarylove.entity.po.LoveMoodRecordPO;
+import diary.diarylove.entity.po.LoveRecordImagePO;
+import diary.diarylove.entity.po.LoveRecordMoodPO;
+import diary.diarylove.entity.po.LoveRecordPO;
+import diary.diarylove.entity.po.LoveRecordTagPO;
+import diary.diarylove.entity.po.LoveTagPO;
 
 public class DtoConvertToPo {
     public static LoveCouplePO convertToPo(LoveCoupleDTO loveCoupleDTO) {

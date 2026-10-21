@@ -1,6 +1,6 @@
 package diary.file.impl;
 
-import diary.common.consts.RedisKeyConst;
+import diary.file.consts.FileRedisConst;
 import diary.file.service.RedisService;
 import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -13,7 +13,7 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public Long getPhotoCount() {
-        Object oCount = photoRedisTemplate.opsForValue().get(RedisKeyConst.PHOTO_COUNT_KEY);
+        Object oCount = photoRedisTemplate.opsForValue().get(FileRedisConst.PHOTO_COUNT_KEY);
         if (oCount == null) {
             return 0L;
         }
@@ -22,6 +22,6 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public void updatePhotoCount(long photoCount) {
-        photoRedisTemplate.opsForValue().set(RedisKeyConst.PHOTO_COUNT_KEY, photoCount);
+        photoRedisTemplate.opsForValue().set(FileRedisConst.PHOTO_COUNT_KEY, photoCount);
     }
 }

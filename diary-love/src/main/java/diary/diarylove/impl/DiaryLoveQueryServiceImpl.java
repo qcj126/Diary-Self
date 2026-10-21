@@ -6,12 +6,12 @@ import diary.diarylove.entity.dto.LoveRecordDTO;
 import diary.diarylove.entity.po.LoveCouplePO;
 import diary.diarylove.entity.po.LoveLocationPO;
 import diary.diarylove.entity.po.LoveRecordPO;
-import diary.common.entity.love.vo.*;
 import diary.common.result.ApiResponse;
 import diary.diarylove.entity.vo.LoveAnniversaryVO;
 import diary.diarylove.entity.vo.LoveCoupleVO;
 import diary.diarylove.entity.vo.LoveLocationVO;
 import diary.diarylove.entity.vo.LoveMoodRecordVO;
+import diary.diarylove.entity.vo.LoveMoodVO;
 import diary.diarylove.entity.vo.LoveRecordImageVO;
 import diary.diarylove.entity.vo.LoveRecordVO;
 import diary.diarylove.mapper.DiaryLoveMapper;
@@ -89,6 +89,13 @@ public class DiaryLoveQueryServiceImpl implements DiaryLoveQueryService {
     public ApiResponse<List<LoveMoodRecordVO>> queryRecordMoods(Long recordId) {
         MyUtils.check().notNull(recordId, "recordId");
         return ApiResponse.success(diaryLoveMapper.selectLoveMoodRecordsByRecordId(recordId).stream()
+                .map(PoConvertToVo::convertToVo)
+                .toList());
+    }
+
+    @Override
+    public ApiResponse<List<LoveMoodVO>> queryMoods(Boolean enabled) {
+        return ApiResponse.success(diaryLoveMapper.selectLoveMoods(enabled).stream()
                 .map(PoConvertToVo::convertToVo)
                 .toList());
     }

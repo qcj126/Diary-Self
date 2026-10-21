@@ -1,7 +1,7 @@
 package diary.diarydiet.entity.convert;
 
-import diary.common.entity.diet.dto.DietRecordDTO;
-import diary.common.entity.diet.po.DietRecordPO;
+import diary.diarydiet.entity.dto.DietRecordDTO;
+import diary.diarydiet.entity.po.DietRecordPO;
 
 public final class DTOConvertToPO {
     private DTOConvertToPO() {

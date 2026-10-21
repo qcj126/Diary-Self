@@ -1,8 +1,8 @@
 package diary.diarydiet.entity.convert;
 
-import diary.common.entity.diet.dto.DietRecordDTO;
-import diary.common.entity.diet.vo.DietRecordVO;
-import diary.diarydiet.enums.dietenum.MealTypeEnum;
+import diary.diarydiet.entity.dto.DietRecordDTO;
+import diary.diarydiet.entity.vo.DietRecordVO;
+import diary.diarydiet.enums.MealTypeEnum;
 
 /**
  * 饮食记录 DTO 到 VO 的转换。

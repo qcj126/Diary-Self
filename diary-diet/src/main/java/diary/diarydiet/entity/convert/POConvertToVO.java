@@ -1,8 +1,8 @@
 package diary.diarydiet.entity.convert;
 
-import diary.diarydiet.enums.dietenum.MealTypeEnum;
-import diary.common.entity.diet.po.DietRecordPO;
-import diary.common.entity.diet.vo.DietRecordVO;
+import diary.diarydiet.entity.po.DietRecordPO;
+import diary.diarydiet.entity.vo.DietRecordVO;
+import diary.diarydiet.enums.MealTypeEnum;
 
 public final class POConvertToVO {
     private POConvertToVO() {

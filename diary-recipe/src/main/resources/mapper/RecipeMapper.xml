@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="diary.recipe.mapper.RecipeMapper">
+<mapper namespace="diary.diaryrecipe.mapper.RecipeMapper">
 
-    <resultMap id="BaseResultMap" type="diary.recipe.entity.po.RecipePO">
+    <resultMap id="BaseResultMap" type="diary.diaryrecipe.entity.po.RecipePO">
         <id column="id" property="id"/>
         <result column="user_id" property="userId"/>
         <result column="title" property="title"/>
@@ -46,7 +46,7 @@
         </where>
     </sql>
 
-    <insert id="insert" parameterType="diary.recipe.entity.po.RecipePO">
+    <insert id="insert" parameterType="diary.diaryrecipe.entity.po.RecipePO">
         INSERT INTO recipe (
             id, user_id, title, image_id, description, category_num, meal_type,
             difficulty, cook_way, cooking_time, story, sort, family_member, create_time, update_time

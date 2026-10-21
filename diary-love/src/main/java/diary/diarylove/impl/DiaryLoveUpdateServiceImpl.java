@@ -1,11 +1,11 @@
 package diary.diarylove.impl;
 
 import diary.diarylove.entity.convert.DtoConvertToPo;
-import diary.common.entity.love.dto.*;
 import diary.common.result.ApiResponse;
 import diary.diarylove.entity.dto.LoveAnniversaryDTO;
 import diary.diarylove.entity.dto.LoveCoupleDTO;
 import diary.diarylove.entity.dto.LoveLocationDTO;
+import diary.diarylove.entity.dto.LoveMoodDTO;
 import diary.diarylove.entity.dto.LoveRecordImageDTO;
 import diary.diarylove.entity.dto.UpdateLoveRecordDto;
 import diary.diarylove.mapper.DiaryLoveMapper;
@@ -69,6 +69,21 @@ public class DiaryLoveUpdateServiceImpl implements DiaryLoveUpdateService {
         return updateResult(diaryLoveMapper.updateLoveRecordImage(DtoConvertToPo.convertToPo(dto)), "修改记录图片成功");
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ApiResponse<String> updateMood(LoveMoodDTO dto) {
+        validateMood(dto);
+        if (dto.getSort() == null) dto.setSort(0);
+        if (dto.getEnabled() == null) dto.setEnabled(true);
+        return updateResult(diaryLoveMapper.updateLoveMood(DtoConvertToPo.convertToPo(dto)), "修改心情成功");
+    }
+
+    void validateMood(LoveMoodDTO dto) {
+        MyUtils.check().notNull(dto, "loveMoodDTO")
+                .notNull(dto.getId(), "id")
+                .notEmpty(dto.getMoodCode(), "moodCode")
+                .notEmpty(dto.getMoodName(), "moodName");
+    }
     private ApiResponse<String> updateResult(int affectedRows, String message) {
         return affectedRows > 0 ? ApiResponse.success(message) : ApiResponse.updateFail();
     }

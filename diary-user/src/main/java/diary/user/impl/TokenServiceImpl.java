@@ -1,7 +1,7 @@
 package diary.user.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import diary.common.consts.RedisKeyConst;
+import diary.user.consts.UserRedisKeyConst;
 import diary.user.entity.vo.TokenInfoVO;
 import diary.user.entity.vo.TokenPairVO;
 import diary.common.exception.CustomException;
@@ -50,9 +50,9 @@ public class TokenServiceImpl implements TokenService {
 
         saveWhiteToken(tokenInfo.getAccessTokenId(), tokenInfo, jwtUtil.getAccessTokenExpirationMs());
         saveWhiteToken(tokenInfo.getRefreshTokenId(), tokenInfo, jwtUtil.getRefreshTokenExpirationMs());
-        stringRedisTemplate.opsForSet().add(RedisKeyConst.USER_TOKEN_INDEX_PREFIX + username,
+        stringRedisTemplate.opsForSet().add(UserRedisKeyConst.USER_TOKEN_INDEX_PREFIX + username,
                 tokenInfo.getAccessTokenId(), tokenInfo.getRefreshTokenId());
-        stringRedisTemplate.expire(RedisKeyConst.USER_TOKEN_INDEX_PREFIX + username,
+        stringRedisTemplate.expire(UserRedisKeyConst.USER_TOKEN_INDEX_PREFIX + username,
                 jwtUtil.getRefreshTokenExpirationMs(), TimeUnit.MILLISECONDS);
 
         return TokenPairVO.builder()
@@ -71,7 +71,7 @@ public class TokenServiceImpl implements TokenService {
                 throw new CustomException("refresh token type is invalid");
             }
             String tokenId = jwtUtil.extractTokenId(refreshToken);
-            if (isBlack(tokenId) || !Boolean.TRUE.equals(stringRedisTemplate.hasKey(RedisKeyConst.TOKEN_WHITE_PREFIX + tokenId))) {
+            if (isBlack(tokenId) || !Boolean.TRUE.equals(stringRedisTemplate.hasKey(UserRedisKeyConst.TOKEN_WHITE_PREFIX + tokenId))) {
                 throw new CustomException("refresh token is invalid");
             }
             TokenInfoVO oldTokenInfo = readWhiteToken(tokenId);
@@ -80,10 +80,10 @@ public class TokenServiceImpl implements TokenService {
             List<String> roles = jwtUtil.extractRoles(refreshToken);
             if (oldTokenInfo != null) {
                 blackToken(oldTokenInfo.getAccessTokenId());
-                stringRedisTemplate.delete(RedisKeyConst.TOKEN_WHITE_PREFIX + oldTokenInfo.getAccessTokenId());
+                stringRedisTemplate.delete(UserRedisKeyConst.TOKEN_WHITE_PREFIX + oldTokenInfo.getAccessTokenId());
             }
             blackToken(tokenId);
-            stringRedisTemplate.delete(RedisKeyConst.TOKEN_WHITE_PREFIX + tokenId);
+            stringRedisTemplate.delete(UserRedisKeyConst.TOKEN_WHITE_PREFIX + tokenId);
             if (userId == null) {
                 // 旧 Token 没有 user_id，不能继续向下游传播可信身份；要求重新登录换取新 Token。
                 throw new CustomException("refresh token lacks user identity, please login again");
@@ -103,7 +103,7 @@ public class TokenServiceImpl implements TokenService {
             return jwtUtil.isAccessToken(accessToken)
                     && jwtUtil.extractUserId(accessToken) != null
                     && !isBlack(tokenId)
-                    && Boolean.TRUE.equals(stringRedisTemplate.hasKey(RedisKeyConst.TOKEN_WHITE_PREFIX + tokenId));
+                    && Boolean.TRUE.equals(stringRedisTemplate.hasKey(UserRedisKeyConst.TOKEN_WHITE_PREFIX + tokenId));
         } catch (Exception e) {
             return false;
         }
@@ -111,13 +111,13 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public List<TokenInfoVO> queryTokenInfo(String username) {
-        Set<String> tokenIds = stringRedisTemplate.opsForSet().members(RedisKeyConst.USER_TOKEN_INDEX_PREFIX + username);
+        Set<String> tokenIds = stringRedisTemplate.opsForSet().members(UserRedisKeyConst.USER_TOKEN_INDEX_PREFIX + username);
         if (tokenIds == null || tokenIds.isEmpty()) {
             return List.of();
         }
         List<TokenInfoVO> result = new ArrayList<>();
         for (String tokenId : tokenIds) {
-            String json = stringRedisTemplate.opsForValue().get(RedisKeyConst.TOKEN_WHITE_PREFIX + tokenId);
+            String json = stringRedisTemplate.opsForValue().get(UserRedisKeyConst.TOKEN_WHITE_PREFIX + tokenId);
             if (json == null) {
                 continue;
             }
@@ -135,20 +135,20 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public void kickOut(String username) {
-        Set<String> tokenIds = stringRedisTemplate.opsForSet().members(RedisKeyConst.USER_TOKEN_INDEX_PREFIX + username);
+        Set<String> tokenIds = stringRedisTemplate.opsForSet().members(UserRedisKeyConst.USER_TOKEN_INDEX_PREFIX + username);
         if (tokenIds == null || tokenIds.isEmpty()) {
             return;
         }
         for (String tokenId : tokenIds) {
             blackToken(tokenId);
-            stringRedisTemplate.delete(RedisKeyConst.TOKEN_WHITE_PREFIX + tokenId);
+            stringRedisTemplate.delete(UserRedisKeyConst.TOKEN_WHITE_PREFIX + tokenId);
         }
-        stringRedisTemplate.delete(RedisKeyConst.USER_TOKEN_INDEX_PREFIX + username);
+        stringRedisTemplate.delete(UserRedisKeyConst.USER_TOKEN_INDEX_PREFIX + username);
     }
 
     private void saveWhiteToken(String tokenId, TokenInfoVO tokenInfo, long ttlMs) {
         try {
-            stringRedisTemplate.opsForValue().set(RedisKeyConst.TOKEN_WHITE_PREFIX + tokenId,
+            stringRedisTemplate.opsForValue().set(UserRedisKeyConst.TOKEN_WHITE_PREFIX + tokenId,
                     objectMapper.writeValueAsString(tokenInfo), ttlMs, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
             throw new CustomException("write token to redis failed");
@@ -156,11 +156,11 @@ public class TokenServiceImpl implements TokenService {
     }
 
     private boolean isBlack(String tokenId) {
-        return Boolean.TRUE.equals(stringRedisTemplate.hasKey(RedisKeyConst.TOKEN_BLACK_PREFIX + tokenId));
+        return Boolean.TRUE.equals(stringRedisTemplate.hasKey(UserRedisKeyConst.TOKEN_BLACK_PREFIX + tokenId));
     }
 
     private TokenInfoVO readWhiteToken(String tokenId) {
-        String json = stringRedisTemplate.opsForValue().get(RedisKeyConst.TOKEN_WHITE_PREFIX + tokenId);
+        String json = stringRedisTemplate.opsForValue().get(UserRedisKeyConst.TOKEN_WHITE_PREFIX + tokenId);
         if (json == null) {
             return null;
         }
@@ -175,9 +175,9 @@ public class TokenServiceImpl implements TokenService {
         if (tokenId == null) {
             return;
         }
-        Long ttl = stringRedisTemplate.getExpire(RedisKeyConst.TOKEN_WHITE_PREFIX + tokenId, TimeUnit.MILLISECONDS);
+        Long ttl = stringRedisTemplate.getExpire(UserRedisKeyConst.TOKEN_WHITE_PREFIX + tokenId, TimeUnit.MILLISECONDS);
         long blackTtl = ttl == null || ttl <= 0 ? jwtUtil.getRefreshTokenExpirationMs() : ttl;
-        stringRedisTemplate.opsForValue().set(RedisKeyConst.TOKEN_BLACK_PREFIX + tokenId, "1", blackTtl, TimeUnit.MILLISECONDS);
+        stringRedisTemplate.opsForValue().set(UserRedisKeyConst.TOKEN_BLACK_PREFIX + tokenId, "1", blackTtl, TimeUnit.MILLISECONDS);
     }
 
     private LocalDateTime toLocalDateTime(Date date) {

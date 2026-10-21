@@ -1,7 +1,7 @@
 package diary.diarytimemachine.entity.convert;
 
-import diary.common.entity.timemachine.po.TimeCategoryPO;
-import diary.common.entity.timemachine.vo.TimeCategoryVO;
+import diary.diarytimemachine.entity.po.TimeCategoryPO;
+import diary.diarytimemachine.entity.vo.TimeCategoryVO;
 
 public class PoConvertToVo {
     public static TimeCategoryVO convertToTimeCategoryVO(TimeCategoryPO timeCategoryPO) {

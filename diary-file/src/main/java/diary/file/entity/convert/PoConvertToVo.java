@@ -1,7 +1,7 @@
 package diary.file.entity.convert;
 
-import diary.common.entity.file.po.IconPO;
-import diary.common.entity.file.vo.IconVO;
+import diary.file.entity.po.IconPO;
+import diary.file.entity.vo.IconVO;
 
 public class PoConvertToVo {
     public static IconVO convertToIconVO(IconPO po) {

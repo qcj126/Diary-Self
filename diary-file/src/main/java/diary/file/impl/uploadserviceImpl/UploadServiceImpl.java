@@ -1,6 +1,7 @@
 package diary.file.impl.uploadserviceImpl;
 
 import diary.file.consts.PhotoStatusConst;
+import diary.file.entity.dto.ImageDTO;
 import diary.file.entity.po.ImagePO;
 import diary.file.enums.TypeEnum;
 import diary.common.exception.ParamIllegalException;
@@ -18,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -38,7 +40,7 @@ public class UploadServiceImpl implements UploadService {
         files = files.stream()
                 .filter(file -> {
                     MyUtils.check().notEmpty(file.getContentType(), "文件类型");
-                    return file.getContentType().equals("image/png") || file.getContentType().equals("image/jepg");
+                    return Objects.equals(file.getContentType(), "image/png") || Objects.equals(file.getContentType(), "image/jepg");
                 }).toList();
 
         ImageDTO imageDTO = new ImageDTO();

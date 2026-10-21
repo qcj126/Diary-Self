@@ -8,6 +8,7 @@ import com.aliyun.oss.model.InitiateMultipartUploadResult;
 import com.aliyun.oss.model.PartETag;
 import com.aliyun.oss.model.UploadPartRequest;
 import com.aliyun.oss.model.UploadPartResult;
+import diary.file.entity.dto.ImageDTO;
 import diary.file.entity.po.OssUploadSuccessMsg;
 import diary.file.entity.po.ImagePO;
 import diary.common.exception.ParamIllegalException;

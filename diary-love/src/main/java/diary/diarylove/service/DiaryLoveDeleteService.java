@@ -12,4 +12,6 @@ public interface DiaryLoveDeleteService {
     ApiResponse<String> deleteRecord(Long id);
 
     ApiResponse<String> deleteRecordImage(Long id);
+
+    ApiResponse<String> deleteMood(Long id);
 }

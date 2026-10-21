@@ -1,9 +1,9 @@
 package diary.diarygoal.entity.convert;
 
-import diary.common.entity.goal.dto.StageGoalDTO;
-import diary.common.entity.goal.dto.SubGoalDTO;
-import diary.common.entity.goal.po.StageGoalPO;
-import diary.common.entity.goal.po.SubGoalPO;
+import diary.diarygoal.entity.dto.StageGoalDTO;
+import diary.diarygoal.entity.dto.SubGoalDTO;
+import diary.diarygoal.entity.po.StageGoalPO;
+import diary.diarygoal.entity.po.SubGoalPO;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

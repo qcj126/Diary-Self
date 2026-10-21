@@ -1,10 +1,10 @@
 package diary.diarylove.controller;
 
-import diary.common.entity.love.dto.*;
 import diary.diarylove.entity.dto.AddLoveRecordDto;
 import diary.diarylove.entity.dto.LoveAnniversaryDTO;
 import diary.diarylove.entity.dto.LoveCoupleDTO;
 import diary.diarylove.entity.dto.LoveLocationDTO;
+import diary.diarylove.entity.dto.LoveMoodDTO;
 import diary.diarylove.entity.dto.LoveRecordDTO;
 import diary.diarylove.entity.dto.LoveRecordImageDTO;
 import diary.diarylove.entity.dto.UpdateLoveRecordDto;
@@ -12,6 +12,7 @@ import diary.diarylove.entity.vo.LoveAnniversaryVO;
 import diary.diarylove.entity.vo.LoveCoupleVO;
 import diary.diarylove.entity.vo.LoveLocationVO;
 import diary.diarylove.entity.vo.LoveMoodRecordVO;
+import diary.diarylove.entity.vo.LoveMoodVO;
 import diary.diarylove.entity.vo.LoveRecordImageVO;
 import diary.diarylove.entity.vo.LoveRecordVO;
 import diary.common.result.ApiResponse;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -159,4 +161,29 @@ public class DiaryLoveController {
     public ApiResponse<String> deleteRecordImage(@PathVariable Long id) {
         return diaryLoveDeleteService.deleteRecordImage(id);
     }
+
+    @OperLog(module = "系统数据", description = "新增心情", operationType = "INSERT", saveResult = true)
+    @PostMapping("/add/moods")
+    public ApiResponse<String> addMood(@RequestBody LoveMoodDTO dto) {
+        return diaryLoveAddService.addMood(dto);
+    }
+
+    @OperLog(module = "系统数据", description = "修改心情", operationType = "UPDATE", saveResult = true)
+    @PostMapping("/update/moods")
+    public ApiResponse<String> updateMood(@RequestBody LoveMoodDTO dto) {
+        return diaryLoveUpdateService.updateMood(dto);
+    }
+
+    @OperLog(module = "系统数据", description = "查询心情", operationType = "SELECT", saveResult = true)
+    @GetMapping("/query/moods")
+    public ApiResponse<List<LoveMoodVO>> queryMoods(@RequestParam(required = false) Boolean enabled) {
+        return diaryLoveQueryService.queryMoods(enabled);
+    }
+
+    @OperLog(module = "系统数据", description = "删除心情", operationType = "DELETE", saveResult = true)
+    @PostMapping("/delete/moods/{id}")
+    public ApiResponse<String> deleteMood(@PathVariable Long id) {
+        return diaryLoveDeleteService.deleteMood(id);
+    }
+
 }

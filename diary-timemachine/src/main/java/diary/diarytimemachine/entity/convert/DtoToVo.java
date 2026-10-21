@@ -1,8 +1,7 @@
 package diary.diarytimemachine.entity.convert;
 
-
-import diary.common.entity.timemachine.dto.TimeCategoryIconDTO;
-import diary.common.entity.timemachine.vo.TimeCategoryVO;
+import diary.diarytimemachine.entity.dto.TimeCategoryIconDTO;
+import diary.diarytimemachine.entity.vo.TimeCategoryVO;
 
 public class DtoToVo {
     public static TimeCategoryVO convertToVo(TimeCategoryIconDTO timeCategoryIconDTO) {

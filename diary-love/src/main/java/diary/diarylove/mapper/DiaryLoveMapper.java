@@ -2,8 +2,6 @@ package diary.diarylove.mapper;
 
 import diary.diarylove.entity.dto.LoveCoupleDTO;
 import diary.diarylove.entity.dto.LoveRecordDTO;
-import diary.common.entity.love.po.*;
-import diary.common.entity.mq.po.MqOutboxPO;
 import diary.diarylove.entity.po.LoveAnniversaryPO;
 import diary.diarylove.entity.po.LoveCouplePO;
 import diary.diarylove.entity.po.LoveLocationPO;
@@ -69,8 +67,6 @@ public interface DiaryLoveMapper {
 
     int deleteLoveRecordImage(@Param("id") Long id);
 
-    List<MqOutboxPO> selectReadyOutbox(int publisherBatchSize);
-
     int claimOutbox(Long id, Integer versionId);
 
     int markOutboxSent(Long id, Integer versionId, String brokerMessageId);
@@ -78,4 +74,12 @@ public interface DiaryLoveMapper {
     Long selectUserIdByPartnerName(String partnerName);
 
     int selectExistLoveCouple(@Param("ownerUserId") Long ownerUserId);
+
+    int insertLoveMood(LoveMoodPO loveMoodPO);
+
+    List<LoveMoodPO> selectLoveMoods(@Param("enabled") Boolean enabled);
+
+    int updateLoveMood(LoveMoodPO loveMoodPO);
+
+    int deleteLoveMood(@Param("id") Long id);
 }

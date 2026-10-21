@@ -1,6 +1,6 @@
 package diary.gateway.filter;
 
-import diary.common.consts.RedisKeyConst;
+import diary.gateway.consts.GatewayRedisConst;
 import diary.gateway.config.AuthProperties;
 import diary.utils.jwt.JwtUtil;
 import jakarta.annotation.Resource;
@@ -74,12 +74,12 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
             return unauthorized(exchange);
         }
 
-        Mono<Boolean> inWhite = reactiveStringRedisTemplate.hasKey(RedisKeyConst.TOKEN_WHITE_PREFIX + tokenId);
-        Mono<Boolean> inBlack = reactiveStringRedisTemplate.hasKey(RedisKeyConst.TOKEN_BLACK_PREFIX + tokenId);
+        Mono<Boolean> inWhite = reactiveStringRedisTemplate.hasKey(GatewayRedisConst.TOKEN_WHITE_PREFIX + tokenId);
+        Mono<Boolean> inBlack = reactiveStringRedisTemplate.hasKey(GatewayRedisConst.TOKEN_BLACK_PREFIX + tokenId);
 
         return Mono.zip(inWhite, inBlack)
                 .flatMap(tuple -> {
-                    boolean validToken = Boolean.TRUE.equals(tuple.getT1()) && !Boolean.TRUE.equals(tuple.getT2());
+                    boolean validToken = tuple.getT1() && !tuple.getT2();
                     if (!validToken) {
                         return unauthorized(exchange);
                     }
