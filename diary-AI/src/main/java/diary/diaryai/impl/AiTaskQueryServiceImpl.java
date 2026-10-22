@@ -1,5 +1,6 @@
 package diary.diaryai.impl;
 
+import diary.common.exception.NullResultException;
 import diary.diaryai.entity.ai.convert.ConvertPoToVo;
 import diary.diaryai.entity.ai.po.AiTaskPO;
 import diary.diaryai.entity.ai.vo.AiTaskResultVo;
@@ -28,7 +29,9 @@ public class AiTaskQueryServiceImpl implements AiTaskQueryService {
 
     @Override
     public AiTaskResultVo getTaskResult(Long taskId, Long userId) {
-        return diaryAiMapper.selectAiTaskResult(taskId, userId);
+        AiTaskResultVo aiTaskResultVo = diaryAiMapper.selectAiTaskResult(taskId, userId);
+        if (aiTaskResultVo == null) throw new NullResultException("查询的AI任务结果不存在");
+        return aiTaskResultVo;
     }
 
     @Override

@@ -8,7 +8,7 @@ import org.apache.rocketmq.client.apis.consumer.ConsumeResult;
 import java.util.Map;
 
 public interface AiTransactionService {
-    AiTaskPO createTaskAndOutbox(AiInvokeDTO request, Long userId);
+    AiTaskPO createTaskAndOutbox(AiInvokeDTO request, Long userId, String recipeTitle);
 
     void processData(Long taskId, Object data, String model, Map<String, String> result, Double temperature, Long userId, String workerId, Integer versionId);
 

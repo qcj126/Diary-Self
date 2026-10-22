@@ -82,8 +82,12 @@ public class MyUtils {
         }
 
         public Checker stringKeyMapNotContainsEmpty(Map<String, String> map, String fieldName) {
+            if (map == null || map.isEmpty()) {
+                throw new IllegalArgumentException(fieldName + " 不能为空");
+            }
             for (Map.Entry<String, String> entry : map.entrySet()) {
-                if (entry.getKey() == null || entry.getValue() == null || entry.getValue().trim().isEmpty()) {
+                if (entry.getKey() == null || entry.getKey().trim().isEmpty()
+                        || entry.getValue() == null || entry.getValue().trim().isEmpty()) {
                     throw new IllegalArgumentException(fieldName + " 不能包含空值");
                 }
             }

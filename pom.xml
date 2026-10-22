@@ -56,6 +56,7 @@
         <netty.version>4.1.132.Final</netty.version>
         <rocketmq.version>2.3.6</rocketmq.version>
         <aop.version>3.5.14</aop.version>
+        <openfeign.version>4.3.0</openfeign.version>
     </properties>
     
     <dependencyManagement>
@@ -98,7 +99,11 @@
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-openfeign</artifactId>
+                <version>${openfeign.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.apache.rocketmq</groupId>
                 <artifactId>rocketmq-v5-client-spring-boot-starter</artifactId>

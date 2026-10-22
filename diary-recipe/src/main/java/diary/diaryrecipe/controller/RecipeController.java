@@ -1,5 +1,7 @@
 package diary.diaryrecipe.controller;
 
+import com.aliyun.core.annotation.Path;
+import diary.common.auth.CurrentUser;
 import diary.diaryrecipe.entity.dto.RecipeCategoryDto;
 import diary.diaryrecipe.entity.dto.RecipePageReqDto;
 import diary.diaryrecipe.entity.dto.RecipeReqDto;
@@ -13,6 +15,8 @@ import diary.diaryrecipe.service.delete.RecipeDeleteService;
 import diary.diaryrecipe.service.query.RecipeQueryService;
 import diary.diaryrecipe.service.update.RecipeUpdateService;
 import jakarta.annotation.Resource;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +35,8 @@ public class RecipeController {
     private RecipeUpdateService recipeUpdateService;
     @Resource
     private RecipeDeleteService recipeDeleteService;
+    @Resource
+    private CurrentUser currentUser;
 
     // 增加食谱
     @OperLog(module = "食谱", description = "新增食谱", operationType = "INSERT", saveResult = true)
@@ -44,6 +50,14 @@ public class RecipeController {
     @PostMapping("/query")
     public ApiResponse<PageRecipeVO<RecipeVO>> pageQueryRecipe(@RequestBody RecipePageReqDto recipePageReqDto) {
         return recipeQueryService.pageQueryRecipe(recipePageReqDto);
+    }
+
+    // 查询单条食谱
+    @OperLog(module = "食谱", description = "分页查询食谱", operationType = "SELECT", saveResult = true)
+    @GetMapping("/query/{recipeId}")
+    public ApiResponse<String> queryRecipeTitleById(@PathVariable("recipeId") Long recipeId) {
+        Long userId = currentUser.getUser();
+        return recipeQueryService.queryRecipe(userId, recipeId);
     }
 
     // 修改食谱

@@ -2,6 +2,7 @@ package diary.diaryrecipe.impl.query;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import diary.common.exception.ParamIllegalException;
 import diary.diaryrecipe.entity.convert.DtoConvertToVo;
 import diary.diaryrecipe.entity.convert.PoConvertToVo;
 import diary.diaryrecipe.entity.dto.RecipeCategoryIconDto;
@@ -93,5 +94,13 @@ public class RecipeQueryServiceImpl implements RecipeQueryService {
                 .map(DtoConvertToVo::convertToRecipeCategoryVO)
                 .toList();
         return ApiResponse.success(recipeCategoryVOS);
+    }
+
+    @Override
+    public ApiResponse<String> queryRecipe(Long userId, Long recipeId) {
+        if (recipeId == null || recipeId < 0 || userId == null || userId < 0) {
+            throw new ParamIllegalException("非法参数！");
+        }
+        return ApiResponse.success(recipeMapper.selectTitleByUserIdAndRecipeId(userId, recipeId));
     }
 }

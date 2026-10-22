@@ -33,4 +33,6 @@ public interface DietMapper {
     List<DietRecordPO> selectByUserId(@Param("userId") Long userId);
 
     List<DietRecordPO> selectList(DietQueryDTO query);
+
+    String selectFoodNameByIdAndUserId(@Param("dietId") Long dietId, @Param("userId") Long userId);
 }

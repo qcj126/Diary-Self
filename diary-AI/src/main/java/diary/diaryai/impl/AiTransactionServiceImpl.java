@@ -48,7 +48,7 @@ public class AiTransactionServiceImpl implements AiTransactionService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public AiTaskPO createTaskAndOutbox(AiInvokeDTO request, Long userId) {
+    public AiTaskPO createTaskAndOutbox(AiInvokeDTO request, Long userId, String targetTitle) {
         LocalDateTime now = LocalDateTime.now();
         Long taskId = MyUtils.getPrimaryKey();
         // mq消息和outbox数据使用同一个eventId，保证事件的一致性
@@ -78,6 +78,9 @@ public class AiTransactionServiceImpl implements AiTransactionService {
                 .createTime(now)
                 .updateTime(now)
                 .versionId(0)
+                .targetTitle(targetTitle)
+                .targetId(request.getUniversalId())
+                .targetType(request.getFlag())
                 .build();
 
         AiTaskMessageDto message = AiTaskMessageDto.builder()

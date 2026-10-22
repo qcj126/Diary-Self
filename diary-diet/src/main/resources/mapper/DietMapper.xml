@@ -128,4 +128,8 @@
         ORDER BY eat_time DESC, id DESC
     </select>
 
+    <select id="selectFoodNameByIdAndUserId" resultType="java.lang.String">
+        select food_name from diet_record where id = #{dietId} and user_id = #{userId} and deleted = 0
+    </select>
+
 </mapper>

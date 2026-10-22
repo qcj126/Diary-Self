@@ -12,4 +12,6 @@ public interface RecipeQueryService {
     ApiResponse<PageRecipeVO<RecipeVO>> pageQueryRecipe(RecipePageReqDto pageReqDto);
 
     ApiResponse<List<RecipeCategoryVO>> queryRecipeCategory();
+
+    ApiResponse<String> queryRecipe(Long userId, Long recipeId);
 }

@@ -1,5 +1,6 @@
 package diary.diarydiet.controller;
 
+import diary.common.auth.CurrentUser;
 import diary.diarydiet.entity.dto.DietQueryDTO;
 import diary.diarydiet.entity.dto.DietRecordDTO;
 import diary.diarydiet.entity.vo.DietRecordVO;
@@ -25,6 +26,8 @@ public class DietController {
     private DietUpdateService dietUpdateService;
     @Resource
     private DietQueryService dietQueryService;
+    @Resource
+    private CurrentUser currentUser;
 
     // 增
     @OperLog(module = "饮食记录", description = "新增饮食记录", operationType = "INSERT", saveResult = true)
@@ -66,5 +69,12 @@ public class DietController {
     @PostMapping("/query")
     public ApiResponse<List<DietRecordVO>> queryDietRecords(@RequestBody DietQueryDTO query) {
         return dietQueryService.queryDietRecords(query);
+    }
+
+    @OperLog(module = "饮食记录", description = "查询食物名称", operationType = "SELECT", saveResult = true)
+    @GetMapping("/query/food-name/{dietId}")
+    public ApiResponse<String> queryFoodName(@PathVariable(name = "dietId") Long dietId) {
+        Long userId = currentUser.getUser();
+        return dietQueryService.queryFoodName(dietId, userId);
     }
 }

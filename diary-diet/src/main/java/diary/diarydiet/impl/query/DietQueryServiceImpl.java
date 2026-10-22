@@ -48,4 +48,9 @@ public class DietQueryServiceImpl implements DietQueryService {
                 .toList();
         return ApiResponse.success(records);
     }
+
+    @Override
+    public ApiResponse<String> queryFoodName(Long dietId, Long userId) {
+        return ApiResponse.success(dietMapper.selectFoodNameByIdAndUserId(dietId, userId));
+    }
 }

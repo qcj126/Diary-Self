@@ -1,6 +1,6 @@
 package diary.diaryai.impl;
 
-import diary.common.exception.ParamIllegalException;
+import diary.common.exception.NullResultException;
 import diary.diaryai.entity.ai.dto.AiInvokeDTO;
 import diary.diaryai.entity.ai.po.AiTaskPO;
 import diary.diaryai.entity.ai.vo.AiTaskSubmitVo;
@@ -9,16 +9,21 @@ import diary.diaryai.enums.aienum.AiApplicationEnum;
 import diary.diaryai.enums.aienum.AiFlagEnum;
 import diary.diaryai.exceptions.AiSubmitRateLimitException;
 import diary.diaryai.exceptions.IdempotencyConflictException;
+import diary.diaryai.feignclient.DietClient;
+import diary.diaryai.feignclient.RecipeClient;
 import diary.diaryai.idempotency.AiRequestFingerprint;
 import diary.diaryai.mapper.DiaryAiMapper;
 import diary.diaryai.redis.AiSubmitRateLimiter;
 import diary.diaryai.service.AiTaskApplicationService;
 import diary.diaryai.service.AiTransactionService;
 import diary.utils.commonutil.MyUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -27,10 +32,12 @@ public class AiTaskApplicationServiceImpl implements AiTaskApplicationService {
     private final AiTransactionService aiTransactionService;
     private final AiSubmitRateLimiter aiSubmitRateLimiter;
     private final AiRequestFingerprint requestFingerprint;
+    private final RecipeClient recipeClient;
+    private final DietClient dietClient;
 
     // 提交任务时，仅让task状态为Pending即可，当定时任务提取了消息并发送时，再改为queued
     @Override
-    public AiTaskSubmitVo submitTask(AiInvokeDTO aiInvokeDTO, Long userId) {
+    public AiTaskSubmitVo submitNutrientAnalyze(AiInvokeDTO aiInvokeDTO, Long userId) {
         validateAndNormalizeRequest(aiInvokeDTO);
 
         MyUtils.check().notNull(userId, "userId");
@@ -56,7 +63,19 @@ public class AiTaskApplicationServiceImpl implements AiTaskApplicationService {
         AiTaskPO aiTaskPO;
         try {
             // 异步创建aiTask和outbox，绑定同一最小事务，确保数据的一致性
-            aiTaskPO = aiTransactionService.createTaskAndOutbox(aiInvokeDTO, userId);
+            // 营养分析目前只关联食谱和饮食；AI 的实际输入始终来自 ingredients。
+            String targetTitle;
+            switch (AiFlagEnum.valueOf(aiInvokeDTO.getFlag())) {
+                case RECIPE -> targetTitle = recipeClient.getRecipeTitle(userId, aiInvokeDTO.getUniversalId()).getData();
+                case DIET -> targetTitle = dietClient.getDietFoodName(userId, aiInvokeDTO.getUniversalId()).getData();
+                default -> throw new IllegalArgumentException("营养分析不支持该目标类型");
+            }
+
+            if (targetTitle == null) {
+                throw new NullResultException("未查询到关联对象");
+            }
+
+            aiTaskPO = aiTransactionService.createTaskAndOutbox(aiInvokeDTO, userId, targetTitle);
             if (aiTaskPO == null) {
                 throw new IllegalStateException("AI任务创建失败");
             }
@@ -102,20 +121,22 @@ public class AiTaskApplicationServiceImpl implements AiTaskApplicationService {
                 .notNull(request.getAiType(), "aiType")
                 .notNull(request.getAiApplication(), "aiApplication")
                 .notEmpty(request.getFlag(), "flag")
-                .notNull(request.getMaterials(), "materials")
-                .stringKeyMapNotContainsEmpty(request.getMaterials(), "materials")
+                .notNull(request.getIngredients(), "ingredients")
+                .stringKeyMapNotContainsEmpty(request.getIngredients(), "ingredients")
                 .notNull(request.getUniversalId(), "universalId");
         if (!AIEnum.isSupport(request.getAiType())) {
             throw new IllegalArgumentException("不支持的AI类型");
         }
+        request.setClientRequestId(request.getClientRequestId().trim());
+        request.setFlag(request.getFlag().trim().toUpperCase(Locale.ROOT));
+
         AiFlagEnum.isTrueFlag(request.getFlag());
         AiApplicationEnum.isTrueApplication(request.getAiApplication());
-        if (1 != request.getAiApplication() && ("DIET".equals(request.getFlag()) || "RECIPE".equals(request.getFlag()))) {
+        AiFlagEnum flag = AiFlagEnum.valueOf(request.getFlag());
+        if (AiApplicationEnum.NUTRITION_ANALYSIS.getCode() != request.getAiApplication()
+                || (flag != AiFlagEnum.DIET && flag != AiFlagEnum.RECIPE)) {
             throw new IllegalArgumentException("AI用途与AI标志不匹配，请检查数据后重试！");
         }
-
-        request.setClientRequestId(request.getClientRequestId().trim());
-        request.setFlag(request.getFlag().trim().toUpperCase());
     }
 
     private AiTaskSubmitVo toSubmitVo(AiTaskPO task, String message) {

@@ -15,10 +15,10 @@ public class AiTaskResultVo {
     private Long taskId;
     private String status;
     private String title;
+    private String targetType;
+    private Long targetId;
     private Integer aiApplication;
     private Long aiInfoId;
-    private Long universalId;
-    private String flag;
     private String calory;
     private String protein;
     private String fat;

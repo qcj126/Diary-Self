@@ -1,6 +1,7 @@
 package diary.diaryrecipe.mapper;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import diary.common.result.ApiResponse;
 import diary.diaryrecipe.entity.dto.RecipePageReqDto;
 import diary.diaryrecipe.entity.dto.RecipeReqDto;
 import diary.diaryrecipe.entity.po.RecipePO;
@@ -67,4 +68,6 @@ public interface RecipeMapper {
     Integer updateById(@Param("req") RecipeReqDto recipeReqDto, @Param("recipeId") Long recipeId);
 
     int deleteRecipeById(@NotNull Long id);
+
+    String selectTitleByUserIdAndRecipeId(@Param("userId")Long userId, @Param("recipeId") Long recipeId);
 }

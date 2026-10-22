@@ -49,7 +49,7 @@ public class AiRequestFingerprint {
         value.put("clientRequestId", request.getClientRequestId());
         value.put("cookWay", request.getCookWay());
         value.put("flag", request.getFlag());
-        value.put("materials", request.getMaterials() == null ? null : new TreeMap<>(request.getMaterials()));
+        value.put("ingredients", request.getIngredients() == null ? null : new TreeMap<>(request.getIngredients()));
         value.put("universalId", request.getUniversalId());
         return value;
     }

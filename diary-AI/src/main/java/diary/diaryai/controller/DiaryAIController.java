@@ -33,9 +33,9 @@ public class DiaryAIController {
     private final CurrentUser currentUser;
 
     @OperLog(module = "AI", description = "提交AI任务", operationType = "INSERT", saveParams = false, saveResult = false)
-    @PostMapping("/tasks")
-    public ResponseEntity<ApiResponse<AiTaskSubmitVo>> submit(@RequestBody AiInvokeDTO request) {
-        AiTaskSubmitVo submitted = aiTaskApplicationService.submitTask(request, currentUser.getUser());
+    @PostMapping("/task/nutrient-analyze")
+    public ResponseEntity<ApiResponse<AiTaskSubmitVo>> submitNutrientAnalyze(@RequestBody AiInvokeDTO request) {
+        AiTaskSubmitVo submitted = aiTaskApplicationService.submitNutrientAnalyze(request, currentUser.getUser());
         return ResponseEntity.accepted()
                 .location(URI.create("/ai/tasks/" + submitted.getTaskId()))
                 .body(ApiResponse.success(submitted));

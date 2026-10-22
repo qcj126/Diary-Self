@@ -280,7 +280,7 @@ Controller 从 `X-Auth-User-Id` 获得用户，Service 校验：
 - `aiType`
 - `aiApplication`
 - `flag`
-- `materials`
+- `ingredients`
 - `universalId`
 
 ### 11.2 MySQL 幂等
@@ -427,7 +427,7 @@ Spring 会把所有 `InvokeAIService` 注入 `AIFactory`。工厂使用 `putIfAb
 ### 16.1 提交
 
 ```http
-POST /ai/tasks
+POST /ai/task/nutrient-analyze
 Authorization: Bearer <access-token>
 Content-Type: application/json
 
@@ -435,7 +435,7 @@ Content-Type: application/json
   "clientRequestId": "ai-demo-20260909-001",
   "aiType": 1,
   "aiApplication": 1,
-  "materials": {
+  "ingredients": {
     "chicken": "150g",
     "rice": "200g"
   },
@@ -471,6 +471,7 @@ Authorization: Bearer <access-token>
 - 处理中状态返回 `202`。
 - `SUCCESS/FAILED/DEAD_LETTER` 返回 `200`，业务结果通过响应体 `status` 表达。
 - 其他用户的 JWT 不能查询该任务。
+- 返回的关联对象使用 `targetType`、`targetId` 与 `title`；不再返回旧的 `flag`、`universalId` 结果字段。
 
 ## 17. 运维查询
 
@@ -478,6 +479,7 @@ Authorization: Bearer <access-token>
 
 ```sql
 SELECT id, user_id, client_request_id, task_type, status,
+       target_type, target_id, target_title,
        attempt_count, max_attempts, worker_id, lease_until,
        error_code, error_message, create_time, queue_time,
        start_time, finish_time, update_time, version_id
@@ -617,7 +619,7 @@ MySQL 本地事务
 
 | 方法 | 路径 | 说明 | 正常 HTTP 状态 |
 | --- | --- | --- | --- |
-| POST | `/ai/tasks` | 提交异步任务 | 202 |
+| POST | `/ai/task/nutrient-analyze` | 提交营养分析任务 | 202 |
 | GET | `/ai/tasks/{taskId}` | 查询任务状态 | 200 |
 | GET | `/ai/tasks/{taskId}/result` | 查询任务结果 | 处理中 202，终态 200 |
 
@@ -627,11 +629,11 @@ MySQL 本地事务
 | --- | --- | --- |
 | `clientRequestId` | 是 | 同一用户内唯一的客户端幂等键 |
 | `aiType` | 是 | 大模型工厂 code |
-| `materials` | 是 | 食材名称与数量 |
-| `aiApplication` | 是 | AI 应用类型 |
+| `ingredients` | 是 | 食材名称与数量 |
+| `aiApplication` | 是 | 固定为 `1`（营养分析） |
 | `cookWay` | 否 | 烹饪方式 |
-| `flag` | 是 | `DIET/RECIPE/GOAL` |
-| `universalId` | 是 | 对应业务数据 ID |
+| `flag` | 是 | `DIET/RECIPE` |
+| `universalId` | 是 | `DIET/RECIPE` 对应业务数据 ID |
 
 相同幂等键和相同内容重复提交时返回原 taskId；相同幂等键对应不同内容时返回幂等冲突。Snowflake ID 传给 JavaScript 客户端时建议使用字符串，避免精度丢失。
 

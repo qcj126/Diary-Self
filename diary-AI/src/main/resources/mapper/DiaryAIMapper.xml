@@ -51,6 +51,9 @@
         <result column="finish_time" property="finishTime" jdbcType="TIMESTAMP"/>
         <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
         <result column="version_id" property="versionId" jdbcType="INTEGER"/>
+        <result column="target_id" property="targetId" jdbcType="BIGINT"/>
+        <result column="target_type" property="targetType" jdbcType="VARCHAR"/>
+        <result column="target_title" property="targetTitle" jdbcType="VARCHAR"/>
     </resultMap>
 
     <resultMap id="MqOutboxResultMap" type="diary.diaryai.entity.mq.po.MqOutboxPO">
@@ -79,9 +82,9 @@
         <id column="id" property="taskId" jdbcType="BIGINT"/>
         <result column="status" property="status" jdbcType="VARCHAR"/>
         <result column="ai_info_id" property="aiInfoId" jdbcType="BIGINT"/>
-        <result column="title" property="title" jdbcType="VARCHAR"/>
-        <result column="universal_id" property="universalId" jdbcType="BIGINT"/>
-        <result column="flag" property="flag" jdbcType="VARCHAR"/>
+        <result column="target_title" property="title" jdbcType="VARCHAR"/>
+        <result column="target_type" property="targetType" jdbcType="VARCHAR"/>
+        <result column="target_id" property="targetId" jdbcType="BIGINT"/>
         <result column="calory" property="calory" jdbcType="VARCHAR"/>
         <result column="protein" property="protein" jdbcType="VARCHAR"/>
         <result column="fat" property="fat" jdbcType="VARCHAR"/>
@@ -124,10 +127,12 @@
         -->
         INSERT INTO ai_task
             (id, user_id, client_request_id, request_hash, task_type, status, input_snapshot,
-             attempt_count, max_attempts, create_time, update_time, version_id, ai_application)
+             attempt_count, max_attempts, create_time, update_time, version_id, ai_application,
+             target_title, target_id, target_type)
         VALUES
             (#{id}, #{userId}, #{clientRequestId}, #{requestHash}, #{taskType}, #{status}, #{inputSnapshot},
-             #{attemptCount}, #{maxAttempts}, #{createTime}, #{updateTime}, #{versionId}, #{aiApplication})
+             #{attemptCount}, #{maxAttempts}, #{createTime}, #{updateTime}, #{versionId}, #{aiApplication},
+             #{targetTitle}, #{targetId}, #{targetType})
     </insert>
 
     <select id="selectAiTaskByTaskId" resultMap="AiTaskResultMap">
@@ -404,12 +409,11 @@
     </delete>
 
     <select id="selectAiTaskList" resultMap="AiTaskResultVo">
-        select a.id, a.status, a.ai_info_id, c.universal_id, c.flag, c.calory, c.protein, d.title,
+        select a.id, a.status, a.ai_info_id, a.target_id, a.target_type, c.calory, c.protein, a.target_title,
         c.fat, c.carbohydrate, c.sugar, c.sodium, a.error_code, a.error_message, a.ai_application, a.create_time, a.finish_time
         from ai_task a
-        inner join ai_info b on a.ai_info_id = b.id and b.user_id = a.user_id
-        inner join ai_nutrient c on c.ai_info_id = b.id and c.user_id = a.user_id
-        inner join recipe d on d.id = c.universal_id and d.user_id = a.user_id
+        left join ai_info b on a.ai_info_id = b.id and b.user_id = a.user_id
+        left join ai_nutrient c on c.ai_info_id = b.id and c.user_id = a.user_id
         where a.user_id = #{userId}
         <if test="taskStatus != null and taskStatus != ''">
             and a.status = #{taskStatus}
@@ -418,18 +422,17 @@
             and a.ai_application = #{applicationCode}
         </if>
         <if test="title != null and title != ''">
-            and d.title like CONCAT('%', #{title}, '%')
+            and a.target_title like CONCAT('%', #{title}, '%')
         </if>
         order by a.create_time desc limit #{pageSize} offset #{offset}
     </select>
 
     <select id="selectAiTaskResult" resultMap="AiTaskResultVo">
-        select a.id, a.status, a.ai_info_id, c.universal_id, c.flag, c.calory, c.protein, d.title,
+        select a.id, a.status, a.ai_info_id, a.target_id, a.target_type, c.calory, c.protein, a.target_title,
         c.fat, c.carbohydrate, c.sugar, c.sodium, a.error_code, a.error_message, a.ai_application, a.create_time, a.finish_time
         from ai_task a
-        inner join ai_info b on a.ai_info_id = b.id and b.user_id = a.user_id
-        inner join ai_nutrient c on c.ai_info_id = b.id and c.user_id = a.user_id
-        inner join recipe d on d.id = c.universal_id and d.user_id = a.user_id
+        left join ai_info b on a.ai_info_id = b.id and b.user_id = a.user_id
+        left join ai_nutrient c on c.ai_info_id = b.id and c.user_id = a.user_id
         where a.user_id = #{userId} and a.id = #{taskId}
         order by a.create_time desc
     </select>

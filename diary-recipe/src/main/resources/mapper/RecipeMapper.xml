@@ -160,4 +160,8 @@
     <delete id="deleteRecipeById">
         DELETE FROM recipe WHERE id = #{recipeId}
     </delete>
+
+    <select id="selectTitleByUserIdAndRecipeId" resultType="java.lang.String">
+        select title from recipe where id = #{recipeId} and user_id = #{userId}
+    </select>
 </mapper>
