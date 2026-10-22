@@ -2,14 +2,16 @@ package diary.diaryai.controller;
 
 import diary.common.auth.CurrentUser;
 import diary.diaryai.entity.ai.dto.AiInvokeDTO;
+import diary.diaryai.entity.ai.dto.LoveRecordSentimentSubmitDTO;
 import diary.diaryai.entity.ai.vo.AiTaskResultVo;
 import diary.diaryai.entity.ai.vo.AiTaskStatusVo;
 import diary.diaryai.entity.ai.vo.AiTaskSubmitVo;
 import diary.diaryai.enums.aienum.AiTaskStatusEnum;
 import diary.common.result.ApiResponse;
 import diary.config.logconfig.OperLog;
-import diary.diaryai.service.AiTaskApplicationService;
+import diary.diaryai.service.AiTaskNutrientApplicationService;
 import diary.diaryai.service.AiTaskQueryService;
+import diary.diaryai.service.AiTaskSentimentApplicationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,11 +30,12 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/ai")
 public class DiaryAIController {
-    private final AiTaskApplicationService aiTaskApplicationService;
+    private final AiTaskNutrientApplicationService aiTaskApplicationService;
+    private final AiTaskSentimentApplicationService aiTaskSentimentApplicationService;
     private final AiTaskQueryService aiTaskQueryService;
     private final CurrentUser currentUser;
 
-    @OperLog(module = "AI", description = "提交AI任务", operationType = "INSERT", saveParams = false, saveResult = false)
+    @OperLog(module = "AI", description = "提交AI饮食营养分析任务", operationType = "INSERT", saveParams = false, saveResult = false)
     @PostMapping("/task/nutrient-analyze")
     public ResponseEntity<ApiResponse<AiTaskSubmitVo>> submitNutrientAnalyze(@RequestBody AiInvokeDTO request) {
         AiTaskSubmitVo submitted = aiTaskApplicationService.submitNutrientAnalyze(request, currentUser.getUser());
@@ -40,6 +43,16 @@ public class DiaryAIController {
                 .location(URI.create("/ai/tasks/" + submitted.getTaskId()))
                 .body(ApiResponse.success(submitted));
     }
+
+    @OperLog(module = "AI", description = "提交AI恋爱记录情感分析任务", operationType = "INSERT", saveParams = false, saveResult = false)
+    @PostMapping("task/love-record-sentiment-analyze")
+    public ResponseEntity<ApiResponse<AiTaskSubmitVo>> submitLoveRecordSentimentAnalyze(@RequestBody LoveRecordSentimentSubmitDTO loveRecordSentimentSubmitDTO) {
+        AiTaskSubmitVo submitted = aiTaskSentimentApplicationService.submitLoveRecordSentimentAnalyze(loveRecordSentimentSubmitDTO, currentUser.getUser());
+        return ResponseEntity.accepted()
+                .location(URI.create("/ai/tasks/" + submitted.getTaskId()))
+                .body(ApiResponse.success(submitted));
+    }
+
 
     @OperLog(module = "AI", description = "获取AI任务状态", operationType = "SELECT", saveParams = true, saveResult = true)
     @GetMapping("/tasks/{taskId}")

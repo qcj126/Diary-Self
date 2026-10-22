@@ -7,7 +7,11 @@ import lombok.Getter;
 public enum AiTaskTypeEnum {
     DIET_NUTRIENT_ANALYSIS("餐食营养分析"),
     RECIPE_NUTRIENT_ANALYSIS("食谱营养分析"),
-    LOVE_SENTIMENT_ANALYSIS("爱情情感分析");
+    LOVE_RECORD_SENTIMENT_ANALYSIS("恋爱记录情感分析");
+
+    // 后续规划：
+    // LOVE_PERIOD_EMOTION_REVIEW：按近 7/30 天恋爱记录做情绪趋势回顾
+    // LOVE_CONFLICT_REFLECTION：针对一条冲突记录做事实、感受、需求复盘
 
     private final String displayName;
 

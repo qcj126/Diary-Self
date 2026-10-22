@@ -44,7 +44,6 @@ public class AiRequestFingerprint {
 
     public Map<String, Object> canonicalForm(AiInvokeDTO request) {
         Map<String, Object> value = new TreeMap<>();
-        value.put("aiApplication", request.getAiApplication());
         value.put("aiType", request.getAiType());
         value.put("clientRequestId", request.getClientRequestId());
         value.put("cookWay", request.getCookWay());

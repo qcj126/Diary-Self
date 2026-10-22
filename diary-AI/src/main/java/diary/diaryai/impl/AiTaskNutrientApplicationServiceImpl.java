@@ -14,10 +14,9 @@ import diary.diaryai.feignclient.RecipeClient;
 import diary.diaryai.idempotency.AiRequestFingerprint;
 import diary.diaryai.mapper.DiaryAiMapper;
 import diary.diaryai.redis.AiSubmitRateLimiter;
-import diary.diaryai.service.AiTaskApplicationService;
+import diary.diaryai.service.AiTaskNutrientApplicationService;
 import diary.diaryai.service.AiTransactionService;
 import diary.utils.commonutil.MyUtils;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +26,7 @@ import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
-public class AiTaskApplicationServiceImpl implements AiTaskApplicationService {
+public class AiTaskNutrientApplicationServiceImpl implements AiTaskNutrientApplicationService {
     private final DiaryAiMapper diaryAiMapper;
     private final AiTransactionService aiTransactionService;
     private final AiSubmitRateLimiter aiSubmitRateLimiter;
@@ -119,7 +118,6 @@ public class AiTaskApplicationServiceImpl implements AiTaskApplicationService {
                 .notNull(request, "aiInvokeDTO")
                 .notEmpty(request.getClientRequestId(), "clientRequestId")
                 .notNull(request.getAiType(), "aiType")
-                .notNull(request.getAiApplication(), "aiApplication")
                 .notEmpty(request.getFlag(), "flag")
                 .notNull(request.getIngredients(), "ingredients")
                 .stringKeyMapNotContainsEmpty(request.getIngredients(), "ingredients")
@@ -131,12 +129,6 @@ public class AiTaskApplicationServiceImpl implements AiTaskApplicationService {
         request.setFlag(request.getFlag().trim().toUpperCase(Locale.ROOT));
 
         AiFlagEnum.isTrueFlag(request.getFlag());
-        AiApplicationEnum.isTrueApplication(request.getAiApplication());
-        AiFlagEnum flag = AiFlagEnum.valueOf(request.getFlag());
-        if (AiApplicationEnum.NUTRITION_ANALYSIS.getCode() != request.getAiApplication()
-                || (flag != AiFlagEnum.DIET && flag != AiFlagEnum.RECIPE)) {
-            throw new IllegalArgumentException("AI用途与AI标志不匹配，请检查数据后重试！");
-        }
     }
 
     private AiTaskSubmitVo toSubmitVo(AiTaskPO task, String message) {

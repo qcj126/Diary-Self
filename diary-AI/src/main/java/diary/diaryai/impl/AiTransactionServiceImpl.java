@@ -10,6 +10,7 @@ import diary.diaryai.entity.ai.po.AiInfoPO;
 import diary.diaryai.entity.ai.po.AiNutrientPO;
 import diary.diaryai.entity.ai.po.AiTaskPO;
 import diary.diaryai.entity.mq.po.MqOutboxPO;
+import diary.diaryai.enums.aienum.AiApplicationEnum;
 import diary.diaryai.enums.aienum.AiTaskErrorCodeEnum;
 import diary.diaryai.enums.aienum.AiTaskStatusEnum;
 import diary.diaryai.enums.aienum.AiTaskTypeEnum;
@@ -66,7 +67,7 @@ public class AiTransactionServiceImpl implements AiTransactionService {
 
         AiTaskPO task = AiTaskPO.builder()
                 .id(taskId)
-                .aiApplication(request.getAiApplication())
+                .aiApplication(AiApplicationEnum.NUTRITION_ANALYSIS.getCode())
                 .userId(userId)
                 .clientRequestId(request.getClientRequestId())
                 .requestHash(requestHash)
@@ -103,7 +104,7 @@ public class AiTransactionServiceImpl implements AiTransactionService {
                 .aggregateId(taskId)
                 .eventType(OutboxEventTypeEnum.AI_TASK_CREATED.name())
                 .topic(properties.getRocketmq().getTaskTopic())
-                .tag(myUtil.getOutboxTag(request.getAiApplication()))
+                .tag(myUtil.getOutboxTag(AiApplicationEnum.NUTRITION_ANALYSIS.getCode()))
                 .messageKey(taskId.toString())
                 .payload(writeJson(message, "AI任务消息序列化失败"))
                 .schemaVersion(OUTBOX_SCHEMA_VERSION)
@@ -146,7 +147,7 @@ public class AiTransactionServiceImpl implements AiTransactionService {
                 .temperature(String.valueOf(temperature))
                 .model(model)
                 .aiType(aiInvokeDTO.getAiType())
-                .aiApplication(aiInvokeDTO.getAiApplication())
+                .aiApplication(AiApplicationEnum.NUTRITION_ANALYSIS.getCode())
                 .build();
         AiNutrientPO aiNutrientPO = AiNutrientPO.builder()
                 .id(MyUtils.getPrimaryKey())
