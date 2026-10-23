@@ -3,8 +3,11 @@ package diary.diaryai.mapper;
 import diary.diaryai.entity.ai.dto.AiTaskProcessDto;
 import diary.diaryai.entity.ai.po.AiInfoPO;
 import diary.diaryai.entity.ai.po.AiNutrientPO;
+import diary.diaryai.entity.ai.po.AiSentimentPO;
 import diary.diaryai.entity.ai.po.AiTaskPO;
 import diary.diaryai.entity.ai.vo.AiTaskResultVo;
+import diary.diaryai.entity.ai.vo.AiSentimentTaskResultVo;
+import diary.diaryai.entity.ai.vo.AiTaskSummaryVo;
 import diary.diaryai.entity.mq.po.MqOutboxPO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -14,6 +17,8 @@ import java.util.List;
 @Mapper
 public interface DiaryAiMapper {
     int insertAiNutrient(AiNutrientPO aiNutrientPO);
+
+    int insertAiSentiment(AiSentimentPO aiSentimentPO);
 
     int insertAiInfo(AiInfoPO aiInfoPO);
 
@@ -102,12 +107,17 @@ public interface DiaryAiMapper {
             @Param("limit") int limit
     );
 
-    List<AiTaskResultVo> selectAiTaskList(@Param("userId") Long userId,
-                                          @Param("taskStatus") String taskStatus,
-                                          @Param("applicationCode") Integer applicationCode,
-                                          @Param("title") String title,
-                                          @Param("pageSize") Integer pageSize,
-                                          @Param("offset") Integer offset);
+    List<AiTaskSummaryVo> selectAiTaskSummaryList(@Param("userId") Long userId,
+                                                   @Param("taskStatus") String taskStatus,
+                                                   @Param("applicationCode") Integer applicationCode,
+                                                   @Param("title") String title,
+                                                   @Param("pageSize") Integer pageSize,
+                                                   @Param("offset") Integer offset);
 
-    AiTaskResultVo selectAiTaskResult(Long taskId, Long userId);
+    AiTaskResultVo selectNutrientTaskResult(@Param("taskId") Long taskId, @Param("userId") Long userId);
+
+    AiSentimentTaskResultVo selectLoveRecordSentimentTaskResult(
+            @Param("taskId") Long taskId,
+            @Param("userId") Long userId
+    );
 }

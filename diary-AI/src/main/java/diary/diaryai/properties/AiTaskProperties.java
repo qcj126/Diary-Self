@@ -28,7 +28,8 @@ public class AiTaskProperties {
         private String taskTopic;
         private String taskNutrientTag;
         private String taskSentimentTag;
-        private String taskConsumerNutrientGroup;
+        private String aiTaskConsumerTag;
+        private String aiTaskConsumerGroup;
         private String taskConsumerSentimentGroup;
         private String eventTopic;
         @Min(1)

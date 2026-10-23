@@ -33,7 +33,7 @@ public class AiTaskPO {
     private LocalDateTime finishTime;       // 执行结束时间
     private LocalDateTime updateTime;       // 最近一次状态更新时间；用于识别长期卡住的非 RUNNING 任务
     private Integer versionId;              // 乐观锁版本：每次有效状态迁移由数据库执行 version_id + 1
-    private String targetType;              // AI作用域：RECIPE/DIET/LOVE_RECORD
+    private String targetType;              // AI 分析目标的具体场景类型
     private Long targetId;                  // 业务对象ID
     private String targetTitle;             // 提交任务时的展示标题
 }

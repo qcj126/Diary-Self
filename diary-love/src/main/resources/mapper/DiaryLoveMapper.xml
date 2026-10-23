@@ -352,4 +352,9 @@
     <delete id="deleteLoveMood">
         DELETE FROM love_mood WHERE id = #{id}
     </delete>
+
+    <select id="queryLoveRecordSnapshot" resultType="diary.common.entity.feign.LoveRecordAiSnapshotDTO">
+        select id as loveRecordId, title, content, record_date as recordDate, category_code as categoryCode
+        from love_record where id = #{loveRecordId} and creator_user_id = #{userId} and deleted = 0
+    </select>
 </mapper>

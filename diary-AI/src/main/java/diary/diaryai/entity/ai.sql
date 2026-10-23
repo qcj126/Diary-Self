@@ -39,6 +39,30 @@ create index idx_ai_nutrient_info_id
 create index idx_ai_nutrient_user_time
     on ai_nutrient (user_id, create_time);
 
+create table ai_sentiment
+(
+    id               bigint unsigned                    not null comment '主键'
+        primary key,
+    user_id          bigint unsigned                    not null comment '用户ID',
+    ai_info_id       bigint unsigned                    not null comment 'AI调用信息ID',
+    ai_task_id       bigint unsigned                    not null comment 'AI任务ID',
+    sentiment_label  varchar(16)                        not null comment 'POSITIVE/NEUTRAL/NEGATIVE/MIXED',
+    sentiment_score  smallint                           not null comment '情感倾向分，范围-100到100',
+    analysis_summary varchar(500)                       not null comment '分析摘要',
+    suggestion       varchar(500)                       not null comment '温和建议',
+    create_time      datetime default CURRENT_TIMESTAMP not null comment '创建时间',
+    update_time      datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    constraint uk_ai_sentiment_task_id
+        unique (ai_task_id)
+)
+    comment 'AI恋爱记录情感分析结果表' charset = utf8mb4;
+
+create index idx_ai_sentiment_info_id
+    on ai_sentiment (ai_info_id);
+
+create index idx_ai_sentiment_user_time
+    on ai_sentiment (user_id, create_time);
+
 
 
 -- auto-generated definition

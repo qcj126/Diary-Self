@@ -5,10 +5,8 @@ import diary.diaryai.entity.ai.dto.AiInvokeDTO;
 import diary.diaryai.entity.ai.po.AiTaskPO;
 import diary.diaryai.entity.ai.vo.AiTaskSubmitVo;
 import diary.diaryai.enums.aienum.AIEnum;
-import diary.diaryai.enums.aienum.AiApplicationEnum;
 import diary.diaryai.enums.aienum.AiFlagEnum;
 import diary.diaryai.exceptions.AiSubmitRateLimitException;
-import diary.diaryai.exceptions.IdempotencyConflictException;
 import diary.diaryai.feignclient.DietClient;
 import diary.diaryai.feignclient.RecipeClient;
 import diary.diaryai.idempotency.AiRequestFingerprint;
@@ -16,6 +14,7 @@ import diary.diaryai.mapper.DiaryAiMapper;
 import diary.diaryai.redis.AiSubmitRateLimiter;
 import diary.diaryai.service.AiTaskNutrientApplicationService;
 import diary.diaryai.service.AiTransactionService;
+import diary.diaryai.utils.MyUtil;
 import diary.utils.commonutil.MyUtils;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -33,6 +32,7 @@ public class AiTaskNutrientApplicationServiceImpl implements AiTaskNutrientAppli
     private final AiRequestFingerprint requestFingerprint;
     private final RecipeClient recipeClient;
     private final DietClient dietClient;
+    private final MyUtil myUtil;
 
     // 提交任务时，仅让task状态为Pending即可，当定时任务提取了消息并发送时，再改为queued
     @Override
@@ -40,24 +40,22 @@ public class AiTaskNutrientApplicationServiceImpl implements AiTaskNutrientAppli
         validateAndNormalizeRequest(aiInvokeDTO);
 
         MyUtils.check().notNull(userId, "userId");
-        String clientRequestId = aiInvokeDTO.getClientRequestId();
         // 不信任前端传来的数据
         // 校验clientRequestId---是否是同一次提交
         // 校验requestHash---是否是同一份数据
-        String requestHash = requestFingerprint.fingerprint(aiInvokeDTO);
+        String requestHash = requestFingerprint.fingerprint(aiInvokeDTO, aiInvokeDTO.getFlag());
 
         // MySQL 联合唯一索引是幂等性的唯一权威，避免再维护一套 Redis 幂等缓存。
+        String clientRequestId = aiInvokeDTO.getClientRequestId();
         AiTaskPO existingTask = diaryAiMapper.selectByUserIdAndClientRequestId(userId, clientRequestId);
         if (existingTask != null) {
-            assertSameRequest(existingTask, requestHash);
+            myUtil.assertSameRequest(existingTask, requestHash, aiInvokeDTO.getFlag());
             return toSubmitVo(existingTask, "该请求已提交");
         }
 
         // 真正创建任务和outbox前，检查请求次数是否已达上限
         boolean allow = aiSubmitRateLimiter.allow(userId);
-        if (!allow) {
-            throw new AiSubmitRateLimitException("请求次数已达上限");
-        }
+        if (!allow) throw new AiSubmitRateLimitException("请求次数已达上限");
 
         AiTaskPO aiTaskPO;
         try {
@@ -74,7 +72,7 @@ public class AiTaskNutrientApplicationServiceImpl implements AiTaskNutrientAppli
                 throw new NullResultException("未查询到关联对象");
             }
 
-            aiTaskPO = aiTransactionService.createTaskAndOutbox(aiInvokeDTO, userId, targetTitle);
+            aiTaskPO = aiTransactionService.createNutrientTaskAndOutbox(aiInvokeDTO, userId, targetTitle);
             if (aiTaskPO == null) {
                 throw new IllegalStateException("AI任务创建失败");
             }
@@ -87,30 +85,10 @@ public class AiTaskNutrientApplicationServiceImpl implements AiTaskNutrientAppli
                 // 此时就不是联合唯一索引冲突，而是主键冲突了
                 throw duplicateKeyException;
             }
-            assertSameRequest(concurrentTask, requestHash);
+            myUtil.assertSameRequest(concurrentTask, requestHash, aiInvokeDTO.getFlag());
             return toSubmitVo(concurrentTask, "该请求已提交");
         }
         return toSubmitVo(aiTaskPO, "AI分析任务已受理");
-    }
-
-    // 使用CAS比较并替换思想，获取不同设备的相同数据请求下的最新数据
-    private void assertSameRequest(AiTaskPO existingTask, String requestHash) {
-        String storedHash = existingTask.getRequestHash();
-        if (storedHash == null || storedHash.isBlank()) {
-            String snapshotHash = requestFingerprint.fingerprintSnapshot(existingTask.getInputSnapshot());
-            int backfilled = diaryAiMapper.updateRequestHashIfNull(existingTask.getId(), snapshotHash);
-            if (backfilled == 1) {
-                storedHash = snapshotHash;
-            } else {
-                // 存量任务首次幂等重放可能并发回填；未抢到 CAS 的请求必须重读胜出值。
-                AiTaskPO refreshed = diaryAiMapper.selectAiTaskByTaskId(existingTask.getId());
-                storedHash = refreshed == null ? null : refreshed.getRequestHash();
-            }
-        }
-        if (storedHash == null || !storedHash.equals(requestHash)) {
-            throw new IdempotencyConflictException(
-                    "clientRequestId已用于不同的AI请求: " + existingTask.getClientRequestId());
-        }
     }
 
     private void validateAndNormalizeRequest(AiInvokeDTO request) {

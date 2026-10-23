@@ -1,5 +1,7 @@
 package diary.diarylove.controller;
 
+import diary.common.auth.CurrentUser;
+import diary.common.entity.feign.LoveRecordAiSnapshotDTO;
 import diary.diarylove.entity.dto.AddLoveRecordDto;
 import diary.diarylove.entity.dto.LoveAnniversaryDTO;
 import diary.diarylove.entity.dto.LoveCoupleDTO;
@@ -41,6 +43,7 @@ public class DiaryLoveController {
     private final DiaryLoveQueryService diaryLoveQueryService;
     private final DiaryLoveDeleteService diaryLoveDeleteService;
     private final DiaryLoveUpdateService diaryLoveUpdateService;
+    private final CurrentUser currentUser;
 
     @OperLog(module = "恋爱记录", description = "创建情侣关系", operationType = "INSERT", saveResult = true)
     @PostMapping("/add/couples") // 已测
@@ -100,6 +103,13 @@ public class DiaryLoveController {
     @GetMapping("/query/record-moods/{recordId}")
     public ApiResponse<List<LoveMoodRecordVO>> queryRecordMoods(@PathVariable Long recordId) {
         return diaryLoveQueryService.queryRecordMoods(recordId);
+    }
+
+    @OperLog(module = "恋爱记录", description = "查询恋爱记录快照记录", operationType = "SELECT", saveResult = false)
+    @GetMapping("/query/love-record/{loveRecordId}")
+    public ApiResponse<LoveRecordAiSnapshotDTO> queryLoveRecordSnapshot(@PathVariable("loveRecordId") Long loveRecordId) {
+        Long userId = currentUser.getUser();
+        return diaryLoveQueryService.queryLoveRecordSnapshot(loveRecordId, userId);
     }
 
     @OperLog(module = "恋爱记录", description = "修改情侣关系", operationType = "UPDATE", saveResult = true)

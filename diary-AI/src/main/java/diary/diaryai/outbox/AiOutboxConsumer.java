@@ -28,9 +28,9 @@ import static diary.diaryai.consts.MqTaskConst.OUTBOX_SCHEMA_VERSION;
 
 @Service
 @RocketMQMessageListener(
-        consumerGroup = "${diary.ai.rocketmq.task-consumer-nutrient-group:diary-ai-nutrient-workers}",
+        consumerGroup = "${diary.ai.rocketmq.ai-task-consumer-group: diary-ai-task-workers}",
         topic = "${diary.ai.rocketmq.task-topic:diary-ai-task}",
-        tag = "${diary.ai.rocketmq.task-nutrient-tag:NUTRIENT_ANALYSE}",
+        tag = "${diary.ai.rocketmq.ai-task-consumer-tag:NUTRIENT_ANALYSE || SENTIMENT_ANALYSIS}",
         sslEnabled = false
 )
 @RequiredArgsConstructor

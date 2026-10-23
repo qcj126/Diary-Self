@@ -29,6 +29,19 @@
         <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
     </resultMap>
 
+    <resultMap id="AiSentimentResultMap" type="diary.diaryai.entity.ai.po.AiSentimentPO">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="user_id" property="userId" jdbcType="BIGINT"/>
+        <result column="ai_info_id" property="aiInfoId" jdbcType="BIGINT"/>
+        <result column="ai_task_id" property="aiTaskId" jdbcType="BIGINT"/>
+        <result column="sentiment_label" property="sentimentLabel" jdbcType="VARCHAR"/>
+        <result column="sentiment_score" property="sentimentScore" jdbcType="SMALLINT"/>
+        <result column="analysis_summary" property="analysisSummary" jdbcType="VARCHAR"/>
+        <result column="suggestion" property="suggestion" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
     <resultMap id="AiTaskResultMap" type="diary.diaryai.entity.ai.po.AiTaskPO">
         <id column="id" property="id" jdbcType="BIGINT"/>
         <result column="user_id" property="userId" jdbcType="BIGINT"/>
@@ -98,6 +111,42 @@
         <result column="finish_time" property="finishTime" jdbcType="TIMESTAMP"/>
     </resultMap>
 
+    <resultMap id="AiTaskSummaryVo" type="diary.diaryai.entity.ai.vo.AiTaskSummaryVo">
+        <id column="id" property="taskId" jdbcType="BIGINT"/>
+        <result column="task_type" property="taskType" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="VARCHAR"/>
+        <result column="target_title" property="title" jdbcType="VARCHAR"/>
+        <result column="target_type" property="targetType" jdbcType="VARCHAR"/>
+        <result column="target_id" property="targetId" jdbcType="BIGINT"/>
+        <result column="ai_application" property="aiApplication" jdbcType="TINYINT"/>
+        <result column="attempt_count" property="attemptCount" jdbcType="INTEGER"/>
+        <result column="max_attempts" property="maxAttempts" jdbcType="INTEGER"/>
+        <result column="error_code" property="errorCode" jdbcType="VARCHAR"/>
+        <result column="error_message" property="errorMessage" jdbcType="LONGVARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="queue_time" property="queueTime" jdbcType="TIMESTAMP"/>
+        <result column="start_time" property="startTime" jdbcType="TIMESTAMP"/>
+        <result column="finish_time" property="finishTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <resultMap id="AiSentimentTaskResultVo" type="diary.diaryai.entity.ai.vo.AiSentimentTaskResultVo">
+        <id column="id" property="taskId" jdbcType="BIGINT"/>
+        <result column="status" property="status" jdbcType="VARCHAR"/>
+        <result column="ai_info_id" property="aiInfoId" jdbcType="BIGINT"/>
+        <result column="target_title" property="title" jdbcType="VARCHAR"/>
+        <result column="target_type" property="targetType" jdbcType="VARCHAR"/>
+        <result column="target_id" property="targetId" jdbcType="BIGINT"/>
+        <result column="sentiment_label" property="sentimentLabel" jdbcType="VARCHAR"/>
+        <result column="sentiment_score" property="sentimentScore" jdbcType="SMALLINT"/>
+        <result column="analysis_summary" property="analysisSummary" jdbcType="VARCHAR"/>
+        <result column="suggestion" property="suggestion" jdbcType="VARCHAR"/>
+        <result column="error_code" property="errorCode" jdbcType="VARCHAR"/>
+        <result column="error_message" property="errorMessage" jdbcType="LONGVARCHAR"/>
+        <result column="ai_application" property="aiApplication" jdbcType="TINYINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="finish_time" property="finishTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
     <sql id="mqOutboxColumns">
         id, event_id, aggregate_type, aggregate_id, event_type, topic, tag, message_key, payload,
         schema_version, status, retry_count, max_retries, next_retry_time, broker_message_id,
@@ -113,6 +162,13 @@
             (id, user_id, universal_id, flag, ai_info_id, ai_task_id, calory, protein, fat, carbohydrate, sugar, sodium)
         VALUES
             (#{id}, #{userId}, #{universalId}, #{flag}, #{aiInfoId}, #{aiTaskId}, #{calory}, #{protein}, #{fat}, #{carbohydrate}, #{sugar}, #{sodium})
+    </insert>
+
+    <insert id="insertAiSentiment">
+        INSERT INTO ai_sentiment
+            (id, user_id, ai_info_id, ai_task_id, sentiment_label, sentiment_score, analysis_summary, suggestion)
+        VALUES
+            (#{id}, #{userId}, #{aiInfoId}, #{aiTaskId}, #{sentimentLabel}, #{sentimentScore}, #{analysisSummary}, #{suggestion})
     </insert>
 
     <insert id="insertAiInfo">
@@ -408,12 +464,11 @@
         LIMIT #{limit}
     </delete>
 
-    <select id="selectAiTaskList" resultMap="AiTaskResultVo">
-        select a.id, a.status, a.ai_info_id, a.target_id, a.target_type, c.calory, c.protein, a.target_title,
-        c.fat, c.carbohydrate, c.sugar, c.sodium, a.error_code, a.error_message, a.ai_application, a.create_time, a.finish_time
-        from ai_task a
-        left join ai_info b on a.ai_info_id = b.id and b.user_id = a.user_id
-        left join ai_nutrient c on c.ai_info_id = b.id and c.user_id = a.user_id
+    <select id="selectAiTaskSummaryList" resultMap="AiTaskSummaryVo">
+        SELECT a.id, a.task_type, a.status, a.target_title, a.target_type, a.target_id,
+               a.ai_application, a.attempt_count, a.max_attempts, a.error_code, a.error_message,
+               a.create_time, a.queue_time, a.start_time, a.finish_time
+        FROM ai_task a
         where a.user_id = #{userId}
         <if test="taskStatus != null and taskStatus != ''">
             and a.status = #{taskStatus}
@@ -427,13 +482,29 @@
         order by a.create_time desc limit #{pageSize} offset #{offset}
     </select>
 
-    <select id="selectAiTaskResult" resultMap="AiTaskResultVo">
+    <select id="selectNutrientTaskResult" resultMap="AiTaskResultVo">
         select a.id, a.status, a.ai_info_id, a.target_id, a.target_type, c.calory, c.protein, a.target_title,
         c.fat, c.carbohydrate, c.sugar, c.sodium, a.error_code, a.error_message, a.ai_application, a.create_time, a.finish_time
         from ai_task a
         left join ai_info b on a.ai_info_id = b.id and b.user_id = a.user_id
         left join ai_nutrient c on c.ai_info_id = b.id and c.user_id = a.user_id
-        where a.user_id = #{userId} and a.id = #{taskId}
+        where a.user_id = #{userId}
+          and a.id = #{taskId}
+          and a.task_type in ('RECIPE_NUTRIENT_ANALYSIS', 'DIET_NUTRIENT_ANALYSIS')
         order by a.create_time desc
+    </select>
+
+    <select id="selectLoveRecordSentimentTaskResult" resultMap="AiSentimentTaskResultVo">
+        SELECT a.id, a.status, a.ai_info_id, a.target_id, a.target_type, a.target_title,
+               a.error_code, a.error_message, a.ai_application, a.create_time, a.finish_time,
+               s.sentiment_label, s.sentiment_score, s.analysis_summary, s.suggestion
+        FROM ai_task a
+        LEFT JOIN ai_sentiment s
+               ON s.ai_task_id = a.id
+              AND s.user_id = a.user_id
+        WHERE a.id = #{taskId}
+          AND a.user_id = #{userId}
+          AND a.task_type = 'LOVE_RECORD_SENTIMENT_ANALYSIS'
+        LIMIT 1
     </select>
 </mapper>

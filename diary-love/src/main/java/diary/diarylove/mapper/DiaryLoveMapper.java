@@ -1,5 +1,6 @@
 package diary.diarylove.mapper;
 
+import diary.common.entity.feign.LoveRecordAiSnapshotDTO;
 import diary.diarylove.entity.dto.LoveCoupleDTO;
 import diary.diarylove.entity.dto.LoveRecordDTO;
 import diary.diarylove.entity.po.LoveAnniversaryPO;
@@ -82,4 +83,6 @@ public interface DiaryLoveMapper {
     int updateLoveMood(LoveMoodPO loveMoodPO);
 
     int deleteLoveMood(@Param("id") Long id);
+
+    LoveRecordAiSnapshotDTO queryLoveRecordSnapshot(@Param("loveRecordId") Long loveRecordId, @Param("userId") Long userId);
 }

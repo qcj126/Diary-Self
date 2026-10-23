@@ -24,11 +24,11 @@ diary:
       task-topic: diary-ai-task
       task-nutrient-tag: NUTRIENT_ANALYSE
       task-sentiment-tag: SENTIMENT_ANALYSIS
-      task-consumer-nutrient-group: diary-ai-nutrient-workers
-      task-consumer-sentiment-group: diary-ai-sentiment-workers
+      ai-task-consumer-tag: "NUTRIENT_ANALYSE || SENTIMENT_ANALYSIS"
+      ai-task-consumer-group: diary-ai-task-workers
       event-topic: diary-ai-event
       publisher-batch-size: 20
-      publisher-interval-ms: 1000
+      publisher-interval-ms: 10000
       publisher-sending-timeout-seconds: 60
       outbox-max-retries: 5
       sent-retention-days: 7
@@ -36,7 +36,7 @@ diary:
     task:
       max-attempts: 3
       execution-lease-seconds: 330
-      recovery-interval-ms: 30000
+      recovery-interval-ms: 10000
       recovery-batch-size: 50
     cache:
       running-ttl-seconds: 30

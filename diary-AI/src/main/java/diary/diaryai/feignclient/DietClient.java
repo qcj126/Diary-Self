@@ -11,5 +11,6 @@ public interface DietClient {
     @GetMapping("/query/food-name/{dietId}")
     ApiResponse<String> getDietFoodName(
             @RequestHeader("X-Auth-User-Id") Long userId,
-            @PathVariable("dietId") Long dietId);
+            @PathVariable("dietId") Long dietId
+    );
 }

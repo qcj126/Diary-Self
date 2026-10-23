@@ -36,6 +36,9 @@ public enum AiTaskTypeEnum {
             case "RECIPE" -> {
                 return RECIPE_NUTRIENT_ANALYSIS.name();
             }
+            case "LOVE_RECORD" -> {
+                return LOVE_RECORD_SENTIMENT_ANALYSIS.name();
+            }
             default -> throw new NullResultException("没有此AiFlag的数据");
         }
     }

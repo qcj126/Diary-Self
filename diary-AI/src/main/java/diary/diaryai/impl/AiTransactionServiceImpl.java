@@ -2,15 +2,20 @@ package diary.diaryai.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import diary.common.entity.feign.LoveRecordAiSnapshotDTO;
 import diary.diaryai.entity.ai.dto.AiInvokeDTO;
 import diary.diaryai.entity.ai.dto.AiTaskMessageDto;
 import diary.diaryai.entity.ai.dto.AiTaskEventDto;
 import diary.diaryai.entity.ai.dto.AiTaskProcessDto;
+import diary.diaryai.entity.ai.dto.LoveRecordSentimentInputSnapshotDTO;
+import diary.diaryai.entity.ai.dto.LoveRecordSentimentSubmitDTO;
 import diary.diaryai.entity.ai.po.AiInfoPO;
 import diary.diaryai.entity.ai.po.AiNutrientPO;
+import diary.diaryai.entity.ai.po.AiSentimentPO;
 import diary.diaryai.entity.ai.po.AiTaskPO;
 import diary.diaryai.entity.mq.po.MqOutboxPO;
 import diary.diaryai.enums.aienum.AiApplicationEnum;
+import diary.diaryai.enums.aienum.AiFlagEnum;
 import diary.diaryai.enums.aienum.AiTaskErrorCodeEnum;
 import diary.diaryai.enums.aienum.AiTaskStatusEnum;
 import diary.diaryai.enums.aienum.AiTaskTypeEnum;
@@ -49,7 +54,38 @@ public class AiTransactionServiceImpl implements AiTransactionService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public AiTaskPO createTaskAndOutbox(AiInvokeDTO request, Long userId, String targetTitle) {
+    public AiTaskPO createNutrientTaskAndOutbox(AiInvokeDTO request, Long userId, String targetTitle) {
+        Map<String, Object> canonicalNutrientForm = requestFingerprint.canonicalNutrientForm(request);
+        String requestHash = requestFingerprint.fingerprint(request, request.getFlag());
+        String clientRequestId = request.getClientRequestId();
+        String flag = request.getFlag();
+        Long universalId = request.getUniversalId();
+        Integer aiApplication = AiApplicationEnum.NUTRITION_ANALYSIS.getCode();
+        return buildTaskAndOutbox(canonicalNutrientForm, requestHash, userId, clientRequestId, flag, targetTitle, universalId, aiApplication);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public AiTaskPO createLoveRecordSentimentTaskAndOutbox(LoveRecordAiSnapshotDTO loveRecordAiSnapshotDTO, Long userId, LoveRecordSentimentSubmitDTO loveRecordSentimentSubmitDTO) {
+        String flag = AiFlagEnum.LOVE_RECORD.name();
+        LoveRecordSentimentInputSnapshotDTO snapshotDTO = LoveRecordSentimentInputSnapshotDTO.builder()
+                .aiType(loveRecordSentimentSubmitDTO.getAiType())
+                .snapshotVersion(1)
+                .loveRecord(loveRecordAiSnapshotDTO)
+                .build();
+        Map<String, Object> canonicalLoveSentimentForm = requestFingerprint.canonicalLoveRecordSentimentSnapshotForm(snapshotDTO);
+
+        String requestHash = requestFingerprint.fingerprint(loveRecordSentimentSubmitDTO, flag);
+        String clientRequestId = loveRecordSentimentSubmitDTO.getClientRequestId();
+        Long universalId = loveRecordAiSnapshotDTO.getLoveRecordId();
+        String targetTitle = loveRecordAiSnapshotDTO.getTitle();
+        Integer aiApplication = AiApplicationEnum.SENTIMENT_ANALYSIS.getCode();
+
+        return buildTaskAndOutbox(canonicalLoveSentimentForm, requestHash, userId, clientRequestId, flag, targetTitle, universalId, aiApplication);
+    }
+
+    private AiTaskPO buildTaskAndOutbox(Map<String, Object> canonicalForm, String requestHash, Long userId, String clientRequestId,
+                                        String flag, String targetTitle, Long universalId, Integer aiApplication) {
         LocalDateTime now = LocalDateTime.now();
         Long taskId = MyUtils.getPrimaryKey();
         // mq消息和outbox数据使用同一个eventId，保证事件的一致性
@@ -59,19 +95,18 @@ public class AiTransactionServiceImpl implements AiTransactionService {
         String inputSnapshot;
         try {
             // 将入参作为快照数据存入任务中
-            inputSnapshot = objectMapper.writeValueAsString(requestFingerprint.canonicalForm(request));
+            inputSnapshot = objectMapper.writeValueAsString(canonicalForm);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        String requestHash = requestFingerprint.fingerprint(request);
 
         AiTaskPO task = AiTaskPO.builder()
                 .id(taskId)
-                .aiApplication(AiApplicationEnum.NUTRITION_ANALYSIS.getCode())
+                .aiApplication(aiApplication)
                 .userId(userId)
-                .clientRequestId(request.getClientRequestId())
+                .clientRequestId(clientRequestId)
                 .requestHash(requestHash)
-                .taskType(AiTaskTypeEnum.getAiTaskType(request.getFlag()))
+                .taskType(AiTaskTypeEnum.getAiTaskType(flag))
                 .status(AiTaskStatusEnum.PENDING.name())
                 .inputSnapshot(inputSnapshot)
                 .attemptCount(0)
@@ -80,16 +115,16 @@ public class AiTransactionServiceImpl implements AiTransactionService {
                 .updateTime(now)
                 .versionId(0)
                 .targetTitle(targetTitle)
-                .targetId(request.getUniversalId())
-                .targetType(request.getFlag())
+                .targetId(universalId)
+                .targetType(flag)
                 .build();
 
         AiTaskMessageDto message = AiTaskMessageDto.builder()
                 .eventId(eventId)
                 .taskId(taskId)
                 .userId(userId)
-                .clientRequestId(request.getClientRequestId())
-                .taskType(AiTaskTypeEnum.getAiTaskType(request.getFlag()))
+                .clientRequestId(clientRequestId)
+                .taskType(AiTaskTypeEnum.getAiTaskType(flag))
                 .eventType(OutboxEventTypeEnum.AI_TASK_CREATED.name())
                 .taskStatus(AiTaskStatusEnum.PENDING.name())
                 .schemaVersion(OUTBOX_SCHEMA_VERSION)
@@ -104,7 +139,7 @@ public class AiTransactionServiceImpl implements AiTransactionService {
                 .aggregateId(taskId)
                 .eventType(OutboxEventTypeEnum.AI_TASK_CREATED.name())
                 .topic(properties.getRocketmq().getTaskTopic())
-                .tag(myUtil.getOutboxTag(AiApplicationEnum.NUTRITION_ANALYSIS.getCode()))
+                .tag(myUtil.getOutboxTag(aiApplication))
                 .messageKey(taskId.toString())
                 .payload(writeJson(message, "AI任务消息序列化失败"))
                 .schemaVersion(OUTBOX_SCHEMA_VERSION)
@@ -136,7 +171,7 @@ public class AiTransactionServiceImpl implements AiTransactionService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void processData(Long taskId, Object data, String model, Map<String, String> result, Double temperature, Long userId, String workerId, Integer versionId) {
+    public void processNutrientData(Long taskId, Object data, String model, Map<String, String> result, Double temperature, Long userId, String workerId, Integer versionId) {
         String eventId = OUTBOX_EVENT_ID + MyUtils.getPrimaryKey();
         LocalDateTime now = LocalDateTime.now();
 
@@ -221,6 +256,92 @@ public class AiTransactionServiceImpl implements AiTransactionService {
             throw new IllegalStateException(
                     "AI结果事务提交失败: aiInfo=" + aiInfoCnt
                             + ", aiNutrient=" + aiNutrientCnt
+                            + ", aiTask=" + aiTaskCnt
+                            + ", mqOutbox=" + mqOutboxCnt
+            );
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void processLoveRecordSentimentData(Long taskId, Integer aiType, String model,
+            Map<String, String> result, Double temperature, Long userId, String clientRequestId, String workerId, Integer versionId) {
+        String eventId = OUTBOX_EVENT_ID + MyUtils.getPrimaryKey();
+        LocalDateTime now = LocalDateTime.now();
+
+        AiInfoPO aiInfoPO = AiInfoPO.builder()
+                .id(MyUtils.getPrimaryKey())
+                .userId(userId)
+                .temperature(String.valueOf(temperature))
+                .model(model)
+                .aiType(aiType)
+                .aiApplication(AiApplicationEnum.SENTIMENT_ANALYSIS.getCode())
+                .build();
+
+        AiSentimentPO aiSentimentPO = AiSentimentPO.builder()
+                .id(MyUtils.getPrimaryKey())
+                .userId(userId)
+                .aiInfoId(aiInfoPO.getId())
+                .aiTaskId(taskId)
+                .sentimentLabel(result.get("sentiment").trim())
+                .sentimentScore(Integer.parseInt(result.get("score").trim()))
+                .analysisSummary(result.get("summary").trim())
+                .suggestion(result.get("suggestion").trim())
+                .build();
+
+        AiTaskProcessDto aiTaskProcessDto = AiTaskProcessDto.builder()
+                .taskId(taskId)
+                .userId(userId)
+                .clientRequestId(clientRequestId)
+                .workerId(workerId)
+                .versionId(versionId)
+                .aiInfoId(aiInfoPO.getId())
+                .finishTime(now)
+                .build();
+
+        AiTaskEventDto message = AiTaskEventDto.builder()
+                .eventId(eventId)
+                .eventType(OutboxEventTypeEnum.AI_COMPLETED.name())
+                .taskId(taskId)
+                .userId(userId)
+                .taskStatus(AiTaskStatusEnum.SUCCESS.name())
+                .resultId(aiInfoPO.getId())
+                .schemaVersion(OUTBOX_SCHEMA_VERSION)
+                .occurTime(now)
+                .traceId(MDC.get("traceId"))
+                .build();
+
+        MqOutboxPO mqOutboxPO = MqOutboxPO.builder()
+                .id(MyUtils.getPrimaryKey())
+                .eventId(eventId)
+                .aggregateType(AI_TASK_AGGREGATE_TYPE)
+                .aggregateId(taskId)
+                .eventType(OutboxEventTypeEnum.AI_COMPLETED.name())
+                .topic(properties.getRocketmq().getEventTopic())
+                .tag(properties.getRocketmq().getCompletedTag())
+                .messageKey(String.valueOf(taskId))
+                .payload(writeJson(message, "AI任务消息序列化失败"))
+                .schemaVersion(OUTBOX_SCHEMA_VERSION)
+                .status(OutboxStatusEnum.NEW.name())
+                .retryCount(0)
+                .maxRetries(properties.getRocketmq().getOutboxMaxRetries())
+                .nextRetryTime(now)
+                .brokerMessageId(null)
+                .lastError(null)
+                .sentTime(null)
+                .createTime(now)
+                .updateTime(now)
+                .versionId(0)
+                .build();
+
+        int aiInfoCnt = diaryAiMapper.insertAiInfo(aiInfoPO);
+        int aiSentimentCnt = diaryAiMapper.insertAiSentiment(aiSentimentPO);
+        int aiTaskCnt = diaryAiMapper.markSuccessIfOwned(aiTaskProcessDto);
+        int mqOutboxCnt = diaryAiMapper.insertOutbox(mqOutboxPO);
+        if (aiInfoCnt != 1 || aiSentimentCnt != 1 || aiTaskCnt != 1 || mqOutboxCnt != 1) {
+            throw new IllegalStateException(
+                    "爱情情感分析结果事务提交失败: aiInfo=" + aiInfoCnt
+                            + ", aiSentiment=" + aiSentimentCnt
                             + ", aiTask=" + aiTaskCnt
                             + ", mqOutbox=" + mqOutboxCnt
             );

@@ -1,5 +1,6 @@
 package diary.diarylove.service;
 
+import diary.common.entity.feign.LoveRecordAiSnapshotDTO;
 import diary.diarylove.entity.dto.LoveRecordDTO;
 import diary.diarylove.entity.dto.LoveCoupleDTO;
 import diary.common.result.ApiResponse;
@@ -29,4 +30,6 @@ public interface DiaryLoveQueryService {
     ApiResponse<List<LoveMoodRecordVO>> queryRecordMoods(Long recordId);
 
     ApiResponse<List<LoveMoodVO>> queryMoods(Boolean enabled);
+
+    ApiResponse<LoveRecordAiSnapshotDTO> queryLoveRecordSnapshot(Long loveRecordId, Long userId);
 }

@@ -1,5 +1,6 @@
 package diary.diarylove.impl;
 
+import diary.common.entity.feign.LoveRecordAiSnapshotDTO;
 import diary.diarylove.entity.convert.PoConvertToVo;
 import diary.diarylove.entity.dto.LoveCoupleDTO;
 import diary.diarylove.entity.dto.LoveRecordDTO;
@@ -98,5 +99,10 @@ public class DiaryLoveQueryServiceImpl implements DiaryLoveQueryService {
         return ApiResponse.success(diaryLoveMapper.selectLoveMoods(enabled).stream()
                 .map(PoConvertToVo::convertToVo)
                 .toList());
+    }
+
+    @Override
+    public ApiResponse<LoveRecordAiSnapshotDTO> queryLoveRecordSnapshot(Long loveRecordId, Long userId) {
+        return ApiResponse.success(diaryLoveMapper.queryLoveRecordSnapshot(loveRecordId, userId));
     }
 }

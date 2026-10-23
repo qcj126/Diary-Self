@@ -5,7 +5,8 @@ import diary.common.exception.ParamIllegalException;
 public enum AiFlagEnum {
     DIET,
     RECIPE,
-    GOAL;
+    GOAL,
+    LOVE_RECORD;
     public static void isTrueFlag(String flag) {
         for (AiFlagEnum aiFlagEnum : AiFlagEnum.values()) {
             if (aiFlagEnum.name().equalsIgnoreCase(flag)) return ;

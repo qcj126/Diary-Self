@@ -1,4 +1,4 @@
-package diary.diaryai.strategy.nutrientanlalyze;
+package diary.diaryai.strategy.nutrientanalyze;
 
 import com.alibaba.dashscope.aigc.generation.Generation;
 import com.alibaba.dashscope.aigc.generation.GenerationParam;
@@ -10,12 +10,14 @@ import com.alibaba.dashscope.exception.NoApiKeyException;
 import com.alibaba.dashscope.utils.Constants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import diary.diaryai.entity.ai.dto.AiInvokeDTO;
 import diary.diaryai.enums.aienum.AIEnum;
 import diary.common.exception.CustomException;
 import diary.diaryai.prompt.PromptContext;
 import diary.diaryai.properties.AliCloudProperty;
 import diary.diaryai.service.AiTransactionService;
-import diary.diaryai.strategy.service.InvokeAIService;
+import diary.diaryai.service.InvokeNutrientAiService;
+import diary.diaryai.strategy.UsualMethod;
 import diary.diaryai.template.InvokeAITemplate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,26 +32,26 @@ import java.util.Map;
 @Slf4j
 @Order(1)
 @RequiredArgsConstructor
-public class InvokeDeepseekPro extends InvokeAITemplate implements InvokeAIService {
+public class InvokeDeepseekPro extends InvokeAITemplate implements InvokeNutrientAiService {
     private final AliCloudProperty aliCloudProperty;
     private final PromptContext promptContext;
     private final Generation gen = new Generation();
     private final AiTransactionService aiTransactionService;
 
     @Override
-    public void getAiResultAndSave(Object data, Long taskId, Long userId, String workerId, Integer versionId) {
+    public void getNutrientAiResultAndSave(AiInvokeDTO data, Long taskId, Long userId, String workerId, Integer versionId) {
         String model = aliCloudProperty.getDeepSeekV4ProModel();
         Double temperature = aliCloudProperty.getTemperature();
         Object prompt = buildPrompt(data);
         GenerationResult aiResult = invokeAi(prompt, model);
         Map<String, String> result = extractResult(aiResult, model, prompt);
-        UsualMethod.validateResult(result);
+        UsualMethod.validateNutrientResult(result);
         /*
          * 以前生产日志打印完整 AI 结果和用户食材，可能暴露用户饮食内容。现在只记录任务及返回字段，
          * 既能排查响应契约，也避免把完整输入输出写入日志。
          */
         log.info("AI nutrient result parsed, taskId={}, fields={}", taskId, result.keySet());
-        aiTransactionService.processData(taskId, data, model, result, temperature, userId, workerId, versionId);
+        aiTransactionService.processNutrientData(taskId, data, model, result, temperature, userId, workerId, versionId);
     }
 
     @Override

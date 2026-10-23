@@ -25,7 +25,7 @@ public class AiOutboxPublisher {
     private final AiTaskProperties properties;
     private final RocketMQClientTemplate rocketMQClientTemplate;
 
-//    @Scheduled(fixedDelayString = "${diary.ai.rocketmq.publisher-interval-ms:1000}")
+    @Scheduled(fixedDelayString = "${diary.ai.rocketmq.publisher-interval-ms:30000}")
     public void publishReadyMessages() {
         // 优先尝试恢复超时的消息
         recoverTimedOutMessages();
