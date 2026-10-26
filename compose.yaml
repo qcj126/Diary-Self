@@ -9,7 +9,23 @@ services:
     restart: unless-stopped
     environment:
       SPRING_APPLICATION_NAME: diary-ai
+      SERVER_PORT: "8807"
       NACOS_ADDR: nacos:8848
+    networks:
+        - diary-net
+
+  diary-gateway:
+    build:
+      context: .
+      dockerfile: diary-gateway/Dockerfile
+    image: diary-gateway:0.1.0
+    restart: unless-stopped
+    environment:
+      SPRING_APPLICATION_NAME: diary-gateway
+      SERVER_PORT: "10000"
+      NACOS_ADDR: nacos:8848
+    ports:
+      - "10000:10000"
     networks:
       - diary-net
 
