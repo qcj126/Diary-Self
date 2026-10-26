@@ -1,6 +1,6 @@
+name: diary-app
+
 services:
-  # Do not set container_name or ports here: Docker Compose must be free to
-  # create multiple replicas, and the gateway will be the public HTTP entry.
   diary-ai:
     build:
       context: .
@@ -13,8 +13,6 @@ services:
     networks:
       - diary-net
 
-# Nacos, MySQL, Redis, and RocketMQ are already running containers.  Reuse
-# their shared user-defined bridge network rather than recreating them here.
 networks:
   diary-net:
     external: true
