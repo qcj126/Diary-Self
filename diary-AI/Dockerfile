@@ -1,3 +1,14 @@
+# ---------- 构建阶段 ----------
+FROM maven:3.9-eclipse-temurin-21 AS build
+
+WORKDIR /workspace
+
+COPY . .
+
+RUN mvn -pl diary-AI -am -DskipTests package
+
+
+# ---------- 运行阶段 ----------
 FROM eclipse-temurin:21-jre
 
 WORKDIR /app
