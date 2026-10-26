@@ -1,4 +1,4 @@
-package diary.diaryai.strategy.nutrientanalyze;
+package diary.diaryai.strategy.lovesentimentanalyze;
 
 import com.alibaba.dashscope.aigc.generation.Generation;
 import com.alibaba.dashscope.aigc.generation.GenerationParam;
@@ -10,13 +10,13 @@ import com.alibaba.dashscope.exception.NoApiKeyException;
 import com.alibaba.dashscope.utils.Constants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import diary.diaryai.entity.ai.dto.AiInvokeDTO;
-import diary.diaryai.enums.aienum.AIEnum;
 import diary.common.exception.CustomException;
+import diary.diaryai.entity.ai.dto.LoveRecordSentimentInputSnapshotDTO;
+import diary.diaryai.enums.aienum.AIEnum;
 import diary.diaryai.prompt.PromptContext;
 import diary.diaryai.properties.AliCloudProperty;
 import diary.diaryai.service.AiTransactionService;
-import diary.diaryai.service.InvokeNutrientAiService;
+import diary.diaryai.service.InvokeLoveRecordAIService;
 import diary.diaryai.strategy.UsualMethod;
 import diary.diaryai.template.InvokeAITemplate;
 import lombok.RequiredArgsConstructor;
@@ -25,33 +25,31 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Type;
-import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 @Component
 @Slf4j
 @Order(1)
 @RequiredArgsConstructor
-public class InvokeDeepseekPro extends InvokeAITemplate implements InvokeNutrientAiService {
+public class LoveRecordInvokeDeepseekPro extends InvokeAITemplate implements InvokeLoveRecordAIService {
     private final AliCloudProperty aliCloudProperty;
     private final PromptContext promptContext;
     private final Generation gen = new Generation();
     private final AiTransactionService aiTransactionService;
 
     @Override
-    public void getNutrientAiResultAndSave(AiInvokeDTO data, Long taskId, Long userId, String workerId, Integer versionId) {
+    public void getLoveRecordAiResultAndSave(LoveRecordSentimentInputSnapshotDTO data, Long taskId,
+            Long userId, String clientRequestId, String workerId, Integer versionId) {
         String model = aliCloudProperty.getDeepSeekV4ProModel();
         Double temperature = aliCloudProperty.getTemperature();
         Object prompt = buildPrompt(data);
         GenerationResult aiResult = invokeAi(prompt, model);
         Map<String, String> result = extractResult(aiResult, model, prompt);
-        UsualMethod.validateNutrientResult(result);
-        /*
-         * 以前生产日志打印完整 AI 结果和用户食材，可能暴露用户饮食内容。现在只记录任务及返回字段，
-         * 既能排查响应契约，也避免把完整输入输出写入日志。
-         */
-        log.info("AI nutrient result parsed, taskId={}, fields={}", taskId, result.keySet());
-        aiTransactionService.processNutrientData(taskId, data, model, result, temperature, userId, workerId, versionId);
+        UsualMethod.validateLoveRecordResult(result);
+        log.info("DeepSeek love-record sentiment result parsed, taskId={}, fields={}", taskId, result.keySet());
+        aiTransactionService.processLoveRecordSentimentData(taskId, data.getAiType(), model, result,
+                temperature, userId, clientRequestId, workerId, versionId);
     }
 
     @Override
@@ -61,30 +59,27 @@ public class InvokeDeepseekPro extends InvokeAITemplate implements InvokeNutrien
 
     @Override
     public String buildPrompt(Object data) {
-        return promptContext.getUniversalNutrientContent(data);
+        return promptContext.getLoveRecordSummaryText(data);
     }
 
     @Override
     public GenerationResult invokeAi(Object prompt, String model) {
-        /*
-          纯文本任务仍使用多模态调用类
-          当前没有图片输入，仍使用 MultiModalConversation。如果 Qwen Plus 的普通文本接口满足需求，建议换成文本 Generation API；暂时继续使用也能接受，但命名和 Prompt 不应再体现图片或多模态业务。
-         */
         Constants.baseHttpApiUrl = aliCloudProperty.getUrl();
         String apiKey = aliCloudProperty.getApiKey();
+        Double temperature = aliCloudProperty.getTemperature();
         Message systemMsg = Message.builder()
                 .role(Role.SYSTEM.getValue())
-                .content("你是一个专业的营养学 AI 助手。")
+                .content("你是一名温和、客观的恋爱记录情感分析助手。请严格遵守用户消息中的 JSON 输出契约。")
                 .build();
         Message userMsg = Message.builder()
                 .role(Role.USER.getValue())
-                .content(prompt.toString())
+                .content((String) prompt)
                 .build();
         GenerationParam param = GenerationParam.builder()
-                // 若没有配置环境变量，请用百炼API Key将下行替换为：.apiKey("sk-xxx")
                 .apiKey(apiKey)
-                .model("deepseek-v4-pro-0813")
-                .messages(Arrays.asList(systemMsg, userMsg))
+                .model(model)
+                .temperature(temperature.floatValue())
+                .messages(List.of(systemMsg, userMsg))
                 .resultFormat(GenerationParam.ResultFormat.MESSAGE)
                 .enableThinking(true)
                 .build();
@@ -99,9 +94,18 @@ public class InvokeDeepseekPro extends InvokeAITemplate implements InvokeNutrien
 
     @Override
     public Map<String, String> extractResult(Object aiResult, String model, Object prompt) {
-        String content = ((GenerationResult) aiResult).getOutput().getChoices().getFirst().getMessage().getContent();
-        Gson gson = new Gson();
-        Type type = new TypeToken<Map<String, String>>(){}.getType();
-        return gson.fromJson(content, type);
+        try {
+            String content = ((GenerationResult) aiResult)
+                    .getOutput()
+                    .getChoices()
+                    .getFirst()
+                    .getMessage()
+                    .getContent();
+            Gson gson = new Gson();
+            Type type = new TypeToken<Map<String, String>>() {}.getType();
+            return gson.fromJson(content, type);
+        } catch (RuntimeException responseException) {
+            throw new CustomException("DeepSeek 响应不是约定的单个 JSON 对象: " + responseException.getMessage());
+        }
     }
 }

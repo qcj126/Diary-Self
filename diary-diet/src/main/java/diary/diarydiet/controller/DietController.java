@@ -33,6 +33,7 @@ public class DietController {
     @OperLog(module = "饮食记录", description = "新增饮食记录", operationType = "INSERT", saveResult = true)
     @PostMapping("/add")
     public ApiResponse<String> addDietRecord(@RequestBody DietRecordDTO dietRecordDTO) {
+        dietRecordDTO.setUserId(currentUser.getUser());
         return dietAddService.addDietRecord(dietRecordDTO);
     }
 
@@ -47,6 +48,7 @@ public class DietController {
     @OperLog(module = "饮食记录", description = "修改饮食记录", operationType = "UPDATE", saveResult = true)
     @PostMapping("/update")
     public ApiResponse<String> updateDietRecord(@RequestBody DietRecordDTO dietRecordDTO) {
+        dietRecordDTO.setUserId(currentUser.getUser());
         return dietUpdateService.updateDietRecord(dietRecordDTO);
     }
 
@@ -59,15 +61,16 @@ public class DietController {
 
     // 查 - 根据用户ID查询所有记录
     @OperLog(module = "饮食记录", description = "按用户查询饮食记录", operationType = "SELECT", saveResult = true)
-    @GetMapping("/query/user/{userId}")
-    public ApiResponse<List<DietRecordVO>> getDietRecordsByUserId(@PathVariable Long userId) {
-        return dietQueryService.getDietRecordsByUserId(userId);
+    @GetMapping("/query/user")
+    public ApiResponse<List<DietRecordVO>> getDietRecordsByUserId() {
+        return dietQueryService.getDietRecordsByUserId(currentUser.getUser());
     }
 
     // 查 - 支持用户、关键字、时间范围、餐别和地点组合查询
     @OperLog(module = "饮食记录", description = "组合查询饮食记录", operationType = "SELECT", saveResult = true)
     @PostMapping("/query")
     public ApiResponse<List<DietRecordVO>> queryDietRecords(@RequestBody DietQueryDTO query) {
+        query.setUserId(currentUser.getUser());
         return dietQueryService.queryDietRecords(query);
     }
 

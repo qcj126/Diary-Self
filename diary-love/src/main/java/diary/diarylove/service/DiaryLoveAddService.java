@@ -11,7 +11,7 @@ public interface DiaryLoveAddService {
 
     ApiResponse<String> addAnniversary(LoveAnniversaryDTO dto);
 
-    ApiResponse<String> addRecord(AddLoveRecordDto dto);
+    ApiResponse<String> addRecord(AddLoveRecordDto dto, Long userId);
 
     ApiResponse<String> addMood(LoveMoodDTO dto);
 }

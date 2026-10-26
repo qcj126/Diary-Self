@@ -1,6 +1,8 @@
 package diary.file.controller;
 
 import diary.file.entity.vo.ImageVO;
+import diary.common.auth.CurrentUser;
+import diary.file.service.ImageFileService;
 import diary.common.result.ApiResponse;
 import diary.config.logconfig.OperLog;
 import diary.file.service.VideoFileService;
@@ -10,13 +12,21 @@ import diary.file.service.queryurlservice.QueryUrlService;
 import diary.file.service.uploadservice.UploadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.util.UriUtils;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -35,19 +45,42 @@ public class FileController {
 
     private final DeleteService deleteService;
 
+    private final ImageFileService imageFileService;
+
+    private final CurrentUser currentUser;
+
     @OperLog(module = "文件管理", description = "批量上传图片", operationType = "UPLOAD", saveParams = false, saveResult = true)
     @PostMapping("/upload/images")
     public ApiResponse<List<Long>> upload(@RequestParam("files") List<MultipartFile> files,
                                           @RequestParam("code") Integer code) {
-        return ApiResponse.success(uploadService.uploadImagesAndInsert(files, code));
+        return ApiResponse.success(uploadService.uploadImagesAndInsert(files, code, currentUser.getUser()));
     }
 
     @OperLog(module = "文件管理", description = "查询图片访问地址", operationType = "SELECT", saveResult = false)
     @PostMapping("/query/images/urls")
     public ApiResponse<List<ImageVO>> queryImageUrls(@RequestBody List<Long> imageIds) {
-        // 根据 imageIds 查询图片，并动态生成签名 URL（有效期5分钟）
-        // 前端每次加载日记时都应调用此接口获取最新的签名 URL
         return ApiResponse.success(queryUrlService.queryImageUrls(imageIds));
+    }
+
+    /**
+     * 与 /file/sys/icon/{fileName} 一致，按原始文件名读取图片。
+     * 本地不存在时由 ImageFileService 从 OSS 回源并写回本地。
+     */
+    @OperLog(module = "文件管理", description = "获取图片文件", operationType = "DOWNLOAD", saveResult = false)
+    @GetMapping("/images/{fileName:.+}")
+    public ResponseEntity<byte[]> getImage(@PathVariable String fileName) {
+        String originalName = UriUtils.decode(fileName, StandardCharsets.UTF_8);
+        Path imagePath = imageFileService.getOrRestore(originalName);
+        if (imagePath == null || !Files.isRegularFile(imagePath)) {
+            return ResponseEntity.notFound().build();
+        }
+        try {
+            String contentType = Files.probeContentType(imagePath);
+            MediaType mediaType = contentType == null ? MediaType.APPLICATION_OCTET_STREAM : MediaType.parseMediaType(contentType);
+            return ResponseEntity.ok().contentType(mediaType).body(Files.readAllBytes(imagePath));
+        } catch (IOException | IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @OperLog(module = "文件管理", description = "查询轮播图片", operationType = "SELECT", saveParams = false, saveResult = false)

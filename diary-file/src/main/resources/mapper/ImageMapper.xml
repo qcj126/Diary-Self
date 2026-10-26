@@ -16,8 +16,17 @@
         <id property="updateTime" column="update_time"/>
     </resultMap>
     <select id="selectImageById" resultMap="ImageResultMap">
-        SELECT id, object_key FROM image WHERE id = #{id}
+        SELECT id, object_key, original_name FROM image WHERE id = #{id}
         and deleted = 0 and status = 1000
+    </select>
+
+    <select id="selectImageByOriginalName" resultMap="ImageResultMap">
+        SELECT id, object_key, original_name, mime_type FROM image
+        WHERE original_name = #{originalName}
+          AND deleted = 0
+          AND status = 1000
+        ORDER BY update_time DESC
+        LIMIT 1
     </select>
 
     <select id="selectImagesForUploadByIds" resultMap="ImageResultMap">
@@ -33,7 +42,7 @@
     </update>
 
     <select id="selectImageByTypeAndName" resultType="java.lang.Long">
-        select id from image where type = #{type} and original_name = #{originalFilename}
+        select id from image where original_name = #{originalFilename}
     </select>
 
     <insert id="batchAddImageToDb" parameterType="list">

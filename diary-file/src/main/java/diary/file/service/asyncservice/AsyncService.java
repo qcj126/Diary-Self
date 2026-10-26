@@ -13,7 +13,7 @@ public interface AsyncService {
      * 异步上传图片到OSS并发送消息
      *
      * @param result 数据库插入结果
-     * @param files  已复制到应用临时目录的文件列表
+     * @param files  已保存到本地图片目录的文件列表
      */
     void uploadAndSendMsgAsync(List<Long> result, List<File> files, List<String> originalNames, ImageDTO imageDTO);
 

@@ -20,16 +20,15 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
+
+import static diary.file.consts.FileDirConst.ICON_DIR;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class IconQueryServiceImpl implements IconQueryService {
     private final IconMapper iconMapper;
-
-    private static final Path ICON_DIR = Paths.get("E:\\Diary-Front\\icon").normalize();
 
     @Override
     public ApiResponse<?> queryIcons(IconDTO iconDTO) {

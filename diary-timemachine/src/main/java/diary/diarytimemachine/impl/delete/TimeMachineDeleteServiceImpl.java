@@ -14,7 +14,7 @@ public class TimeMachineDeleteServiceImpl implements TimeMachineDeleteService {
 
     @Override
     public String categoryDelete(TimeCategoryDTO categoryDTO) {
-        Integer i = timeMachineMapper.logicallyDeleteCategory(categoryDTO.getId());
+        Integer i = timeMachineMapper.logicallyDeleteCategory(categoryDTO);
         if (i > 0) {
             return "时光分类删除成功";
         }
@@ -23,7 +23,7 @@ public class TimeMachineDeleteServiceImpl implements TimeMachineDeleteService {
 
     @Override
     public String cardDelete(TimeCardDTO cardDTO) {
-        Integer i = timeMachineMapper.deleteCard(cardDTO.getId());
+        Integer i = timeMachineMapper.deleteCard(cardDTO);
         if (i > 0) {
             return "时光卡片删除成功";
         }

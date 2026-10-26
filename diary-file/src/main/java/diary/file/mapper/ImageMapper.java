@@ -16,6 +16,8 @@ public interface ImageMapper {
 
     ImagePO selectImageById(Long id);
 
+    ImagePO selectImageByOriginalName(String originalName);
+
     List<ImagePO> selectImagesForUploadByIds(@Param("imageIds") List<Long> imageIds);
 
     List<ImagePO> selectLatestTwoImagesForCarousel();

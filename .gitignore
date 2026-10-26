@@ -1,7 +1,9 @@
 # 最佳实践是直接忽略整个编译输出目录，比如 Maven 项目的 target 目录
-target/
-.idea/
-*.class
-*.lst
-/diary-common/target/**
-/test/
+.git
+.idea
+**/*.iml
+**/target
+**/.DS_Store
+
+# 绝不传入 Docker 构建上下文
+**/src/main/resources/a

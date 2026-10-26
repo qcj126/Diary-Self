@@ -42,6 +42,7 @@ public class RecipeController {
     @OperLog(module = "食谱", description = "新增食谱", operationType = "INSERT", saveResult = true)
     @PostMapping("/add")
     public ApiResponse<String> addRecipe(@RequestBody RecipeReqDto recipeReqDto) {
+        recipeReqDto.setAuthorId(currentUser.getUser());
         return recipeAddService.addRecipe(recipeReqDto);
     }
 
@@ -64,6 +65,7 @@ public class RecipeController {
     @OperLog(module = "食谱", description = "修改食谱", operationType = "UPDATE", saveResult = true)
     @PostMapping("/update")
     public ApiResponse<String> updateRecipe(@RequestBody RecipeReqDto recipeReqDto) {
+        recipeReqDto.setAuthorId(currentUser.getUser());
         return recipeUpdateService.updateRecipe(recipeReqDto);
     }
 
@@ -71,6 +73,7 @@ public class RecipeController {
     @OperLog(module = "食谱", description = "删除食谱", operationType = "DELETE", saveResult = true)
     @PostMapping("/delete")
     public ApiResponse<String> deleteRecipe(@RequestBody RecipeReqDto recipeReqDto) {
+        recipeReqDto.setAuthorId(currentUser.getUser());
         return recipeDeleteService.deleteRecipe(recipeReqDto);
     }
 
@@ -85,6 +88,7 @@ public class RecipeController {
     @OperLog(module = "食谱", description = "删除食谱分类", operationType = "DELETE", saveResult = true)
     @PostMapping("/delete/category")
     public ApiResponse<String> deleteCategory(@RequestBody RecipeCategoryDto recipeCategoryDto) {
+        recipeCategoryDto.setUserId(currentUser.getUser());
         return recipeDeleteService.deleteCategory(recipeCategoryDto);
     }
 
@@ -92,6 +96,7 @@ public class RecipeController {
     @OperLog(module = "食谱", description = "新增食谱分类", operationType = "INSERT", saveResult = true)
     @PostMapping("/add/category")
     public ApiResponse<String> addCategory(@RequestBody RecipeCategoryDto recipeCategoryDto) {
+        recipeCategoryDto.setUserId(currentUser.getUser());
         return recipeAddService.addCategory(recipeCategoryDto);
     }
 
@@ -99,6 +104,7 @@ public class RecipeController {
     @OperLog(module = "食谱", description = "修改食谱分类", operationType = "UPDATE", saveResult = true)
     @PostMapping("/update/category")
     public ApiResponse<String> updateCategory(@RequestBody RecipeCategoryDto recipeCategoryDto) {
+        recipeCategoryDto.setUserId(currentUser.getUser());
         return recipeUpdateService.updateCategory(recipeCategoryDto);
     }
 }

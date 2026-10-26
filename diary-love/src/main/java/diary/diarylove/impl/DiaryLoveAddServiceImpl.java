@@ -71,7 +71,7 @@ public class DiaryLoveAddServiceImpl implements DiaryLoveAddService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ApiResponse<String> addRecord(AddLoveRecordDto dto) {
+    public ApiResponse<String> addRecord(AddLoveRecordDto dto, Long userId) {
 
         validateRecord(dto);
         dto.setId(MyUtils.getPrimaryKey());
@@ -88,7 +88,7 @@ public class DiaryLoveAddServiceImpl implements DiaryLoveAddService {
         // 构建recordDto
         Long locationId = locationDto == null ? dto.getLocationId() : locationDto.getId();
         dto.setLocationId(locationId);
-        LoveRecordDTO loveRecordDTO = convertLoveRecord(dto);
+        LoveRecordDTO loveRecordDTO = convertLoveRecord(dto, userId);
         // 构建recordImageDto
         List<LoveRecordImageDTO> loveRecordImageDTOS = convertLoveRecordImage(dto, loveRecordDTO);
         // 构建tagDto

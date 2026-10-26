@@ -10,6 +10,8 @@ import com.aliyun.oss.model.UploadPartRequest;
 import com.aliyun.oss.model.UploadPartResult;
 import diary.file.entity.dto.ImageDTO;
 import diary.file.entity.po.OssUploadSuccessMsg;
+import diary.file.consts.PhotoStatusConst;
+import diary.file.service.ImageFileService;
 import diary.file.entity.po.ImagePO;
 import diary.common.exception.ParamIllegalException;
 import diary.config.mqconfig.RabbitMqConfig;
@@ -72,6 +74,9 @@ public class AsyncServiceImpl implements AsyncService {
     @Resource
     private ImageMapper imageMapper;
 
+    @Resource
+    private ImageFileService imageFileService;
+
     @Async("ossUploadExecutor")
     @Override
     public void uploadAndSendMsgAsync(List<Long> result, List<File> files, List<String> originalNames, ImageDTO imageDTO) {
@@ -91,9 +96,11 @@ public class AsyncServiceImpl implements AsyncService {
             File file = files.get(i);
             String originalName = (i < originalNames.size()) ? originalNames.get(i) : file.getName();
             Long imageId = result.get(i);
+            ImagePO imagePO = null;
+            boolean ossUploaded = false;
 
             try {
-                ImagePO imagePO = imageMap.get(imageId);
+                imagePO = imageMap.get(imageId);
                 if (imagePO == null || imagePO.getObjectKey() == null) {
                     throw new ParamIllegalException("object_key 不能为空");
                 }
@@ -101,6 +108,7 @@ public class AsyncServiceImpl implements AsyncService {
 
                 // 1. 上传文件到 OSS（V4 客户端会自动使用 V4 签名）
                 diaryOssClient.putObject(bucketName, fileName, file);
+                ossUploaded = true;
 
                 // 2. 构建消息对象，存储 object_key 而非签名 URL
                 OssUploadSuccessMsg msg = new OssUploadSuccessMsg(
@@ -121,18 +129,14 @@ public class AsyncServiceImpl implements AsyncService {
                 successCount++;
             } catch (Exception e) {
                 log.error("处理文件异常，photoId: {}, fileName: {}", imageId, originalName, e);
+                if (imagePO != null) {
+                    imageMapper.updateImageStatusById(imageId, imagePO.getObjectKey(), PhotoStatusConst.PHOTO_STATUS_FAILED);
+                }
+                if (!ossUploaded) {
+                    imageFileService.deleteLocalFile(file.toPath());
+                }
                 failCount++;
                 failedFiles.add(originalName + ": " + e.getMessage());
-            } finally {
-                if (file.exists() && !file.delete()) {
-                    log.warn("删除上传临时文件失败: {}", file.getAbsolutePath());
-                }
-            }
-        }
-        for (int i = uploadCount; i < files.size(); i++) {
-            File file = files.get(i);
-            if (file.exists() && !file.delete()) {
-                log.warn("删除未上传临时文件失败: {}", file.getAbsolutePath());
             }
         }
 

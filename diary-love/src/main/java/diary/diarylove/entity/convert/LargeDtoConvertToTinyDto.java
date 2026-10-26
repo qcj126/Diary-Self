@@ -30,11 +30,11 @@ public class LargeDtoConvertToTinyDto {
     }
 
     // 构建record
-    public static LoveRecordDTO convertLoveRecord(AddLoveRecordDto dto) {
+    public static LoveRecordDTO convertLoveRecord(AddLoveRecordDto dto, Long creatorUserId) {
         return LoveRecordDTO.builder()
                 .id(MyUtils.getPrimaryKey())
                 .coupleId(dto.getCoupleId())
-                .creatorUserId(10000L)
+                .creatorUserId(creatorUserId)
                 .locationId(dto.getLocationId())
                 .title(dto.getTitle())
                 .content(dto.getContent())

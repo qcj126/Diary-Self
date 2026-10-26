@@ -1,6 +1,7 @@
 package diary.diarytimemachine.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import diary.common.auth.CurrentUser;
 import diary.diarytimemachine.entity.dto.TimeCardDTO;
 import diary.diarytimemachine.entity.dto.TimeCategoryDTO;
 import diary.diarytimemachine.entity.vo.TimeCardVO;
@@ -30,17 +31,21 @@ public class TimeMachineController {
     private TimeMachineDeleteService timeMachineDeleteService;
     @Resource
     private TimeMachineQueryService timeMachineQueryService;
+    @Resource
+    private CurrentUser currentUser;
 
     // 增
     @OperLog(module = "时光机", description = "新增时光机分类", operationType = "INSERT", saveResult = true)
     @PostMapping("/category/add")
     public ApiResponse<Integer> addCategory(@RequestBody TimeCategoryDTO categoryDTO) {
+        categoryDTO.setUserId(currentUser.getUser());
         return ApiResponse.success(timeMachineAddService.categoryAdd(categoryDTO));
     }
 
     @OperLog(module = "时光机", description = "新增时光卡片", operationType = "INSERT", saveResult = true)
     @PostMapping("/card/add")
     public ApiResponse<Integer> addCard(@RequestBody TimeCardDTO cardDTO) {
+        cardDTO.setUserId(currentUser.getUser());
         return ApiResponse.success(timeMachineAddService.cardAdd(cardDTO));
     }
 
@@ -48,12 +53,14 @@ public class TimeMachineController {
     @OperLog(module = "时光机", description = "删除时光机分类", operationType = "DELETE", saveResult = true)
     @PostMapping("/category/delete")
     public ApiResponse<String> deleteCategory(@RequestBody TimeCategoryDTO categoryDTO) {
+        categoryDTO.setUserId(currentUser.getUser());
         return ApiResponse.success(timeMachineDeleteService.categoryDelete(categoryDTO));
     }
 
     @OperLog(module = "时光机", description = "删除时光卡片", operationType = "DELETE", saveResult = true)
     @PostMapping("/card/delete")
     public ApiResponse<String> deleteCard(@RequestBody TimeCardDTO cardDTO) {
+        cardDTO.setUserId(currentUser.getUser());
         return ApiResponse.success(timeMachineDeleteService.cardDelete(cardDTO));
     }
 
@@ -61,12 +68,14 @@ public class TimeMachineController {
     @OperLog(module = "时光机", description = "修改时光机分类", operationType = "UPDATE", saveResult = true)
     @PostMapping("/category/update")
     public ApiResponse<String> updateCategory(@RequestBody TimeCategoryDTO categoryDTO) {
+        categoryDTO.setUserId(currentUser.getUser());
         return ApiResponse.success(timeMachineUpdateService.categoryUpdate(categoryDTO));
     }
 
     @OperLog(module = "时光机", description = "修改时光卡片", operationType = "UPDATE", saveResult = true)
     @PostMapping("/card/update")
     public ApiResponse<String> updateCard(@RequestBody TimeCardDTO cardDTO) {
+        cardDTO.setUserId(currentUser.getUser());
         return ApiResponse.success(timeMachineUpdateService.cardUpdate(cardDTO));
     }
 
@@ -74,12 +83,13 @@ public class TimeMachineController {
     @OperLog(module = "时光机", description = "查询时光机分类", operationType = "SELECT", saveResult = true)
     @PostMapping("/category/query")
     public ApiResponse<List<TimeCategoryVO>> queryCategory() {
-        return ApiResponse.success(timeMachineQueryService.categoryQuery());
+        return ApiResponse.success(timeMachineQueryService.categoryQuery(currentUser.getUser()));
     }
 
     @OperLog(module = "时光机", description = "分页查询时光卡片", operationType = "SELECT", saveResult = true)
     @PostMapping("/card/query")
     public ApiResponse<IPage<TimeCardVO>> queryCard(@RequestBody TimeCardDTO cardDTO) {
+        cardDTO.setUserId(currentUser.getUser());
         return ApiResponse.success(timeMachineQueryService.cardQuery(cardDTO));
     }
 }

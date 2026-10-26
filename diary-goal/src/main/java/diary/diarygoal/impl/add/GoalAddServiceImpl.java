@@ -21,7 +21,6 @@ import java.util.List;
 
 @Service
 public class GoalAddServiceImpl implements GoalAddService {
-    private static final Long DEFAULT_USER_ID = 10000L;
     private static final long DEFAULT_DDL_DAYS = 7L;
 
     @Resource
@@ -123,7 +122,10 @@ public class GoalAddServiceImpl implements GoalAddService {
     }
 
     private Long resolveUserId(Long userId) {
-        return userId == null ? DEFAULT_USER_ID : userId;
+        if (userId == null) {
+            throw new IllegalArgumentException("userId 不能为空");
+        }
+        return userId;
     }
 
     private Long resolveUserId(Long userId, Long fallbackUserId) {

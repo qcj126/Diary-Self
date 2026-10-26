@@ -35,7 +35,7 @@ public class AIFactory {
                         + " (" + existing.getClass().getSimpleName()
                         + ", " + service.getClass().getSimpleName() + ")");
             }
-            log.info("注册AI: {} -> {}", type, service.getClass().getSimpleName());
+            log.info("注册营养分析AI: {} -> {}", type, service.getClass().getSimpleName());
         }
         for (InvokeLoveRecordAIService service : aiLoveRecordServiceList) {
             Integer type = service.getCode();

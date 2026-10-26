@@ -6,6 +6,7 @@ import diary.file.entity.po.ImagePO;
 import diary.file.enums.TypeEnum;
 import diary.common.exception.ParamIllegalException;
 import diary.file.mapper.ImageMapper;
+import diary.file.service.ImageFileService;
 import diary.file.service.asyncservice.AsyncService;
 import diary.file.service.uploadservice.UploadService;
 
@@ -18,7 +19,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -29,10 +32,12 @@ public class UploadServiceImpl implements UploadService {
 
     private final FileUtil fileUtil;
 
+    private final ImageFileService imageFileService;
+
     private final AsyncService asyncService;
 
     @Override
-    public List<Long> uploadImagesAndInsert(List<MultipartFile> files, Integer code) {
+    public List<Long> uploadImagesAndInsert(List<MultipartFile> files, Integer code, Long userId) {
         // 拦截参数为空的数据
         MyUtils.check().notNull(files, "文件列表").listNotContainsEmpty(files, "文件列表").notNull(code, "图片类别");
 
@@ -40,14 +45,14 @@ public class UploadServiceImpl implements UploadService {
         files = files.stream()
                 .filter(file -> {
                     MyUtils.check().notEmpty(file.getContentType(), "文件类型");
-                    return Objects.equals(file.getContentType(), "image/png") || Objects.equals(file.getContentType(), "image/jepg");
+                    return Objects.equals(file.getContentType(), "image/png") || Objects.equals(file.getContentType(), "image/jpeg");
                 }).toList();
 
         ImageDTO imageDTO = new ImageDTO();
-        imageDTO.setUserId(10000L);
+        imageDTO.setUserId(userId);
         imageDTO.setCode(code);
 
-        List<ImagePO> imageList = new ArrayList<>();
+        List<UploadTask> uploadTasks = new ArrayList<>();
         List<String> failedFiles = new ArrayList<>();
         List<Long> imageIds = new ArrayList<>();
 
@@ -55,15 +60,19 @@ public class UploadServiceImpl implements UploadService {
         for (MultipartFile file : files) {
             try {
                 Integer type = TypeEnum.getCode(imageDTO.getCode());
-                String typeName = TypeEnum.getType(imageDTO.getCode());
-                String originalFilename = file.getOriginalFilename();
-                String objectKey = fileUtil.getFileName(typeName, originalFilename);
+                String originalFilename = fileUtil.getSafeOriginalName(file.getOriginalFilename());
+                String objectKey = originalFilename;
 
                 // 查看同一图片所属类别下是否有相同名称的图片
                 Long isExist = imagMapper.selectImageByTypeAndName(type, originalFilename);
                 if (isExist != null) {
-                    log.info("图片已存在");
-                    imageIds.add(isExist);
+                    // 重复上传不再重复写 OSS；若本地缓存已被清理，则立即从 OSS 回写。
+                    if (imageFileService.getOrRestore(originalFilename) != null) {
+                        log.info("图片已存在，已确认本地缓存: {}", originalFilename);
+                        imageIds.add(isExist);
+                    } else {
+                        failedFiles.add(originalFilename + ": 本地与 OSS 均未找到已存在图片");
+                    }
                     continue;
                 }
 
@@ -72,26 +81,43 @@ public class UploadServiceImpl implements UploadService {
                 image.setId(MyUtils.getPrimaryKey());
                 image.setUserId(imageDTO.getUserId());
                 image.setFileSize(file.getSize());
-                image.setOriginalName(file.getOriginalFilename());
+                image.setOriginalName(originalFilename);
                 image.setMimeType(file.getContentType());
                 image.setType(type);
                 image.setStatus(PhotoStatusConst.PHOTO_STATUS_PROCESSING);
                 image.setObjectKey(objectKey);
-                imageList.add(image);
+                uploadTasks.add(new UploadTask(image, file));
             } catch (Exception e) {
                 log.error("处理文件 {} 时发生异常", file.getOriginalFilename(), e);
                 failedFiles.add(file.getOriginalFilename() + ": " + e.getMessage());
             }
         }
 
-        // 第二步：分批插入数据库，每批最多20条
+        // 第二步：先将新文件落盘。之后的 OSS 上传始终读取这个本地副本。
+        Map<Long, File> localFilesByImageId = new HashMap<>();
+        List<UploadTask> localTasks = new ArrayList<>();
+        for (UploadTask task : uploadTasks) {
+            try {
+                File localFile = fileUtil.saveToAppPicture(task.file(), task.image().getOriginalName());
+                localFilesByImageId.put(task.image().getId(), localFile);
+                localTasks.add(task);
+                log.info("图片已保存到本地: {}", localFile.getAbsolutePath());
+            } catch (Exception e) {
+                failedFiles.add(task.image().getOriginalName() + ": 本地保存失败: " + e.getMessage());
+                log.error("保存本地图片失败: {}", task.image().getOriginalName(), e);
+            }
+        }
+
+        // 第三步：本地保存成功后再分批插入数据库，每批最多20条。
         int batchSize = 20;
-        int totalSize = imageList.size();
+        int totalSize = localTasks.size();
+        List<UploadTask> persistedTasks = new ArrayList<>();
 
         for (int i = 0; i < totalSize; i += batchSize) {
             // 计算当前批次的结束位置
             int end = Math.min(i + batchSize, totalSize);
-            List<ImagePO> batchList = imageList.subList(i, end);
+            List<UploadTask> batchTasks = localTasks.subList(i, end);
+            List<ImagePO> batchList = batchTasks.stream().map(UploadTask::image).toList();
 
             try {
                 Integer count = imagMapper.batchAddImageToDb(batchList);
@@ -100,11 +126,13 @@ public class UploadServiceImpl implements UploadService {
                     for (ImagePO image : batchList) {
                         imageIds.add(image.getId());
                     }
+                    persistedTasks.addAll(batchTasks);
                 } else {
                     // 记录失败的文件
                     for (ImagePO image : batchList) {
                         failedFiles.add(image.getOriginalName() + ": 批量插入失败");
                     }
+                    batchTasks.forEach(task -> fileUtil.deleteFile(localFilesByImageId.get(task.image().getId()).getAbsolutePath()));
                     log.error("批量插入照片失败，批次范围: {} - {}", i + 1, end);
                 }
             } catch (Exception e) {
@@ -113,6 +141,7 @@ public class UploadServiceImpl implements UploadService {
                 for (ImagePO image : batchList) {
                     failedFiles.add(image.getOriginalName() + ": " + e.getMessage());
                 }
+                batchTasks.forEach(task -> fileUtil.deleteFile(localFilesByImageId.get(task.image().getId()).getAbsolutePath()));
             }
         }
 
@@ -124,10 +153,24 @@ public class UploadServiceImpl implements UploadService {
         if (imageIds.isEmpty()) {
             throw new ParamIllegalException("所有文件均处理失败");
         }
-        // 异步上传图片到OSS成功后，发送消息给mq
-        List<File> tempFiles = fileUtil.copyToTempFiles(files);
-        List<String> originalNames = files.stream().map(MultipartFile::getOriginalFilename).toList();
-        asyncService.uploadAndSendMsgAsync(imageIds, tempFiles, originalNames, imageDTO);
+        // 第四步：异步上传已落盘的本地图片到 OSS。
+        List<File> localFiles = new ArrayList<>();
+        List<Long> uploadImageIds = new ArrayList<>();
+        List<String> originalNames = new ArrayList<>();
+        for (UploadTask task : persistedTasks) {
+            localFiles.add(localFilesByImageId.get(task.image().getId()));
+            uploadImageIds.add(task.image().getId());
+            originalNames.add(task.image().getOriginalName());
+        }
+        if (!uploadImageIds.isEmpty()) {
+            asyncService.uploadAndSendMsgAsync(uploadImageIds, localFiles, originalNames, imageDTO);
+        }
+        if (imageIds.isEmpty()) {
+            throw new ParamIllegalException("所有文件均处理失败");
+        }
         return imageIds;
+    }
+
+    private record UploadTask(ImagePO image, MultipartFile file) {
     }
 }

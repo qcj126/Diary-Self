@@ -48,24 +48,27 @@ public class DiaryLoveController {
     @OperLog(module = "恋爱记录", description = "创建情侣关系", operationType = "INSERT", saveResult = true)
     @PostMapping("/add/couples") // 已测
     public ApiResponse<String> addCouples(@RequestBody LoveCoupleDTO dto) {
+        dto.setOwnerUserId(currentUser.getUser());
         return diaryLoveAddService.addCouples(dto);
     }
 
     @OperLog(module = "恋爱记录", description = "新增纪念日", operationType = "INSERT", saveResult = true)
     @PostMapping("/add/anniversaries") // 已测
     public ApiResponse<String> addAnniversary(@RequestBody LoveAnniversaryDTO dto) {
+        dto.setCreatorUserId(currentUser.getUser());
         return diaryLoveAddService.addAnniversary(dto);
     }
 
     @OperLog(module = "恋爱记录", description = "新增恋爱记录", operationType = "INSERT", saveResult = true)
     @PostMapping("/add/records") // 已测
     public ApiResponse<String> addRecord(@Valid @RequestBody AddLoveRecordDto dto) {
-        return diaryLoveAddService.addRecord(dto);
+        return diaryLoveAddService.addRecord(dto, currentUser.getUser());
     }
 
     @OperLog(module = "恋爱记录", description = "查询情侣关系", operationType = "SELECT", saveResult = true)
     @PostMapping("/query/couples") // 已测
     public ApiResponse<LoveCoupleVO> queryCouples(@RequestBody LoveCoupleDTO loveCoupleDTO) {
+        loveCoupleDTO.setOwnerUserId(currentUser.getUser());
         return diaryLoveQueryService.queryCouples(loveCoupleDTO);
     }
 
@@ -115,12 +118,14 @@ public class DiaryLoveController {
     @OperLog(module = "恋爱记录", description = "修改情侣关系", operationType = "UPDATE", saveResult = true)
     @PostMapping("/update/couples") // 已测
     public ApiResponse<String> updateCouple(@RequestBody LoveCoupleDTO dto) {
+        dto.setOwnerUserId(currentUser.getUser());
         return diaryLoveUpdateService.updateCouple(dto);
     }
 
     @OperLog(module = "恋爱记录", description = "修改纪念日", operationType = "UPDATE", saveResult = true)
     @PostMapping("/update/anniversaries") // 已测
     public ApiResponse<String> updateAnniversary(@RequestBody LoveAnniversaryDTO dto) {
+        dto.setCreatorUserId(currentUser.getUser());
         return diaryLoveUpdateService.updateAnniversary(dto);
     }
 
@@ -133,6 +138,7 @@ public class DiaryLoveController {
     @OperLog(module = "恋爱记录", description = "修改恋爱记录", operationType = "UPDATE", saveResult = true)
     @PostMapping("/update/records") // 已测
     public ApiResponse<String> updateRecord(@Valid @RequestBody UpdateLoveRecordDto dto) {
+        dto.setCreatorUserId(currentUser.getUser());
         return diaryLoveUpdateService.updateRecord(dto);
     }
 

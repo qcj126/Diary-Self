@@ -123,7 +123,7 @@
 
     <select id="selectCardPage" resultMap="TimeCardVOResultMap">
         select a.id, a.user_id, a.image_id, a.category_id, a.card_title, a.card_content, a.record_time, a.create_time, a.update_time
-        from time_card a where 1=1
+        from time_card a where a.user_id = #{userId}
         <if test="categoryId != null">
             and category_id = #{categoryId}
         </if>
@@ -134,7 +134,7 @@
     </select>
 
     <update id="deleteCard">
-        delete from time_card where id = #{id};
+        delete from time_card where id = #{id} and user_id = #{userId};
     </update>
 
     <update id="updateCard">
@@ -146,11 +146,11 @@
             <if test="recordTime != null">record_time = #{recordTime},</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>
         </set>
-        where id = #{id};
+        where id = #{id} and user_id = #{userId};
     </update>
 
     <delete id="logicallyDeleteCategory">
-        update time_category set deleted = 1 where id = #{id};
+        update time_category set deleted = 1 where id = #{id} and user_id = #{userId};
     </delete>
 
     <select id="selectCategory" resultMap="CategoryIconResultMap">
@@ -158,6 +158,6 @@
             aa.id, aa.user_id, aa.icon_id, aa.category_name, aa.category_num, aa.sort, aa.deleted,
             aa.create_time, aa.update_time, bb.icon_name, bb.icon_type, bb.icon_path, bb.icon_size, bb.icon_pixel
         from time_category aa inner join icon bb on aa.icon_id = bb.id
-        where aa.deleted = 0
+        where aa.deleted = 0 and aa.user_id = #{userId}
     </select>
 </mapper>

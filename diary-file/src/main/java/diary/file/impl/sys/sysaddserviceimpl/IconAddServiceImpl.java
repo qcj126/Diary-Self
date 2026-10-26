@@ -18,13 +18,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static diary.file.consts.FileDirConst.ICON_DIR;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class IconAddServiceImpl implements IconAddService {
     private final IconMapper iconMapper;
 
-    private static final Path ICON_DIR = Paths.get("E:\\Diary-Front\\icon").normalize();
     @Override
     public ApiResponse<?> addIcon(MultipartFile file, IconDTO iconDTO) {
         try {

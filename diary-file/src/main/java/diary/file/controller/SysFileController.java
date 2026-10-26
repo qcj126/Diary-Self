@@ -2,6 +2,7 @@ package diary.file.controller;
 
 
 import diary.common.result.ApiResponse;
+import diary.common.auth.CurrentUser;
 import diary.config.logconfig.OperLog;
 import diary.file.entity.dto.IconDTO;
 import diary.file.service.sys.sysaddservice.IconAddService;
@@ -27,16 +28,18 @@ import java.io.IOException;
 @RequestMapping("/file/sys")
 @RequiredArgsConstructor
 public class SysFileController {
-    private IconAddService iconAddService;
-    private IconQueryService iconQueryService;
-    private IconDeleteService iconDeleteService;
-    private IconUpdateService iconUpdateService;
+    private final IconAddService iconAddService;
+    private final IconQueryService iconQueryService;
+    private final IconDeleteService iconDeleteService;
+    private final IconUpdateService iconUpdateService;
+    private final CurrentUser currentUser;
 
 
     @OperLog(module = "系统数据", description = "上传系统图标", operationType = "UPLOAD", saveParams = false, saveResult = true)
     @PostMapping("/icon/add")
     public ApiResponse<?> addIcon(@RequestParam("file") MultipartFile file,
                                   @ModelAttribute IconDTO iconDTO) {
+        iconDTO.setUserId(currentUser.getUser());
         return iconAddService.addIcon(file, iconDTO);
     }
 
@@ -50,12 +53,14 @@ public class SysFileController {
     @PostMapping("/icon/update")
     public ApiResponse<?> updateIcon(@RequestParam(value = "file", required = false) MultipartFile file,
                                      @ModelAttribute IconDTO iconDTO) {
+        iconDTO.setUserId(currentUser.getUser());
         return iconUpdateService.updateIcon(file, iconDTO);
     }
 
     @OperLog(module = "系统数据", description = "删除系统图标", operationType = "DELETE", saveResult = true)
     @PostMapping("/icon/delete")
     public ApiResponse<?> deleteIcon(@RequestBody IconDTO iconDTO) {
+        iconDTO.setUserId(currentUser.getUser());
         return iconDeleteService.deleteIcon(iconDTO);
     }
 

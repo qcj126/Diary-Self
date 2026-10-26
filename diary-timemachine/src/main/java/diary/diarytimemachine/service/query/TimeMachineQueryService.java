@@ -8,6 +8,6 @@ import diary.diarytimemachine.entity.vo.TimeCategoryVO;
 import java.util.List;
 
 public interface TimeMachineQueryService {
-    List<TimeCategoryVO> categoryQuery();
+    List<TimeCategoryVO> categoryQuery(Long userId);
     IPage<TimeCardVO> cardQuery(TimeCardDTO cardDTO);
 }

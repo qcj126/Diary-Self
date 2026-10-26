@@ -1,59 +1,60 @@
 package diary.file.utils;
 
-import diary.common.exception.CustomException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 
-import static diary.file.consts.FileTypeConst.BEAN_MATCHING_IMAGE;
-import static diary.file.consts.FileTypeConst.BEAN_MATCHING_IMAGE_PATH;
-import static diary.file.consts.FileTypeConst.DAILY_IMAGE;
-import static diary.file.consts.FileTypeConst.DAILY_IMAGE_PATH;
-import static diary.file.consts.FileTypeConst.DIET_IMAGE;
-import static diary.file.consts.FileTypeConst.DIET_IMAGE_PATH;
-import static diary.file.consts.FileTypeConst.EXERCISE_IMAGE;
-import static diary.file.consts.FileTypeConst.EXERCISE_IMAGE_PATH;
-import static diary.file.consts.FileTypeConst.GIFT_IMAGE;
-import static diary.file.consts.FileTypeConst.GIFT_IMAGE_PATH;
-import static diary.file.consts.FileTypeConst.INGREDIENT_IMAGE;
-import static diary.file.consts.FileTypeConst.INGREDIENT_IMAGE_PATH;
-import static diary.file.consts.FileTypeConst.RECIPE_IMAGE;
-import static diary.file.consts.FileTypeConst.RECIPE_IMAGE_PATH;
-import static diary.file.consts.FileTypeConst.SNACK_IMAGE;
-import static diary.file.consts.FileTypeConst.SNACK_IMAGE_PATH;
-import static diary.file.consts.FileTypeConst.TEA_IMAGE;
-import static diary.file.consts.FileTypeConst.TEA_IMAGE_PATH;
-import static diary.file.consts.FileTypeConst.TRAVEL_IMAGE;
-import static diary.file.consts.FileTypeConst.TRAVEL_IMAGE_PATH;
-import static diary.file.consts.FileTypeConst.WALK_IMAGE;
-import static diary.file.consts.FileTypeConst.WALK_IMAGE_PATH;
-
+import static diary.file.consts.FileDirConst.APP_PICTURE_DIR;
 
 @Slf4j
 @Component
 public class FileUtil {
+    /**
+     * 将客户端提供的文件名限制为单个文件名，避免路径穿越并保证本地、OSS 使用同一名称。
+     */
+    public String getSafeOriginalName(String originalFilename) {
+        if (originalFilename == null || originalFilename.isBlank()) {
+            throw new IllegalArgumentException("文件名不能为空");
+        }
+        String fileName = Path.of(originalFilename).getFileName().toString();
+        if (fileName.isBlank() || ".".equals(fileName) || "..".equals(fileName)) {
+            throw new IllegalArgumentException("文件名不合法");
+        }
+        return fileName;
+    }
+
+    public File saveToAppPicture(MultipartFile multipartFile, String originalName) throws IOException {
+        try (InputStream inputStream = multipartFile.getInputStream()) {
+            return saveToAppPicture(inputStream, originalName);
+        }
+    }
+
+    public File saveToAppPicture(InputStream inputStream, String originalName) throws IOException {
+        Path target = resolveAppPicture(originalName);
+        Files.createDirectories(APP_PICTURE_DIR);
+        Files.copy(inputStream, target, StandardCopyOption.REPLACE_EXISTING);
+        return target.toFile();
+    }
+
+    public Path resolveAppPicture(String originalName) {
+        Path target = APP_PICTURE_DIR.resolve(getSafeOriginalName(originalName)).normalize();
+        if (!target.startsWith(APP_PICTURE_DIR)) {
+            throw new IllegalArgumentException("文件名不合法");
+        }
+        return target;
+    }
+
     public String getFileName(String type, String originalFilename) {
-        return switch (type) {
-            case DIET_IMAGE -> DIET_IMAGE_PATH + System.currentTimeMillis() + originalFilename;
-            case RECIPE_IMAGE -> RECIPE_IMAGE_PATH + System.currentTimeMillis() + originalFilename;
-            case INGREDIENT_IMAGE -> INGREDIENT_IMAGE_PATH + System.currentTimeMillis() + originalFilename;
-            case BEAN_MATCHING_IMAGE -> BEAN_MATCHING_IMAGE_PATH + System.currentTimeMillis() + originalFilename;
-            case GIFT_IMAGE -> GIFT_IMAGE_PATH + System.currentTimeMillis() + originalFilename;
-            case SNACK_IMAGE -> SNACK_IMAGE_PATH + System.currentTimeMillis() + originalFilename;
-            case TEA_IMAGE -> TEA_IMAGE_PATH + System.currentTimeMillis() + originalFilename;
-            case TRAVEL_IMAGE -> TRAVEL_IMAGE_PATH + System.currentTimeMillis() + originalFilename;
-            case DAILY_IMAGE -> DAILY_IMAGE_PATH + System.currentTimeMillis() + originalFilename;
-            case EXERCISE_IMAGE -> EXERCISE_IMAGE_PATH + System.currentTimeMillis() + originalFilename;
-            case WALK_IMAGE -> WALK_IMAGE_PATH + System.currentTimeMillis() + originalFilename;
-            default -> throw new CustomException("未知图片类型");
-        };
+        return getSafeOriginalName(originalFilename);
     }
 
     /**

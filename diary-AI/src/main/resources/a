@@ -4,7 +4,7 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr:
+        server-addr: 192.168.101.128:8848
   main:
     web-application-type: servlet
   servlet:
@@ -54,9 +54,18 @@ rocketmq:
   # 启用生产者, 从而触发 RocketMQClientTemplate 的自动创建
   producer:
     # 你的 NameServer 地址
-    endpoints:
+    endpoints: 192.168.101.128:7081
 
   # 如果你有消费者, 可以类似地启用消费者
   # 但注意, 如果你使用 @RocketMQMessageListener 进行消费, 应配置 push-consumer
   push-consumer:
-    endpoints:
+    endpoints: 192.168.101.128:7081
+
+  ali-cloud:
+    api:
+      api-key:
+      url: h
+      deepSeekV4ProModel: deepseek-v4-pro-0813
+      qwenPlusModel: qwen3.7-plus
+      qwenMaxModel: qwen3.7-max
+      temperature: 0.7

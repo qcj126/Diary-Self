@@ -21,7 +21,6 @@ import java.util.List;
 
 @Service
 public class GoalUpdateServiceImpl implements GoalUpdateService {
-    private static final Long DEFAULT_USER_ID = 10000L;
     private static final long DEFAULT_DDL_DAYS = 7L;
     private static final int STAGE_GOAL_FLAG = 1;
     private static final int SUB_GOAL_FLAG = 2;
@@ -181,7 +180,10 @@ public class GoalUpdateServiceImpl implements GoalUpdateService {
         if (userId != null) {
             return userId;
         }
-        return fallbackUserId == null ? DEFAULT_USER_ID : fallbackUserId;
+        if (fallbackUserId == null) {
+            throw new IllegalArgumentException("userId 不能为空");
+        }
+        return fallbackUserId;
     }
 
     private LocalDateTime defaultEndTime(LocalDateTime endTime) {

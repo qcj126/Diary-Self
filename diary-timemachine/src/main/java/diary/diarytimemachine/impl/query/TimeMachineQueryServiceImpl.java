@@ -22,8 +22,8 @@ public class TimeMachineQueryServiceImpl implements TimeMachineQueryService {
     private TimeMachineMapper timeMachineMapper;
 
     @Override
-    public List<TimeCategoryVO> categoryQuery() {
-        List<TimeCategoryIconDTO> timeCategoryIconDTOS = timeMachineMapper.selectCategory();
+    public List<TimeCategoryVO> categoryQuery(Long userId) {
+        List<TimeCategoryIconDTO> timeCategoryIconDTOS = timeMachineMapper.selectCategory(userId);
         List<TimeCategoryVO> timeCategoryVOS = new ArrayList<>();
         for (TimeCategoryIconDTO timeCategoryIconDTO : timeCategoryIconDTOS) {
             timeCategoryVOS.add(DtoToVo.convertToVo(timeCategoryIconDTO));
@@ -38,6 +38,6 @@ public class TimeMachineQueryServiceImpl implements TimeMachineQueryService {
         Page<TimeCardVO> page = new Page<>((pageIndex == null ? 0 : pageIndex), (pageSize == null ? 30 : pageSize));
         Long categoryId = cardDTO.getCategoryId(); // 有值查分类、无值查全部
         String exactDate = cardDTO.getExactDate();
-        return timeMachineMapper.selectCardPage(page, categoryId, exactDate);
+        return timeMachineMapper.selectCardPage(page, categoryId, exactDate, cardDTO.getUserId());
     }
 }

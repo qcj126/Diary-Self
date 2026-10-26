@@ -79,7 +79,6 @@ public class RecipeAddServiceImpl implements RecipeAddService {
         Integer maxCategoryNum = recipeCategoryMapper.selectMaxCategoryNum();
         Integer categoryNum = maxCategoryNum == null ? 1000 : maxCategoryNum + 100;
         recipeCategoryDto.setCategoryId(MyUtils.getPrimaryKey());
-        recipeCategoryDto.setUserId(10000L);
         recipeCategoryDto.setCategoryNum(categoryNum);
         RecipeCategoryPO recipeCategoryPO = DtoConvertToPo.recipeCategoryDtoConvertToPO(recipeCategoryDto);
         Integer cnt = recipeCategoryMapper.insert(recipeCategoryPO);
@@ -91,7 +90,6 @@ public class RecipeAddServiceImpl implements RecipeAddService {
 
     private void validateRecipe(RecipeReqDto recipeReqDto) {
         MyUtils.check().notNull(recipeReqDto, "食谱");
-        recipeReqDto.setAuthorId(10000L);
         MyUtils.check()
                 .notNull(recipeReqDto.getAuthorId(), "食谱作者编号")
                 .notEmpty(recipeReqDto.getTitle(), "食谱标题")

@@ -3,17 +3,17 @@ package diary.file.impl.queryserviceImpl;
 import diary.file.entity.po.ImagePO;
 import diary.file.entity.vo.ImageVO;
 import diary.file.mapper.ImageMapper;
+import diary.file.service.ImageFileService;
 import diary.file.service.queryurlservice.QueryUrlService;
-import diary.utils.OSS.OssUtil;
 import diary.utils.commonutil.MyUtils;
-import diary.utils.redis.RedisUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Service
@@ -22,35 +22,21 @@ public class QueryUrlServiceImpl implements QueryUrlService {
     private ImageMapper imageMapper;
 
     @Resource
-    private OssUtil ossUtil;
-
-    @Resource
-    private RedisUtil redisUtil;
+    private ImageFileService imageFileService;
 
     public List<ImageVO> queryImageUrls(List<Long> imageIds) {
         MyUtils.check().listNotContainsEmpty(imageIds, "图片ID列表");
         List<ImageVO> imageVOS = new ArrayList<>();
-        // 先走缓存
         for (Long imageId : imageIds) {
-            String url = redisUtil.getStringWithExpire("imageUrls:" + imageId);
             ImageVO imageVO = new ImageVO();
-            if (MyUtils.isEmpty(url)) {
-                // 1. 从数据库查询 object_key
-                ImagePO imagePO = imageMapper.selectImageById(imageId);
-                if (imagePO == null) continue;
-                // 2. 提取所有 object_key
-                String objectKey = imagePO.getObjectKey();
-
-                // 3. 批量生成签名 URL
-                Map<Long, String> signedUrlMap = ossUtil.generateSignedUrl(objectKey, imageId);
-                // 将新生成的url插入redis
-                redisUtil.setStringWithExpire("imageUrls:" + imageId, signedUrlMap.get(imageId), 10);
-                imageVO.setId(imageId);
-                imageVO.setUrl(signedUrlMap.get(imageId));
-            } else {
-                imageVO.setId(imageId);
-                imageVO.setUrl(url);
+            ImagePO imagePO = imageMapper.selectImageById(imageId);
+            if (imagePO == null) continue;
+            if (imageFileService.getOrRestore(imagePO) == null) {
+                log.warn("图片不可用，本地与 OSS 均未找到: id={}, originalName={}", imageId, imagePO.getOriginalName());
+                continue;
             }
+            imageVO.setId(imageId);
+            imageVO.setUrl("/file/images/" + UriUtils.encodePathSegment(imagePO.getOriginalName(), StandardCharsets.UTF_8));
             imageVOS.add(imageVO);
         }
         return imageVOS;

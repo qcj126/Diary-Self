@@ -2,11 +2,13 @@ package diary.diarytimemachine.mapper;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import diary.diarytimemachine.entity.dto.TimeCardDTO;
+import diary.diarytimemachine.entity.dto.TimeCategoryDTO;
 import diary.diarytimemachine.entity.dto.TimeCategoryIconDTO;
 import diary.diarytimemachine.entity.po.TimeCardPO;
 import diary.diarytimemachine.entity.po.TimeCategoryPO;
 import diary.diarytimemachine.entity.vo.TimeCardVO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -24,14 +26,15 @@ public interface TimeMachineMapper {
 
     Integer selectSameCard(Long categoryId, String cardTitle);
 
-    IPage<TimeCardVO> selectCardPage(IPage<TimeCardVO> page, Long categoryId, String exactDate);
+    IPage<TimeCardVO> selectCardPage(IPage<TimeCardVO> page, @Param("categoryId") Long categoryId,
+                                     @Param("exactDate") String exactDate, @Param("userId") Long userId);
 
-    Integer deleteCard(Long id);
+    Integer deleteCard(TimeCardDTO cardDTO);
 
     Integer updateCard(TimeCardDTO cardDTO);
 
-    Integer logicallyDeleteCategory(Long id);
+    Integer logicallyDeleteCategory(TimeCategoryDTO categoryDTO);
 
-    List<TimeCategoryIconDTO> selectCategory();
+    List<TimeCategoryIconDTO> selectCategory(@Param("userId") Long userId);
 
 }
