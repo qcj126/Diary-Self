@@ -111,8 +111,6 @@ public class AiTransactionServiceImpl implements AiTransactionService {
                 .inputSnapshot(inputSnapshot)
                 .attemptCount(0)
                 .maxAttempts(properties.getTask().getMaxAttempts())
-                .createTime(now)
-                .updateTime(now)
                 .versionId(0)
                 .targetTitle(targetTitle)
                 .targetId(universalId)
@@ -205,7 +203,6 @@ public class AiTransactionServiceImpl implements AiTransactionService {
                 .workerId(workerId)
                 .versionId(versionId)
                 .aiInfoId(aiInfoPO.getId())
-                .finishTime(LocalDateTime.now())
                 .build();
 
         AiTaskEventDto message = AiTaskEventDto.builder()
@@ -296,7 +293,6 @@ public class AiTransactionServiceImpl implements AiTransactionService {
                 .workerId(workerId)
                 .versionId(versionId)
                 .aiInfoId(aiInfoPO.getId())
-                .finishTime(now)
                 .build();
 
         AiTaskEventDto message = AiTaskEventDto.builder()
@@ -351,8 +347,6 @@ public class AiTransactionServiceImpl implements AiTransactionService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ConsumeResult handleExecutionFailure(AiTaskMessageDto message, AiTaskPO claimedTask, String workerId, Exception executionException) {
-        LocalDateTime now = LocalDateTime.now();
-
         boolean permanentError = executionException instanceof IllegalArgumentException;
         boolean attemptsExhausted = claimedTask.getAttemptCount() >= claimedTask.getMaxAttempts();
         String errorMessage = truncateErrorMessage(executionException.getMessage());
@@ -367,7 +361,6 @@ public class AiTransactionServiceImpl implements AiTransactionService {
                         permanentError ? AiTaskErrorCodeEnum.PERMANENT_ERROR.name() :
                                 attemptsExhausted ? AiTaskErrorCodeEnum.RETRY_EXHAUSTED.name() : AiTaskErrorCodeEnum.RETRYABLE_ERROR.name())
                 .errorMessage(errorMessage)
-                .finishTime(now)
                 .build();
 
         if (permanentError || attemptsExhausted) {
@@ -397,13 +390,11 @@ public class AiTransactionServiceImpl implements AiTransactionService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean failExhaustedTask(AiTaskPO task, String errorMessage) {
-        LocalDateTime now = LocalDateTime.now();
         AiTaskProcessDto failed = AiTaskProcessDto.builder()
                 .taskId(task.getId())
                 .userId(task.getUserId())
                 .clientRequestId(task.getClientRequestId())
                 .versionId(task.getVersionId())
-                .finishTime(now)
                 .errorCode(AiTaskErrorCodeEnum.RETRY_EXHAUSTED.name())
                 .errorMessage(truncateErrorMessage(errorMessage))
                 .build();
@@ -419,13 +410,11 @@ public class AiTransactionServiceImpl implements AiTransactionService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean deadLetterDispatchTask(AiTaskPO task, String errorMessage) {
-        LocalDateTime now = LocalDateTime.now();
         AiTaskProcessDto deadLetter = AiTaskProcessDto.builder()
                 .taskId(task.getId())
                 .userId(task.getUserId())
                 .clientRequestId(task.getClientRequestId())
                 .versionId(task.getVersionId())
-                .finishTime(now)
                 .errorCode(AiTaskErrorCodeEnum.OUTBOX_SEND_FAILED.name())
                 .errorMessage(truncateErrorMessage(errorMessage))
                 .build();

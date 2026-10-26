@@ -187,7 +187,7 @@
              target_title, target_id, target_type)
         VALUES
             (#{id}, #{userId}, #{clientRequestId}, #{requestHash}, #{taskType}, #{status}, #{inputSnapshot},
-             #{attemptCount}, #{maxAttempts}, #{createTime}, #{updateTime}, #{versionId}, #{aiApplication},
+             #{attemptCount}, #{maxAttempts}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, #{versionId}, #{aiApplication},
              #{targetTitle}, #{targetId}, #{targetType})
     </insert>
 
@@ -268,7 +268,7 @@
             lease_until = NULL,
             error_code = NULL,
             error_message = NULL,
-            finish_time = #{finishTime},
+            finish_time = CURRENT_TIMESTAMP,
             update_time = CURRENT_TIMESTAMP,
             version_id = version_id + 1
         WHERE id = #{taskId}
@@ -286,7 +286,7 @@
             lease_until = NULL,
             error_code = #{errorCode},
             error_message = #{errorMessage},
-            finish_time = #{finishTime},
+            finish_time = CURRENT_TIMESTAMP,
             update_time = CURRENT_TIMESTAMP,
             version_id = version_id + 1
         WHERE id = #{taskId}
@@ -308,7 +308,7 @@
             lease_until = NULL,
             error_code = #{errorCode},
             error_message = #{errorMessage},
-            finish_time = #{finishTime},
+            finish_time = CURRENT_TIMESTAMP,
             update_time = CURRENT_TIMESTAMP,
             version_id = version_id + 1
         WHERE id = #{taskId}
@@ -347,7 +347,7 @@
             lease_until = NULL,
             error_code = #{errorCode},
             error_message = #{errorMessage},
-            finish_time = #{finishTime},
+            finish_time = CURRENT_TIMESTAMP,
             update_time = CURRENT_TIMESTAMP,
             version_id = version_id + 1
         WHERE id = #{taskId}

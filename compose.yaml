@@ -29,6 +29,51 @@ services:
     networks:
       - diary-net
 
+  diary-user:
+    build:
+      context: .
+      dockerfile: diary-user/Dockerfile
+    image: diary-user:0.1.0
+    restart: unless-stopped
+    environment:
+      SPRING_APPLICATION_NAME: diary-user
+      SERVER_PORT: "8801"
+      NACOS_ADDR: nacos:8848
+    ports:
+      - "8801:8801"
+    networks:
+      - diary-net
+
+  diary-recipe:
+    build:
+      context: .
+      dockerfile: diary-recipe/Dockerfile
+    image: diary-recipe:0.1.0
+    restart: unless-stopped
+    environment:
+      SPRING_APPLICATION_NAME: diary-recipe
+      SERVER_PORT: "8803"
+      NACOS_ADDR: nacos:8848
+    ports:
+      - "8803:8803"
+    networks:
+      - diary-net
+
+  diary-love:
+    build:
+      context: .
+      dockerfile: diary-love/Dockerfile
+    image: diary-love:0.1.0
+    restart: unless-stopped
+    environment:
+      SPRING_APPLICATION_NAME: diary-love
+      SERVER_PORT: "8810"
+      NACOS_ADDR: nacos:8848
+    ports:
+      - "8810:8810"
+    networks:
+      - diary-net
+
 networks:
   diary-net:
     external: true
