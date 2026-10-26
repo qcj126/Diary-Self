@@ -1,0 +1,21 @@
+services:
+  # Do not set container_name or ports here: Docker Compose must be free to
+  # create multiple replicas, and the gateway will be the public HTTP entry.
+  diary-ai:
+    build:
+      context: .
+      dockerfile: diary-AI/Dockerfile
+    image: diary-ai:0.1.0
+    restart: unless-stopped
+    environment:
+      SPRING_APPLICATION_NAME: diary-ai
+      NACOS_ADDR: nacos:8848
+    networks:
+      - diary-net
+
+# Nacos, MySQL, Redis, and RocketMQ are already running containers.  Reuse
+# their shared user-defined bridge network rather than recreating them here.
+networks:
+  diary-net:
+    external: true
+    name: diary-net
