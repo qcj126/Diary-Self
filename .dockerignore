@@ -1,0 +1,30 @@
+# Git 与 IDE
+.git/
+.idea/
+.vscode/
+**/*.iml
+
+# Maven 编译产物：必须在容器内重新构建
+**/target/
+
+# 前端依赖与构建产物
+**/node_modules/
+**/dist/
+
+# 日志与系统临时文件
+**/*.log
+**/.DS_Store
+**/Thumbs.db
+
+# 本地环境变量、密钥文件
+.env
+.env.*
+**/*.pem
+**/*.key
+
+# 当前项目中含敏感信息、且不会被 Spring 自动加载的文件
+**/src/main/resources/a
+
+# 与 diary-AI 构建无关的文档
+projectbook/
+**/docs/
