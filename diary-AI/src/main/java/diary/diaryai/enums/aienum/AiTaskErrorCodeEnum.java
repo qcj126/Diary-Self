@@ -9,6 +9,8 @@ public enum AiTaskErrorCodeEnum {
     RETRY_EXHAUSTED("重试次数耗尽"),
     SNAPSHOT_INVALID("快照数据无效"),
     SUBMIT_RATE_LIMITED("提交已被限流"),
+    MODEL_CAPACITY_EXHAUSTED("模型全局并发配额已满"),
+    REDIS_UNAVAILABLE("Redis 模型并发控制不可用"),
     OUTBOX_SEND_FAILED("outbox发送失败");
     private final String displayName;
     AiTaskErrorCodeEnum(String displayName) {

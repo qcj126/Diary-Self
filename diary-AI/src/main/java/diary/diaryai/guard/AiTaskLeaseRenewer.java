@@ -62,7 +62,7 @@ public class AiTaskLeaseRenewer {
         void close();
     }
 
-    private static final class LeaseThreadFactory implements ThreadFactory {
+    static final class LeaseThreadFactory implements ThreadFactory {
         @Override
         public Thread newThread(Runnable runnable) {
             Thread thread = new Thread(runnable, "ai-task-lease-renewer");

@@ -96,7 +96,11 @@ public interface DiaryAiMapper {
             @Param("lastError") String lastError
     );
 
-    int markQueuedByTaskIdIfWaiting(@Param("taskId") Long taskId);
+    // PENDING    → QUEUED：仅初始 AI_TASK_CREATED Outbox 成功发送后使用
+    int markQueuedFromPending(@Param("taskId") Long taskId);
+
+    // RETRY_WAIT → QUEUED：仅 AI_TASK_RETRY Outbox 成功发送后使用
+    int markQueuedFromRetryWait(@Param("taskId") Long taskId);
 
     List<AiTaskPO> selectExpiredRunningTasks(@Param("limit") int limit);
 
@@ -120,4 +124,6 @@ public interface DiaryAiMapper {
             @Param("taskId") Long taskId,
             @Param("userId") Long userId
     );
+    // 只允许状态转换：PENDING / QUEUED → RETRY_WAIT
+    int markRetryWaitIfDispatchable(AiTaskProcessDto request);
 }

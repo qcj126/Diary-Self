@@ -48,6 +48,20 @@ diary:
       submit-per-user-per-minute: 10
       model-local-concurrency: 5
       local-permit-wait-ms: 1000
+      global-model-permit:
+        # Worker 崩溃后，permit 最迟约 90 秒可被回收。
+        lease-seconds: 90
+        # 正常长任务每 20 秒续一次；必须明显小于 90 秒。
+        renewal-interval-seconds: 20
+        # 模型名额满时，延迟重投的基础等待时间。
+        capacity-retry-delay-seconds: 10
+        # Redis 故障时更保守地等待，优先保护供应商配额。
+        redis-unavailable-retry-delay-seconds: 30
+        models:
+          QWEN37PLUS:
+            max-concurrency: 5
+          DEEPSEEKV4PRO0813:
+            max-concurrency: 10
 
 # 使用 rocketmq-v5-client-spring-boot-starter 的正确配置
 rocketmq:

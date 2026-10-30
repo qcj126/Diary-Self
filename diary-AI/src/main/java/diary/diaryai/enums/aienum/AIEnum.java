@@ -16,6 +16,19 @@ public enum AIEnum {
         this.desc = desc;
     }
     public static boolean isSupport(Integer code) {
-        return Arrays.stream(values()).anyMatch(item -> item.code == code);
+        return code != null && Arrays.stream(values()).anyMatch(item -> item.code == code);
+    }
+
+    // 获取AI类型
+    public static AIEnum fromCode(Integer code) {
+        if (code == null) {
+            throw new IllegalArgumentException("AI code不能为空");
+        }
+        for (AIEnum aiEnum : AIEnum.values()) {
+            if (aiEnum.getCode() == code) {
+                return aiEnum;
+            }
+        }
+        throw new IllegalArgumentException("不支持的AI类型");
     }
 }

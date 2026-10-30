@@ -83,7 +83,7 @@ public class AiTaskSentimentApplicationServiceImpl implements AiTaskSentimentApp
                 .notEmpty(request.getClientRequestId(), "clientRequestId")
                 .notNull(request.getAiType(), "aiType")
                 .notNull(request.getLoveRecordId(), "loveRecordId");
-        if (!AIEnum.isSupport(request.getAiType())) {
+        if (AIEnum.isSupport(request.getAiType())) {
             throw new IllegalArgumentException("不支持的AI类型");
         }
     }

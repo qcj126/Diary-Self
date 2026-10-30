@@ -83,7 +83,7 @@ public class NutrientInvokeDeepseekPro extends InvokeAITemplate implements Invok
         GenerationParam param = GenerationParam.builder()
                 // 若没有配置环境变量，请用百炼API Key将下行替换为：.apiKey("sk-xxx")
                 .apiKey(apiKey)
-                .model("deepseek-v4-pro-0813")
+                .model(model)
                 .messages(Arrays.asList(systemMsg, userMsg))
                 .resultFormat(GenerationParam.ResultFormat.MESSAGE)
                 .enableThinking(true)

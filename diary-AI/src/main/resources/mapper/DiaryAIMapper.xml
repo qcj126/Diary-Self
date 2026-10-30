@@ -259,6 +259,24 @@
           AND version_id = #{versionId}
     </update>
 
+    <!--
+        模型全局并发池满或 Redis 暂不可用时，任务尚未进入 RUNNING，
+        因此不消耗 attempt_count，也不写 worker_id 或 lease_until。
+        条件状态更新同时防止重复消息创建多条延迟重试 Outbox。
+    -->
+    <update id="markRetryWaitIfDispatchable" parameterType="diary.diaryai.entity.ai.dto.AiTaskProcessDto">
+        UPDATE ai_task
+        SET status = 'RETRY_WAIT',
+            error_code = #{errorCode},
+            error_message = #{errorMessage},
+            update_time = CURRENT_TIMESTAMP,
+            version_id = version_id + 1
+        WHERE id = #{taskId}
+          AND user_id = #{userId}
+          AND client_request_id = #{clientRequestId}
+          AND status IN ('PENDING', 'QUEUED')
+    </update>
+
     <update id="markSuccessIfOwned" parameterType="diary.diaryai.entity.ai.dto.AiTaskProcessDto">
         <!-- 旧 Worker 必须同时匹配 worker_id 和抢占后的 version_id，避免租约恢复后覆盖新 Worker 的结果。 -->
         UPDATE ai_task
@@ -377,7 +395,7 @@
         VALUES
             (#{id}, #{eventId}, #{aggregateType}, #{aggregateId}, #{eventType},
              #{topic}, #{tag}, #{messageKey}, #{payload}, #{schemaVersion},
-             #{status}, #{retryCount}, #{maxRetries}, CURRENT_TIMESTAMP,
+             #{status}, #{retryCount}, #{maxRetries}, #{nextRetryTime},
              CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, #{versionId})
     </insert>
 
@@ -423,11 +441,18 @@
         WHERE id = #{id} AND status = 'SENDING' AND version_id = #{versionId}
     </update>
 
-    <update id="markQueuedByTaskIdIfWaiting">
+    <update id="markQueuedFromPending">
         UPDATE ai_task
         SET status = 'QUEUED', queue_time = COALESCE(queue_time, CURRENT_TIMESTAMP),
             update_time = CURRENT_TIMESTAMP, version_id = version_id + 1
-        WHERE id = #{taskId} AND status IN ('PENDING', 'RETRY_WAIT')
+        WHERE id = #{taskId} AND status = 'PENDING'
+    </update>
+
+    <update id="markQueuedFromRetryWait">
+        UPDATE ai_task
+        SET status = 'QUEUED', queue_time = COALESCE(queue_time, CURRENT_TIMESTAMP),
+            update_time = CURRENT_TIMESTAMP, version_id = version_id + 1
+        WHERE id = #{taskId} AND status = 'RETRY_WAIT'
     </update>
 
     <select id="selectExpiredRunningTasks" resultMap="AiTaskResultMap">
@@ -451,7 +476,7 @@
         VALUES
         (#{id}, #{eventId}, #{aggregateType}, #{aggregateId}, #{eventType},
         #{topic}, #{tag}, #{messageKey}, #{payload}, #{schemaVersion},
-             #{status}, #{retryCount}, #{maxRetries}, CURRENT_TIMESTAMP,
+             #{status}, #{retryCount}, #{maxRetries}, #{nextRetryTime},
              CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, #{versionId})
     </insert>
 

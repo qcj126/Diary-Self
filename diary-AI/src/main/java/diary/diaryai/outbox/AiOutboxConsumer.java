@@ -7,10 +7,14 @@ import diary.diaryai.entity.ai.po.AiTaskPO;
 import diary.diaryai.enums.aienum.AiTaskStatusEnum;
 import diary.diaryai.enums.aienum.AiTaskTypeEnum;
 import diary.diaryai.executor.AiTaskExecutor;
+import diary.diaryai.executor.AiTaskModelResolver;
 import diary.diaryai.guard.LocalAiConcurrencyGuard;
 import diary.diaryai.guard.AiTaskLeaseRenewer;
+import diary.diaryai.guard.RedisModelPermitRenewer;
 import diary.diaryai.mapper.DiaryAiMapper;
 import diary.diaryai.properties.AiTaskProperties;
+import diary.diaryai.redis.RedisModelPermitManager;
+import diary.diaryai.service.AiTaskDispatchDeferralService;
 import diary.diaryai.service.AiTransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +47,10 @@ public class AiOutboxConsumer implements RocketMQListener {
     private final LocalAiConcurrencyGuard localAiConcurrencyGuard;
     private final AiTaskLeaseRenewer aiTaskLeaseRenewer;
     private final AiTransactionService aiTransactionService;
+    private final AiTaskModelResolver aiTaskModelResolver;
+    private final RedisModelPermitManager redisModelPermitManager;
+    private final RedisModelPermitRenewer redisModelPermitRenewer;
+    private final AiTaskDispatchDeferralService aiTaskDispatchDeferralService;
 
     @Override
     public ConsumeResult consume(MessageView messageView) {

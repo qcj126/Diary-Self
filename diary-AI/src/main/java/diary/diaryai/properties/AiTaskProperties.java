@@ -1,11 +1,18 @@
 package diary.diaryai.properties;
 
+import diary.diaryai.enums.aienum.AIEnum;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.Map;
 
 @Data
 @Component
@@ -76,5 +83,38 @@ public class AiTaskProperties {
         private int modelLocalConcurrency;
         @Min(0)
         private long localPermitWaitMs;
+        @Valid
+        private GlobalModelPermit globalModelPermit = new GlobalModelPermit();
+    }
+
+    @Data
+    public static class GlobalModelPermit {
+        @Min(1)
+        private int leaseSeconds;
+        @Min(1)
+        private int renewalIntervalSeconds;
+        @Min(1)
+        private int capacityRetryDelaySeconds;
+        @Min(1)
+        private int redisUnavailableRetryDelaySeconds;
+        @Valid
+        @NotEmpty
+        private Map<AIEnum, ModelPermit> models = new EnumMap<>(AIEnum.class);
+
+        @AssertTrue(message = "renewalIntervalSeconds 必须小于 leaseSeconds")
+        public boolean isRenewalIntervalBeforeLease() {
+            return renewalIntervalSeconds < leaseSeconds;
+        }
+
+        @AssertTrue(message = "每个 AIEnum 都必须配置全局并发配额")
+        public boolean isQuotaConfiguredForEveryModel() {
+            return models != null && models.keySet().containsAll(EnumSet.allOf(AIEnum.class));
+        }
+    }
+
+    @Data
+    public static class ModelPermit {
+        @Min(1)
+        private int maxConcurrency;
     }
 }

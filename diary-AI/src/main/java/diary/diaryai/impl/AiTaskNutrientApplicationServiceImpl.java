@@ -100,7 +100,7 @@ public class AiTaskNutrientApplicationServiceImpl implements AiTaskNutrientAppli
                 .notNull(request.getIngredients(), "ingredients")
                 .stringKeyMapNotContainsEmpty(request.getIngredients(), "ingredients")
                 .notNull(request.getUniversalId(), "universalId");
-        if (!AIEnum.isSupport(request.getAiType())) {
+        if (AIEnum.isSupport(request.getAiType())) {
             throw new IllegalArgumentException("不支持的AI类型");
         }
         request.setClientRequestId(request.getClientRequestId().trim());

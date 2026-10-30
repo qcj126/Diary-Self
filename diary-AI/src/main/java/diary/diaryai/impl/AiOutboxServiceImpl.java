@@ -43,10 +43,15 @@ public class AiOutboxServiceImpl implements AiOutboxService {
             throw new IllegalStateException("Outbox SENT 更新失败: " + outbox.getId());
         }
 
-        // 确认消息投递成功后，将状态为PENDING和RETRY_WAIT的任务更新为 QUEUED
-        if (isTaskDispatchEvent(outbox)) {
-            // 首次发送和恢复消息都已进入 Broker，对外统一表达为 QUEUED。
-            diaryAiMapper.markQueuedByTaskIdIfWaiting(outbox.getAggregateId());
+        /*
+         * 初始 Outbox 与延迟重试 Outbox 的状态前置条件不同。
+         * 不能将两者合并为 PENDING/RETRY_WAIT → QUEUED，否则原始消息的发送确认
+         * 可能覆盖 Consumer 刚写入的 RETRY_WAIT，导致容量等待被提前绕过。
+         */
+        if (OutboxEventTypeEnum.AI_TASK_CREATED.name().equals(outbox.getEventType())) {
+            diaryAiMapper.markQueuedFromPending(outbox.getAggregateId());
+        } else if (OutboxEventTypeEnum.AI_TASK_RETRY.name().equals(outbox.getEventType())) {
+            diaryAiMapper.markQueuedFromRetryWait(outbox.getAggregateId());
         }
     }
 
