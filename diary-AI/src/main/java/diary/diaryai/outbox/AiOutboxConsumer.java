@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import diary.diaryai.entity.ai.dto.AiTaskMessageDto;
 import diary.diaryai.entity.ai.dto.AiTaskProcessDto;
 import diary.diaryai.entity.ai.po.AiTaskPO;
+import diary.diaryai.enums.aienum.AIEnum;
+import diary.diaryai.enums.aienum.AiTaskErrorCodeEnum;
 import diary.diaryai.enums.aienum.AiTaskStatusEnum;
 import diary.diaryai.enums.aienum.AiTaskTypeEnum;
 import diary.diaryai.executor.AiTaskExecutor;
@@ -25,8 +27,10 @@ import org.apache.rocketmq.client.core.RocketMQListener;
 import org.springframework.stereotype.Service;
 
 import java.nio.ByteBuffer;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static diary.diaryai.consts.MqTaskConst.OUTBOX_SCHEMA_VERSION;
 
@@ -37,8 +41,8 @@ import static diary.diaryai.consts.MqTaskConst.OUTBOX_SCHEMA_VERSION;
         tag = "${diary.ai.rocketmq.ai-task-consumer-tag:NUTRIENT_ANALYSE || SENTIMENT_ANALYSIS}",
         sslEnabled = false
 )
-@RequiredArgsConstructor
 @Slf4j
+@RequiredArgsConstructor
 public class AiOutboxConsumer implements RocketMQListener {
     private final AiTaskProperties aiTaskProperties;
     private final ObjectMapper objectMapper;
@@ -71,14 +75,45 @@ public class AiOutboxConsumer implements RocketMQListener {
             return ConsumeResult.FAILURE;
         }
 
+        final AiTaskPO candidateTask;
+        try {
+            candidateTask = diaryAiMapper.selectAiTaskByTaskId(message.getTaskId());
+        } catch (RuntimeException databaseException) {
+            log.error("读取 AI 任务失败，taskId={}", message.getTaskId(), databaseException);
+            return ConsumeResult.FAILURE;
+        }
+
+        if (candidateTask == null) {
+            log.error("AI 任务不存在，taskId={}", message.getTaskId());
+            return ConsumeResult.FAILURE;
+        }
+
+        if (!AiTaskStatusEnum.PENDING.name().equals(candidateTask.getStatus())
+                && !AiTaskStatusEnum.QUEUED.name().equals(candidateTask.getStatus())) {
+            return handleUnclaimedMessage(message);
+        }
+
+        final AIEnum model;
+        try {
+            model = aiTaskModelResolver.resolve(candidateTask);
+        } catch (IllegalArgumentException resolveException) {
+            log.error("AI 任务模型解析失败，taskId={}", message.getTaskId(), resolveException);
+            return ConsumeResult.FAILURE;
+        }
+
+        log.debug("AI 任务模型已解析，taskId={}, model={}", message.getTaskId(), model);
+
         // 在任务进入处理前，执行并发保护
         if (!localAiConcurrencyGuard.tryAcquire()) {
             log.warn("本地AI并发已满, taskId={}", message.getTaskId());
             return ConsumeResult.FAILURE;
         }
 
+        boolean globalPermitAcquired = false;
+        final String workerId = "diary-ai-" + UUID.randomUUID();
+        final String permitId = createGlobalPermitId(candidateTask.getId(), workerId);
         try {
-            final String workerId = "diary-ai-" + UUID.randomUUID();
+
             AiTaskProcessDto claimRequest = AiTaskProcessDto.builder()
                     .taskId(message.getTaskId())
                     .userId(message.getUserId())
@@ -86,6 +121,29 @@ public class AiOutboxConsumer implements RocketMQListener {
                     .workerId(workerId)
                     .leaseSeconds(aiTaskProperties.getTask().getExecutionLeaseSeconds())
                     .build();
+
+            final boolean acquired;
+            try {
+                acquired = redisModelPermitManager.tryAcquire(model, permitId);
+            } catch (RuntimeException redisException) {
+                log.warn("Redis 模型 permit 不可用，taskId={}, model={}",
+                        message.getTaskId(), model, redisException);
+                return deferForGlobalPermit(
+                        message,
+                        candidateTask,
+                        AiTaskErrorCodeEnum.REDIS_UNAVAILABLE,
+                        "Redis模型并发控制不可用，等待延迟重试");
+            }
+
+            if (!acquired) {
+                return deferForGlobalPermit(
+                        message,
+                        candidateTask,
+                        AiTaskErrorCodeEnum.MODEL_CAPACITY_EXHAUSTED,
+                        "模型全局并发配额已满，等待延迟重试");
+            }
+
+            globalPermitAcquired = true;
 
             final int claimed;
             try {
@@ -117,18 +175,20 @@ public class AiOutboxConsumer implements RocketMQListener {
 
             // 长时间模型调用期间持续续租，提交结果仍校验 workerId + versionId。
             /*
-            * 续租中的定时任务与关闭时序：
-            *   进入 try 块
-            *   → start() 创建定时续租 future
-            *   → 开始同步调用模型
-            *   → 模型调用结束，execute() 返回
-            *   → 离开 try 块
-            *   → Java 自动调用 ignored.close()
-            *   → close() 执行 future.cancel(false)
-            *   → 后续不再续租
-            * */
-            try (AiTaskLeaseRenewer.LeaseRenewalHandle ignored = aiTaskLeaseRenewer.start(
-                    claimedTask.getId(), workerId, claimedTask.getVersionId())) {
+             * 续租中的定时任务与关闭时序：
+             *   进入 try 块
+             *   → start() 创建定时续租 future
+             *   → 开始同步调用模型
+             *   → 模型调用结束，execute() 返回
+             *   → 离开 try 块
+             *   → Java 自动调用 ignored.close()
+             *   → close() 执行 future.cancel(false)
+             *   → 后续不再续租
+             * */
+            try (AiTaskLeaseRenewer.LeaseRenewalHandle leaseHandle =
+                         aiTaskLeaseRenewer.start(claimedTask.getId(), workerId, claimedTask.getVersionId());
+                 RedisModelPermitRenewer.PermitRenewalHandle permitHandle =
+                         redisModelPermitRenewer.start(model, permitId)) {
                 boolean executed = aiTaskExecutor.execute(message, claimedTask);
                 return executed ? ConsumeResult.SUCCESS : handleOwnershipLost(message.getTaskId());
             } catch (Exception executionException) {
@@ -146,6 +206,14 @@ public class AiOutboxConsumer implements RocketMQListener {
                 }
             }
         } finally {
+            if (globalPermitAcquired) {
+                try {
+                    redisModelPermitManager.release(model, permitId);
+                } catch (RuntimeException releaseException) {
+                    log.warn("释放 Redis 模型 permit 失败，等待租约自动回收，taskId={}, permitId={}",
+                            message.getTaskId(), permitId, releaseException);
+                }
+            }
             localAiConcurrencyGuard.release();
         }
     }
@@ -154,15 +222,15 @@ public class AiOutboxConsumer implements RocketMQListener {
         AiTaskPO currentTask = diaryAiMapper.selectAiTaskByTaskId(message.getTaskId());
         if (currentTask == null) {
             /*
-            * 消息引用的 AI 任务不存在：可能是误投、跨环境消息、数据被清理或读库延迟
-            * 可能的异常场景包括：
-            *       - 消息是其他服务、测试脚本或人工误投到该 Topic 的；
-            *       - 消息体的 taskId 错误、被篡改或协议版本不兼容；
-            *       - 有人手工删除/清理了 ai_task，但 Broker 中仍保留旧消息；
-            *       - 消息来自另一套环境，却误连到了当前环境的 Broker；
-            *       - 读写分离时，查询误读到了尚未同步的从库；
-            *       - 极少见的数据损坏或历史迁移遗漏。
-            * */
+             * 消息引用的 AI 任务不存在：可能是误投、跨环境消息、数据被清理或读库延迟
+             * 可能的异常场景包括：
+             *       - 消息是其他服务、测试脚本或人工误投到该 Topic 的；
+             *       - 消息体的 taskId 错误、被篡改或协议版本不兼容；
+             *       - 有人手工删除/清理了 ai_task，但 Broker 中仍保留旧消息；
+             *       - 消息来自另一套环境，却误连到了当前环境的 Broker；
+             *       - 读写分离时，查询误读到了尚未同步的从库；
+             *       - 极少见的数据损坏或历史迁移遗漏。
+             * */
             log.error("AI task does not exist, taskId={}", message.getTaskId());
             return ConsumeResult.FAILURE;
         }
@@ -170,18 +238,18 @@ public class AiOutboxConsumer implements RocketMQListener {
         if (isTerminal(currentTask.getStatus())) {
             /* 重复消息遇到任务终态直接 ACK，避免 SUCCESS/FAILED 任务再次调用模型。 */
             /*
-            * 如果这里返回 ConsumeResult.FAILURE，RocketMQ 会认为“消费者处理失败”，然后：
-            * 同一条消息重投
-            *    → 又查到任务是 SUCCESS / FAILED
-            *    → 又返回 FAILURE
-            *    → 不断重试
-            *    → 达到重试上限后进入 DLQ
-            * 这不会带来任何新的业务进展，只会造成：
-            *    - 无意义的消息重投和日志噪声；
-            *    - 消费积压；
-            *    - 无意义的 DLQ 告警和人工排查；
-            *    - 某些情况下占用 Consumer 处理能力。
-            * */
+             * 如果这里返回 ConsumeResult.FAILURE，RocketMQ 会认为“消费者处理失败”，然后：
+             * 同一条消息重投
+             *    → 又查到任务是 SUCCESS / FAILED
+             *    → 又返回 FAILURE
+             *    → 不断重试
+             *    → 达到重试上限后进入 DLQ
+             * 这不会带来任何新的业务进展，只会造成：
+             *    - 无意义的消息重投和日志噪声；
+             *    - 消费积压；
+             *    - 无意义的 DLQ 告警和人工排查；
+             *    - 某些情况下占用 Consumer 处理能力。
+             * */
             return ConsumeResult.SUCCESS;
         }
 
@@ -270,5 +338,43 @@ public class AiOutboxConsumer implements RocketMQListener {
                 || AiTaskStatusEnum.FAILED.name().equals(status)
                 || AiTaskStatusEnum.CANCELLED.name().equals(status)
                 || AiTaskStatusEnum.DEAD_LETTER.name().equals(status);
+    }
+
+    // 计算模型并发容量满后或者Redis不可用后，下一次重试的时间：配置时间 + 随机抖动
+    private LocalDateTime calculateGlobalPermitRetryTime(AiTaskErrorCodeEnum errorCode) {
+        long baseDelaySeconds;
+        if (errorCode == AiTaskErrorCodeEnum.MODEL_CAPACITY_EXHAUSTED) {
+            baseDelaySeconds = aiTaskProperties.getLimit().getGlobalModelPermit().getCapacityRetryDelaySeconds();
+        } else if (errorCode == AiTaskErrorCodeEnum.REDIS_UNAVAILABLE) {
+            baseDelaySeconds = aiTaskProperties.getLimit().getGlobalModelPermit().getRedisUnavailableRetryDelaySeconds();
+        } else {
+            throw new IllegalArgumentException("不支持的全局模型 permit 延迟错误码: " + errorCode);
+        }
+
+        // 添加随机时间进行抖动
+        long jitterSeconds = ThreadLocalRandom.current().nextLong(0, 4);
+        return LocalDateTime.now().plusSeconds(baseDelaySeconds + jitterSeconds);
+    }
+
+    private ConsumeResult deferForGlobalPermit(AiTaskMessageDto message, AiTaskPO task, AiTaskErrorCodeEnum errorCode, String errorMessage) {
+        try {
+            LocalDateTime nextRetryTime = calculateGlobalPermitRetryTime(errorCode);
+
+            boolean deferred = aiTaskDispatchDeferralService.deferForGlobalModelPermit(task, errorCode, errorMessage, nextRetryTime);
+
+            if (deferred) {
+                log.info("延迟重试已持久化，taskId={}，errorCode={}，nextRetryTime={}", task.getId(), errorCode, nextRetryTime);
+                return ConsumeResult.SUCCESS;
+            } else {
+                return handleUnclaimedMessage(message);
+            }
+        } catch (RuntimeException e) {
+            log.error("延迟 AI 任务重试失败，taskId={}, errorCode={}", message.getTaskId(), errorCode, e);
+            return ConsumeResult.FAILURE;
+        }
+    }
+
+    private String createGlobalPermitId(Long taskId, String workerId) {
+        return taskId + ":" + workerId + ":" + UUID.randomUUID();
     }
 }
