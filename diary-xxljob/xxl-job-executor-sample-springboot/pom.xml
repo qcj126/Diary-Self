@@ -25,7 +25,6 @@
     </properties>
 
     <dependencies>
-        <!-- spring-boot-starter-web (spring-webmvc + tomcat) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
