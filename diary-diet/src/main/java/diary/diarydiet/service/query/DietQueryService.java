@@ -7,7 +7,7 @@ import diary.common.result.ApiResponse;
 import java.util.List;
 
 public interface DietQueryService {
-    ApiResponse<DietRecordVO> getDietRecordById(Long id);
+    ApiResponse<DietRecordVO> getDietRecordById(Long id, Long userId);
     ApiResponse<List<DietRecordVO>> getDietRecordsByUserId(Long userId);
     ApiResponse<List<DietRecordVO>> queryDietRecords(DietQueryDTO query);
     ApiResponse<String> queryFoodName(Long dietId, Long userId);

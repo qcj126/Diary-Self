@@ -2,6 +2,7 @@ package diary.diarydiet.controller;
 
 import diary.common.auth.CurrentUser;
 import diary.diarydiet.entity.dto.DietQueryDTO;
+import diary.diarydiet.entity.dto.DietRecordAddDTO;
 import diary.diarydiet.entity.dto.DietRecordDTO;
 import diary.diarydiet.entity.vo.DietRecordVO;
 import diary.common.result.ApiResponse;
@@ -32,9 +33,8 @@ public class DietController {
     // 增
     @OperLog(module = "饮食记录", description = "新增饮食记录", operationType = "INSERT", saveResult = true)
     @PostMapping("/add")
-    public ApiResponse<String> addDietRecord(@RequestBody DietRecordDTO dietRecordDTO) {
-        dietRecordDTO.setUserId(currentUser.getUser());
-        return dietAddService.addDietRecord(dietRecordDTO);
+    public ApiResponse<Long> addDietRecord(@RequestBody DietRecordAddDTO dietRecordAddDTO) {
+        return dietAddService.addDietRecord(dietRecordAddDTO, currentUser.getUser());
     }
 
     // 删
@@ -56,7 +56,7 @@ public class DietController {
     @OperLog(module = "饮食记录", description = "查询饮食记录详情", operationType = "SELECT", saveResult = true)
     @GetMapping("/query/{id}")
     public ApiResponse<DietRecordVO> getDietRecordById(@PathVariable Long id) {
-        return dietQueryService.getDietRecordById(id);
+        return dietQueryService.getDietRecordById(id, currentUser.getUser());
     }
 
     // 查 - 根据用户ID查询所有记录

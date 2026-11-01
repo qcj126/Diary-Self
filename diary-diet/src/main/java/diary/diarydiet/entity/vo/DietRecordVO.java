@@ -75,11 +75,6 @@ public class DietRecordVO {
     private BigDecimal sodium;
 
     /**
-     * 饱腹感评分 1~10
-     */
-    private Byte fullnessScore;
-
-    /**
      * 用餐地点
      */
     private String location;

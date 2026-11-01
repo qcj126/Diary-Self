@@ -1,7 +1,7 @@
 package diary.diarydiet.impl.add;
 
 import diary.diarydiet.entity.convert.DTOConvertToPO;
-import diary.diarydiet.entity.dto.DietRecordDTO;
+import diary.diarydiet.entity.dto.DietRecordAddDTO;
 import diary.diarydiet.entity.po.DietRecordPO;
 import diary.common.result.ApiResponse;
 import diary.diarydiet.support.DietRecordValidator;
@@ -17,16 +17,17 @@ public class DietAddServiceImpl implements DietAddService {
     private DietMapper dietMapper;
 
     @Override
-    public ApiResponse<String> addDietRecord(DietRecordDTO dietRecordDTO) {
-        DietRecordValidator.validateForAdd(dietRecordDTO);
+    public ApiResponse<Long> addDietRecord(DietRecordAddDTO dietRecordAddDTO, Long userId) {
+        DietRecordValidator.validateForAdd(dietRecordAddDTO, userId);
 
         long primaryKey = MyUtils.getPrimaryKey();
-        DietRecordPO dietRecordPO = DTOConvertToPO.dietRecordDTOConvertToPO(dietRecordDTO, primaryKey);
+        DietRecordPO dietRecordPO = DTOConvertToPO.dietRecordAddDTOConvertToPO(
+                dietRecordAddDTO, primaryKey, userId);
         dietRecordPO.setDeleted(false);
 
         if (dietMapper.insert(dietRecordPO) != 1) {
-            return ApiResponse.addFail();
+            return ApiResponse.fail(291, "添加失败");
         }
-        return ApiResponse.success("饮食记录添加成功");
+        return ApiResponse.success(primaryKey);
     }
 }

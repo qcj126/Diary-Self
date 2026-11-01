@@ -1,6 +1,8 @@
 package diary.diaryai.controller;
 
 import diary.common.auth.CurrentUser;
+import diary.common.entity.ai.dto.AiNutrientBatchQueryDTO;
+import diary.common.entity.ai.vo.AiNutrientVO;
 import diary.diaryai.entity.ai.dto.AiInvokeDTO;
 import diary.diaryai.entity.ai.dto.LoveRecordSentimentSubmitDTO;
 import diary.diaryai.entity.ai.vo.AiTaskResultVo;
@@ -12,6 +14,7 @@ import diary.diaryai.enums.aienum.AiTaskStatusEnum;
 import diary.common.result.ApiResponse;
 import diary.config.logconfig.OperLog;
 import diary.diaryai.service.AiTaskNutrientApplicationService;
+import diary.diaryai.service.AiNutrientQueryService;
 import diary.diaryai.service.AiTaskQueryService;
 import diary.diaryai.service.AiTaskSentimentApplicationService;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +36,7 @@ import java.util.List;
 @RequestMapping("/ai")
 public class DiaryAIController {
     private final AiTaskNutrientApplicationService aiTaskApplicationService;
+    private final AiNutrientQueryService aiNutrientQueryService;
     private final AiTaskSentimentApplicationService aiTaskSentimentApplicationService;
     private final AiTaskQueryService aiTaskQueryService;
     private final CurrentUser currentUser;
@@ -44,6 +48,15 @@ public class DiaryAIController {
         return ResponseEntity.accepted()
                 .location(URI.create("/ai/tasks/" + submitted.getTaskId()))
                 .body(ApiResponse.success(submitted));
+    }
+
+    @OperLog(module = "AI", description = "批量查询饮食最新营养分析结果", operationType = "SELECT", saveParams = false, saveResult = false)
+    @PostMapping("/nutrient/query/diets/latest")
+    public ApiResponse<List<AiNutrientVO>> latestDietNutrients(
+            @RequestBody AiNutrientBatchQueryDTO request
+    ) {
+        return ApiResponse.success(aiNutrientQueryService.getLatestDietNutrients(
+                request == null ? null : request.getDietIds(), currentUser.getUser()));
     }
 
     @OperLog(module = "AI", description = "提交AI恋爱记录情感分析任务", operationType = "INSERT", saveParams = false, saveResult = false)

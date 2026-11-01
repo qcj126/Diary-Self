@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 public interface AiTaskDispatchDeferralService {
     boolean deferForGlobalModelPermit(
             AiTaskPO task,
+            String sourceEventId,
             AiTaskErrorCodeEnum errorCode,
             String errorMessage,
             LocalDateTime nextRetryTime

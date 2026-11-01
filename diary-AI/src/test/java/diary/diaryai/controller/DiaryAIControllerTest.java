@@ -1,12 +1,15 @@
 package diary.diaryai.controller;
 
 import diary.common.auth.CurrentUser;
+import diary.common.entity.ai.dto.AiNutrientBatchQueryDTO;
+import diary.common.entity.ai.vo.AiNutrientVO;
 import diary.common.result.ApiResponse;
 import diary.diaryai.entity.ai.vo.AiSentimentTaskResultVo;
 import diary.diaryai.entity.ai.vo.AiTaskResultVo;
 import diary.diaryai.entity.ai.vo.AiTaskStatusVo;
 import diary.diaryai.entity.ai.vo.AiTaskSummaryVo;
 import diary.diaryai.service.AiTaskNutrientApplicationService;
+import diary.diaryai.service.AiNutrientQueryService;
 import diary.diaryai.service.AiTaskQueryService;
 import diary.diaryai.service.AiTaskSentimentApplicationService;
 import org.junit.jupiter.api.Test;
@@ -32,6 +35,8 @@ class DiaryAIControllerTest {
     @Mock
     private AiTaskNutrientApplicationService aiTaskNutrientApplicationService;
     @Mock
+    private AiNutrientQueryService aiNutrientQueryService;
+    @Mock
     private AiTaskSentimentApplicationService aiTaskSentimentApplicationService;
     @Mock
     private AiTaskQueryService aiTaskQueryService;
@@ -39,6 +44,24 @@ class DiaryAIControllerTest {
     private CurrentUser currentUser;
     @InjectMocks
     private DiaryAIController controller;
+
+    @Test
+    void shouldReturnLatestDietNutrients() {
+        AiNutrientBatchQueryDTO request = new AiNutrientBatchQueryDTO();
+        request.setDietIds(List.of(30001L));
+        List<AiNutrientVO> nutrients = List.of(AiNutrientVO.builder()
+                .universalId(30001L)
+                .calory("500 kcal")
+                .build());
+        when(currentUser.getUser()).thenReturn(USER_ID);
+        when(aiNutrientQueryService.getLatestDietNutrients(request.getDietIds(), USER_ID))
+                .thenReturn(nutrients);
+
+        ApiResponse<List<AiNutrientVO>> response = controller.latestDietNutrients(request);
+
+        assertEquals(nutrients, response.getData());
+        verify(aiNutrientQueryService).getLatestDietNutrients(request.getDietIds(), USER_ID);
+    }
 
     @Test
     void shouldReturnTaskSummaryList() {

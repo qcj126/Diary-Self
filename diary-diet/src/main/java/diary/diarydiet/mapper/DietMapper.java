@@ -19,6 +19,8 @@ public interface DietMapper {
      * 根据ID查询饮食记录
      */
     DietRecordPO selectById(@Param("id") Long id);
+
+    DietRecordPO selectByIdAndUserId(@Param("id") Long id, @Param("userId") Long userId);
     
     /**
      * 根据ID更新饮食记录

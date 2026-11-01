@@ -1,11 +1,11 @@
 package diary.diarydiet.support;
 
 import diary.diarydiet.entity.dto.DietQueryDTO;
+import diary.diarydiet.entity.dto.DietRecordAddDTO;
 import diary.diarydiet.entity.dto.DietRecordDTO;
 import diary.common.exception.ParamIllegalException;
 import diary.utils.commonutil.MyUtils;
 
-import java.math.BigDecimal;
 import java.util.Set;
 
 /**
@@ -19,26 +19,27 @@ public final class DietRecordValidator {
     private DietRecordValidator() {
     }
 
-    public static void validateForAdd(DietRecordDTO dto) {
+    public static void validateForAdd(DietRecordAddDTO dto, Long userId) {
         runCheck(() -> MyUtils.check()
                 .notNull(dto, "dietRecord")
+                .notNull(userId, "userId")
+                .notNull(dto.getEatTime(), "eatTime")
+                .notNull(dto.getMealType(), "mealType")
+                .notEmpty(dto.getFoodName(), "foodName")
+                .notEmpty(dto.getLocation(), "location"));
+        validateMealType(dto.getMealType());
+    }
+
+    public static void validateForUpdate(DietRecordDTO dto) {
+        runCheck(() -> MyUtils.check()
+                .notNull(dto, "dietRecord")
+                .notNull(dto.getId(), "id")
                 .notNull(dto.getUserId(), "userId")
                 .notNull(dto.getEatTime(), "eatTime")
                 .notNull(dto.getMealType(), "mealType")
                 .notEmpty(dto.getFoodName(), "foodName")
-                .notNull(dto.getCalories(), "calories")
-                .notNull(dto.getProtein(), "protein")
-                .notNull(dto.getFat(), "fat")
-                .notNull(dto.getCarbohydrate(), "carbohydrate")
-                .notNull(dto.getSugar(), "sugar")
-                .notNull(dto.getSodium(), "sodium")
                 .notEmpty(dto.getLocation(), "location"));
-        validateValues(dto);
-    }
-
-    public static void validateForUpdate(DietRecordDTO dto) {
-        runCheck(() -> MyUtils.check().notNull(dto, "dietRecord").notNull(dto.getId(), "id"));
-        validateForAdd(dto);
+        validateMealType(dto.getMealType());
     }
 
     public static void validateQuery(DietQueryDTO query) {
@@ -54,31 +55,9 @@ public final class DietRecordValidator {
         runCheck(() -> MyUtils.check().notNull(id, "id"));
     }
 
-    private static void validateValues(DietRecordDTO dto) {
-        validateMealType(dto.getMealType());
-        if (dto.getCalories() < 0) {
-            throw new ParamIllegalException("calories 不能为负数");
-        }
-        validateNonNegative(dto.getProtein(), "protein");
-        validateNonNegative(dto.getFat(), "fat");
-        validateNonNegative(dto.getCarbohydrate(), "carbohydrate");
-        validateNonNegative(dto.getSugar(), "sugar");
-        validateNonNegative(dto.getSodium(), "sodium");
-        if (dto.getFullnessScore() != null
-                && (dto.getFullnessScore() < 1 || dto.getFullnessScore() > 10)) {
-            throw new ParamIllegalException("fullnessScore 必须在 1 到 10 之间");
-        }
-    }
-
     private static void validateMealType(Byte mealType) {
         if (mealType != null && !MEAL_TYPES.contains(mealType)) {
             throw new ParamIllegalException("mealType 不在允许范围内");
-        }
-    }
-
-    private static void validateNonNegative(BigDecimal value, String fieldName) {
-        if (value != null && value.compareTo(BigDecimal.ZERO) < 0) {
-            throw new ParamIllegalException(fieldName + " 不能为负数");
         }
     }
 

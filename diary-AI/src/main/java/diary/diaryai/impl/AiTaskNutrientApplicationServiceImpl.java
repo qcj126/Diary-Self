@@ -97,14 +97,16 @@ public class AiTaskNutrientApplicationServiceImpl implements AiTaskNutrientAppli
                 .notEmpty(request.getClientRequestId(), "clientRequestId")
                 .notNull(request.getAiType(), "aiType")
                 .notEmpty(request.getFlag(), "flag")
+                .notEmpty(request.getCookWay(), "cookWay")
                 .notNull(request.getIngredients(), "ingredients")
                 .stringKeyMapNotContainsEmpty(request.getIngredients(), "ingredients")
                 .notNull(request.getUniversalId(), "universalId");
-        if (AIEnum.isSupport(request.getAiType())) {
+        if (!AIEnum.isSupport(request.getAiType())) {
             throw new IllegalArgumentException("不支持的AI类型");
         }
         request.setClientRequestId(request.getClientRequestId().trim());
         request.setFlag(request.getFlag().trim().toUpperCase(Locale.ROOT));
+        request.setCookWay(request.getCookWay().trim());
 
         AiFlagEnum.isTrueFlag(request.getFlag());
     }

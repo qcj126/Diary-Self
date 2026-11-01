@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 分析任务完整流程与状态机</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --page-bg: light-dark(#f4f6f8, #111827);
+      --panel-bg: light-dark(#ffffff, #1f2937);
+      --text: light-dark(#172033, #f3f4f6);
+      --muted: light-dark(#667085, #a9b3c3);
+      --border: light-dark(#d0d5dd, #4b5563);
+      --grid: light-dark(#d9dee7, #263244);
+      --button-bg: light-dark(#ffffff, #273449);
+      --button-hover: light-dark(#eef2ff, #374151);
+      --primary: light-dark(#3157d5, #8aa4ff);
+      --normal: light-dark(#edf5ff, #182b45);
+      --wait: light-dark(#fff6de, #463919);
+      --run: light-dark(#eee9ff, #2d2651);
+      --success: light-dark(#e9f8ef, #183c2a);
+      --failed: light-dark(#fff0ef, #482421);
+      --system: light-dark(#f2f4f7, #2b3442);
+      --line: light-dark(#344054, #d0d5dd);
+      --accent-line: light-dark(#3157d5, #8aa4ff);
+      --danger-line: light-dark(#b42318, #ff9a94);
+      --warn-line: light-dark(#9a6700, #ffd58a);
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--page-bg); color: var(--text); font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif; }
+    .app { min-height: 100vh; display: grid; grid-template-rows: auto auto 1fr; }
+    header { padding: 16px 20px 12px; background: var(--panel-bg); border-bottom: 1px solid var(--border); }
+    h1 { margin: 0 0 6px; font-size: 20px; font-weight: 600; }
+    .hint { color: var(--muted); font-size: 13px; line-height: 1.55; }
+    .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 16px; background: var(--panel-bg); border-bottom: 1px solid var(--border); }
+    button { min-height: 34px; padding: 6px 12px; color: var(--text); background: var(--button-bg); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font: inherit; }
+    button:hover { background: var(--button-hover); }
+    button.active { color: var(--primary); border-color: var(--primary); }
+    .spacer { flex: 1; }
+    .scale-label { min-width: 54px; color: var(--muted); text-align: center; font-variant-numeric: tabular-nums; }
+    .viewport { position: relative; min-height: 700px; overflow: hidden; cursor: grab; background-image: linear-gradient(to right, color-mix(in srgb, var(--grid) 60%, transparent) 1px, transparent 1px), linear-gradient(to bottom, color-mix(in srgb, var(--grid) 60%, transparent) 1px, transparent 1px); background-size: 24px 24px; }
+    .viewport.dragging { cursor: grabbing; }
+    .canvas { position: absolute; left: 0; top: 0; padding: 28px; transform-origin: 0 0; user-select: none; }
+    .diagram { display: none; }
+    .diagram.active { display: block; }
+    svg { display: block; max-width: none; height: auto; overflow: visible; font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif; }
+    .flow-svg { width: 2300px; height: 1700px; }
+    .state-svg { width: 2050px; height: 1180px; }
+    .lane { fill: color-mix(in srgb, var(--panel-bg) 60%, transparent); stroke: var(--border); stroke-width: 2; stroke-dasharray: 7 7; }
+    .lane-title { fill: var(--text); font-size: 24px; font-weight: 600; }
+    .lane-subtitle { fill: var(--muted); font-size: 15px; }
+    .node rect, .state rect { stroke: var(--line); stroke-width: 2; rx: 14; ry: 14; filter: drop-shadow(0 3px 5px color-mix(in srgb, var(--line) 15%, transparent)); }
+    .node.normal rect, .state.pending rect, .state.queued rect { fill: var(--normal); }
+    .node.wait rect, .state.retry rect { fill: var(--wait); stroke: var(--warn-line); }
+    .node.run rect, .state.running rect { fill: var(--run); stroke: var(--accent-line); }
+    .node.success rect, .state.success rect { fill: var(--success); }
+    .node.failed rect, .state.failed rect { fill: var(--failed); stroke: var(--danger-line); }
+    .node.system rect, .state.system rect { fill: var(--system); }
+    .node-title, .state-title { fill: var(--text); font-size: 18px; font-weight: 600; text-anchor: middle; }
+    .node-desc, .state-desc { fill: var(--muted); font-size: 14px; text-anchor: middle; }
+    .small { fill: var(--muted); font-size: 13px; }
+    .label { fill: var(--text); font-size: 14px; font-weight: 500; text-anchor: middle; }
+    .label-bg { fill: var(--panel-bg); opacity: .94; }
+    .arrow { fill: none; stroke: var(--line); stroke-width: 2.5; marker-end: url(#arrow); }
+    .arrow-primary { fill: none; stroke: var(--accent-line); stroke-width: 3; marker-end: url(#arrow-primary); }
+    .arrow-warn { fill: none; stroke: var(--warn-line); stroke-width: 3; marker-end: url(#arrow-warn); }
+    .arrow-danger { fill: none; stroke: var(--danger-line); stroke-width: 3; marker-end: url(#arrow-danger); }
+    .arrow-dashed { stroke-dasharray: 9 7; }
+    .legend { fill: var(--panel-bg); stroke: var(--border); stroke-width: 1.5; rx: 12; }
+    .legend-text { fill: var(--text); font-size: 14px; }
+    .legend-note { fill: var(--muted); font-size: 13px; }
+    .dot-normal { fill: var(--normal); stroke: var(--line); }
+    .dot-wait { fill: var(--wait); stroke: var(--warn-line); }
+    .dot-run { fill: var(--run); stroke: var(--accent-line); }
+    .dot-success { fill: var(--success); stroke: var(--line); }
+    .dot-failed { fill: var(--failed); stroke: var(--danger-line); }
+    @media (max-width: 640px) { header { padding: 14px 14px 10px; } .toolbar { padding: 8px 10px; } .viewport { min-height: 590px; } .spacer { display: none; } }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Diary AI：分析任务完整流程与状态机</h1>
+    <div class="hint">阅读顺序：先看“完整处理流程”，再切换到“任务状态机”。黄色是等待重试，紫色是正在执行，绿色/红色是终态。</div>
+  </header>
+  <nav class="toolbar" aria-label="流程图工具栏">
+    <button id="flow-tab" class="active" type="button" aria-pressed="true">完整处理流程</button>
+    <button id="state-tab" type="button" aria-pressed="false">任务状态机</button>
+    <span class="spacer"></span>
+    <button id="zoom-out" type="button" aria-label="缩小">−</button>
+    <span id="scale-label" class="scale-label">100%</span>
+    <button id="zoom-in" type="button" aria-label="放大">＋</button>
+    <button id="fit" type="button">适应窗口</button>
+    <button id="fullscreen" type="button">全屏</button>
+  </nav>
+
+  <main id="viewport" class="viewport" aria-label="可缩放、可拖动的 AI 任务流程图">
+    <div id="canvas" class="canvas">
+      <section id="flow-diagram" class="diagram active" aria-label="AI 分析任务完整处理流程">
+        <svg class="flow-svg" viewBox="0 0 2300 1700" role="img" aria-labelledby="flow-title flow-desc">
+          <title id="flow-title">AI 分析任务从提交、投递、执行到结束的完整流程</title>
+          <desc id="flow-desc">包含 Outbox 投递、RocketMQ 消费、本地与 Redis 模型并发保护、任务租约、延迟重试和定时恢复流程。</desc>
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--line)"/></marker>
+            <marker id="arrow-primary" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--accent-line)"/></marker>
+            <marker id="arrow-warn" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--warn-line)"/></marker>
+            <marker id="arrow-danger" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--danger-line)"/></marker>
+          </defs>
+
+          <rect class="lane" x="30" y="120" width="430" height="1260" rx="20"/>
+          <text class="lane-title" x="70" y="160">① 提交：创建可靠任务</text>
+          <text class="lane-subtitle" x="70" y="187">API / MySQL 本地事务</text>
+          <rect class="lane" x="490" y="120" width="390" height="1260" rx="20"/>
+          <text class="lane-title" x="530" y="160">② 投递：Outbox + MQ</text>
+          <text class="lane-subtitle" x="530" y="187">Publisher / RocketMQ</text>
+          <rect class="lane" x="910" y="120" width="580" height="1260" rx="20"/>
+          <text class="lane-title" x="950" y="160">③ 消费：先保护资源，再抢任务</text>
+          <text class="lane-subtitle" x="950" y="187">Consumer / Semaphore / Redis / MySQL</text>
+          <rect class="lane" x="1520" y="120" width="350" height="1260" rx="20"/>
+          <text class="lane-title" x="1560" y="160">④ 模型调用</text>
+          <text class="lane-subtitle" x="1560" y="187">AI 供应商</text>
+          <rect class="lane" x="1900" y="120" width="370" height="1260" rx="20"/>
+          <text class="lane-title" x="1940" y="160">⑤ 结果与恢复</text>
+          <text class="lane-subtitle" x="1940" y="187">任务终态 / 定时任务</text>
+
+          <!-- 第一列：提交 -->
+          <g class="node normal"><rect x="105" y="245" width="280" height="92"/><text class="node-title" x="245" y="280">客户端提交 AI 分析</text><text class="node-desc" x="245" y="307">带 clientRequestId（幂等键）</text></g>
+          <g class="node normal"><rect x="105" y="410" width="280" height="110"/><text class="node-title" x="245" y="447">校验请求 + 提交限流</text><text class="node-desc" x="245" y="474">用户每分钟限流、参数规范化</text><text class="node-desc" x="245" y="496">重复提交直接返回已有任务</text></g>
+          <g class="node normal"><rect x="85" y="600" width="320" height="144"/><text class="node-title" x="245" y="638">一个本地数据库事务</text><text class="node-desc" x="245" y="666">ai_task：PENDING</text><text class="node-desc" x="245" y="690">mq_outbox：AI_TASK_CREATED / NEW</text><text class="node-desc" x="245" y="714">任务和待发消息一起提交</text></g>
+
+          <!-- 第二列：Outbox -->
+          <g class="node system"><rect x="545" y="300" width="280" height="115"/><text class="node-title" x="685" y="337">Outbox Publisher 定时扫描</text><text class="node-desc" x="685" y="364">扫描 NEW / 到期 RETRY_WAIT</text><text class="node-desc" x="685" y="388">先发送，再确认 SENT</text></g>
+          <g class="node normal"><rect x="545" y="515" width="280" height="118"/><text class="node-title" x="685" y="552">Broker 投递任务消息</text><text class="node-desc" x="685" y="580">AI_TASK_CREATED 或 AI_TASK_RETRY</text><text class="node-desc" x="685" y="605">Message Key = taskId</text></g>
+          <g class="node normal"><rect x="545" y="730" width="280" height="124"/><text class="node-title" x="685" y="766">发送确认后推进状态</text><text class="node-desc" x="685" y="794">CREATED：PENDING → QUEUED</text><text class="node-desc" x="685" y="820">RETRY：RETRY_WAIT → QUEUED</text></g>
+          <g class="node system"><rect x="535" y="1010" width="300" height="154"/><text class="node-title" x="685" y="1047">重要：投递早于确认的竞态</text><text class="node-desc" x="685" y="1075">Broker 可能已把 RETRY 消息交给 Consumer</text><text class="node-desc" x="685" y="1100">Consumer 发现 RETRY_WAIT 时，先安全推进</text><text class="node-desc" x="685" y="1125">为 QUEUED，再继续处理，避免消息被白白 ACK</text></g>
+
+          <!-- 第三列：消费与并发控制 -->
+          <g class="node normal"><rect x="1055" y="270" width="290" height="105"/><text class="node-title" x="1200" y="306">Consumer 收到消息</text><text class="node-desc" x="1200" y="334">校验协议、读取 ai_task</text><text class="node-desc" x="1200" y="356">终态或被其他 Worker 占有：ACK</text></g>
+          <g class="node normal"><rect x="1055" y="450" width="290" height="100"/><text class="node-title" x="1200" y="486">解析本任务的模型</text><text class="node-desc" x="1200" y="514">从任务快照解析 AIEnum</text><text class="node-desc" x="1200" y="536">如 QWEN37PLUS / DEEPSEEKV4PRO0813</text></g>
+          <g class="node normal"><rect x="1055" y="620" width="290" height="105"/><text class="node-title" x="1200" y="656">获取本地 Semaphore</text><text class="node-desc" x="1200" y="684">仅保护当前 diary-ai 实例</text><text class="node-desc" x="1200" y="706">满时返回 FAILURE，由 MQ 稍后重投</text></g>
+          <g class="node run"><rect x="1055" y="800" width="290" height="145"/><text class="node-title" x="1200" y="837">获取 Redis 全局 permit</text><text class="node-desc" x="1200" y="865">按“模型”维度的 ZSet 名额池</text><text class="node-desc" x="1200" y="890">Qwen=5，DeepSeek=10（示例）</text><text class="node-desc" x="1200" y="915">成员为唯一 permitId，带过期时间</text></g>
+          <g class="node run"><rect x="1055" y="1030" width="290" height="130"/><text class="node-title" x="1200" y="1067">MySQL 原子抢占任务</text><text class="node-desc" x="1200" y="1095">QUEUED → RUNNING</text><text class="node-desc" x="1200" y="1120">写 workerId、leaseUntil、attemptCount</text><text class="node-desc" x="1200" y="1143">抢占失败：释放 Redis permit</text></g>
+
+          <!-- 容量/Redis 分支 -->
+          <g class="node wait"><rect x="930" y="1240" width="260" height="120"/><text class="node-title" x="1060" y="1277">模型名额已满</text><text class="node-desc" x="1060" y="1305">不调用模型</text><text class="node-desc" x="1060" y="1328">MODEL_CAPACITY_EXHAUSTED</text></g>
+          <g class="node wait"><rect x="1210" y="1240" width="260" height="120"/><text class="node-title" x="1340" y="1277">Redis 不可用</text><text class="node-desc" x="1340" y="1305">不调用模型，优先保护模型配额</text><text class="node-desc" x="1340" y="1328">REDIS_UNAVAILABLE</text></g>
+          <g class="node wait"><rect x="1020" y="1430" width="370" height="164"/><text class="node-title" x="1205" y="1467">同一事务：延迟重试</text><text class="node-desc" x="1205" y="1495">任务 → RETRY_WAIT；写 errorCode / nextRetryTime</text><text class="node-desc" x="1205" y="1520">新建 AI_TASK_RETRY Outbox（sourceEventId = 当前 eventId）</text><text class="node-desc" x="1205" y="1545">唯一约束避免同一来源消息重复创建重试事件</text><text class="node-desc" x="1205" y="1568">持久化成功后 ACK；到期后由 Publisher 再投递</text></g>
+
+          <!-- 第四列：执行 -->
+          <g class="node run"><rect x="1560" y="570" width="270" height="145"/><text class="node-title" x="1695" y="607">续租后调用模型</text><text class="node-desc" x="1695" y="635">MySQL 任务租约：任务归属</text><text class="node-desc" x="1695" y="660">Redis permit 租约：全局名额</text><text class="node-desc" x="1695" y="685">两者均定期续期</text></g>
+          <g class="node normal"><rect x="1560" y="810" width="270" height="110"/><text class="node-title" x="1695" y="847">AiTaskExecutor 执行</text><text class="node-desc" x="1695" y="875">调用供应商、解析与校验结果</text><text class="node-desc" x="1695" y="898">提交结果时仍校验任务所有权</text></g>
+          <g class="node system"><rect x="1560" y="1030" width="270" height="120"/><text class="node-title" x="1695" y="1067">finally 一定清理</text><text class="node-desc" x="1695" y="1095">停止两种续租</text><text class="node-desc" x="1695" y="1120">释放 Redis permit + 本地 permit</text></g>
+
+          <!-- 第五列：终态与恢复 -->
+          <g class="node success"><rect x="1950" y="370" width="270" height="135"/><text class="node-title" x="2085" y="407">成功：SUCCESS</text><text class="node-desc" x="2085" y="435">结果数据 + SUCCESS + AI_COMPLETED Outbox</text><text class="node-desc" x="2085" y="460">同一事务提交</text><text class="node-desc" x="2085" y="483">任务结束</text></g>
+          <g class="node failed"><rect x="1950" y="610" width="270" height="135"/><text class="node-title" x="2085" y="647">不可重试：FAILED</text><text class="node-desc" x="2085" y="675">永久错误或尝试次数耗尽</text><text class="node-desc" x="2085" y="700">写 AI_FAILED Outbox</text><text class="node-desc" x="2085" y="723">任务结束</text></g>
+          <g class="node system"><rect x="1940" y="950" width="290" height="178"/><text class="node-title" x="2085" y="987">定时任务：租约恢复</text><text class="node-desc" x="2085" y="1015">周期扫描“RUNNING 且 lease_until 已过期”</text><text class="node-desc" x="2085" y="1040">不是扫描 RETRY_WAIT</text><text class="node-desc" x="2085" y="1065">未耗尽：RUNNING → RETRY_WAIT</text><text class="node-desc" x="2085" y="1090">同事务新建 AI_TASK_RETRY Outbox</text><text class="node-desc" x="2085" y="1113">随后 Publisher → MQ → Consumer 再次接管</text></g>
+
+          <!-- 主流程连线 -->
+          <path class="arrow-primary" d="M245 337 V410"/><path class="arrow-primary" d="M245 520 V600"/>
+          <path class="arrow-primary" d="M405 672 H545 V358"/>
+          <path class="arrow-primary" d="M685 415 V515"/><path class="arrow-primary" d="M825 574 H1055"/>
+          <path class="arrow" d="M685 633 V730"/>
+          <path class="arrow-primary" d="M1200 375 V450"/><path class="arrow-primary" d="M1200 550 V620"/><path class="arrow-primary" d="M1200 725 V800"/>
+          <path class="arrow-primary" d="M1345 872 H1510 V642 H1560"/>
+          <path class="arrow-primary" d="M1695 715 V810"/>
+          <path class="arrow-primary" d="M1830 865 H1950 V438"/>
+          <path class="arrow-primary" d="M1695 920 V1030"/>
+          <path class="arrow-primary" d="M1345 1095 H1560"/>
+          <path class="arrow-warn" d="M1125 945 V1165 H1060 V1240"/>
+          <path class="arrow-warn" d="M1275 945 V1165 H1340 V1240"/>
+          <path class="arrow-warn" d="M1060 1360 V1430"/><path class="arrow-warn" d="M1340 1360 V1430"/>
+          <path class="arrow-warn" d="M1020 1512 H880 V790"/>
+          <path class="arrow" d="M2085 950 V745"/>
+          <path class="arrow-danger" d="M1830 865 H1905 V677 H1950"/>
+
+          <!-- 重要说明标签 -->
+          <g><rect class="label-bg" x="1322" y="805" width="170" height="42" rx="8"/><text class="label" x="1407" y="831">获取成功</text></g>
+          <g><rect class="label-bg" x="1150" y="1165" width="250" height="42" rx="8"/><text class="label" x="1275" y="1191">获取失败的两种原因</text></g>
+          <g><rect class="label-bg" x="835" y="838" width="230" height="42" rx="8"/><text class="label" x="950" y="864">延迟到期重新投递</text></g>
+          <g><rect class="label-bg" x="1815" y="470" width="155" height="42" rx="8"/><text class="label" x="1892" y="496">执行成功</text></g>
+          <g><rect class="label-bg" x="1825" y="625" width="120" height="42" rx="8"/><text class="label" x="1885" y="651">终态失败</text></g>
+
+          <rect class="legend" x="50" y="1450" width="800" height="165"/>
+          <text class="legend-text" x="78" y="1485" font-weight="600">新手记忆口诀</text>
+          <text class="legend-note" x="78" y="1515">1. Outbox 负责“消息最终发出去”；RocketMQ 允许重复，所以 Consumer 必须幂等。</text>
+          <text class="legend-note" x="78" y="1542">2. 本地 Semaphore 管单实例，Redis permit 管所有实例合计的每个模型并发，MySQL 租约管任务所有权。</text>
+          <text class="legend-note" x="78" y="1569">3. Redis permit 拿到但任务抢占失败，finally 会释放；Worker 宕机没有释放时，permit 租约会自动过期回收。</text>
+          <text class="legend-note" x="78" y="1596">4. 全局名额不足或 Redis 故障，不直接高频重试：先落库为 RETRY_WAIT，再由 Outbox 按 nextRetryTime 重新投递。</text>
+        </svg>
+      </section>
+
+      <section id="state-diagram" class="diagram" aria-label="AI 任务状态机">
+        <svg class="state-svg" viewBox="0 0 2050 1180" role="img" aria-labelledby="state-title state-desc">
+          <title id="state-title">AI 任务状态机</title>
+          <desc id="state-desc">展示 PENDING、QUEUED、RUNNING、RETRY_WAIT、SUCCESS、FAILED、DEAD_LETTER 之间的状态变化及其触发者。</desc>
+          <defs>
+            <marker id="s-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--line)"/></marker>
+            <marker id="s-arrow-primary" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--accent-line)"/></marker>
+            <marker id="s-arrow-warn" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--warn-line)"/></marker>
+            <marker id="s-arrow-danger" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--danger-line)"/></marker>
+          </defs>
+
+          <text class="lane-title" x="60" y="65">状态机总览：状态只会向前推进；所有 SQL 都带状态/workerId/versionId 条件，防止旧 Worker 覆盖新结果。</text>
+          <text class="lane-subtitle" x="60" y="96">实线表示正常主路径；黄色路径表示可恢复等待；红色路径表示终态失败。点击上方“完整处理流程”可查看每条箭头发生在哪个组件。</text>
+
+          <g class="state pending"><rect x="100" y="390" width="250" height="140"/><text class="state-title" x="225" y="432">PENDING</text><text class="state-desc" x="225" y="462">任务已在数据库创建</text><text class="state-desc" x="225" y="487">初始 Outbox 尚未确认发送</text></g>
+          <g class="state queued"><rect x="470" y="390" width="250" height="140"/><text class="state-title" x="595" y="432">QUEUED</text><text class="state-desc" x="595" y="462">已有可消费的任务消息</text><text class="state-desc" x="595" y="487">等待某个 Consumer 抢占</text></g>
+          <g class="state running"><rect x="845" y="390" width="270" height="140"/><text class="state-title" x="980" y="432">RUNNING</text><text class="state-desc" x="980" y="462">当前 Worker 已拥有任务</text><text class="state-desc" x="980" y="487">workerId + lease_until 生效</text></g>
+          <g class="state success"><rect x="1270" y="225" width="250" height="140"/><text class="state-title" x="1395" y="267">SUCCESS</text><text class="state-desc" x="1395" y="297">结果、SUCCESS、AI_COMPLETED</text><text class="state-desc" x="1395" y="322">在同一事务提交</text></g>
+          <g class="state retry"><rect x="1255" y="570" width="280" height="160"/><text class="state-title" x="1395" y="612">RETRY_WAIT</text><text class="state-desc" x="1395" y="642">不执行模型，等待下一次调度</text><text class="state-desc" x="1395" y="667">记录 errorCode / nextRetryTime</text><text class="state-desc" x="1395" y="692">并配套 AI_TASK_RETRY Outbox</text></g>
+          <g class="state failed"><rect x="1700" y="390" width="250" height="140"/><text class="state-title" x="1825" y="432">FAILED</text><text class="state-desc" x="1825" y="462">永久错误或执行次数耗尽</text><text class="state-desc" x="1825" y="487">AI_FAILED 事件已写入 Outbox</text></g>
+          <g class="state failed"><rect x="1700" y="785" width="250" height="140"/><text class="state-title" x="1825" y="827">DEAD_LETTER</text><text class="state-desc" x="1825" y="857">任务消息多次发送失败</text><text class="state-desc" x="1825" y="882">Outbox 发送耗尽后的终态</text></g>
+
+          <path d="M350 460 H470" fill="none" stroke="var(--accent-line)" stroke-width="3" marker-end="url(#s-arrow-primary)"/>
+          <path d="M720 460 H845" fill="none" stroke="var(--accent-line)" stroke-width="3" marker-end="url(#s-arrow-primary)"/>
+          <path d="M1115 430 H1195 V295 H1270" fill="none" stroke="var(--accent-line)" stroke-width="3" marker-end="url(#s-arrow-primary)"/>
+          <path d="M1115 510 H1205 V650 H1255" fill="none" stroke="var(--warn-line)" stroke-width="3" marker-end="url(#s-arrow-warn)"/>
+          <path d="M1115 460 H1700" fill="none" stroke="var(--danger-line)" stroke-width="3" marker-end="url(#s-arrow-danger)"/>
+          <path d="M1255 680 H910 V760 H595 V530" fill="none" stroke="var(--warn-line)" stroke-width="3" marker-end="url(#s-arrow-warn)"/>
+          <path d="M350 510 V855 H1700" fill="none" stroke="var(--danger-line)" stroke-width="3" stroke-dasharray="10 8" marker-end="url(#s-arrow-danger)"/>
+          <path d="M980 530 V880 H1395 V730" fill="none" stroke="var(--warn-line)" stroke-width="3" stroke-dasharray="10 8" marker-end="url(#s-arrow-warn)"/>
+
+          <g><rect class="label-bg" x="342" y="346" width="260" height="58" rx="8"/><text class="label" x="472" y="370">初始 AI_TASK_CREATED</text><text class="label" x="472" y="391">发送确认：仅 PENDING → QUEUED</text></g>
+          <g><rect class="label-bg" x="706" y="346" width="270" height="58" rx="8"/><text class="label" x="841" y="370">Consumer 抢占成功</text><text class="label" x="841" y="391">写 workerId、租约、尝试次数</text></g>
+          <g><rect class="label-bg" x="1140" y="255" width="123" height="42" rx="8"/><text class="label" x="1201" y="282">模型执行成功</text></g>
+          <g><rect class="label-bg" x="1118" y="553" width="210" height="48" rx="8"/><text class="label" x="1223" y="576">全局 permit 满 / Redis 故障</text><text class="label" x="1223" y="594">或需要恢复重试</text></g>
+          <g><rect class="label-bg" x="1425" y="405" width="252" height="48" rx="8"/><text class="label" x="1551" y="428">永久错误 / 尝试次数耗尽</text><text class="label" x="1551" y="446">仅 RUNNING → FAILED</text></g>
+          <g><rect class="label-bg" x="710" y="702" width="390" height="52" rx="8"/><text class="label" x="905" y="725">AI_TASK_RETRY 到期发送并确认后：仅 RETRY_WAIT → QUEUED</text><text class="label" x="905" y="744">消息先到时，Consumer 会先执行同一个安全推进</text></g>
+          <g><rect class="label-bg" x="120" y="790" width="500" height="48" rx="8"/><text class="label" x="370" y="814">初始 Outbox 多次发送失败且耗尽：PENDING / QUEUED → DEAD_LETTER</text><text class="label" x="370" y="832">（并写 AI_FAILED 终态事件）</text></g>
+          <g><rect class="label-bg" x="1000" y="810" width="445" height="48" rx="8"/><text class="label" x="1222" y="834">定时恢复：只扫描 RUNNING 且 lease_until 已过期</text><text class="label" x="1222" y="852">恢复为 RETRY_WAIT，并创建新的 AI_TASK_RETRY Outbox</text></g>
+
+          <rect class="legend" x="90" y="980" width="1770" height="130"/>
+          <circle class="dot-normal" cx="125" cy="1018" r="11"/><text class="legend-text" x="145" y="1023">PENDING / QUEUED：尚未执行</text>
+          <circle class="dot-run" cx="455" cy="1018" r="11"/><text class="legend-text" x="475" y="1023">RUNNING：一个 Worker 已持有 MySQL 租约</text>
+          <circle class="dot-wait" cx="910" cy="1018" r="11"/><text class="legend-text" x="930" y="1023">RETRY_WAIT：暂停执行，等待可恢复的重试事件</text>
+          <circle class="dot-success" cx="1395" cy="1018" r="11"/><text class="legend-text" x="1415" y="1023">SUCCESS：成功终态</text>
+          <circle class="dot-failed" cx="1595" cy="1018" r="11"/><text class="legend-text" x="1615" y="1023">FAILED / DEAD_LETTER：失败终态</text>
+          <text class="legend-note" x="125" y="1062">为什么要区分三种“租约/名额”：MySQL 租约保证“谁能提交该任务的结果”；Redis permit 保证“所有实例加起来不超过某模型的并发额度”；本地 Semaphore 保护“单个实例”的线程和连接等本地资源。</text>
+          <text class="legend-note" x="125" y="1090">重点纠正：定时恢复任务不是把 RETRY_WAIT 再次扫描出来执行；它发现的是 Worker 崩溃遗留的 RUNNING 过期租约，把它转为 RETRY_WAIT，并通过新的 Retry Outbox 唤醒后续消费。</text>
+        </svg>
+      </section>
+    </div>
+  </main>
+</div>
+
+<script>
+  const viewport = document.getElementById('viewport');
+  const canvas = document.getElementById('canvas');
+  const flowTab = document.getElementById('flow-tab');
+  const stateTab = document.getElementById('state-tab');
+  const flowDiagram = document.getElementById('flow-diagram');
+  const stateDiagram = document.getElementById('state-diagram');
+  const scaleLabel = document.getElementById('scale-label');
+  let scale = 1;
+  let panX = 0;
+  let panY = 0;
+  let dragging = false;
+  let startX = 0;
+  let startY = 0;
+
+  function activeSvg() { return flowDiagram.classList.contains('active') ? flowDiagram.querySelector('svg') : stateDiagram.querySelector('svg'); }
+  function render() {
+    canvas.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+    scaleLabel.textContent = `${Math.round(scale * 100)}%`;
+  }
+  function fitToWindow() {
+    const svg = activeSvg();
+    const viewBox = svg.viewBox.baseVal;
+    const availableWidth = Math.max(300, viewport.clientWidth - 60);
+    const availableHeight = Math.max(420, viewport.clientHeight - 60);
+    scale = Math.min(1, availableWidth / viewBox.width, availableHeight / viewBox.height);
+    panX = Math.max(10, (viewport.clientWidth - viewBox.width * scale) / 2);
+    panY = 28;
+    render();
+  }
+  function setTab(tab) {
+    const showFlow = tab === 'flow';
+    flowDiagram.classList.toggle('active', showFlow);
+    stateDiagram.classList.toggle('active', !showFlow);
+    flowTab.classList.toggle('active', showFlow);
+    stateTab.classList.toggle('active', !showFlow);
+    flowTab.setAttribute('aria-pressed', String(showFlow));
+    stateTab.setAttribute('aria-pressed', String(!showFlow));
+    fitToWindow();
+  }
+
+  flowTab.addEventListener('click', () => setTab('flow'));
+  stateTab.addEventListener('click', () => setTab('state'));
+  document.getElementById('zoom-in').addEventListener('click', () => { scale = Math.min(1.8, scale + 0.12); render(); });
+  document.getElementById('zoom-out').addEventListener('click', () => { scale = Math.max(0.25, scale - 0.12); render(); });
+  document.getElementById('fit').addEventListener('click', fitToWindow);
+  document.getElementById('fullscreen').addEventListener('click', async () => {
+    if (document.fullscreenElement) await document.exitFullscreen();
+    else await document.documentElement.requestFullscreen();
+    setTimeout(fitToWindow, 80);
+  });
+  viewport.addEventListener('pointerdown', (event) => {
+    dragging = true; startX = event.clientX - panX; startY = event.clientY - panY;
+    viewport.classList.add('dragging'); viewport.setPointerCapture(event.pointerId);
+  });
+  viewport.addEventListener('pointermove', (event) => {
+    if (!dragging) return;
+    panX = event.clientX - startX; panY = event.clientY - startY; render();
+  });
+  function stopDrag() { dragging = false; viewport.classList.remove('dragging'); }
+  viewport.addEventListener('pointerup', stopDrag);
+  viewport.addEventListener('pointercancel', stopDrag);
+  viewport.addEventListener('wheel', (event) => {
+    event.preventDefault();
+    const oldScale = scale;
+    scale = Math.min(1.8, Math.max(0.25, scale + (event.deltaY < 0 ? 0.08 : -0.08)));
+    const pointerX = event.clientX - viewport.getBoundingClientRect().left;
+    const pointerY = event.clientY - viewport.getBoundingClientRect().top;
+    panX = pointerX - (pointerX - panX) * (scale / oldScale);
+    panY = pointerY - (pointerY - panY) * (scale / oldScale);
+    render();
+  }, { passive: false });
+  window.addEventListener('resize', fitToWindow);
+  fitToWindow();
+</script>
+</body>
+</html>

@@ -1,13 +1,9 @@
 package diary.diarydiet.entity.dto;
 
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -42,55 +38,6 @@ public class DietRecordDTO {
     @NotNull(message = "食物名称不能为空")
     @Size(max = 200, message = "食物名称最多200字符")
     private String foodName;
-
-    /**
-     * 热量（千卡）
-     */
-    @NotNull(message = "热量不能为空")
-    @Min(value = 0, message = "热量不能为负数")
-    private Integer calories;
-
-    /**
-     * 蛋白质(g)
-     */
-    @NotNull(message = "蛋白质不能为空")
-    @DecimalMin(value = "0.00", message = "蛋白质不能为负数")
-    private BigDecimal protein;
-
-    /**
-     * 脂肪(g)
-     */
-    @NotNull(message = "脂肪不能为空")
-    @DecimalMin(value = "0.00", message = "脂肪不能为负数")
-    private BigDecimal fat;
-
-    /**
-     * 碳水化合物(g)
-     */
-    @NotNull(message = "碳水化合物不能为空")
-    @DecimalMin(value = "0.00", message = "碳水化合物不能为负数")
-    private BigDecimal carbohydrate;
-
-    /**
-     * 糖(g)
-     */
-    @NotNull(message = "糖不能为空")
-    @DecimalMin(value = "0.00", message = "糖不能为负数")
-    private BigDecimal sugar;
-
-    /**
-     * 钠(mg)
-     */
-    @NotNull(message = "钠不能为空")
-    @DecimalMin(value = "0.00", message = "钠不能为负数")
-    private BigDecimal sodium;
-
-    /**
-     * 饱腹感评分 1~10
-     */
-    @Min(value = 1, message = "饱腹感评分最小为1")
-    @Max(value = 10, message = "饱腹感评分最大为10")
-    private Byte fullnessScore;
 
     /**
      * 用餐地点

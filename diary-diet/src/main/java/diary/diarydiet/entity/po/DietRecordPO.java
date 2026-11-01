@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -37,41 +36,6 @@ public class DietRecordPO {
      * 食物/菜品名称
      */
     private String foodName;
-
-    /**
-     * 热量（千卡）
-     */
-    private Integer calories;
-
-    /**
-     * 蛋白质(g)
-     */
-    private BigDecimal protein;
-
-    /**
-     * 脂肪(g)
-     */
-    private BigDecimal fat;
-
-    /**
-     * 碳水化合物(g)
-     */
-    private BigDecimal carbohydrate;
-
-    /**
-     * 糖(g)
-     */
-    private BigDecimal sugar;
-
-    /**
-     * 钠(mg)
-     */
-    private BigDecimal sodium;
-
-    /**
-     * 饱腹感评分 1~10
-     */
-    private Byte fullnessScore;
 
     /**
      * 用餐地点（家里/公司/餐厅等）

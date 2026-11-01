@@ -28,6 +28,12 @@ public class MqOutboxPO {
     private String eventId;
 
     /**
+     * 触发当前 Retry 事件的来源消息 ID。
+     * 同一来源消息至多安排一次下一轮 AI_TASK_RETRY，用于消费端幂等。
+     */
+    private String sourceEventId;
+
+    /**
      * 聚合根类型
      * 如：ORDER、PAYMENT、USER 等
      */

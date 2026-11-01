@@ -15,6 +15,7 @@ import diary.diaryai.utils.MyUtil;
 import diary.utils.commonutil.MyUtils;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.MDC;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,8 +36,13 @@ public class AiTaskDispatchDeferralServiceImpl implements AiTaskDispatchDeferral
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean deferForGlobalModelPermit(AiTaskPO task, AiTaskErrorCodeEnum errorCode, String errorMessage, LocalDateTime nextRetryTime) {
+    public boolean deferForGlobalModelPermit(AiTaskPO task, String sourceEventId,
+                                              AiTaskErrorCodeEnum errorCode, String errorMessage,
+                                              LocalDateTime nextRetryTime) {
         Objects.requireNonNull(task, "task 不能为空");
+        if (sourceEventId == null || sourceEventId.isBlank()) {
+            throw new IllegalArgumentException("sourceEventId 不能为空");
+        }
         Objects.requireNonNull(errorCode, "errorCode 不能为空");
         Objects.requireNonNull(nextRetryTime, "nextRetryTime 不能为空");
 
@@ -49,16 +55,6 @@ public class AiTaskDispatchDeferralServiceImpl implements AiTaskDispatchDeferral
         if (!nextRetryTime.isAfter(now)) {
             throw new IllegalArgumentException("nextRetryTime 必须是未来时间");
         }
-
-        AiTaskProcessDto processDto = AiTaskProcessDto.builder()
-                .taskId(task.getId())
-                .userId(task.getUserId())
-                .clientRequestId(task.getClientRequestId())
-                .errorCode(errorCode.name())
-                .errorMessage(errorMessage)
-                .build();
-        int changed = diaryAiMapper.markRetryWaitIfDispatchable(processDto);
-        if (changed == 0) return false;
 
         String eventId = OUTBOX_EVENT_ID + MyUtils.getPrimaryKey();
 
@@ -78,6 +74,7 @@ public class AiTaskDispatchDeferralServiceImpl implements AiTaskDispatchDeferral
         MqOutboxPO outbox = MqOutboxPO.builder()
                 .id(MyUtils.getPrimaryKey())
                 .eventId(eventId)
+                .sourceEventId(sourceEventId)
                 .aggregateType(AI_TASK_AGGREGATE_TYPE)
                 .aggregateId(task.getId())
                 .eventType(OutboxEventTypeEnum.AI_TASK_RETRY.name())
@@ -94,8 +91,25 @@ public class AiTaskDispatchDeferralServiceImpl implements AiTaskDispatchDeferral
                 .updateTime(now)
                 .versionId(0)
                 .build();
-        if (diaryAiMapper.insertRetryTaskOutbox(outbox) != 1) {
-            throw new IllegalStateException("全局模型并发延迟重试事件写入Outbox失败, taskId=" + task.getId());
+        try {
+            if (diaryAiMapper.insertRetryTaskOutbox(outbox) != 1) {
+                throw new IllegalStateException("全局模型并发延迟重试事件写入Outbox失败, taskId=" + task.getId());
+            }
+        } catch (DuplicateKeyException duplicateSourceEvent) {
+            // 同一条 RocketMQ 来源消息已成功安排下一轮重试；不重复创建 Retry Outbox。
+            return false;
+        }
+
+        AiTaskProcessDto processDto = AiTaskProcessDto.builder()
+                .taskId(task.getId())
+                .userId(task.getUserId())
+                .clientRequestId(task.getClientRequestId())
+                .errorCode(errorCode.name())
+                .errorMessage(errorMessage)
+                .build();
+        if (diaryAiMapper.markRetryWaitIfDispatchable(processDto) != 1) {
+            // Outbox 预约必须随本事务回滚，不能留下没有进入 RETRY_WAIT 的孤儿 Retry 事件。
+            throw new IllegalStateException("全局模型并发延迟重试任务状态更新失败, taskId=" + task.getId());
         }
         return true;
     }

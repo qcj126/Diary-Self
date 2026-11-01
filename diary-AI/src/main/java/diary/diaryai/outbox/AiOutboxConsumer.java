@@ -8,6 +8,7 @@ import diary.diaryai.enums.aienum.AIEnum;
 import diary.diaryai.enums.aienum.AiTaskErrorCodeEnum;
 import diary.diaryai.enums.aienum.AiTaskStatusEnum;
 import diary.diaryai.enums.aienum.AiTaskTypeEnum;
+import diary.diaryai.enums.outbox.OutboxEventTypeEnum;
 import diary.diaryai.executor.AiTaskExecutor;
 import diary.diaryai.executor.AiTaskModelResolver;
 import diary.diaryai.guard.LocalAiConcurrencyGuard;
@@ -88,8 +89,33 @@ public class AiOutboxConsumer implements RocketMQListener {
             return ConsumeResult.FAILURE;
         }
 
-        if (!AiTaskStatusEnum.PENDING.name().equals(candidateTask.getStatus())
-                && !AiTaskStatusEnum.QUEUED.name().equals(candidateTask.getStatus())) {
+        boolean dispatchable = AiTaskStatusEnum.PENDING.name().equals(candidateTask.getStatus())
+                || AiTaskStatusEnum.QUEUED.name().equals(candidateTask.getStatus());
+
+        /*
+         * Publisher 是先向 Broker 发送 AI_TASK_RETRY、再写入 SENT 与 RETRY_WAIT → QUEUED 的确认。
+         * 因此 Broker 可能在确认 SQL 前投递消息。此时已实际收到 retry 消息的 Consumer 可以安全
+         * 地推进状态；否则会将消息 ACK 掉，随后 Publisher 才写 QUEUED，造成任务没有消息可消费。
+         */
+        if (!dispatchable
+                && AiTaskStatusEnum.RETRY_WAIT.name().equals(candidateTask.getStatus())
+                && OutboxEventTypeEnum.AI_TASK_RETRY.name().equals(message.getEventType())) {
+            final int promoted;
+            try {
+                promoted = diaryAiMapper.markQueuedFromRetryWait(candidateTask.getId());
+            } catch (RuntimeException databaseException) {
+                log.error("推进提前到达的 AI_TASK_RETRY 消息失败，taskId={}",
+                        message.getTaskId(), databaseException);
+                return ConsumeResult.FAILURE;
+            }
+            if (promoted != 1) {
+                // Publisher 或其他 Consumer 已并发推进状态；不能 ACK 后丢失执行机会。
+                return ConsumeResult.FAILURE;
+            }
+            dispatchable = true;
+        }
+
+        if (!dispatchable) {
             return handleUnclaimedMessage(message);
         }
 
@@ -323,6 +349,8 @@ public class AiOutboxConsumer implements RocketMQListener {
     // 也可以防止某些非法调用
     private void validateMessage(AiTaskMessageDto message) {
         if (message == null
+                || message.getEventId() == null
+                || message.getEventId().isBlank()
                 || message.getTaskId() == null
                 || message.getUserId() == null
                 || message.getClientRequestId() == null
@@ -360,7 +388,8 @@ public class AiOutboxConsumer implements RocketMQListener {
         try {
             LocalDateTime nextRetryTime = calculateGlobalPermitRetryTime(errorCode);
 
-            boolean deferred = aiTaskDispatchDeferralService.deferForGlobalModelPermit(task, errorCode, errorMessage, nextRetryTime);
+            boolean deferred = aiTaskDispatchDeferralService.deferForGlobalModelPermit(
+                    task, message.getEventId(), errorCode, errorMessage, nextRetryTime);
 
             if (deferred) {
                 log.info("延迟重试已持久化，taskId={}，errorCode={}，nextRetryTime={}", task.getId(), errorCode, nextRetryTime);
