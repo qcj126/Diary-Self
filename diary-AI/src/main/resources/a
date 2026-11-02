@@ -6,6 +6,9 @@ spring:
       discovery:
         server-addr: 192.168.101.128:8848
     openfeign:
+      # Feign 的连接/读取超时仍由下方 client.config 管理；这里仅在连续故障时快速失败。
+      circuitbreaker:
+        enabled: true
       client:
         config:
           # 所有 Feign Client 的保守默认值，单位毫秒
@@ -26,6 +29,10 @@ spring:
           diary-love:
             connectTimeout: 800
             readTimeout: 2500
+    circuitbreaker:
+      resilience4j:
+        # 当前调用均为同步调用。避免默认 TimeLimiter 与 Feign/DashScope 的真实网络超时竞争。
+        disable-time-limiter: true
   main:
     web-application-type: servlet
   servlet:
@@ -131,3 +138,33 @@ management:
   metrics:
     tags:
       application: ${spring.application.name:diary-ai}
+
+# Resilience4j 初版策略：
+# - default 供三个 Feign Client 使用；业务 404 不应被视为依赖服务故障。
+# - dashscope 供 Qwen/DeepSeek 共用；按模型拆分和熔断后的延迟 Outbox 重试留待后续演进。
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 20
+        minimum-number-of-calls: 10
+        failure-rate-threshold: 50
+        slow-call-duration-threshold: 2s
+        slow-call-rate-threshold: 70
+        wait-duration-in-open-state: 30s
+        permitted-number-of-calls-in-half-open-state: 3
+        automatic-transition-from-open-to-half-open-enabled: true
+        ignore-exceptions:
+          - diary.diaryai.exceptions.UpstreamBusinessException
+    instances:
+      dashscope:
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        slow-call-duration-threshold: 60s
+        slow-call-rate-threshold: 80
+        wait-duration-in-open-state: 30s
+        permitted-number-of-calls-in-half-open-state: 1
+        automatic-transition-from-open-to-half-open-enabled: true

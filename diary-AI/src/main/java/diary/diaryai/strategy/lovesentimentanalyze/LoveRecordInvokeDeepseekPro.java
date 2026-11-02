@@ -5,8 +5,6 @@ import com.alibaba.dashscope.aigc.generation.GenerationParam;
 import com.alibaba.dashscope.aigc.generation.GenerationResult;
 import com.alibaba.dashscope.common.Message;
 import com.alibaba.dashscope.common.Role;
-import com.alibaba.dashscope.exception.InputRequiredException;
-import com.alibaba.dashscope.exception.NoApiKeyException;
 import com.alibaba.dashscope.utils.Constants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -17,6 +15,7 @@ import diary.diaryai.prompt.PromptContext;
 import diary.diaryai.properties.AliCloudProperty;
 import diary.diaryai.service.AiTransactionService;
 import diary.diaryai.service.InvokeLoveRecordAIService;
+import diary.diaryai.guard.AiModelCallGuard;
 import diary.diaryai.strategy.UsualMethod;
 import diary.diaryai.template.InvokeAITemplate;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +36,7 @@ public class LoveRecordInvokeDeepseekPro extends InvokeAITemplate implements Inv
     private final PromptContext promptContext;
     private final Generation gen = new Generation();
     private final AiTransactionService aiTransactionService;
+    private final AiModelCallGuard aiModelCallGuard;
 
     @Override
     public void getLoveRecordAiResultAndSave(LoveRecordSentimentInputSnapshotDTO data, Long taskId,
@@ -83,13 +83,8 @@ public class LoveRecordInvokeDeepseekPro extends InvokeAITemplate implements Inv
                 .resultFormat(GenerationParam.ResultFormat.MESSAGE)
                 .enableThinking(true)
                 .build();
-        try {
-            return gen.call(param);
-        } catch (NoApiKeyException e) {
-            throw new CustomException("请配置百炼API Key");
-        } catch (InputRequiredException e) {
-            throw new CustomException("输入参数不完整");
-        }
+        // 受检 SDK 异常由 AiModelCallGuard 统一转换并交给任务状态机重试。
+        return aiModelCallGuard.execute(model, () -> gen.call(param));
     }
 
     @Override

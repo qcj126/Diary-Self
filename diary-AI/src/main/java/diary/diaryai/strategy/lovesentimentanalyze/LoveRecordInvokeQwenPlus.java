@@ -15,6 +15,7 @@ import diary.diaryai.prompt.PromptContext;
 import diary.diaryai.properties.AliCloudProperty;
 import diary.diaryai.service.AiTransactionService;
 import diary.diaryai.service.InvokeLoveRecordAIService;
+import diary.diaryai.guard.AiModelCallGuard;
 import diary.diaryai.strategy.UsualMethod;
 import diary.diaryai.template.InvokeAITemplate;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,7 @@ public class LoveRecordInvokeQwenPlus extends InvokeAITemplate implements Invoke
     private final PromptContext promptContext;
     private final MultiModalConversation conv = new MultiModalConversation();
     private final AiTransactionService aiTransactionService;
+    private final AiModelCallGuard aiModelCallGuard;
 
     @Override
     public void getLoveRecordAiResultAndSave(LoveRecordSentimentInputSnapshotDTO data, Long taskId,
@@ -81,7 +83,7 @@ public class LoveRecordInvokeQwenPlus extends InvokeAITemplate implements Invoke
                     .temperature(temperature.floatValue())
                     .messages(Collections.singletonList(userMessage))
                     .build();
-            return conv.call(param);
+            return aiModelCallGuard.execute(model, () -> conv.call(param));
         } catch (Exception e) {
             throw new CustomException("调用Qwen3.7-Plus模型失败：" + e.getMessage());
         }

@@ -4,6 +4,7 @@ import diary.common.result.ApiResponse;
 import feign.FeignException;
 import feign.RetryableException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.client.circuitbreaker.NoFallbackAvailableException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -63,6 +64,43 @@ public class AiExceptionHandler {
     }
 
     /**
+     * OpenFeign 开启 CircuitBreaker 且未配置业务 fallback 时，会把原始调用异常包装为
+     * NoFallbackAvailableException。解包后复用原有状态码，既不额外维护三套 Client
+     * fallback，也不会把业务 404 错误错误地响应为 503。
+     */
+    @ExceptionHandler(NoFallbackAvailableException.class)
+    public ResponseEntity<ApiResponse<Void>> handleFeignCircuitBreaker(NoFallbackAvailableException exception) {
+        UpstreamBusinessException businessException = findCause(exception, UpstreamBusinessException.class);
+        if (businessException != null) {
+            return handleUpstreamBusiness(businessException);
+        }
+
+        UpstreamUnavailableException unavailableException = findCause(exception, UpstreamUnavailableException.class);
+        if (unavailableException != null) {
+            return handleUpstreamUnavailable(unavailableException);
+        }
+
+        UpstreamCallException callException = findCause(exception, UpstreamCallException.class);
+        if (callException != null) {
+            return handleUpstreamCall(callException);
+        }
+
+        RetryableException retryableException = findCause(exception, RetryableException.class);
+        if (retryableException != null) {
+            return handleFeignTransport(retryableException);
+        }
+
+        FeignException feignException = findCause(exception, FeignException.class);
+        if (feignException != null) {
+            return handleFeign(feignException);
+        }
+
+        // 没有可恢复的原始异常时，通常表示断路器已打开；统一快速返回 503。
+        log.warn("AI Feign 熔断器拒绝调用，未找到可分类根因", exception);
+        return failure(HttpStatus.SERVICE_UNAVAILABLE, "关联服务暂不可用，请稍后重试");
+    }
+
+    /**
      * 连接失败或读取超时不会经过 ErrorDecoder；Feign 会以 RetryableException 抛出。
      */
     @ExceptionHandler(RetryableException.class)
@@ -99,5 +137,14 @@ public class AiExceptionHandler {
             }
         }
         return false;
+    }
+
+    private <T extends Throwable> T findCause(Throwable throwable, Class<T> expectedType) {
+        for (Throwable current = throwable; current != null; current = current.getCause()) {
+            if (expectedType.isInstance(current)) {
+                return expectedType.cast(current);
+            }
+        }
+        return null;
     }
 }

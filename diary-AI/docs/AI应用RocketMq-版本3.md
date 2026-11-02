@@ -587,7 +587,48 @@ attemptCount
 
 测试体系包括单元测试、MySQL/Redis/RocketMQ 集成测试、服务契约测试、完整链路 E2E 测试，以及故障注入和恢复测试。测试文档不能代替自动化测试。
 
-## 18. 实施顺序
+## 18. 初版 Resilience4j 熔断策略
+
+### 18.1 目标与边界
+
+初版只处理“上游持续失败时停止继续施压”的问题，不改变现有的任务状态机、Redis 全局模型 permit 或 RocketMQ 重试语义。
+
+```text
+Feign 调用              → 由 Spring Cloud OpenFeign 自动包裹 CircuitBreaker
+Qwen / DeepSeek SDK 调用 → AiModelCallGuard → 共享 dashscope CircuitBreaker
+本地模型并发             → 既有 LocalAiConcurrencyGuard（Semaphore）
+集群模型并发             → 既有 RedisModelPermitManager
+```
+
+`dashscope` 熔断器有意由 Qwen 和 DeepSeek 共用：当前两个模型都通过同一 DashScope/百炼上游访问。这样只需在四个策略类的 `call()` 调用点增加统一包装，不引入新的线程池、舱壁或自动模型切换。
+
+DashScope 的同步 `call()` 声明了受检异常。`AiModelCallGuard` 通过可抛异常的 `CheckedSupplier` 统一将其转换为 `AiProviderCallException`，因此策略类不需要重复捕获 `NoApiKeyException`、`InputRequiredException` 等 SDK 异常。
+
+### 18.2 配置与运行行为
+
+- Feign 保留 Nacos 中既有的连接、读取超时；Resilience4j 的 TimeLimiter 全局关闭，避免与实际 HTTP 超时相互竞争。
+- Feign 的业务性 `404` 被排除在失败统计外；超时、连接失败、429 和 5xx 仍会推动熔断。
+- 初版不为每个 Feign Client 增加 fallback 类；全局异常处理器会解包 OpenFeign 的 `NoFallbackAvailableException`，保留既有的 422、503、504 响应语义。
+- `dashscope` 在至少 5 次调用后评估最近 10 次调用：失败率达到 50%，或慢调用（60 秒）比例达到 80%，则进入 OPEN。
+- OPEN 持续 30 秒；之后只允许 1 个半开探测调用。熔断状态转换和被拒绝调用都会写日志。
+- OPEN 时不执行 SDK 调用，因此不会继续向供应商发送请求或产生新的调用成本。
+
+### 18.3 与现有 MQ 状态机的关系
+
+`AiProviderCircuitOpenException` 是可重试基础设施异常。当前 Consumer 会沿用既有逻辑：任务变为 `RETRY_WAIT`，然后由 RocketMQ 的失败重投机制再次尝试。
+
+这不是最终的成本保护方案。若实际 Broker 重试间隔小于 30 秒，OPEN 期间的重复消息仍会消耗任务尝试次数。后续可单独演进为：熔断打开时将 `RETRY_WAIT` 和带 `next_retry_time` 的 Retry Outbox 在一个事务中落库，并 ACK 当前消息。该增强不是本阶段的必需项。
+
+### 18.4 后续可选增强
+
+以下能力与初版共享熔断器解耦，按实际指标和成本需求再实施：
+
+1. 将 `dashscope` 拆分为 `qwen` 与 `deepseek` 两个断路器，避免单个模型故障影响另一个模型。
+2. 熔断 OPEN 或本地舱壁满时改用延迟 Retry Outbox，而非依赖 Broker 的默认重投节奏。
+3. 基于 DashScope SDK 的连接、读取和总调用超时做分模型配置；Resilience4j 只负责慢调用统计与熔断，不替代网络超时。
+4. 为熔断器状态、拒绝次数和半开探测结果建立 Prometheus 告警。
+
+## 19. 实施顺序
 
 ### 阶段 0：确认版本 2 基线
 
@@ -637,7 +678,7 @@ attemptCount
 - 建立指标面板和告警。
 - 自动化执行多实例、重复投递、超时和故障恢复测试。
 
-## 19. 版本 3 验收标准
+## 20. 版本 3 验收标准
 
 版本 3 完成时应满足：
 
@@ -655,7 +696,7 @@ attemptCount
 - 服务能够通过 Docker Compose 重复部署，并完成多实例故障测试。
 - 配置和密钥不写死在代码仓库，数据库账号遵循最小权限原则。
 
-## 20. 演进结论
+## 21. 演进结论
 
 `diary-AI` 的分布式演进不是简单地加入 RocketMQ、Redis、Docker 或 Kubernetes，而是逐步明确每一种故障由谁负责：
 
