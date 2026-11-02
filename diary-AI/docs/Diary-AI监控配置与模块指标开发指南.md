@@ -55,7 +55,7 @@ Prometheus 只负责抓取和存储数值；Grafana 负责把 PromQL 查询结�
 
 ### 3.2 Nacos 配置源
 
-本项目使用 [a](../src/main/resources/a) 作为同步到 Nacos `diary-AI.yaml` 的配置源。以下配置应位于 YAML 顶层的 `management`：
+本项目使用 [a](../src/main/resources/a.txt) 作为同步到 Nacos `diary-AI.yaml` 的配置源。以下配置应位于 YAML 顶层的 `management`：
 
 ```yaml
 management:
@@ -299,7 +299,7 @@ diary_ai_outbox_status_count{job="diary-ai", status="DEAD"}
 
 ## 8. 部署后验证清单
 
-1. 将 [a](../src/main/resources/a) 同步到 Nacos `diary-AI.yaml`。
+1. 将 [a](../src/main/resources/a.txt) 同步到 Nacos `diary-AI.yaml`。
 2. 重新部署 `diary-AI`，确保新 Java 指标代码生效。
 3. 验证 `/actuator/health/liveness` 与 `/actuator/health/readiness` 均为 `UP`。
 4. 访问 `/actuator/prometheus`，搜索 `diary_ai_` 与 `executor_` 前缀。

@@ -29,7 +29,7 @@ class CurrentUserTest {
     @Test
     void rejectsInvalidUserIdentity() {
         MockHttpServletRequest request = new MockHttpServletRequest();
-        request.addHeader("X-Auth-User-Id", "not-a-number");
+        request.addHeader("X-Auth-User-Id", "not-a.txt-number");
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> new CurrentUser(request).getUser());

@@ -558,7 +558,7 @@ done
 
 ```bash
 # Docker / Compose
-docker ps -a
+docker ps -a.txt
 docker logs -f 容器名
 docker inspect 容器名
 docker compose ps

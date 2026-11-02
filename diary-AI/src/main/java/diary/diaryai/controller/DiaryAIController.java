@@ -52,11 +52,10 @@ public class DiaryAIController {
 
     @OperLog(module = "AI", description = "批量查询饮食最新营养分析结果", operationType = "SELECT", saveParams = false, saveResult = false)
     @PostMapping("/nutrient/query/diets/latest")
-    public ApiResponse<List<AiNutrientVO>> latestDietNutrients(
-            @RequestBody AiNutrientBatchQueryDTO request
-    ) {
-        return ApiResponse.success(aiNutrientQueryService.getLatestDietNutrients(
-                request == null ? null : request.getDietIds(), currentUser.getUser()));
+    public ApiResponse<List<AiNutrientVO>> latestDietNutrients(@RequestBody AiNutrientBatchQueryDTO request) {
+        return ApiResponse.success(
+                aiNutrientQueryService.getLatestDietNutrients(request == null ? null : request.getDietIds(), currentUser.getUser())
+        );
     }
 
     @OperLog(module = "AI", description = "提交AI恋爱记录情感分析任务", operationType = "INSERT", saveParams = false, saveResult = false)

@@ -279,7 +279,7 @@ docker rm -f diary-ai-1
 确认容器已删除：
 
 ```bash
-docker ps -a --filter name=diary-ai-1
+docker ps -a.txt --filter name=diary-ai-1
 ```
 
 停止真实发布者后，再次查询 publisher 和实例列表；正常情况下 publisher 的 `data` 应为空，实例总数应变为 `0`。
@@ -556,7 +556,7 @@ docker compose logs -f diary-love
 如果构建失败，不应盲目重复 `docker compose up`。先查看失败发生在镜像构建阶段还是容器运行阶段：
 
 ```bash
-docker compose ps -a diary-love
+docker compose ps -a.txt diary-love
 docker compose logs --tail=200 diary-love
 ```
 
