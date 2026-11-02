@@ -5,6 +5,27 @@ spring:
     nacos:
       discovery:
         server-addr: 192.168.101.128:8848
+    openfeign:
+      client:
+        config:
+          # 所有 Feign Client 的保守默认值，单位毫秒
+          default:
+            connectTimeout: 800
+            readTimeout: 2000
+            loggerLevel: basic
+
+          # 也可按服务名覆盖；名称必须与 @FeignClient(name = "...") 一致
+          diary-diet:
+            connectTimeout: 800
+            readTimeout: 2000
+
+          diary-recipe:
+            connectTimeout: 800
+            readTimeout: 2000
+
+          diary-love:
+            connectTimeout: 800
+            readTimeout: 2500
   main:
     web-application-type: servlet
   servlet:
@@ -62,6 +83,9 @@ diary:
             max-concurrency: 5
           DEEPSEEKV4PRO0813:
             max-concurrency: 10
+    metrics:
+      # 将数据库状态快照写入内存 Gauge 的间隔；Prometheus 抓取时不会额外查询数据库。
+      snapshot-interval-ms: 15000
 
 # 使用 rocketmq-v5-client-spring-boot-starter 的正确配置
 rocketmq:
@@ -83,3 +107,27 @@ rocketmq:
       qwenPlusModel: qwen3.7-plus
       qwenMaxModel: qwen3.7-max
       temperature: 0.7
+
+# Prometheus 从 /actuator/prometheus 抓取指标；健康端点用于负载均衡和容器探针。
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+      group:
+        # AI 任务依赖 MySQL 持久化和 Redis 限流；任一不可用时不应继续接收流量。
+        readiness:
+          include: readinessState,db,redis
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name:diary-ai}

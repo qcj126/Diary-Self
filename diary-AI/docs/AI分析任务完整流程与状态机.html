@@ -128,25 +128,25 @@
           <!-- 第一列：提交 -->
           <g class="node normal"><rect x="105" y="245" width="280" height="92"/><text class="node-title" x="245" y="280">客户端提交 AI 分析</text><text class="node-desc" x="245" y="307">带 clientRequestId（幂等键）</text></g>
           <g class="node normal"><rect x="105" y="410" width="280" height="110"/><text class="node-title" x="245" y="447">校验请求 + 提交限流</text><text class="node-desc" x="245" y="474">用户每分钟限流、参数规范化</text><text class="node-desc" x="245" y="496">重复提交直接返回已有任务</text></g>
-          <g class="node normal"><rect x="85" y="600" width="320" height="144"/><text class="node-title" x="245" y="638">一个本地数据库事务</text><text class="node-desc" x="245" y="666">ai_task：PENDING</text><text class="node-desc" x="245" y="690">mq_outbox：AI_TASK_CREATED / NEW</text><text class="node-desc" x="245" y="714">任务和待发消息一起提交</text></g>
+          <g class="node normal"><rect x="55" y="590" width="380" height="164"/><text class="node-title" x="245" y="630">一个本地数据库事务</text><text class="node-desc" x="245" y="662">ai_task：PENDING</text><text class="node-desc" x="245" y="690">mq_outbox：AI_TASK_CREATED / NEW</text><text class="node-desc" x="245" y="718">任务和待发消息一起提交</text></g>
 
           <!-- 第二列：Outbox -->
           <g class="node system"><rect x="545" y="300" width="280" height="115"/><text class="node-title" x="685" y="337">Outbox Publisher 定时扫描</text><text class="node-desc" x="685" y="364">扫描 NEW / 到期 RETRY_WAIT</text><text class="node-desc" x="685" y="388">先发送，再确认 SENT</text></g>
-          <g class="node normal"><rect x="545" y="515" width="280" height="118"/><text class="node-title" x="685" y="552">Broker 投递任务消息</text><text class="node-desc" x="685" y="580">AI_TASK_CREATED 或 AI_TASK_RETRY</text><text class="node-desc" x="685" y="605">Message Key = taskId</text></g>
+          <g class="node normal"><rect x="525" y="505" width="320" height="138"/><text class="node-title" x="685" y="545">Broker 投递任务消息</text><text class="node-desc" x="685" y="576">AI_TASK_CREATED 或 AI_TASK_RETRY</text><text class="node-desc" x="685" y="606">Message Key = taskId</text></g>
           <g class="node normal"><rect x="545" y="730" width="280" height="124"/><text class="node-title" x="685" y="766">发送确认后推进状态</text><text class="node-desc" x="685" y="794">CREATED：PENDING → QUEUED</text><text class="node-desc" x="685" y="820">RETRY：RETRY_WAIT → QUEUED</text></g>
-          <g class="node system"><rect x="535" y="1010" width="300" height="154"/><text class="node-title" x="685" y="1047">重要：投递早于确认的竞态</text><text class="node-desc" x="685" y="1075">Broker 可能已把 RETRY 消息交给 Consumer</text><text class="node-desc" x="685" y="1100">Consumer 发现 RETRY_WAIT 时，先安全推进</text><text class="node-desc" x="685" y="1125">为 QUEUED，再继续处理，避免消息被白白 ACK</text></g>
+          <g class="node system"><rect x="510" y="1000" width="350" height="174"/><text class="node-title" x="685" y="1040">重要：投递早于确认的竞态</text><text class="node-desc" x="685" y="1072">Broker 可能已把 RETRY 消息交给 Consumer</text><text class="node-desc" x="685" y="1100">Consumer 发现 RETRY_WAIT 时，先安全推进</text><text class="node-desc" x="685" y="1128">为 QUEUED，再继续处理，避免消息被白白 ACK</text></g>
 
           <!-- 第三列：消费与并发控制 -->
-          <g class="node normal"><rect x="1055" y="270" width="290" height="105"/><text class="node-title" x="1200" y="306">Consumer 收到消息</text><text class="node-desc" x="1200" y="334">校验协议、读取 ai_task</text><text class="node-desc" x="1200" y="356">终态或被其他 Worker 占有：ACK</text></g>
-          <g class="node normal"><rect x="1055" y="450" width="290" height="100"/><text class="node-title" x="1200" y="486">解析本任务的模型</text><text class="node-desc" x="1200" y="514">从任务快照解析 AIEnum</text><text class="node-desc" x="1200" y="536">如 QWEN37PLUS / DEEPSEEKV4PRO0813</text></g>
-          <g class="node normal"><rect x="1055" y="620" width="290" height="105"/><text class="node-title" x="1200" y="656">获取本地 Semaphore</text><text class="node-desc" x="1200" y="684">仅保护当前 diary-ai 实例</text><text class="node-desc" x="1200" y="706">满时返回 FAILURE，由 MQ 稍后重投</text></g>
-          <g class="node run"><rect x="1055" y="800" width="290" height="145"/><text class="node-title" x="1200" y="837">获取 Redis 全局 permit</text><text class="node-desc" x="1200" y="865">按“模型”维度的 ZSet 名额池</text><text class="node-desc" x="1200" y="890">Qwen=5，DeepSeek=10（示例）</text><text class="node-desc" x="1200" y="915">成员为唯一 permitId，带过期时间</text></g>
-          <g class="node run"><rect x="1055" y="1030" width="290" height="130"/><text class="node-title" x="1200" y="1067">MySQL 原子抢占任务</text><text class="node-desc" x="1200" y="1095">QUEUED → RUNNING</text><text class="node-desc" x="1200" y="1120">写 workerId、leaseUntil、attemptCount</text><text class="node-desc" x="1200" y="1143">抢占失败：释放 Redis permit</text></g>
+          <g class="node normal"><rect x="1000" y="270" width="400" height="105"/><text class="node-title" x="1200" y="306">Consumer 收到消息</text><text class="node-desc" x="1200" y="334">校验协议、读取 ai_task</text><text class="node-desc" x="1200" y="356">终态或被其他 Worker 占有：ACK</text></g>
+          <g class="node normal"><rect x="1000" y="450" width="400" height="100"/><text class="node-title" x="1200" y="486">解析本任务的模型</text><text class="node-desc" x="1200" y="514">从任务快照解析 AIEnum</text><text class="node-desc" x="1200" y="536">如 QWEN37PLUS / DEEPSEEKV4PRO0813</text></g>
+          <g class="node normal"><rect x="1000" y="620" width="400" height="105"/><text class="node-title" x="1200" y="656">获取本地 Semaphore</text><text class="node-desc" x="1200" y="684">仅保护当前 diary-ai 实例</text><text class="node-desc" x="1200" y="706">满时返回 FAILURE，由 MQ 稍后重投</text></g>
+          <g class="node run"><rect x="1000" y="800" width="400" height="145"/><text class="node-title" x="1200" y="837">获取 Redis 全局 permit</text><text class="node-desc" x="1200" y="865">按“模型”维度的 ZSet 名额池</text><text class="node-desc" x="1200" y="890">Qwen=5，DeepSeek=10（示例）</text><text class="node-desc" x="1200" y="915">成员为唯一 permitId，带过期时间</text></g>
+          <g class="node run"><rect x="1000" y="1030" width="400" height="130"/><text class="node-title" x="1200" y="1067">MySQL 原子抢占任务</text><text class="node-desc" x="1200" y="1095">QUEUED → RUNNING</text><text class="node-desc" x="1200" y="1120">写 workerId、leaseUntil、attemptCount</text><text class="node-desc" x="1200" y="1143">抢占失败：释放 Redis permit</text></g>
 
           <!-- 容量/Redis 分支 -->
           <g class="node wait"><rect x="930" y="1240" width="260" height="120"/><text class="node-title" x="1060" y="1277">模型名额已满</text><text class="node-desc" x="1060" y="1305">不调用模型</text><text class="node-desc" x="1060" y="1328">MODEL_CAPACITY_EXHAUSTED</text></g>
           <g class="node wait"><rect x="1210" y="1240" width="260" height="120"/><text class="node-title" x="1340" y="1277">Redis 不可用</text><text class="node-desc" x="1340" y="1305">不调用模型，优先保护模型配额</text><text class="node-desc" x="1340" y="1328">REDIS_UNAVAILABLE</text></g>
-          <g class="node wait"><rect x="1020" y="1430" width="370" height="164"/><text class="node-title" x="1205" y="1467">同一事务：延迟重试</text><text class="node-desc" x="1205" y="1495">任务 → RETRY_WAIT；写 errorCode / nextRetryTime</text><text class="node-desc" x="1205" y="1520">新建 AI_TASK_RETRY Outbox（sourceEventId = 当前 eventId）</text><text class="node-desc" x="1205" y="1545">唯一约束避免同一来源消息重复创建重试事件</text><text class="node-desc" x="1205" y="1568">持久化成功后 ACK；到期后由 Publisher 再投递</text></g>
+          <g class="node wait"><rect x="950" y="1430" width="500" height="164"/><text class="node-title" x="1200" y="1467">同一事务：延迟重试</text><text class="node-desc" x="1200" y="1495">任务 → RETRY_WAIT；写 errorCode / nextRetryTime</text><text class="node-desc" x="1200" y="1520">新建 AI_TASK_RETRY Outbox（sourceEventId = 当前 eventId）</text><text class="node-desc" x="1200" y="1545">唯一约束避免同一来源消息重复创建重试事件</text><text class="node-desc" x="1200" y="1568">持久化成功后 ACK；到期后由 Publisher 再投递</text></g>
 
           <!-- 第四列：执行 -->
           <g class="node run"><rect x="1560" y="570" width="270" height="145"/><text class="node-title" x="1695" y="607">续租后调用模型</text><text class="node-desc" x="1695" y="635">MySQL 任务租约：任务归属</text><text class="node-desc" x="1695" y="660">Redis permit 租约：全局名额</text><text class="node-desc" x="1695" y="685">两者均定期续期</text></g>
@@ -154,32 +154,36 @@
           <g class="node system"><rect x="1560" y="1030" width="270" height="120"/><text class="node-title" x="1695" y="1067">finally 一定清理</text><text class="node-desc" x="1695" y="1095">停止两种续租</text><text class="node-desc" x="1695" y="1120">释放 Redis permit + 本地 permit</text></g>
 
           <!-- 第五列：终态与恢复 -->
-          <g class="node success"><rect x="1950" y="370" width="270" height="135"/><text class="node-title" x="2085" y="407">成功：SUCCESS</text><text class="node-desc" x="2085" y="435">结果数据 + SUCCESS + AI_COMPLETED Outbox</text><text class="node-desc" x="2085" y="460">同一事务提交</text><text class="node-desc" x="2085" y="483">任务结束</text></g>
-          <g class="node failed"><rect x="1950" y="610" width="270" height="135"/><text class="node-title" x="2085" y="647">不可重试：FAILED</text><text class="node-desc" x="2085" y="675">永久错误或尝试次数耗尽</text><text class="node-desc" x="2085" y="700">写 AI_FAILED Outbox</text><text class="node-desc" x="2085" y="723">任务结束</text></g>
-          <g class="node system"><rect x="1940" y="950" width="290" height="178"/><text class="node-title" x="2085" y="987">定时任务：租约恢复</text><text class="node-desc" x="2085" y="1015">周期扫描“RUNNING 且 lease_until 已过期”</text><text class="node-desc" x="2085" y="1040">不是扫描 RETRY_WAIT</text><text class="node-desc" x="2085" y="1065">未耗尽：RUNNING → RETRY_WAIT</text><text class="node-desc" x="2085" y="1090">同事务新建 AI_TASK_RETRY Outbox</text><text class="node-desc" x="2085" y="1113">随后 Publisher → MQ → Consumer 再次接管</text></g>
+          <g class="node success"><rect x="1920" y="360" width="330" height="155"/><text class="node-title" x="2085" y="402">成功：SUCCESS</text><text class="node-desc" x="2085" y="433">结果数据 + SUCCESS + AI_COMPLETED Outbox</text><text class="node-desc" x="2085" y="462">同一事务提交</text><text class="node-desc" x="2085" y="488">任务结束</text></g>
+          <g class="node failed"><rect x="1920" y="600" width="330" height="155"/><text class="node-title" x="2085" y="642">不可重试：FAILED</text><text class="node-desc" x="2085" y="673">永久错误或尝试次数耗尽</text><text class="node-desc" x="2085" y="702">写 AI_FAILED Outbox</text><text class="node-desc" x="2085" y="728">任务结束</text></g>
+          <g class="node system"><rect x="1910" y="940" width="350" height="198"/><text class="node-title" x="2085" y="980">定时任务：租约恢复</text><text class="node-desc" x="2085" y="1012">周期扫描“RUNNING 且 lease_until 已过期”</text><text class="node-desc" x="2085" y="1040">不是扫描 RETRY_WAIT</text><text class="node-desc" x="2085" y="1068">未耗尽：RUNNING → RETRY_WAIT</text><text class="node-desc" x="2085" y="1096">同事务新建 AI_TASK_RETRY Outbox</text><text class="node-desc" x="2085" y="1122">随后 Publisher → MQ → Consumer 再次接管</text></g>
 
           <!-- 主流程连线 -->
-          <path class="arrow-primary" d="M245 337 V410"/><path class="arrow-primary" d="M245 520 V600"/>
-          <path class="arrow-primary" d="M405 672 H545 V358"/>
-          <path class="arrow-primary" d="M685 415 V515"/><path class="arrow-primary" d="M825 574 H1055"/>
+          <path class="arrow-primary" d="M245 337 V410"/><path class="arrow-primary" d="M245 520 V590"/>
+          <path class="arrow-primary" d="M435 672 H455 V250 H685 V300"/>
+          <path class="arrow-primary" d="M685 415 V505"/><path class="arrow-primary" d="M845 574 H900 V322 H1000"/>
           <path class="arrow" d="M685 633 V730"/>
           <path class="arrow-primary" d="M1200 375 V450"/><path class="arrow-primary" d="M1200 550 V620"/><path class="arrow-primary" d="M1200 725 V800"/>
-          <path class="arrow-primary" d="M1345 872 H1510 V642 H1560"/>
+          <!-- permit 成功后仍必须先抢占 MySQL 任务；不能绕过 RUNNING 状态直接调用模型。 -->
+          <path class="arrow-primary" d="M1200 945 V1030"/>
           <path class="arrow-primary" d="M1695 715 V810"/>
-          <path class="arrow-primary" d="M1830 865 H1950 V438"/>
+          <path class="arrow-primary" d="M1830 850 H1885 V438 H1920"/>
           <path class="arrow-primary" d="M1695 920 V1030"/>
-          <path class="arrow-primary" d="M1345 1095 H1560"/>
-          <path class="arrow-warn" d="M1125 945 V1165 H1060 V1240"/>
-          <path class="arrow-warn" d="M1275 945 V1165 H1340 V1240"/>
+          <!-- 抢占成功后才进入带双续租的模型调用；连线绕开节点文字。 -->
+          <path class="arrow-primary" d="M1400 1095 H1510 V642 H1560"/>
+          <path class="arrow-warn" d="M1120 945 V1165 H1060 V1240"/>
+          <path class="arrow-warn" d="M1280 945 V1165 H1340 V1240"/>
           <path class="arrow-warn" d="M1060 1360 V1430"/><path class="arrow-warn" d="M1340 1360 V1430"/>
-          <path class="arrow-warn" d="M1020 1512 H880 V790"/>
-          <path class="arrow" d="M2085 950 V745"/>
-          <path class="arrow-danger" d="M1830 865 H1905 V677 H1950"/>
+          <!-- 延迟重试回到 Publisher：从节点下方绕行，不穿过任何业务节点。 -->
+          <path class="arrow-warn" d="M950 1512 H900 V1405 H490 V358 H545"/>
+          <path class="arrow" d="M2085 940 V755"/>
+          <path class="arrow-danger" d="M1830 885 H1890 V677 H1920"/>
 
           <!-- 重要说明标签 -->
-          <g><rect class="label-bg" x="1322" y="805" width="170" height="42" rx="8"/><text class="label" x="1407" y="831">获取成功</text></g>
+          <g><rect class="label-bg" x="1220" y="960" width="170" height="42" rx="8"/><text class="label" x="1305" y="986">permit 已取得</text></g>
+          <g><rect class="label-bg" x="1410" y="1018" width="100" height="42" rx="8"/><text class="label" x="1460" y="1044">抢占成功</text></g>
           <g><rect class="label-bg" x="1150" y="1165" width="250" height="42" rx="8"/><text class="label" x="1275" y="1191">获取失败的两种原因</text></g>
-          <g><rect class="label-bg" x="835" y="838" width="230" height="42" rx="8"/><text class="label" x="950" y="864">延迟到期重新投递</text></g>
+          <g><rect class="label-bg" x="600" y="1307" width="230" height="42" rx="8"/><text class="label" x="715" y="1333">nextRetryTime 到期后重投</text></g>
           <g><rect class="label-bg" x="1815" y="470" width="155" height="42" rx="8"/><text class="label" x="1892" y="496">执行成功</text></g>
           <g><rect class="label-bg" x="1825" y="625" width="120" height="42" rx="8"/><text class="label" x="1885" y="651">终态失败</text></g>
 
@@ -217,20 +221,21 @@
           <path d="M350 460 H470" fill="none" stroke="var(--accent-line)" stroke-width="3" marker-end="url(#s-arrow-primary)"/>
           <path d="M720 460 H845" fill="none" stroke="var(--accent-line)" stroke-width="3" marker-end="url(#s-arrow-primary)"/>
           <path d="M1115 430 H1195 V295 H1270" fill="none" stroke="var(--accent-line)" stroke-width="3" marker-end="url(#s-arrow-primary)"/>
-          <path d="M1115 510 H1205 V650 H1255" fill="none" stroke="var(--warn-line)" stroke-width="3" marker-end="url(#s-arrow-warn)"/>
+          <path d="M980 530 V650 H1255" fill="none" stroke="var(--warn-line)" stroke-width="3" marker-end="url(#s-arrow-warn)"/>
           <path d="M1115 460 H1700" fill="none" stroke="var(--danger-line)" stroke-width="3" marker-end="url(#s-arrow-danger)"/>
-          <path d="M1255 680 H910 V760 H595 V530" fill="none" stroke="var(--warn-line)" stroke-width="3" marker-end="url(#s-arrow-warn)"/>
+          <!-- RETRY_WAIT 从下方绕行回 QUEUED，避免横线穿过等待节点本身。 -->
+          <path d="M1395 730 V800 H595 V530" fill="none" stroke="var(--warn-line)" stroke-width="3" marker-end="url(#s-arrow-warn)"/>
           <path d="M350 510 V855 H1700" fill="none" stroke="var(--danger-line)" stroke-width="3" stroke-dasharray="10 8" marker-end="url(#s-arrow-danger)"/>
           <path d="M980 530 V880 H1395 V730" fill="none" stroke="var(--warn-line)" stroke-width="3" stroke-dasharray="10 8" marker-end="url(#s-arrow-warn)"/>
 
           <g><rect class="label-bg" x="342" y="346" width="260" height="58" rx="8"/><text class="label" x="472" y="370">初始 AI_TASK_CREATED</text><text class="label" x="472" y="391">发送确认：仅 PENDING → QUEUED</text></g>
           <g><rect class="label-bg" x="706" y="346" width="270" height="58" rx="8"/><text class="label" x="841" y="370">Consumer 抢占成功</text><text class="label" x="841" y="391">写 workerId、租约、尝试次数</text></g>
           <g><rect class="label-bg" x="1140" y="255" width="123" height="42" rx="8"/><text class="label" x="1201" y="282">模型执行成功</text></g>
-          <g><rect class="label-bg" x="1118" y="553" width="210" height="48" rx="8"/><text class="label" x="1223" y="576">全局 permit 满 / Redis 故障</text><text class="label" x="1223" y="594">或需要恢复重试</text></g>
+          <g><rect class="label-bg" x="590" y="552" width="350" height="52" rx="8"/><text class="label" x="765" y="576">全局 permit 满 / Redis 故障</text><text class="label" x="765" y="594">或需要恢复重试</text></g>
           <g><rect class="label-bg" x="1425" y="405" width="252" height="48" rx="8"/><text class="label" x="1551" y="428">永久错误 / 尝试次数耗尽</text><text class="label" x="1551" y="446">仅 RUNNING → FAILED</text></g>
-          <g><rect class="label-bg" x="710" y="702" width="390" height="52" rx="8"/><text class="label" x="905" y="725">AI_TASK_RETRY 到期发送并确认后：仅 RETRY_WAIT → QUEUED</text><text class="label" x="905" y="744">消息先到时，Consumer 会先执行同一个安全推进</text></g>
+          <g><rect class="label-bg" x="650" y="835" width="420" height="52" rx="8"/><text class="label" x="860" y="858">AI_TASK_RETRY 到期发送并确认后：仅 RETRY_WAIT → QUEUED</text><text class="label" x="860" y="877">消息先到时，Consumer 会先执行同一个安全推进</text></g>
           <g><rect class="label-bg" x="120" y="790" width="500" height="48" rx="8"/><text class="label" x="370" y="814">初始 Outbox 多次发送失败且耗尽：PENDING / QUEUED → DEAD_LETTER</text><text class="label" x="370" y="832">（并写 AI_FAILED 终态事件）</text></g>
-          <g><rect class="label-bg" x="1000" y="810" width="445" height="48" rx="8"/><text class="label" x="1222" y="834">定时恢复：只扫描 RUNNING 且 lease_until 已过期</text><text class="label" x="1222" y="852">恢复为 RETRY_WAIT，并创建新的 AI_TASK_RETRY Outbox</text></g>
+          <g><rect class="label-bg" x="1110" y="900" width="520" height="48" rx="8"/><text class="label" x="1370" y="923">定时恢复：只扫描 RUNNING 且 lease_until 已过期</text><text class="label" x="1370" y="942">恢复为 RETRY_WAIT，并创建新的 AI_TASK_RETRY Outbox</text></g>
 
           <rect class="legend" x="90" y="980" width="1770" height="130"/>
           <circle class="dot-normal" cx="125" cy="1018" r="11"/><text class="legend-text" x="145" y="1023">PENDING / QUEUED：尚未执行</text>

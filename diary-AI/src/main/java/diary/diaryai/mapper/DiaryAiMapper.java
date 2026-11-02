@@ -9,6 +9,7 @@ import diary.diaryai.entity.ai.vo.AiTaskResultVo;
 import diary.diaryai.entity.ai.vo.AiSentimentTaskResultVo;
 import diary.diaryai.entity.ai.vo.AiTaskSummaryVo;
 import diary.diaryai.entity.mq.po.MqOutboxPO;
+import diary.diaryai.metrics.StatusCount;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -63,6 +64,16 @@ public interface DiaryAiMapper {
     );
 
     int insertOutbox(MqOutboxPO outbox);
+
+    /**
+     * 为 Prometheus 运营指标聚合 AI 任务数量；结果按有限的任务状态分组。
+     */
+    List<StatusCount> selectAiTaskStatusCounts();
+
+    /**
+     * 为 Prometheus 运营指标聚合 Outbox 数量；DEAD 或 RETRY_WAIT 非零时可用于告警。
+     */
+    List<StatusCount> selectOutboxStatusCounts();
 
     List<MqOutboxPO> selectReadyOutbox(@Param("limit") int limit);
 

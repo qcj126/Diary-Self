@@ -27,6 +27,8 @@ public class AiTaskProperties {
     private Cache redis = new Cache();
     @Valid
     private Limit limit = new Limit();
+    @Valid
+    private Metrics metrics = new Metrics();
 
     @Data
     public static class Rocketmq {
@@ -85,6 +87,16 @@ public class AiTaskProperties {
         private long localPermitWaitMs;
         @Valid
         private GlobalModelPermit globalModelPermit = new GlobalModelPermit();
+    }
+
+    /**
+     * AI 服务的运营监控配置，与任务执行和模型配额限制分开，避免监控调参影响业务限流语义。
+     */
+    @Data
+    public static class Metrics {
+        /** 数据库状态聚合刷新到内存 Gauge 的周期；不等同于 Prometheus 的抓取周期。 */
+        @Min(1000)
+        private long snapshotIntervalMs;
     }
 
     @Data

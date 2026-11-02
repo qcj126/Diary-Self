@@ -13,4 +13,3 @@ spring:
       config:
         server-addr: ${NACOS_ADDR:192.168.101.128:8848}
         namespace: b78c8d52-3fc3-4276-9cbb-0f2efd326481
-        

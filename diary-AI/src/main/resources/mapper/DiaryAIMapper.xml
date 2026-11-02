@@ -400,6 +400,22 @@
              CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, #{versionId})
     </insert>
 
+    <!--
+        用于运营监控的低频聚合查询；status 列已有索引，结果行数被枚举状态数严格限制。
+        查询由 AiOperationalMetrics 定时执行，结果写入内存 Gauge；不要在 Prometheus HTTP 抓取路径中直接执行此 SQL。
+    -->
+    <select id="selectAiTaskStatusCounts" resultType="diary.diaryai.metrics.StatusCount">
+        SELECT status, COUNT(*) AS total
+        FROM ai_task
+        GROUP BY status
+    </select>
+
+    <select id="selectOutboxStatusCounts" resultType="diary.diaryai.metrics.StatusCount">
+        SELECT status, COUNT(*) AS total
+        FROM mq_outbox
+        GROUP BY status
+    </select>
+
     <select id="selectReadyOutbox" resultMap="MqOutboxResultMap">
         select <include refid="mqOutboxColumns"/>
         WHERE status IN ('NEW', 'RETRY_WAIT')
