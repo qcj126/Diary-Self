@@ -15,7 +15,7 @@ import diary.diaryai.redis.AiSubmitRateLimiter;
 import diary.diaryai.service.AiTaskNutrientApplicationService;
 import diary.diaryai.service.AiTransactionService;
 import diary.diaryai.utils.MyUtil;
-import diary.utils.commonutil.MyUtils;
+import diary.utils.common.MyUtils;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 

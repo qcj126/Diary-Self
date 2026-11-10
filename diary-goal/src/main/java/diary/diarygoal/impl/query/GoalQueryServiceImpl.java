@@ -8,7 +8,7 @@ import diary.diarygoal.entity.vo.StageGoalVO;
 import diary.common.result.ApiResponse;
 import diary.diarygoal.mapper.GoalMapper;
 import diary.diarygoal.service.query.GoalQueryService;
-import diary.utils.commonutil.MyUtils;
+import diary.utils.common.MyUtils;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 

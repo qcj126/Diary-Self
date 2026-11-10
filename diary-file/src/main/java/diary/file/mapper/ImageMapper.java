@@ -23,4 +23,8 @@ public interface ImageMapper {
     List<ImagePO> selectLatestTwoImagesForCarousel();
 
     Integer deleteImageById(Long id);
+
+    ImagePO selectImageStatusById(@Param("imageId") Long imageId);
+
+    int updateStatusIfCurrent(@Param("imageId") Long imageId, @Param("expectedStatus") int expectedStatus, @Param("targetStatus") int targetStatus);
 }

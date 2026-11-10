@@ -27,7 +27,7 @@ import diary.diaryai.mapper.DiaryAiMapper;
 import diary.diaryai.properties.AiTaskProperties;
 import diary.diaryai.service.AiTransactionService;
 import diary.diaryai.utils.MyUtil;
-import diary.utils.commonutil.MyUtils;
+import diary.utils.common.MyUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.apis.consumer.ConsumeResult;
@@ -40,7 +40,9 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 import static diary.diaryai.consts.MqTaskConst.*;
-import static diary.utils.commonutil.MyUtils.writeJson;
+import static diary.diaryai.utils.CanonicalFormUtil.canonicalLoveRecordSentimentSnapshotForm;
+import static diary.diaryai.utils.CanonicalFormUtil.canonicalNutrientForm;
+import static diary.utils.common.MyUtils.writeJson;
 
 @Service
 @Slf4j
@@ -55,7 +57,7 @@ public class AiTransactionServiceImpl implements AiTransactionService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public AiTaskPO createNutrientTaskAndOutbox(AiInvokeDTO request, Long userId, String targetTitle) {
-        Map<String, Object> canonicalNutrientForm = requestFingerprint.canonicalNutrientForm(request);
+        Map<String, Object> canonicalNutrientForm = canonicalNutrientForm(request);
         String requestHash = requestFingerprint.fingerprint(request, request.getFlag());
         String clientRequestId = request.getClientRequestId();
         String flag = request.getFlag();
@@ -73,7 +75,7 @@ public class AiTransactionServiceImpl implements AiTransactionService {
                 .snapshotVersion(1)
                 .loveRecord(loveRecordAiSnapshotDTO)
                 .build();
-        Map<String, Object> canonicalLoveSentimentForm = requestFingerprint.canonicalLoveRecordSentimentSnapshotForm(snapshotDTO);
+        Map<String, Object> canonicalLoveSentimentForm = canonicalLoveRecordSentimentSnapshotForm(snapshotDTO);
 
         String requestHash = requestFingerprint.fingerprint(loveRecordSentimentSubmitDTO, flag);
         String clientRequestId = loveRecordSentimentSubmitDTO.getClientRequestId();

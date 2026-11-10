@@ -10,7 +10,7 @@ import diary.common.exception.SameDataException;
 import diary.user.mapper.UserMapper;
 import diary.user.service.TokenService;
 import diary.user.service.UserService;
-import diary.utils.commonutil.MyUtils;
+import diary.utils.common.MyUtils;
 import diary.user.utils.ValidatUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

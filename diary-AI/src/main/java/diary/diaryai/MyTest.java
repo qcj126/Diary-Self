@@ -1,6 +1,6 @@
 package diary.diaryai;
 
-import diary.utils.commonutil.MyUtils;
+import diary.utils.common.MyUtils;
 
 public class MyTest {
     public static void main(String[] args) {

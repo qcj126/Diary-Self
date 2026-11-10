@@ -7,7 +7,7 @@ import diary.file.entity.dto.IconDTO;
 import diary.file.entity.po.IconPO;
 import diary.file.mapper.IconMapper;
 import diary.file.service.sys.sysdeleteservice.IconDeleteService;
-import diary.utils.commonutil.MyUtils;
+import diary.utils.common.MyUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

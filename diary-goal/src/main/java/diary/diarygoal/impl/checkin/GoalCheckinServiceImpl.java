@@ -14,7 +14,7 @@ import diary.diarygoal.enums.GoalStatusEnum;
 import diary.common.result.ApiResponse;
 import diary.diarygoal.mapper.GoalCheckinMapper;
 import diary.diarygoal.service.checkin.GoalCheckinService;
-import diary.utils.commonutil.MyUtils;
+import diary.utils.common.MyUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;

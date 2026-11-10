@@ -1,33 +1,41 @@
--- =============================================
--- MQ 发件箱表（可靠消息最终一致性）
--- =============================================
-CREATE TABLE IF NOT EXISTS `mq_outbox` (
-    `id`                BIGINT          NOT NULL AUTO_INCREMENT      COMMENT '主键 ID',
-    `event_id`          VARCHAR(64)     NOT NULL                    COMMENT '事件 ID（全局唯一）',
-    `source_event_id`   VARCHAR(64)     DEFAULT NULL                COMMENT '触发当前 Retry 的来源消息 ID',
-    `aggregate_type`    VARCHAR(64)     NOT NULL                    COMMENT '聚合根类型',
-    `aggregate_id`      BIGINT          NOT NULL                    COMMENT '聚合根 ID',
-    `event_type`        VARCHAR(128)    NOT NULL                    COMMENT '事件类型',
-    `topic`             VARCHAR(128)    NOT NULL                    COMMENT 'MQ Topic 名称',
-    `tag`               VARCHA`R(64)     DEFAULT NULL                COMMENT 'MQ Tag（RocketMQ 特有）',
-    `message_key`       VARCHAR(128)    DEFAULT NULL                COMMENT '消息 Key',
-    `payload`           JSON            NOT NULL                    COMMENT '消息体（JSON 格式）',
-    `schema_version`    INT             DEFAULT 1                   COMMENT '消息体 Schema 版本',
-    `status`            VARCHAR(32)     NOT NULL                    COMMENT '消息状态：NEW/SENDING/RETRY_WAIT/SENT/DEAD',
-    `retry_count`       INT             DEFAULT 0                   COMMENT '当前重试次数',
-    `max_retries`       INT             DEFAULT 3                   COMMENT '最大重试次数',
-    `next_retry_time`   DATETIME        DEFAULT NULL                COMMENT '下次重试时间',
-    `broker_message_id` VARCHAR(128)    DEFAULT NULL                COMMENT 'MQ 返回的消息 ID',
-    `last_error`        TEXT            DEFAULT NULL                COMMENT '最后一次错误信息',
-    `sent_time`         DATETIME        DEFAULT NULL                COMMENT '消息发送时间',
-    `create_time`       DATETIME        NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time`       DATETIME        NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `version_id`        INT             NOT NULL    DEFAULT 0       COMMENT '乐观锁版本号',
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_event_id` (`event_id`),
-    UNIQUE KEY `uk_retry_source_event` (`event_type`, `source_event_id`),
-    KEY `idx_status_next_retry` (`status`, `next_retry_time`),
-    KEY `idx_status_update` (`status`, `update_time`, `id`),
-    KEY `idx_aggregate` (`aggregate_type`, `aggregate_id`),
-    KEY `idx_create_time` (`create_time`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='MQ 发件箱表';
+-- auto-generated definition
+create table mq_outbox
+(
+    id                bigint auto_increment comment '主键 ID'
+        primary key,
+    event_id          varchar(64)                        not null comment '事件 ID（全局唯一）',
+    source_event_id   varchar(64)                        null comment '触发当前 Retry 的来源消息 ID',
+    aggregate_type    varchar(64)                        not null comment '聚合根类型',
+    aggregate_id      bigint                             not null comment '聚合根 ID  当前为taskId',
+    event_type        varchar(128)                       not null comment '事件类型',
+    topic             varchar(128)                       not null comment 'MQ Topic 名称',
+    tag               varchar(64)                        null comment 'MQ Tag（RocketMQ 特有）',
+    message_key       varchar(128)                       null comment '消息 Key',
+    payload           json                               not null comment '消息体（JSON 格式）',
+    schema_version    int      default 1                 null comment '消息体 Schema 版本',
+    status            varchar(32)                        not null comment '消息状态：NEW/SENDING/RETRY_WAIT/SENT/DEAD',
+    retry_count       int      default 0                 null comment '当前重试次数',
+    max_retries       int      default 3                 null comment '最大重试次数',
+    next_retry_time   datetime                           null comment '下次重试时间',
+    broker_message_id varchar(128)                       null comment 'MQ 返回的消息 ID',
+    last_error        text                               null comment '最后一次错误信息',
+    sent_time         datetime                           null comment '消息发送时间',
+    create_time       datetime                           not null comment '创建时间',
+    update_time       datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    version_id        int      default 0                 not null comment '乐观锁版本号',
+    constraint uk_mq_outbox_event_id
+        unique (event_id),
+    constraint uk_retry_source_event
+        unique (event_type, source_event_id)
+)
+    comment 'MQ 发件箱表' collate = utf8mb4_unicode_ci;
+
+create index idx_mq_outbox_aggregate
+    on mq_outbox (aggregate_type, aggregate_id);
+
+create index idx_mq_outbox_publish
+    on mq_outbox (status, next_retry_time, update_time);
+
+create index idx_status_update
+    on mq_outbox (status, update_time, id);
+

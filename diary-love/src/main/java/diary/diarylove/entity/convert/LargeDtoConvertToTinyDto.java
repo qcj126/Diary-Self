@@ -9,7 +9,7 @@ import diary.diarylove.entity.dto.LoveTagDTO;
 import diary.diarylove.entity.dto.NewLoveTag;
 import diary.diarylove.entity.dto.NewRecordImageDto;
 import diary.diarylove.entity.po.LoveMoodPO;
-import diary.utils.commonutil.MyUtils;
+import diary.utils.common.MyUtils;
 
 import java.util.ArrayList;
 import java.util.List;

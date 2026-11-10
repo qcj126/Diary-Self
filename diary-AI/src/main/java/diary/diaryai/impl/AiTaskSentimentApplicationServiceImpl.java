@@ -15,7 +15,7 @@ import diary.diaryai.redis.AiSubmitRateLimiter;
 import diary.diaryai.service.AiTaskSentimentApplicationService;
 import diary.diaryai.service.AiTransactionService;
 import diary.diaryai.utils.MyUtil;
-import diary.utils.commonutil.MyUtils;
+import diary.utils.common.MyUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;

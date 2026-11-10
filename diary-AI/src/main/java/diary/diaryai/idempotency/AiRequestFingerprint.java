@@ -8,6 +8,7 @@ import diary.diaryai.entity.ai.dto.AiInvokeDTO;
 import diary.diaryai.entity.ai.dto.LoveRecordSentimentInputSnapshotDTO;
 import diary.diaryai.entity.ai.dto.LoveRecordSentimentSubmitDTO;
 import diary.diaryai.enums.aienum.AiFlagEnum;
+import diary.utils.common.MyUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -15,8 +16,10 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
-import java.util.Map;
-import java.util.TreeMap;
+
+import static diary.diaryai.utils.CanonicalFormUtil.canonicalLoveSentimentForm;
+import static diary.diaryai.utils.CanonicalFormUtil.canonicalNutrientForm;
+import static diary.utils.common.MyUtils.convertJsonToClass;
 
 /**
  * 为幂等校验生成稳定的请求快照和指纹。
@@ -24,17 +27,16 @@ import java.util.TreeMap;
 @Component
 @RequiredArgsConstructor
 public class AiRequestFingerprint {
-    private final ObjectMapper objectMapper;
 
     public String fingerprint(Object request, String aiFlag) {
         try {
             String value = null;
             if (aiFlag.equals(AiFlagEnum.RECIPE.name()) || aiFlag.equals(AiFlagEnum.DIET.name())) {
                 AiInvokeDTO aiInvokeDTO = (AiInvokeDTO) request;
-                value = objectMapper.writeValueAsString(canonicalNutrientForm(aiInvokeDTO));
+                value = MyUtils.writeJson(canonicalNutrientForm(aiInvokeDTO), "格式化aiInvokeDTO为Map失败");
             } else if (aiFlag.equals(AiFlagEnum.LOVE_RECORD.name())) {
                 LoveRecordSentimentSubmitDTO loveRecordSentimentSubmitDTO = (LoveRecordSentimentSubmitDTO) request;
-                value = objectMapper.writeValueAsString(canonicalLoveSentimentForm(loveRecordSentimentSubmitDTO));
+                value = MyUtils.writeJson(canonicalLoveSentimentForm(loveRecordSentimentSubmitDTO), "格式化loveRecordSentimentSubmitDTO为Map失败");
             }
 
             if (value == null) throw new NullResultException("json转字符串异常，value为空");
@@ -44,64 +46,24 @@ public class AiRequestFingerprint {
             return HexFormat.of().formatHex(digest);
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException("JVM不支持SHA-256", e);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
         }
-    }
-
-    public Map<String, Object> canonicalLoveSentimentForm(LoveRecordSentimentSubmitDTO loveRecordSentimentSubmitDTO) {
-        Map<String, Object> value = new TreeMap<>();
-        value.put("aiType", loveRecordSentimentSubmitDTO.getAiType());
-        value.put("clientRequestId", loveRecordSentimentSubmitDTO.getClientRequestId());
-        value.put("loveRecordId", loveRecordSentimentSubmitDTO.getLoveRecordId());
-        return value;
     }
 
     public String fingerprintSnapshot(String snapshot, String aiFlag, String clientRequestId) {
-        try {
-            String fingerprint = null;
-            if (aiFlag.equals(AiFlagEnum.RECIPE.name()) || aiFlag.equals(AiFlagEnum.DIET.name())) {
-                fingerprint = fingerprint(objectMapper.readValue(snapshot, AiInvokeDTO.class), aiFlag);
-            } else if (aiFlag.equals(AiFlagEnum.LOVE_RECORD.name())) {
-                LoveRecordSentimentInputSnapshotDTO snapshotDTO = objectMapper.readValue(snapshot, LoveRecordSentimentInputSnapshotDTO.class);
-                LoveRecordSentimentSubmitDTO request = new LoveRecordSentimentSubmitDTO();
-                request.setAiType(snapshotDTO.getAiType());
-                request.setLoveRecordId(snapshotDTO.getLoveRecord().getLoveRecordId());
-                request.setClientRequestId(clientRequestId);
-                fingerprint = fingerprint(request, aiFlag);
-            }
-            if (fingerprint == null) throw new NullResultException("无法获取快照结果");
-            return fingerprint;
-        } catch (JsonProcessingException e) {
-            throw new IllegalStateException("已存储的AI任务快照无法校验", e);
+        String fingerprint = null;
+        if (aiFlag.equals(AiFlagEnum.RECIPE.name()) || aiFlag.equals(AiFlagEnum.DIET.name())) {
+            fingerprint = fingerprint(convertJsonToClass(snapshot, AiInvokeDTO.class), aiFlag);
+        } else if (aiFlag.equals(AiFlagEnum.LOVE_RECORD.name())) {
+            LoveRecordSentimentInputSnapshotDTO snapshotDTO = (LoveRecordSentimentInputSnapshotDTO) convertJsonToClass(snapshot, LoveRecordSentimentInputSnapshotDTO.class);
+            LoveRecordSentimentSubmitDTO request = new LoveRecordSentimentSubmitDTO();
+            request.setAiType(snapshotDTO.getAiType());
+            request.setLoveRecordId(snapshotDTO.getLoveRecord().getLoveRecordId());
+            request.setClientRequestId(clientRequestId);
+            fingerprint = fingerprint(request, aiFlag);
         }
+        if (fingerprint == null) throw new NullResultException("无法获取快照结果");
+        return fingerprint;
     }
 
-    public Map<String, Object> canonicalNutrientForm(AiInvokeDTO request) {
-        Map<String, Object> value = new TreeMap<>();
-        value.put("aiType", request.getAiType());
-        value.put("clientRequestId", request.getClientRequestId());
-        value.put("cookWay", request.getCookWay());
-        value.put("ingredients", request.getIngredients() == null ? null : new TreeMap<>(request.getIngredients()));
-        value.put("universalId", request.getUniversalId());
-        value.put("flag", request.getFlag());
-        return value;
-    }
 
-    public Map<String, Object> canonicalLoveRecordSentimentSnapshotForm(LoveRecordSentimentInputSnapshotDTO snapshotDTO) {
-        Map<String, Object> value = new TreeMap<>();
-        value.put("aiType", snapshotDTO.getAiType());
-        value.put("snapshotVersion", snapshotDTO.getSnapshotVersion());
-
-        LoveRecordAiSnapshotDTO loveRecord = snapshotDTO.getLoveRecord();
-        Map<String, Object> loveRecordMap = new TreeMap<>();
-        loveRecordMap.put("loveRecordId", loveRecord.getLoveRecordId());
-        loveRecordMap.put("content", loveRecord.getContent());
-        loveRecordMap.put("categoryCode", loveRecord.getCategoryCode());
-        loveRecordMap.put("recordDate", loveRecord.getRecordDate());
-        loveRecordMap.put("title", loveRecord.getTitle());
-
-        value.put("loveRecord", loveRecordMap);
-        return value;
-    }
 }

@@ -1,16 +1,16 @@
 package diary.file.impl.uploadserviceImpl;
 
-import diary.file.consts.PhotoStatusConst;
 import diary.file.entity.dto.ImageDTO;
 import diary.file.entity.po.ImagePO;
-import diary.file.enums.TypeEnum;
+import diary.file.enums.ImageStatusEnum;
+import diary.file.enums.ImageTypeEnum;
 import diary.common.exception.ParamIllegalException;
 import diary.file.mapper.ImageMapper;
 import diary.file.service.ImageFileService;
 import diary.file.service.asyncservice.AsyncService;
 import diary.file.service.uploadservice.UploadService;
 
-import diary.utils.commonutil.MyUtils;
+import diary.utils.common.MyUtils;
 import diary.file.utils.FileUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,9 +59,8 @@ public class UploadServiceImpl implements UploadService {
         // 第一步：验证所有文件并构建Photo对象列表
         for (MultipartFile file : files) {
             try {
-                Integer type = TypeEnum.getCode(imageDTO.getCode());
+                Integer type = ImageTypeEnum.getCode(imageDTO.getCode());
                 String originalFilename = fileUtil.getSafeOriginalName(file.getOriginalFilename());
-                String objectKey = originalFilename;
 
                 // 查看同一图片所属类别下是否有相同名称的图片
                 Long isExist = imagMapper.selectImageByTypeAndName(type, originalFilename);
@@ -84,8 +83,8 @@ public class UploadServiceImpl implements UploadService {
                 image.setOriginalName(originalFilename);
                 image.setMimeType(file.getContentType());
                 image.setType(type);
-                image.setStatus(PhotoStatusConst.PHOTO_STATUS_PROCESSING);
-                image.setObjectKey(objectKey);
+                image.setStatus(ImageStatusEnum.PENDING_UPLOAD.getCode());
+                image.setObjectKey(originalFilename);
                 uploadTasks.add(new UploadTask(image, file));
             } catch (Exception e) {
                 log.error("处理文件 {} 时发生异常", file.getOriginalFilename(), e);
@@ -164,9 +163,6 @@ public class UploadServiceImpl implements UploadService {
         }
         if (!uploadImageIds.isEmpty()) {
             asyncService.uploadAndSendMsgAsync(uploadImageIds, localFiles, originalNames, imageDTO);
-        }
-        if (imageIds.isEmpty()) {
-            throw new ParamIllegalException("所有文件均处理失败");
         }
         return imageIds;
     }

@@ -17,7 +17,7 @@ import diary.diarylove.entity.vo.LoveRecordImageVO;
 import diary.diarylove.entity.vo.LoveRecordVO;
 import diary.diarylove.mapper.DiaryLoveMapper;
 import diary.diarylove.service.DiaryLoveQueryService;
-import diary.utils.commonutil.MyUtils;
+import diary.utils.common.MyUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

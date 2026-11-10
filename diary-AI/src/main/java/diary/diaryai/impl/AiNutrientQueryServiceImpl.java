@@ -5,7 +5,7 @@ import diary.common.exception.ParamIllegalException;
 import diary.diaryai.entity.ai.po.AiNutrientPO;
 import diary.diaryai.mapper.AiNutrientQueryMapper;
 import diary.diaryai.service.AiNutrientQueryService;
-import diary.utils.commonutil.MyUtils;
+import diary.utils.common.MyUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

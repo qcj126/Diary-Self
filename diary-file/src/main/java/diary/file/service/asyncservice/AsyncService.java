@@ -25,11 +25,4 @@ public interface AsyncService {
      * @return 下载结果
      */
     CompletableFuture<Map<String, Object>> downloadImageAsync(Long imageId, String url, String savePath);
-
-    /**
-     * 异步上传单个文件到OSS并发送消息
-     * @param result 数据库插入结果
-     * @param file 文件
-     */
-    void uploadAndSendMsgAsync(Map<String, Object> result, MultipartFile file);
 }

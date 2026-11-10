@@ -16,7 +16,7 @@ import static diary.file.consts.FileTypeConst.TRAVEL_IMAGE;
 import static diary.file.consts.FileTypeConst.WALK_IMAGE;
 
 @Getter
-public enum TypeEnum {
+public enum ImageTypeEnum {
     // 1000---1100    图片的类别
     DIET(1000, DIET_IMAGE),
     RECIPE(2000, RECIPE_IMAGE),
@@ -34,16 +34,16 @@ public enum TypeEnum {
     private final Integer code;
     private final String type;
 
-    TypeEnum(Integer code, String type) {
+    ImageTypeEnum(Integer code, String type) {
         this.code = code;
         this.type = type;
     }
 
     public static String getType(Integer code) {
         String type = null;
-        for (TypeEnum typeEnum : TypeEnum.values()) {
-            if (typeEnum.getCode().equals(code)) {
-                type = typeEnum.getType();
+        for (ImageTypeEnum imageTypeEnum : ImageTypeEnum.values()) {
+            if (imageTypeEnum.getCode().equals(code)) {
+                type = imageTypeEnum.getType();
             }
         }
         if (type == null) {
@@ -53,9 +53,9 @@ public enum TypeEnum {
     }
 
     public static Integer getCode(Integer code) {
-        for (TypeEnum typeEnum : TypeEnum.values()) {
-            if (typeEnum.getCode().equals(code)) {
-                return typeEnum.getCode();
+        for (ImageTypeEnum imageTypeEnum : ImageTypeEnum.values()) {
+            if (imageTypeEnum.getCode().equals(code)) {
+                return imageTypeEnum.getCode();
             }
         }
         throw new CustomException("未知图片类型，无效的code: " + code);

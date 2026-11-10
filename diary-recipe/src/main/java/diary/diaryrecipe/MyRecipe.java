@@ -1,6 +1,6 @@
 package diary.diaryrecipe;
 
-import diary.utils.commonutil.MyUtils;
+import diary.utils.common.MyUtils;
 
 public class MyRecipe {
     // INSERT INTO recipe_ingredient (id, recipe_id, user_id, name, quantity, is_main, sort) VALUES

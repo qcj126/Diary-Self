@@ -4,7 +4,7 @@ import diary.diarydiet.entity.dto.DietQueryDTO;
 import diary.diarydiet.entity.dto.DietRecordAddDTO;
 import diary.diarydiet.entity.dto.DietRecordDTO;
 import diary.common.exception.ParamIllegalException;
-import diary.utils.commonutil.MyUtils;
+import diary.utils.common.MyUtils;
 
 import java.util.Set;
 

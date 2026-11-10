@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="diary.file.mapper.FileMqOutboxMapper">
+
+    <resultMap id="FileMqOutboxResultMap" type="diary.file.entity.mq.po.FileMqOutboxPO">
+        <id property="id" column="id"/>
+        <result property="eventId" column="event_id"/>
+        <result property="imageId" column="image_id"/>
+        <result property="eventType" column="event_type"/>
+        <result property="topic" column="topic"/>
+        <result property="tag" column="tag"/>
+        <result property="messageKey" column="message_key"/>
+        <result property="payload" column="payload"/>
+        <result property="schemaVersion" column="schema_version"/>
+        <result property="status" column="status"/>
+        <result property="retryCount" column="retry_count"/>
+        <result property="maxRetries" column="max_retries"/>
+        <result property="nextRetryTime" column="next_retry_time"/>
+        <result property="brokerMessageId" column="broker_message_id"/>
+        <result property="lastError" column="last_error"/>
+        <result property="sentTime" column="sent_time"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="versionId" column="version_id"/>
+    </resultMap>
+
+    <sql id="FileMqOutboxColumns">
+        id, event_id, image_id, event_type, topic, tag, message_key, payload, broker_message_id, sent_time, create_time,
+        schema_version, status, retry_count, max_retries, next_retry_time, version_id, last_error, update_time
+    </sql>
+
+    <insert id="insert" parameterType="diary.file.entity.mq.po.FileMqOutboxPO">
+        INSERT INTO file_mq_outbox (
+            id, event_id, image_id, event_type, topic, tag, message_key, payload,
+            schema_version, status, retry_count, max_retries, next_retry_time, version_id
+        )
+        VALUES (
+            #{id}, #{eventId}, #{imageId}, #{eventType}, #{topic}, #{tag}, #{messageKey}, #{payload},
+            #{schemaVersion}, #{status}, #{retryCount}, #{maxRetries}, #{nextRetryTime}, #{versionId}
+        )
+    </insert>
+
+    <select id="selectById" resultMap="FileMqOutboxResultMap">
+        SELECT <include refid="FileMqOutboxColumns"/>
+        FROM file_mq_outbox
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectPublishableOutboxBatch" resultMap="FileMqOutboxResultMap">
+        SELECT <include refid="FileMqOutboxColumns"/>
+        FROM file_mq_outbox
+        WHERE status in ('NEW', 'RETRY_WAIT') and next_retry_time &lt;= current_timestamp
+        order by next_retry_time, id limit #{limit}
+    </select>
+
+    <update id="claimForPublishing">
+        update file_mq_outbox
+            set status = 'SENDING', version_id = #{expectedVersionId} + 1, update_time = current_timestamp
+        where id = #{id} and version_id = #{expectedVersionId} and next_retry_time &lt;= current_timestamp
+          and status in ('NEW', 'RETRY_WAIT')
+    </update>
+
+    <update id="markSent">
+        update file_mq_outbox set
+            status = 'SENT', broker_message_id = #{brokerMessageId}, last_error = null,
+            sent_time = current_timestamp, update_time = current_timestamp, version_id = #{expectedVersionId} + 1
+        where id = #{id} and version_id = #{expectedVersionId} and status = 'SENDING'
+    </update>
+
+    <update id="markRetryWait">
+        update file_mq_outbox set
+            status = 'RETRY_WAIT', next_retry_time = TIMESTAMPADD(SECOND, #{nextRetryTime}, CURRENT_TIMESTAMP), retry_count = retry_count + 1,
+            last_error = #{lastError}, version_id = #{expectedVersionId} + 1, update_time = current_timestamp
+        where id = #{id} and version_id = #{expectedVersionId}
+          and status = 'SENDING' and retry_count &lt; max_retries
+    </update>
+
+    <update id="markDead">
+        update file_mq_outbox set
+            status = 'DEAD', last_error = #{lastError}, version_id = #{expectedVersionId} + 1, update_time = current_timestamp
+        where id = #{id} and version_id = #{expectedVersionId}
+          and status = 'SENDING' and retry_count >= max_retries
+    </update>
+
+    <select id="selectTimedOutSendingBatch" resultMap="FileMqOutboxResultMap">
+        select <include refid="FileMqOutboxColumns"/>
+        from file_mq_outbox
+        where status = 'SENDING' and update_time &lt; TIMESTAMPADD(SECOND, -#{timeoutSeconds}, CURRENT_TIMESTAMP)
+        order by update_time, id limit #{limit}
+    </select>
+
+    <update id="recoverTimedOutForRetry">
+        update file_mq_outbox set
+            status = 'RETRY_WAIT', next_retry_time = TIMESTAMPADD(SECOND, #{retryDelaySeconds}, CURRENT_TIMESTAMP), retry_count = retry_count + 1,
+            version_id = version_id + 1, update_time = current_timestamp, last_error = #{lastError}
+        where id = #{id} and status = 'SENDING' and version_id = #{expectedVersionId}
+            and retry_count &lt; max_retries and update_time &lt; TIMESTAMPADD(SECOND, -#{timeoutSeconds}, CURRENT_TIMESTAMP)
+    </update>
+
+    <update id="recoverTimedOutAsDead">
+        update file_mq_outbox set
+            status = 'DEAD', version_id = version_id + 1,
+            update_time = current_timestamp, last_error = #{lastError}
+        where id = #{id} and status = 'SENDING' and version_id = #{expectedVersionId}
+          and retry_count >= max_retries and update_time &lt; TIMESTAMPADD(SECOND, -#{timeoutSeconds}, CURRENT_TIMESTAMP)
+    </update>
+
+    <delete id="cleanSentOutboxData">
+        delete from file_mq_outbox
+        where status = 'SENT' and sent_time &lt; TIMESTAMPADD(DAY, -#{sentRetentionDays}, CURRENT_TIMESTAMP)
+            order by sent_time, id limit #{cleanBatchSize}
+    </delete>
+</mapper>

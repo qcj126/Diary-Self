@@ -5,7 +5,7 @@ import diary.file.entity.vo.ImageVO;
 import diary.file.mapper.ImageMapper;
 import diary.file.service.ImageFileService;
 import diary.file.service.queryurlservice.QueryUrlService;
-import diary.utils.commonutil.MyUtils;
+import diary.utils.common.MyUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

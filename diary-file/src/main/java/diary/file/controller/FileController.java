@@ -5,7 +5,6 @@ import diary.common.auth.CurrentUser;
 import diary.file.service.ImageFileService;
 import diary.common.result.ApiResponse;
 import diary.config.logconfig.OperLog;
-import diary.file.service.VideoFileService;
 import diary.file.service.deleteservice.DeleteService;
 import diary.file.service.downloadservice.DownloadService;
 import diary.file.service.queryurlservice.QueryUrlService;
@@ -38,8 +37,6 @@ public class FileController {
     private final UploadService uploadService;
 
     private final DownloadService downloadService;
-
-    private final VideoFileService videoFileService;
 
     private final QueryUrlService queryUrlService;
 
@@ -95,16 +92,6 @@ public class FileController {
     public ApiResponse<Map<String, Object>> download(@RequestBody Map<Long, String> imageIdUrls) {
         // 批量下载图片
         return ApiResponse.success(downloadService.batchDownloadPhotos(imageIdUrls));
-    }
-
-    @OperLog(module = "文件管理", description = "上传视频", operationType = "UPLOAD", saveParams = false, saveResult = false)
-    @PostMapping("/upload/video")
-    public ApiResponse<Map<String, Object>> uploadVideo(@RequestParam("file") MultipartFile file) {
-        // 直接先插入数据
-        Map<String, Object> result = videoFileService.addVideoToDb(file);
-        // 异步上传视频到OSS成功后，发送消息给mq
-        videoFileService.uploadAndSendMsgAsync(result, file);
-        return ApiResponse.success(result);
     }
 
     @OperLog(module = "文件管理", description = "删除图片文件", operationType = "DELETE", saveResult = true)

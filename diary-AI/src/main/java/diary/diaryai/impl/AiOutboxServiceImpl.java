@@ -5,6 +5,7 @@ import diary.diaryai.entity.ai.po.AiTaskPO;
 import diary.diaryai.enums.outbox.OutboxEventTypeEnum;
 import diary.diaryai.enums.outbox.OutboxStatusEnum;
 import diary.diaryai.mapper.DiaryAiMapper;
+import diary.diaryai.properties.AiTaskProperties;
 import diary.diaryai.service.AiOutboxService;
 import diary.diaryai.service.AiTransactionService;
 import lombok.RequiredArgsConstructor;
@@ -12,8 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.concurrent.ThreadLocalRandom;
-
+import static diary.utils.outbox.OutboxUtil.calculateRetryDelaySeconds;
 import static org.springframework.util.StringUtils.truncate;
 
 @Service
@@ -22,6 +22,8 @@ import static org.springframework.util.StringUtils.truncate;
 public class AiOutboxServiceImpl implements AiOutboxService {
     private final DiaryAiMapper diaryAiMapper;
     private final AiTransactionService aiTransactionService;
+    private final AiTaskProperties properties;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean claimSending(MqOutboxPO outbox) {
@@ -77,7 +79,7 @@ public class AiOutboxServiceImpl implements AiOutboxService {
             changed = diaryAiMapper.markOutboxDead(outbox.getId(), outbox.getVersionId(), lastError);
         } else {
             changed = diaryAiMapper.markOutboxRetry(
-                    outbox.getId(), outbox.getVersionId(), calculateRetryDelaySeconds(outbox.getRetryCount()), lastError);
+                    outbox.getId(), outbox.getVersionId(), calculateRetryDelaySeconds(outbox.getRetryCount(), properties.getRocketmq().getOutboxMaxRetries()), lastError);
         }
         if (changed != 1) {
             throw new IllegalStateException("Outbox失败状态更新失败: " + outbox.getId());
@@ -94,12 +96,6 @@ public class AiOutboxServiceImpl implements AiOutboxService {
                         outbox.getId(), outbox.getAggregateId(), deadLettered);
             }
         }
-    }
-
-    private long calculateRetryDelaySeconds(int currentRetryCount) {
-        long baseSeconds = Math.min(1L << Math.min(currentRetryCount, 7), 120L) * 5L;
-        long jitterSeconds = ThreadLocalRandom.current().nextLong(0, 4);
-        return Math.min(baseSeconds, 600L) + jitterSeconds;
     }
 
     private boolean isTaskDispatchEvent(MqOutboxPO outbox) {

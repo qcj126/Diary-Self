@@ -12,7 +12,7 @@ import diary.diaryai.mapper.DiaryAiMapper;
 import diary.diaryai.properties.AiTaskProperties;
 import diary.diaryai.service.AiTaskDispatchDeferralService;
 import diary.diaryai.utils.MyUtil;
-import diary.utils.commonutil.MyUtils;
+import diary.utils.common.MyUtils;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.MDC;
 import org.springframework.dao.DuplicateKeyException;
@@ -25,7 +25,7 @@ import java.util.Objects;
 import static diary.diaryai.consts.MqTaskConst.AI_TASK_AGGREGATE_TYPE;
 import static diary.diaryai.consts.MqTaskConst.OUTBOX_EVENT_ID;
 import static diary.diaryai.consts.MqTaskConst.OUTBOX_SCHEMA_VERSION;
-import static diary.utils.commonutil.MyUtils.writeJson;
+import static diary.utils.common.MyUtils.writeJson;
 
 @Service
 @RequiredArgsConstructor

@@ -107,4 +107,13 @@ public class FileUtil {
             return false;
         }
     }
+
+    /**
+     * 判断文件为空
+     * @param file
+     * @return
+     */
+    public static boolean isFileEmpty(MultipartFile file) {
+        return file == null || file.isEmpty();
+    }
 }

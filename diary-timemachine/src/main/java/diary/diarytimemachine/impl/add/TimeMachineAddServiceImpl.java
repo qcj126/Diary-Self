@@ -9,7 +9,7 @@ import diary.common.exception.ParamIllegalException;
 import diary.common.exception.SameDataException;
 import diary.diarytimemachine.mapper.TimeMachineMapper;
 import diary.diarytimemachine.service.add.TimeMachineAddService;
-import diary.utils.commonutil.MyUtils;
+import diary.utils.common.MyUtils;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 

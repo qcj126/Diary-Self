@@ -4,16 +4,16 @@
 
     <resultMap id="ImageResultMap" type="diary.file.entity.po.ImagePO">
         <id property="id" column="id"/>
-        <id property="userId" column="user_id"/>
-        <id property="fileSize" column="file_size"/>
-        <id property="objectKey" column="object_key"/>
-        <id property="originalName" column="original_name"/>
-        <id property="mimeType" column="mime_type"/>
-        <id property="type" column="type"/>
-        <id property="deleted" column="deleted"/>
-        <id property="status" column="status"/>
-        <id property="createTime" column="create_time"/>
-        <id property="updateTime" column="update_time"/>
+        <result property="userId" column="user_id"/>
+        <result property="fileSize" column="file_size"/>
+        <result property="objectKey" column="object_key"/>
+        <result property="originalName" column="original_name"/>
+        <result property="mimeType" column="mime_type"/>
+        <result property="type" column="type"/>
+        <result property="deleted" column="deleted"/>
+        <result property="status" column="status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
     </resultMap>
     <select id="selectImageById" resultMap="ImageResultMap">
         SELECT id, object_key, original_name FROM image WHERE id = #{id}
@@ -89,4 +89,13 @@
     <delete id="deleteImageById">
         DELETE FROM image WHERE id = #{id}
     </delete>
+
+    <select id="selectImageStatusById" resultMap="ImageResultMap">
+        select id, status, object_key from image where deleted = 0 and id = #{imageId}
+    </select>
+
+    <update id="updateStatusIfCurrent">
+        update image set status = #{targetStatus}, update_time = now()
+        where deleted = 0 and id = #{imageId} and status = #{expectedStatus}
+    </update>
 </mapper>

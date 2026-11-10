@@ -2,7 +2,7 @@ package diary.file.impl.downloadserviceImpl;
 
 import diary.file.service.asyncservice.AsyncService;
 import diary.file.service.downloadservice.DownloadService;
-import diary.utils.commonutil.MyUtils;
+import diary.utils.common.MyUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

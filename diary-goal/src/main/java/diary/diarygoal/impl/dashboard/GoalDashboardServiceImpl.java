@@ -11,7 +11,7 @@ import diary.diarygoal.enums.GoalStatusEnum;
 import diary.common.result.ApiResponse;
 import diary.diarygoal.mapper.GoalDashboardMapper;
 import diary.diarygoal.service.dashboard.GoalDashboardService;
-import diary.utils.commonutil.MyUtils;
+import diary.utils.common.MyUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

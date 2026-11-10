@@ -1,13 +1,12 @@
 package diary.diaryrecipe.impl.sys.add;
 
-import diary.common.exception.NullResultException;
 import diary.common.result.ApiResponse;
 import diary.diaryrecipe.entity.convert.sys.DtoConvertToPo;
 import diary.diaryrecipe.entity.dto.IngredientReqDto;
 import diary.diaryrecipe.entity.po.IngredientPo;
 import diary.diaryrecipe.mapper.SysInfoMapper;
 import diary.diaryrecipe.service.sys.add.SysInfoAddService;
-import diary.utils.commonutil.MyUtils;
+import diary.utils.common.MyUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

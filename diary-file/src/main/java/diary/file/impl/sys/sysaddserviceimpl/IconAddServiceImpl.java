@@ -6,7 +6,7 @@ import diary.file.entity.dto.IconDTO;
 import diary.file.entity.po.IconPO;
 import diary.file.mapper.IconMapper;
 import diary.file.service.sys.sysaddservice.IconAddService;
-import diary.utils.commonutil.MyUtils;
+import diary.utils.common.MyUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,6 +19,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static diary.file.consts.FileDirConst.ICON_DIR;
+import static diary.file.utils.FileUtil.isFileEmpty;
 
 @Service
 @Slf4j
@@ -37,7 +38,7 @@ public class IconAddServiceImpl implements IconAddService {
                     .notNull(file.getContentType(), "文件类型")
                     .notNull(iconDTO.getUserId(), "用户ID");
 
-            if (MyUtils.isFileEmpty(file)) {
+            if (isFileEmpty(file)) {
                 throw new IllegalArgumentException("图标文件不能为空");
             }
             if (!"image/png".equals(file.getContentType())) {

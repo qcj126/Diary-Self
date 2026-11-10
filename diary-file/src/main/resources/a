@@ -13,3 +13,22 @@ spring:
       max-request-size: 20MB
 server:
   port: 8802
+
+diary:
+  file:
+    part:
+      part-size: 10485760 # 10MB
+      file-threshold: 104857600 # 100MB
+    rocketmq:
+      # 用于mq的配置
+      event-topic: diary-file-event
+      image-uploaded-tag: IMAGE_UPLOADED
+      image-ready-consumer-group: diary-file-image-ready-consumer
+      # 用于outbox的配置
+      publisher-batch-size: 20
+      publisher-interval-ms: 10000
+      outbox-sending-timeout-seconds: 60
+      outbox-max-retries: 5
+      outbox-clean-ms: 250000
+      sent-retention-days: 7
+      clean-batch-size: 500

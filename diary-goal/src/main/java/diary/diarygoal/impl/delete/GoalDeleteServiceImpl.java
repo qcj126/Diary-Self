@@ -5,7 +5,7 @@ import diary.common.result.ApiResponse;
 import diary.diarygoal.mapper.GoalMapper;
 import diary.diarygoal.mapper.GoalCheckinMapper;
 import diary.diarygoal.service.delete.GoalDeleteService;
-import diary.utils.commonutil.MyUtils;
+import diary.utils.common.MyUtils;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,10 +1,9 @@
-package diary.utils.commonutil;
+package diary.utils.common;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -46,17 +45,21 @@ public class MyUtils {
         return str == null || str.trim().isEmpty();
     }
 
-    // 判断文件为空
-    public static boolean isFileEmpty(MultipartFile file) {
-        return file == null || file.isEmpty();
-    }
-
     // 序列化为json
     public static String writeJson(Object value, String message) {
         try {
             return OBJECT_MAPPER.writeValueAsString(value);
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException(message, e);
+        }
+    }
+
+    // 转换json为指定类
+    public static Object convertJsonToClass(String json, Class<?> objectClass) {
+        try {
+            return OBJECT_MAPPER.readValue(json, objectClass);
+        }catch (JsonProcessingException e) {
+            throw new IllegalStateException("已存储的AI任务快照无法校验", e);
         }
     }
 

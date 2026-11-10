@@ -11,7 +11,7 @@ import diary.diaryai.entity.ai.vo.AiTaskSummaryVo;
 import diary.diaryai.enums.aienum.AiTaskTypeEnum;
 import diary.diaryai.mapper.DiaryAiMapper;
 import diary.diaryai.service.AiTaskQueryService;
-import diary.utils.commonutil.MyUtils;
+import diary.utils.common.MyUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

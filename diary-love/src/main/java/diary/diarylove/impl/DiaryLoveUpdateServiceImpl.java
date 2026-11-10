@@ -10,7 +10,7 @@ import diary.diarylove.entity.dto.LoveRecordImageDTO;
 import diary.diarylove.entity.dto.UpdateLoveRecordDto;
 import diary.diarylove.mapper.DiaryLoveMapper;
 import diary.diarylove.service.DiaryLoveUpdateService;
-import diary.utils.commonutil.MyUtils;
+import diary.utils.common.MyUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

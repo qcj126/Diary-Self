@@ -13,22 +13,22 @@ spring:
         config:
           # 所有 Feign Client 的保守默认值，单位毫秒
           default:
-            connectTimeout: 800
+            connectTimeout: 1000
             readTimeout: 2000
             loggerLevel: basic
 
           # 也可按服务名覆盖；名称必须与 @FeignClient(name = "...") 一致
           diary-diet:
-            connectTimeout: 800
+            connectTimeout: 1000
             readTimeout: 2000
 
           diary-recipe:
-            connectTimeout: 800
+            connectTimeout: 1000
             readTimeout: 2000
 
           diary-love:
-            connectTimeout: 800
-            readTimeout: 2500
+            connectTimeout: 1000
+            readTimeout: 2000
     circuitbreaker:
       resilience4j:
         # 当前调用均为同步调用。避免默认 TimeLimiter 与 Feign/DashScope 的真实网络超时竞争。
@@ -43,13 +43,12 @@ spring:
 server:
   port: 8807
 
-
 diary:
   ai:
     rocketmq:
+      task-topic: diary-ai-task
       completed-tag: AI_COMPLETED
       failed-tag: AI_FAILED
-      task-topic: diary-ai-task
       task-nutrient-tag: NUTRIENT_ANALYSE
       task-sentiment-tag: SENTIMENT_ANALYSIS
       ai-task-consumer-tag: "NUTRIENT_ANALYSE || SENTIMENT_ANALYSIS"
@@ -106,14 +105,14 @@ rocketmq:
   push-consumer:
     endpoints: 192.168.101.128:7081
 
-  ali-cloud:
-    api:
-      api-key:
-      url: h
-      deepSeekV4ProModel: deepseek-v4-pro-0813
-      qwenPlusModel: qwen3.7-plus
-      qwenMaxModel: qwen3.7-max
-      temperature: 0.7
+ali-cloud:
+  api:
+    api-key:
+    url: h
+    deepSeekV4ProModel: deepseek-v4-pro-0813
+    qwenPlusModel: qwen3.7-plus
+    qwenMaxModel: qwen3.7-max
+    temperature: 0.7
 
 # Prometheus 从 /actuator/prometheus 抓取指标；健康端点用于负载均衡和容器探针。
 management:

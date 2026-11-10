@@ -7,11 +7,13 @@ import diary.file.entity.dto.IconDTO;
 import diary.file.entity.po.IconPO;
 import diary.file.mapper.IconMapper;
 import diary.file.service.sys.sysupdateservice.IconUpdateService;
-import diary.utils.commonutil.MyUtils;
+import diary.utils.common.MyUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import static diary.file.utils.FileUtil.isFileEmpty;
 
 @Slf4j
 @Service
@@ -26,7 +28,7 @@ public class IconUpdateServiceImpl implements IconUpdateService {
                     .notNull(iconDTO, "图标信息")
                     .notNull(iconDTO.getId(), "图标ID");
 
-            boolean hasFile = !MyUtils.isFileEmpty(file);
+            boolean hasFile = !isFileEmpty(file);
             boolean hasUpdateField = !MyUtils.isEmpty(iconDTO.getIconName())
                     || iconDTO.getIconType() != null
                     || iconDTO.getIconPixel() != null

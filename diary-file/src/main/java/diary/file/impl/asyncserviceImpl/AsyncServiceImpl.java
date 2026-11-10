@@ -1,31 +1,21 @@
 package diary.file.impl.asyncserviceImpl;
 
 import com.aliyun.oss.OSS;
-import com.aliyun.oss.model.AbortMultipartUploadRequest;
-import com.aliyun.oss.model.CompleteMultipartUploadRequest;
-import com.aliyun.oss.model.InitiateMultipartUploadRequest;
-import com.aliyun.oss.model.InitiateMultipartUploadResult;
-import com.aliyun.oss.model.PartETag;
-import com.aliyun.oss.model.UploadPartRequest;
-import com.aliyun.oss.model.UploadPartResult;
 import diary.file.entity.dto.ImageDTO;
-import diary.file.entity.po.OssUploadSuccessMsg;
-import diary.file.consts.PhotoStatusConst;
-import diary.file.service.ImageFileService;
+import diary.file.enums.ImageTransitionResultEnum;
+import diary.file.property.FileProperties;
 import diary.file.entity.po.ImagePO;
 import diary.common.exception.ParamIllegalException;
-import diary.config.mqconfig.RabbitMqConfig;
 import diary.file.mapper.ImageMapper;
+import diary.file.service.ImageStatusService;
+import diary.file.service.filetransactionalservice.FileTransactionalService;
 import diary.utils.OSS.OssUtil;
 import diary.file.service.asyncservice.AsyncService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.connection.CorrelationData;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -42,7 +32,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -50,20 +39,14 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class AsyncServiceImpl implements AsyncService {
-    // 分片大小：10MB
-    private static final long PART_SIZE = 10 * 1024 * 1024L;
-
-    // 大文件阈值：100MB
-    private static final long LARGE_FILE_THRESHOLD = 100 * 1024 * 1024L;
+    @Resource
+    private ImageStatusService imageStatusService;
 
     @Resource
     private OSS diaryOssClient;
 
     @Value("${aliyun.oss.bucket-name}")
     private String bucketName;
-
-    @Resource
-    private RabbitTemplate rabbitTemplate;
 
     @Resource
     private OssUtil ossUtil;
@@ -75,7 +58,7 @@ public class AsyncServiceImpl implements AsyncService {
     private ImageMapper imageMapper;
 
     @Resource
-    private ImageFileService imageFileService;
+    private FileTransactionalService fileTransactionService;
 
     @Async("ossUploadExecutor")
     @Override
@@ -84,8 +67,6 @@ public class AsyncServiceImpl implements AsyncService {
             throw new ParamIllegalException("code 不能为空");
         }
 
-        int successCount = 0;
-        int failCount = 0;
         List<String> failedFiles = new ArrayList<>();
         Map<Long, ImagePO> imageMap = imageMapper.selectImagesForUploadByIds(result).stream()
                 .collect(Collectors.toMap(ImagePO::getId, Function.identity()));
@@ -96,53 +77,78 @@ public class AsyncServiceImpl implements AsyncService {
             File file = files.get(i);
             String originalName = (i < originalNames.size()) ? originalNames.get(i) : file.getName();
             Long imageId = result.get(i);
-            ImagePO imagePO = null;
-            boolean ossUploaded = false;
-
-            try {
-                imagePO = imageMap.get(imageId);
-                if (imagePO == null || imagePO.getObjectKey() == null) {
-                    throw new ParamIllegalException("object_key 不能为空");
-                }
-                String fileName = imagePO.getObjectKey();
-
-                // 1. 上传文件到 OSS（V4 客户端会自动使用 V4 签名）
-                diaryOssClient.putObject(bucketName, fileName, file);
-                ossUploaded = true;
-
-                // 2. 构建消息对象，存储 object_key 而非签名 URL
-                OssUploadSuccessMsg msg = new OssUploadSuccessMsg(
-                        imageId, fileName, originalName, System.currentTimeMillis()
-                );
-
-                // 发送消息到rabbitmq
-                // 创建关联ID
-                String correlationId = "UPLOAD" + imageId + System.currentTimeMillis();
-                rabbitTemplate.convertAndSend(
-                        RabbitMqConfig.OSS_UPLOAD_EXCHANGE,
-                        RabbitMqConfig.OSS_UPLOAD_ROUTING_KEY,
-                        msg,
-                        new CorrelationData(correlationId)
-                );
-                log.info("OSS 上传成功，消息已发送，photoId: {}, fileName: {}, correlationId: {}",
-                        imageId, originalName, correlationId);
-                successCount++;
-            } catch (Exception e) {
-                log.error("处理文件异常，photoId: {}, fileName: {}", imageId, originalName, e);
-                if (imagePO != null) {
-                    imageMapper.updateImageStatusById(imageId, imagePO.getObjectKey(), PhotoStatusConst.PHOTO_STATUS_FAILED);
-                }
-                if (!ossUploaded) {
-                    imageFileService.deleteLocalFile(file.toPath());
-                }
-                failCount++;
-                failedFiles.add(originalName + ": " + e.getMessage());
+            ImagePO imagePO = imageMap.get(imageId);
+            if (imagePO == null) {
+                failedFiles.add(originalName + ": 图片记录不存在");
+                continue;
             }
+            if (imagePO.getObjectKey() == null) {
+                // 让此图片永久进入failed，等待后续人工处理
+                try {
+                    ImageTransitionResultEnum transitionResultEnum = imageStatusService.markUploadFailed(imageId);
+                    if (transitionResultEnum == ImageTransitionResultEnum.REJECTED) {
+                        log.warn("ObjectKey不存在但状态拒绝迁移，imageId={}", imageId);
+                        failedFiles.add(originalName + ": ObjectKey不存在但状态拒绝迁移");
+                        continue;
+                    }
+                } catch (Exception e) {
+                    log.warn("修改状态为failed失败，名称为：{}, ID为：{}，失败原因为：", originalName, imageId, e);
+                    failedFiles.add(originalName + ": ObjectKey不存在但状态拒绝迁移");
+                    continue;
+                }
+                continue;
+            }
+            uploadSingleImage(imageId, file, originalName, imagePO, failedFiles);
+        }
+        if (!failedFiles.isEmpty()) {
+            log.warn("异步上传失败列表: {}", failedFiles);
+        }
+    }
+
+    private void uploadSingleImage(Long imageId, File file, String originalName, ImagePO imagePO, List<String> failedFiles) {
+        // 获取图片当前状态，判断是否允许上传
+        // 现在是分布式系统，所以上传前必须查看最新一次图片状态，防止其他实例已更改状态
+        // 更新图片状态为UPLOADING
+        try {
+            ImageTransitionResultEnum transitionResultEnum = imageStatusService.markUploading(imageId);
+            if (transitionResultEnum != ImageTransitionResultEnum.APPLIED) {
+                log.warn("未获得此图片的上传执行权，名称为：{}, ID为：{}", originalName, imageId);
+                return;
+            }
+        } catch (Exception e) {
+            log.warn("未获得此图片的上传执行权，名称为：{}, ID为：{}，失败原因为：", originalName, imageId, e);
+            failedFiles.add(originalName + ": 未获得此图片的上传执行权");
+            return;
         }
 
-        log.info("批量上传完成，成功: {}, 失败: {}", successCount, failCount);
-        if (!failedFiles.isEmpty()) {
-            log.warn("失败文件列表: {}", failedFiles);
+        // 开始上传阿里云oss
+        String fileName = imagePO.getObjectKey();
+        // 1. 上传文件到 OSS（V4 客户端会自动使用 V4 签名）
+        try {
+            diaryOssClient.putObject(bucketName, fileName, file);
+        } catch (Exception fileUploadException) {
+            log.warn("图片上传OSS失败，名称为：{}, ID为：{}，失败原因为：", originalName, imageId, fileUploadException);
+            // 这是可重试的失败状态，需要将状态流转为RETRY_WAIT
+            try {
+                ImageTransitionResultEnum transitionResultEnum = imageStatusService.markRetryWait(imageId);
+                if (transitionResultEnum == ImageTransitionResultEnum.REJECTED) {
+                    log.warn("OSS上传失败，且状态拒绝进入RETRY_WAIT，imageId={}", imageId);
+                }
+            } catch (Exception statusException) {
+                log.warn("图片上传OSS失败后，状态流转为RETRY_WAIT持续失败，名称为：{}, ID为：{}，失败原因为：{}",
+                        originalName, imageId, fileUploadException, statusException);
+                failedFiles.add(originalName + ": 图片上传OSS失败后，状态流转为RETRY_WAIT持续失败");
+                return;
+            }
+            return;
+        }
+
+        // 上传成功后更新状态为UPLOADED
+        try {
+            fileTransactionService.recordImageUploaded(imageId, fileName, originalName, failedFiles);
+        } catch (Exception e) {
+            log.warn("OSS成功，但状态拒绝迁移或outbox数据插入失败，名称为：{}, ID为：{}，失败原因为：", originalName, imageId, e);
+            failedFiles.add(originalName + ": OSS成功，但状态拒绝迁移或outbox数据插入失败");
         }
     }
 
@@ -193,137 +199,6 @@ public class AsyncServiceImpl implements AsyncService {
         }
 
         return CompletableFuture.completedFuture(result);
-    }
-
-    @Async("ossUploadExecutor")
-    @Override
-    public void uploadAndSendMsgAsync(Map<String, Object> result, MultipartFile file) {
-        // 获取videoId
-        Object dataObj = result.get("data");
-        if (dataObj == null) {
-            log.error("数据库插入失败，result: {}", result);
-            throw new RuntimeException("数据插入DB失败");
-        }
-
-        Long videoId;
-        if (dataObj instanceof Long) {
-            videoId = (Long) dataObj;
-        } else {
-            log.error("未知的数据类型: {}", dataObj.getClass());
-            throw new RuntimeException("数据格式错误");
-        }
-
-        try {
-            // 生成唯一文件名，避免同名覆盖
-            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-
-            String ossUrl;
-            // 根据文件大小选择上传方式
-            if (file.getSize() > LARGE_FILE_THRESHOLD) {
-                // 大文件使用分片上传
-                ossUrl = multipartUpload(file, fileName);
-            } else {
-                // 小文件使用普通上传
-                ossUrl = simpleUpload(file, fileName);
-            }
-
-            // 构建消息对象
-            OssUploadSuccessMsg msg = new OssUploadSuccessMsg(
-                    videoId, ossUrl, file.getOriginalFilename(), System.currentTimeMillis()
-            );
-
-            // 发送消息到rabbitmq
-            String correlationId = "VIDEO_UPLOAD" + videoId + System.currentTimeMillis();
-            rabbitTemplate.convertAndSend(
-                    RabbitMqConfig.OSS_UPLOAD_EXCHANGE,
-                    RabbitMqConfig.OSS_UPLOAD_ROUTING_KEY,
-                    msg,
-                    new CorrelationData(correlationId)
-            );
-            log.info("视频OSS上传成功，消息已发送，videoId: {}, fileName: {}, correlationId: {}",
-                    videoId, file.getOriginalFilename(), correlationId);
-        } catch (IOException e) {
-            log.error("视频OSS上传失败，videoId: {}, fileName: {}", videoId, file.getOriginalFilename(), e);
-            // 可在此发送上传失败消息到另一个队列
-        } catch (Exception e) {
-            log.error("处理视频文件异常，videoId: {}, fileName: {}", videoId, file.getOriginalFilename(), e);
-        }
-    }
-
-    /**
-     * 简单上传（适用于小文件）
-     */
-    private String simpleUpload(MultipartFile file, String fileName) throws IOException {
-        // 上传文件到OSS
-        diaryOssClient.putObject(bucketName, fileName, file.getInputStream());
-        // 返回 object_key 而非签名 URL
-        return fileName;
-    }
-
-    /**
-     * 分片上传（适用于大文件，支持断点续传）手动控制分片（精细控制）
-     */
-    private String multipartUpload(MultipartFile file, String fileName) throws IOException {
-        String uploadId = null;
-        try {
-            // 1. 初始化分片上传
-            InitiateMultipartUploadRequest initiateRequest = new InitiateMultipartUploadRequest(bucketName, fileName);
-            InitiateMultipartUploadResult initiateResult = diaryOssClient.initiateMultipartUpload(initiateRequest);
-            uploadId = initiateResult.getUploadId();
-
-            // 2. 计算分片数量
-            long contentLength = file.getSize();
-            int partCount = (int) (contentLength / PART_SIZE);
-            if (contentLength % PART_SIZE != 0) {
-                partCount++;
-            }
-
-            // 3. 上传分片
-            List<PartETag> partETags = new ArrayList<>();
-            try (InputStream inputStream = file.getInputStream()) {
-                for (int i = 0; i < partCount; i++) {
-                    // 跳过已上传的分片
-                    long startPos = i * PART_SIZE;
-                    long curPartSize = (i + 1 == partCount) ? (contentLength - startPos) : PART_SIZE;
-
-                    // 创建分片上传请求
-                    UploadPartRequest uploadPartRequest = new UploadPartRequest();
-                    uploadPartRequest.setBucketName(bucketName);
-                    uploadPartRequest.setKey(fileName);
-                    uploadPartRequest.setUploadId(uploadId);
-                    uploadPartRequest.setInputStream(inputStream);
-                    uploadPartRequest.setPartSize(curPartSize);
-                    uploadPartRequest.setPartNumber(i + 1);
-
-                    // 上传分片
-                    UploadPartResult uploadPartResult = diaryOssClient.uploadPart(uploadPartRequest);
-                    partETags.add(uploadPartResult.getPartETag());
-
-                    log.debug("视频分片上传成功，fileName: {}, partNumber: {}/{}", fileName, i + 1, partCount);
-                }
-            }
-
-            // 4. 完成分片上传
-            CompleteMultipartUploadRequest completeRequest = new CompleteMultipartUploadRequest(
-                    bucketName, fileName, uploadId, partETags);
-            diaryOssClient.completeMultipartUpload(completeRequest);
-
-            // 5. 返回 object_key 而非签名 URL
-            return fileName;
-        } catch (Exception e) {
-            // 如果上传失败，取消分片上传
-            if (uploadId != null) {
-                try {
-                    AbortMultipartUploadRequest abortRequest = new AbortMultipartUploadRequest(
-                            bucketName, fileName, uploadId);
-                    diaryOssClient.abortMultipartUpload(abortRequest);
-                    log.warn("取消分片上传，fileName: {}, uploadId: {}", fileName, uploadId);
-                } catch (Exception abortEx) {
-                    log.error("取消分片上传失败，fileName: {}, uploadId: {}", fileName, uploadId, abortEx);
-                }
-            }
-            throw new IOException("分片上传失败: " + e.getMessage(), e);
-        }
     }
 
     /**

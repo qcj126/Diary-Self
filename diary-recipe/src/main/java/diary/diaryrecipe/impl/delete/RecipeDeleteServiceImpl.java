@@ -9,7 +9,7 @@ import diary.diaryrecipe.mapper.RecipeIngredientMapper;
 import diary.diaryrecipe.mapper.RecipeMapper;
 import diary.diaryrecipe.mapper.RecipeStepMapper;
 import diary.diaryrecipe.service.delete.RecipeDeleteService;
-import diary.utils.commonutil.MyUtils;
+import diary.utils.common.MyUtils;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

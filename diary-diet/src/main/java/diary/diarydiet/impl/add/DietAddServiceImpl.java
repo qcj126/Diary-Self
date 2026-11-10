@@ -5,7 +5,7 @@ import diary.diarydiet.entity.dto.DietRecordAddDTO;
 import diary.diarydiet.entity.po.DietRecordPO;
 import diary.common.result.ApiResponse;
 import diary.diarydiet.support.DietRecordValidator;
-import diary.utils.commonutil.MyUtils;
+import diary.utils.common.MyUtils;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import diary.diarydiet.mapper.DietMapper;
