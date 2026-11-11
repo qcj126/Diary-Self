@@ -49,4 +49,12 @@ public enum ImageStatusEnum {
         }
         throw new ParamIllegalException("未知图片状态编码：" + code);
     }
+
+    public boolean isTerminal() {
+        return this == READY || this == UPLOAD_FAILED;
+    }
+
+    public boolean isSuccess() {
+        return this == READY;
+    }
 }

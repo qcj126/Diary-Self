@@ -1,10 +1,12 @@
 package diary.file.controller;
 
+import diary.file.entity.vo.ImageUploadStatusVO;
 import diary.file.entity.vo.ImageVO;
 import diary.common.auth.CurrentUser;
 import diary.file.service.ImageFileService;
 import diary.common.result.ApiResponse;
 import diary.config.logconfig.OperLog;
+import diary.file.service.ImageUploadStatusQueryService;
 import diary.file.service.deleteservice.DeleteService;
 import diary.file.service.downloadservice.DownloadService;
 import diary.file.service.queryurlservice.QueryUrlService;
@@ -46,6 +48,8 @@ public class FileController {
 
     private final CurrentUser currentUser;
 
+    private final ImageUploadStatusQueryService imageUploadStatusQueryService;
+
     @OperLog(module = "文件管理", description = "批量上传图片", operationType = "UPLOAD", saveParams = false, saveResult = true)
     @PostMapping("/upload/images")
     public ApiResponse<List<Long>> upload(@RequestParam("files") List<MultipartFile> files,
@@ -57,6 +61,18 @@ public class FileController {
     @PostMapping("/query/images/urls")
     public ApiResponse<List<ImageVO>> queryImageUrls(@RequestBody List<Long> imageIds) {
         return ApiResponse.success(queryUrlService.queryImageUrls(imageIds));
+    }
+
+    @OperLog(module = "文件管理", description = "批量查询图片上传状态", operationType = "SELECT", saveParams = true, saveResult = true)
+    @PostMapping("/query/images/statuses")
+    public ApiResponse<List<ImageUploadStatusVO>> queryImageUploadStatuses(
+            @RequestBody List<Long> imageIds) {
+        return ApiResponse.success(
+                imageUploadStatusQueryService.queryStatuses(
+                        imageIds,
+                        currentUser.getUser()
+                )
+        );
     }
 
     /**

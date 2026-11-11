@@ -1,14 +1,16 @@
-create table ai_info(
-                        id             bigint                             not null comment '主键'
-                            primary key,
-                        user_id        bigint unsigned                    not null comment '用户ID',
-                        model          varchar(20)                        not null comment 'AI模型',
-                        temperature    varchar(5)                         not null comment 'AI结果创意度',
-                        ai_type        tinyint(1)                         not null comment 'AI类别，对应着AI模型',
-                        ai_application tinyint                            not null comment 'AI用途：如鉴别营养成分，每日推荐菜品等',
-                        create_time    datetime default CURRENT_TIMESTAMP not null comment '创建时间',
-                        update_time    datetime default CURRENT_TIMESTAMP not null comment '更新时间'
-) engine=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='AI信息表';
+create table ai_info
+(
+    id             bigint                             not null comment '主键'
+        primary key,
+    user_id        bigint unsigned                    not null comment '用户ID',
+    model          varchar(20)                        not null comment 'AI模型',
+    temperature    varchar(5)                         not null comment 'AI结果创意度',
+    ai_type        tinyint(1)                         not null comment 'AI类别，对应着AI模型',
+    ai_application tinyint                            not null comment 'AI用途：如鉴别营养成分，每日推荐菜品等',
+    create_time    datetime default CURRENT_TIMESTAMP not null comment '创建时间',
+    update_time    datetime default CURRENT_TIMESTAMP not null comment '更新时间'
+)
+    comment 'AI信息表' charset = utf8mb4;
 
 -- auto-generated definition
 create table ai_nutrient
@@ -91,7 +93,7 @@ create table ai_task
     update_time       datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '最近一次状态更新时间',
     version_id        int unsigned                       not null comment 'version id',
     ai_application    tinyint                            not null comment 'AI用途：如鉴别营养成分，每日推荐菜品等',
-    target_type       varchar(32)                        not null comment 'RECIPE/DIET/LOVE_RECORD',
+    target_type       varchar(32)                        not null comment 'AI 分析目标的具体场景类型',
     target_id         bigint unsigned                    not null comment '业务对象ID',
     target_title      varchar(200)                       not null comment '提交任务时的展示标题',
     constraint uk_ai_task_user_client_request

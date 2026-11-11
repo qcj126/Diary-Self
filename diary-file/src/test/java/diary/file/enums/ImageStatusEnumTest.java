@@ -57,4 +57,28 @@ class ImageStatusEnumTest {
     void testFromCode_throw() {
         assertThrows(ParamIllegalException.class, () -> ImageStatusEnum.fromCode(9999));
     }
+
+    @Test
+    @DisplayName("isTerminal：仅成功和失败属于最终状态")
+    void isTerminal_onlyReadyAndFailed() {
+        assertTrue(ImageStatusEnum.READY.isTerminal());
+        assertTrue(ImageStatusEnum.UPLOAD_FAILED.isTerminal());
+
+        assertFalse(ImageStatusEnum.PENDING_UPLOAD.isTerminal());
+        assertFalse(ImageStatusEnum.UPLOADING.isTerminal());
+        assertFalse(ImageStatusEnum.UPLOADED.isTerminal());
+        assertFalse(ImageStatusEnum.RETRY_WAIT.isTerminal());
+    }
+
+    @Test
+    @DisplayName("isSuccess：只有 READY 表示上传成功")
+    void isSuccess_onlyReady() {
+        assertTrue(ImageStatusEnum.READY.isSuccess());
+
+        for (ImageStatusEnum status : ImageStatusEnum.values()) {
+            if (status != ImageStatusEnum.READY) {
+                assertFalse(status.isSuccess());
+            }
+        }
+    }
 }

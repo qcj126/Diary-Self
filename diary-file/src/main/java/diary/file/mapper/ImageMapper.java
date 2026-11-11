@@ -8,23 +8,51 @@ import java.util.List;
 
 @Mapper
 public interface ImageMapper {
-    Integer batchAddImageToDb(@Param("imageList") List<ImagePO> imageList);
+    Integer batchAddImageToDb (
+            @Param("imageList") List<ImagePO> imageList
+    );
 
-    Long selectImageByTypeAndName(Integer type, String originalFilename);
+    Long selectImageByTypeAndName (
+            @Param("type") Integer type,
+            @Param("originalFilename") String originalFilename
+    );
 
-    Integer updateImageStatusById(Long id, String objectKey, int status);
+    Integer updateImageStatusById (
+            @Param("id") Long id,
+            @Param("objectKey") String objectKey,
+            @Param("status") int status
+    );
 
-    ImagePO selectImageById(Long id);
+    ImagePO selectImageById (
+            @Param("id") Long id
+    );
 
-    ImagePO selectImageByOriginalName(String originalName);
+    ImagePO selectImageByOriginalName (
+            @Param("originalName") String originalName
+    );
 
-    List<ImagePO> selectImagesForUploadByIds(@Param("imageIds") List<Long> imageIds);
+    List<ImagePO> selectImagesForUploadByIds (
+            @Param("imageIds") List<Long> imageIds
+    );
 
-    List<ImagePO> selectLatestTwoImagesForCarousel();
+    List<ImagePO> selectLatestTwoImagesForCarousel ();
 
-    Integer deleteImageById(Long id);
+    Integer deleteImageById (
+            @Param("id") Long id
+    );
 
-    ImagePO selectImageStatusById(@Param("imageId") Long imageId);
+    ImagePO selectImageStatusById (
+            @Param("imageId") Long imageId
+    );
 
-    int updateStatusIfCurrent(@Param("imageId") Long imageId, @Param("expectedStatus") int expectedStatus, @Param("targetStatus") int targetStatus);
+    List<ImagePO> selectImageStatusesByIdsAndUserId (
+            @Param("imageIds") List<Long> imageIds,
+            @Param("userId") Long userId
+    );
+
+    int updateStatusIfCurrent (
+            @Param("imageId") Long imageId,
+            @Param("expectedStatus") int expectedStatus,
+            @Param("targetStatus") int targetStatus
+    );
 }

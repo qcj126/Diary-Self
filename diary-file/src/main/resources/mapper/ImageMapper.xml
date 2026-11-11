@@ -15,6 +15,11 @@
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
     </resultMap>
+
+    <sql id="imageColumns">
+        id, user_id, file_size, object_key, original_name, mime_type, type, deleted, status, create_time, update_time
+    </sql>
+
     <select id="selectImageById" resultMap="ImageResultMap">
         SELECT id, object_key, original_name FROM image WHERE id = #{id}
         and deleted = 0 and status = 1000
@@ -98,4 +103,13 @@
         update image set status = #{targetStatus}, update_time = now()
         where deleted = 0 and id = #{imageId} and status = #{expectedStatus}
     </update>
+
+    <select id="selectImageStatusesByIdsAndUserId" resultMap="ImageResultMap">
+        select id, status, user_id
+        from image
+        where deleted = 0 and user_id = #{userId} and id IN
+        <foreach collection="imageIds" item="imageId" open="(" separator="," close=")">
+            #{imageId}
+        </foreach>
+    </select>
 </mapper>

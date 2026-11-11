@@ -1,85 +1,101 @@
-CREATE TABLE stage_goal
+-- auto-generated definition
+create table stage_goal
 (
-    id             BIGINT UNSIGNED NOT NULL COMMENT '主键ID',
-    user_id        BIGINT UNSIGNED NOT NULL COMMENT '用户ID',
-    category       VARCHAR(20)     NOT NULL COMMENT '分类',
-    title          VARCHAR(64)     NOT NULL COMMENT '目标标题',
-    description    VARCHAR(255)    NOT NULL COMMENT '目标描述',
-    status         TINYINT UNSIGNED NOT NULL DEFAULT 0
-        COMMENT '状态：0未开始，1进行中，2暂停，3已完成，4已放弃',
-    create_time    DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    update_time    DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP
-        ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    end_time       DATETIME        NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'DDL',
-    completed_time DATETIME        NULL COMMENT '完成时间',
+    id             bigint unsigned                            not null comment '主键ID'
+        primary key,
+    user_id        bigint unsigned                            not null comment '用户ID',
+    category       varchar(20)                                not null comment '分类',
+    title          varchar(64)                                not null comment '目标标题',
+    description    varchar(255)                               not null comment '目标描述',
+    status         tinyint unsigned default '0'               not null comment '状态：0未开始，1进行中，2暂停，3已完成，4已放弃',
+    create_time    datetime         default CURRENT_TIMESTAMP not null comment '创建时间',
+    update_time    datetime         default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    end_time       datetime         default CURRENT_TIMESTAMP null comment 'DDL',
+    completed_time datetime                                   null comment '完成时间',
+    constraint ck_stage_goal_status
+        check (`status` between 0 and 4)
+)
+    comment '阶段目标表' charset = utf8mb4;
 
-    PRIMARY KEY (id),
-    KEY idx_stage_goal_user_status_ddl (user_id, status, end_time),
+create index idx_stage_goal_user_status_ddl
+    on stage_goal (user_id, status, end_time);
 
-    CONSTRAINT ck_stage_goal_status CHECK (status BETWEEN 0 AND 4)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COMMENT = '阶段目标表';
 
-CREATE TABLE sub_goal
+
+-- auto-generated definition
+create table sub_goal
 (
-    id              BIGINT UNSIGNED NOT NULL COMMENT '主键ID',
-    user_id         BIGINT UNSIGNED NOT NULL COMMENT '用户ID',
-    stage_id        BIGINT UNSIGNED NOT NULL COMMENT '主目标ID',
-    title           VARCHAR(100)    NOT NULL COMMENT '小目标标题',
-    content         VARCHAR(255)    NULL COMMENT '详细内容描述',
-    status          TINYINT UNSIGNED NOT NULL DEFAULT 0
-        COMMENT '状态：0未开始，1进行中，2暂停，3已完成，4已放弃',
-    learned_hours   DECIMAL(10, 2)  NULL DEFAULT 0.00 COMMENT '已学时长(小时)',
-    estimated_hours DECIMAL(10, 2)  NULL DEFAULT 0.00 COMMENT '预计总用时(小时)',
-    create_time     DATETIME        NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    update_time     DATETIME        NULL DEFAULT CURRENT_TIMESTAMP
-        ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
-    end_time        DATETIME        NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'DDL',
-    completed_time  DATETIME        NULL COMMENT '完成时间',
+    id              bigint unsigned                            not null comment '主键ID'
+        primary key,
+    user_id         bigint unsigned                            not null comment '用户ID',
+    stage_id        bigint unsigned                            not null comment '主目标ID',
+    title           varchar(100)                               not null comment '小目标标题',
+    content         varchar(255)                               null comment '详细内容描述',
+    status          tinyint unsigned default '0'               not null comment '状态：0未开始，1进行中，2暂停，3已完成，4已放弃',
+    learned_hours   decimal(10, 2)   default 0.00              null comment '已学时长(小时)',
+    estimated_hours decimal(10, 2)   default 0.00              null comment '预计总用时(小时)',
+    create_time     datetime         default CURRENT_TIMESTAMP null comment '创建时间',
+    update_time     datetime         default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP comment '修改时间',
+    end_time        datetime         default CURRENT_TIMESTAMP null comment 'DDL',
+    completed_time  datetime                                   null comment '完成时间',
+    constraint ck_sub_goal_estimated_hours
+        check (`estimated_hours` >= 0),
+    constraint ck_sub_goal_learned_hours
+        check (`learned_hours` >= 0),
+    constraint ck_sub_goal_status
+        check (`status` between 0 and 4)
+)
+    comment '小目标表' charset = utf8mb4;
 
-    PRIMARY KEY (id),
-    KEY idx_sub_goal_stage_status (stage_id, status),
-    KEY idx_sub_goal_user (user_id),
+create index idx_sub_goal_stage_status
+    on sub_goal (stage_id, status);
 
-    CONSTRAINT ck_sub_goal_status CHECK (status BETWEEN 0 AND 4),
-    CONSTRAINT ck_sub_goal_learned_hours CHECK (learned_hours >= 0),
-    CONSTRAINT ck_sub_goal_estimated_hours CHECK (estimated_hours >= 0)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COMMENT = '小目标表';
+create index idx_sub_goal_user
+    on sub_goal (user_id);
 
-CREATE TABLE goal_checkin
+
+
+-- auto-generated definition
+create table goal_checkin
 (
-    id             BIGINT UNSIGNED NOT NULL COMMENT '打卡记录ID，使用雪花算法生成',
-    request_id     VARCHAR(64)     NOT NULL COMMENT '幂等请求ID，防止重复打卡',
-    user_id        BIGINT UNSIGNED NOT NULL COMMENT '用户ID',
-    stage_goal_id  BIGINT UNSIGNED NOT NULL COMMENT '阶段目标ID',
-    sub_goal_id    BIGINT UNSIGNED NULL COMMENT '子目标ID；为空表示针对阶段目标打卡',
-    checkin_type   TINYINT UNSIGNED NOT NULL DEFAULT 1
-        COMMENT '打卡类型：1正常打卡，2完成目标，3重新开始，4补打卡',
-    spent_hours    DECIMAL(10, 2)  NOT NULL DEFAULT 0.00 COMMENT '本次投入时长，单位：小时',
-    content        VARCHAR(1000)   NOT NULL DEFAULT '' COMMENT '本次完成内容或打卡备注',
-    evidence_urls  JSON            NULL COMMENT '打卡凭证URL数组',
-    checkin_date   DATE            NOT NULL COMMENT '打卡业务日期，支持补打卡',
-    source         TINYINT UNSIGNED NOT NULL DEFAULT 1
-        COMMENT '来源：1 Web，2 App，3 系统任务，4 数据导入',
-    is_deleted     TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '逻辑删除：0正常，1删除',
-    create_time    DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
-    update_time    DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3)
-        ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '更新时间',
+    id            bigint unsigned                               not null comment '打卡记录ID，使用雪花算法生成'
+        primary key,
+    request_id    varchar(64)                                   not null comment '幂等请求ID，防止重复打卡',
+    user_id       bigint unsigned                               not null comment '用户ID',
+    stage_goal_id bigint unsigned                               not null comment '阶段目标ID',
+    sub_goal_id   bigint unsigned                               null comment '子目标ID；为空表示针对阶段目标打卡',
+    checkin_type  tinyint unsigned default '1'                  not null comment '打卡类型：1正常打卡，2完成目标，3重新开始，4补打卡',
+    spent_hours   decimal(10, 2)   default 0.00                 not null comment '本次投入时长，单位：小时',
+    content       varchar(1000)    default ''                   not null comment '本次完成内容或打卡备注',
+    evidence_urls json                                          null comment '打卡凭证URL数组',
+    checkin_date  date                                          not null comment '打卡业务日期，支持补打卡',
+    source        tinyint unsigned default '1'                  not null comment '来源：1 Web，2 App，3 系统任务，4 数据导入',
+    is_deleted    tinyint unsigned default '0'                  not null comment '逻辑删除：0正常，1删除',
+    create_time   datetime(3)      default CURRENT_TIMESTAMP(3) not null comment '创建时间',
+    update_time   datetime(3)      default CURRENT_TIMESTAMP(3) not null on update CURRENT_TIMESTAMP(3) comment '更新时间',
+    constraint uk_goal_checkin_user_request
+        unique (user_id, request_id),
+    constraint ck_goal_checkin_deleted
+        check (`is_deleted` in (0, 1)),
+    constraint ck_goal_checkin_source
+        check (`source` between 1 and 4),
+    constraint ck_goal_checkin_spent_hours
+        check (`spent_hours` >= 0),
+    constraint ck_goal_checkin_type
+        check (`checkin_type` between 1 and 4)
+)
+    comment '目标打卡流水表' charset = utf8mb4;
 
-    PRIMARY KEY (id),
-    UNIQUE KEY uk_goal_checkin_user_request (user_id, request_id),
-    KEY idx_goal_checkin_stage_time (stage_goal_id, create_time),
-    KEY idx_goal_checkin_sub_time (sub_goal_id, create_time),
-    KEY idx_goal_checkin_user_date (user_id, checkin_date),
-    KEY idx_goal_checkin_user_stage_date (user_id, stage_goal_id, checkin_date),
+create index idx_goal_checkin_stage_time
+    on goal_checkin (stage_goal_id, create_time);
 
-    CONSTRAINT ck_goal_checkin_spent_hours CHECK (spent_hours >= 0),
-    CONSTRAINT ck_goal_checkin_type CHECK (checkin_type BETWEEN 1 AND 4),
-    CONSTRAINT ck_goal_checkin_source CHECK (source BETWEEN 1 AND 4),
-    CONSTRAINT ck_goal_checkin_deleted CHECK (is_deleted IN (0, 1))
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COMMENT = '目标打卡流水表';
+create index idx_goal_checkin_sub_time
+    on goal_checkin (sub_goal_id, create_time);
+
+create index idx_goal_checkin_user_date
+    on goal_checkin (user_id, checkin_date);
+
+create index idx_goal_checkin_user_stage_date
+    on goal_checkin (user_id, stage_goal_id, checkin_date);
+
+
