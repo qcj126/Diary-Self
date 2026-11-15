@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="diary.file.mapper.ThumbnailMapper">
+
+    <resultMap id="ThumbnailResultMap" type="diary.file.entity.po.ThumbnailPO">
+        <id property="id" column="id"/>
+        <result property="imageId" column="image_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="fileSize" column="file_size"/>
+        <result property="mimeType" column="mime_type"/>
+        <result property="width" column="width"/>
+        <result property="height" column="height"/>
+        <result property="objectKey" column="object_key"/>
+        <result property="status" column="status"/>
+        <result property="deleted" column="deleted"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="thumbnailColumns">
+        id, image_id, user_id, file_size, mime_type, width, height,
+        object_key, status, deleted, create_time, update_time
+    </sql>
+
+    <insert id="insert">
+        INSERT INTO thumbnail (
+            id, image_id, user_id, file_size, mime_type, width, height,
+            object_key, status, deleted
+        ) VALUES (
+            #{id}, #{imageId}, #{userId}, #{fileSize}, #{mimeType},
+            #{width}, #{height}, #{objectKey}, #{status}, #{deleted}
+        )
+    </insert>
+
+    <select id="selectByImageIdAndUserId" resultMap="ThumbnailResultMap">
+        SELECT <include refid="thumbnailColumns"/>
+        FROM thumbnail
+        WHERE image_id = #{imageId}
+          AND user_id = #{userId}
+          AND deleted = 0
+        LIMIT 1
+    </select>
+</mapper>

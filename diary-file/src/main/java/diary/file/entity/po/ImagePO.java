@@ -6,24 +6,55 @@ import java.time.LocalDateTime;
 
 @Data
 public class ImagePO {
+
+    /** 主键 */
     @NotNull
-    private Long id;                      // 主键
+    private Long id;
+
+    /** 用户ID */
     @NotNull
-    private Long userId;                 // 用户ID
+    private Long userId;
+
+    /** 文件大小（字节） */
     @NotNull
-    private Long fileSize;          // 文件大小（字节）
+    private Long fileSize;
+
+    /** OSS对象键（文件路径，用于生成签名URL） */
     @NotNull
-    private String objectKey;         // OSS对象键（文件路径，用于生成签名URL）
+    private String objectKey;
+
+    /** 原始文件名 */
     @NotNull
-    private String originalName;      // 原始文件名
+    private String originalName;
+
+    /** MIME类型，如 image/jpeg */
     @NotNull
-    private String mimeType;          // MIME类型，如 image/jpeg
+    private String mimeType;
+
+    /** 图片所属业务分类，编码定义见 ImageTypeEnum */
     @NotNull
-    private Integer type;             // 图片类型 1000 正常图，1100 缩略图，1200 裁剪图，1300 封面图，2000 未知类型
+    private Integer type;
+
+    /** 是否删除：0-否 1-是 */
     @NotNull
-    private Integer deleted;          // 是否删除：0-否 1-是
+    private Integer deleted;
+
+    /** 状态：1200-上传中 1100-失败 1000-成功 */
     @NotNull
-    private Integer status;           // 状态：1200 上传中 1100 失败 1000 成功
-    private LocalDateTime createTime;      // 上传时间
-    private LocalDateTime updateTime;      // 更新时间
+    private Integer status;
+
+    /** SHA-256 hash值（ASCII 十六进制字符串） */
+    private String sha256;
+
+    /** 图片宽度(px) */
+    private Integer width;
+
+    /** 图片高度(px) */
+    private Integer height;
+
+    /** 上传时间 */
+    private LocalDateTime createTime;
+
+    /** 更新时间 */
+    private LocalDateTime updateTime;
 }

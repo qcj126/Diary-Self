@@ -55,4 +55,16 @@ public interface ImageMapper {
             @Param("expectedStatus") int expectedStatus,
             @Param("targetStatus") int targetStatus
     );
+
+    ImagePO selectReadyByUserIdAndTypeAndSha256(
+            @Param("userId") Long userId,
+            @Param("type") Integer type,
+            @Param("sha256") String sha256
+    );
+
+    ImagePO selectByUserIdAndTypeAndSha256(
+            @Param("userId") Long userId,
+            @Param("type") Integer type,
+            @Param("sha256") String sha256
+    );
 }

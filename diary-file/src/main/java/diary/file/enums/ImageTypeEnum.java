@@ -17,7 +17,12 @@ import static diary.file.consts.FileTypeConst.WALK_IMAGE;
 
 @Getter
 public enum ImageTypeEnum {
-    // 1000---1100    图片的类别
+    /**
+     * 图片所属的业务分类。
+     *
+     * <p>该编码参与 {@code user_id + type + sha256} 唯一约束，不能将其解释为
+     * 原图、缩略图或裁剪图等文件形态。</p>
+     */
     DIET(1000, DIET_IMAGE),
     RECIPE(2000, RECIPE_IMAGE),
     INGREDIENT(3000, INGREDIENT_IMAGE),
@@ -31,33 +36,40 @@ public enum ImageTypeEnum {
     WALK(11000, WALK_IMAGE),
 
     ;
-    private final Integer code;
-    private final String type;
 
-    ImageTypeEnum(Integer code, String type) {
+    private final int code;
+    private final String description;
+
+    ImageTypeEnum(int code, String description) {
         this.code = code;
-        this.type = type;
+        this.description = description;
     }
 
-    public static String getType(Integer code) {
-        String type = null;
-        for (ImageTypeEnum imageTypeEnum : ImageTypeEnum.values()) {
-            if (imageTypeEnum.getCode().equals(code)) {
-                type = imageTypeEnum.getType();
-            }
-        }
-        if (type == null) {
-            throw new CustomException("未知图片类型，无效的code: " + code);
-        }
-        return type;
-    }
-
-    public static Integer getCode(Integer code) {
-        for (ImageTypeEnum imageTypeEnum : ImageTypeEnum.values()) {
-            if (imageTypeEnum.getCode().equals(code)) {
-                return imageTypeEnum.getCode();
+    /**
+     * 根据业务分类编码获取枚举。
+     */
+    public static ImageTypeEnum fromCode(Integer code) {
+        if (code != null) {
+            for (ImageTypeEnum imageTypeEnum : values()) {
+                if (imageTypeEnum.code == code) {
+                    return imageTypeEnum;
+                }
             }
         }
         throw new CustomException("未知图片类型，无效的code: " + code);
+    }
+
+    /**
+     * 保留旧调用方式，返回业务分类名称。
+     */
+    public static String getType(Integer code) {
+        return fromCode(code).description;
+    }
+
+    /**
+     * 校验并返回业务分类编码，兼容现有上传链路。
+     */
+    public static Integer getCode(Integer code) {
+        return fromCode(code).code;
     }
 }

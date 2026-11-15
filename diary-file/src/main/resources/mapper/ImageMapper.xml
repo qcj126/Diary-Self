@@ -12,12 +12,15 @@
         <result property="type" column="type"/>
         <result property="deleted" column="deleted"/>
         <result property="status" column="status"/>
+        <result property="sha256" column="sha256"/>
+        <result property="width" column="width"/>
+        <result property="height" column="height"/>
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
     </resultMap>
 
     <sql id="imageColumns">
-        id, user_id, file_size, object_key, original_name, mime_type, type, deleted, status, create_time, update_time
+        id, user_id, file_size, object_key, original_name, mime_type, type, deleted, status, sha256, width, height, create_time, update_time
     </sql>
 
     <select id="selectImageById" resultMap="ImageResultMap">
@@ -51,35 +54,18 @@
     </select>
 
     <insert id="batchAddImageToDb" parameterType="list">
-        INSERT INTO image
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="imageList[0].id != null">id,</if>
-            <if test="imageList[0].userId != null">user_id,</if>
-            <if test="imageList[0].fileSize != null">file_size,</if>
-            <if test="imageList[0].objectKey != null">object_key,</if>
-            <if test="imageList[0].originalName != null">original_name,</if>
-            <if test="imageList[0].mimeType != null">mime_type,</if>
-            <if test="imageList[0].type != null">type,</if>
-            <if test="imageList[0].deleted != null">deleted,</if>
-            <if test="imageList[0].status != null">status,</if>
-            <if test="imageList[0].createTime != null">create_time,</if>
-            <if test="imageList[0].updateTime != null">update_time,</if>
-        </trim>
+        INSERT INTO image (
+            id, user_id, file_size, object_key, original_name, mime_type,
+            type, deleted, status, sha256, width, height
+        )
         VALUES
         <foreach collection="imageList" item="item" separator=",">
-            <trim prefix="(" suffix=")" suffixOverrides=",">
-                <if test="item.id != null">#{item.id},</if>
-                <if test="item.userId != null">#{item.userId},</if>
-                <if test="item.fileSize != null">#{item.fileSize},</if>
-                <if test="item.objectKey != null">#{item.objectKey},</if>
-                <if test="item.originalName != null">#{item.originalName},</if>
-                <if test="item.mimeType != null">#{item.mimeType},</if>
-                <if test="item.type != null">#{item.type},</if>
-                <if test="item.deleted != null">#{item.deleted},</if>
-                <if test="item.status != null">#{item.status},</if>
-                <if test="item.createTime != null">#{item.createTime},</if>
-                <if test="item.updateTime != null">#{item.updateTime},</if>
-            </trim>
+            (
+                #{item.id}, #{item.userId}, #{item.fileSize}, #{item.objectKey},
+                #{item.originalName}, #{item.mimeType}, #{item.type},
+                COALESCE(#{item.deleted}, 0), #{item.status}, #{item.sha256},
+                #{item.width}, #{item.height}
+            )
         </foreach>
     </insert>
 
@@ -111,5 +97,27 @@
         <foreach collection="imageIds" item="imageId" open="(" separator="," close=")">
             #{imageId}
         </foreach>
+    </select>
+
+    <select id="selectReadyByUserIdAndTypeAndSha256" resultMap="ImageResultMap">
+        SELECT <include refid="imageColumns"/>
+        FROM image
+        WHERE user_id = #{userId}
+        AND type = #{type}
+        AND sha256 = #{sha256}
+        AND deleted = 0
+        AND status = 1000
+        LIMIT 1
+    </select>
+
+    <select id="selectByUserIdAndTypeAndSha256"
+            resultMap="ImageResultMap">
+        SELECT <include refid="imageColumns"/>
+        FROM image
+        WHERE user_id = #{userId}
+        AND type = #{type}
+        AND sha256 = #{sha256}
+        AND deleted = 0
+        LIMIT 1
     </select>
 </mapper>

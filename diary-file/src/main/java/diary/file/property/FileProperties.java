@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
 @Data
-@Component
 @Validated
+@Component
 @ConfigurationProperties(prefix = "diary.file.part")
 public class FileProperties {
     @NotNull
