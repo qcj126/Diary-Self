@@ -4,7 +4,7 @@ import diary.file.entity.mq.po.FileMqOutboxPO;
 
 import java.util.List;
 
-public interface FileTransactionalService {
+public interface OutboxTransactionalService {
     void recordImageUploaded(Long imageId, String objectKey, String originalName, List<String> failedFiles);
 
     void recoverTimedOutForRetry(FileMqOutboxPO fileMqOutboxPO);

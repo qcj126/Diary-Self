@@ -3,7 +3,7 @@ package diary.file.mq.outbox;
 import diary.file.entity.mq.po.FileMqOutboxPO;
 import diary.file.mapper.FileMqOutboxMapper;
 import diary.file.property.FileMqProperties;
-import diary.file.service.filetransactionalservice.FileTransactionalService;
+import diary.file.service.filetransactionalservice.OutboxTransactionalService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.apis.producer.SendReceipt;
@@ -22,7 +22,7 @@ import java.util.List;
 public class ImageOutboxPublisher {
     private final FileMqOutboxMapper fileMqOutboxMapper;
     private final FileMqProperties fileMqProperties;
-    private final FileTransactionalService fileTransactionalService;
+    private final OutboxTransactionalService fileTransactionalService;
     private final RocketMQClientTemplate rocketMQClientTemplate;
 
     @Scheduled(fixedDelayString = "${diary.file.rocketmq.publisher-interval-ms:10000}")

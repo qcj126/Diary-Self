@@ -1,5 +1,6 @@
 package diary.file.utils;
 
+import diary.common.exception.ParamIllegalException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,10 +11,9 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.List;
 
 import static diary.file.consts.FileDirConst.APP_PICTURE_DIR;
+import static diary.file.consts.ImageConst.SHA256_PATTERN;
 
 @Slf4j
 @Component
@@ -53,44 +53,15 @@ public class FileUtil {
         return target;
     }
 
-    public String getFileName(String type, String originalFilename) {
-        return getSafeOriginalName(originalFilename);
-    }
-
-    /**
-     * 将上传的文件复制到临时文件，为异步上传文件设计
-     *
-     * @param files 文件列表
-     * @return 临时文件列表
-     */
-    public List<File> copyToTempFiles(List<MultipartFile> files) {
-        List<File> tempFiles = new ArrayList<>();
-        for (MultipartFile file : files) {
-            try {
-                Path tempFile = Files.createTempFile("diary-image-upload-", ".tmp");
-                file.transferTo(tempFile);
-                tempFiles.add(tempFile.toFile());
-            } catch (IOException e) {
-                tempFiles.forEach(File::delete);
-                throw new RuntimeException("复制上传临时文件失败", e);
-            }
-        }
-        return tempFiles;
-    }
-
     /**
      * 删除文件
      * @param filePath 文件完整路径
-     * @return true-删除成功 false-删除失败
      */
-    public boolean deleteFile(String filePath) {
+    public void deleteFile(String filePath) {
         try {
             File file = new File(filePath);
             // 检查文件是否存在
-            if (!file.exists()) {
-                log.warn("文件不存在，路径: {}", filePath);
-                return false;
-            }
+            if (!file.exists()) log.warn("文件不存在，路径: {}", filePath);
             // 删除文件
             boolean deleted = file.delete();
             if (deleted) {
@@ -98,22 +69,23 @@ public class FileUtil {
             } else {
                 log.error("文件删除失败: {}", filePath);
             }
-            return deleted;
         } catch (SecurityException e) {
             log.error("文件删除权限异常，路径: {}, 错误: {}", filePath, e.getMessage());
-            return false;
         } catch (Exception e) {
             log.error("文件删除异常，路径: {}, 错误: {}", filePath, e.getMessage());
-            return false;
         }
     }
 
-    /**
-     * 判断文件为空
-     * @param file
-     * @return
-     */
     public static boolean isFileEmpty(MultipartFile file) {
         return file == null || file.isEmpty();
+    }
+
+    /**
+     * 判断sha256是否合法
+     */
+    public void isSha256Valid(String requestSha256) {
+        if (requestSha256 == null || !SHA256_PATTERN.matcher(requestSha256).matches()) {
+            throw new ParamIllegalException("sha256必须是64位小写十六进制字符串");
+        }
     }
 }

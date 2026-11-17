@@ -12,6 +12,10 @@ public interface ImageMapper {
             @Param("imageList") List<ImagePO> imageList
     );
 
+    int singleAddImageToDb(
+            ImagePO imagePO
+    );
+
     Long selectImageByTypeAndName (
             @Param("type") Integer type,
             @Param("originalFilename") String originalFilename
@@ -25,6 +29,11 @@ public interface ImageMapper {
 
     ImagePO selectImageById (
             @Param("id") Long id
+    );
+
+    ImagePO selectForUploadByIdAndUserId(
+            @Param("imageId") Long imageId,
+            @Param("userId") Long userId
     );
 
     ImagePO selectImageByOriginalName (

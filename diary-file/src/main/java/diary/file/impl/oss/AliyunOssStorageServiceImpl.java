@@ -20,6 +20,7 @@ import diary.file.entity.model.OssUploadedPart;
 import diary.file.enums.OssCompleteState;
 import diary.file.enums.OssOperationEnum;
 import diary.file.exception.OssStorageException;
+import diary.file.exception.OssObjectSizeMismatchException;
 import diary.file.property.ImageUploadProperties;
 import diary.file.service.oss.OssStorageService;
 import diary.utils.common.MyUtils;
@@ -456,10 +457,7 @@ public class AliyunOssStorageServiceImpl implements OssStorageService {
             throw new OssStorageException(
                     OssOperationEnum.COMPLETE_MULTIPART.name(),
                     objectKey,
-                    new IllegalStateException(
-                            "OSS合并后的对象大小不一致，expected="
-                                    + expectedFileSize + "，actual=" + actualFileSize
-                    )
+                    new OssObjectSizeMismatchException(expectedFileSize, actualFileSize)
             );
         }
     }

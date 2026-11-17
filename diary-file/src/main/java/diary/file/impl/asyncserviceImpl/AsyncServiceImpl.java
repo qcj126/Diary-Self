@@ -3,12 +3,11 @@ package diary.file.impl.asyncserviceImpl;
 import com.aliyun.oss.OSS;
 import diary.file.entity.dto.ImageDTO;
 import diary.file.enums.ImageTransitionResultEnum;
-import diary.file.property.FileProperties;
 import diary.file.entity.po.ImagePO;
 import diary.common.exception.ParamIllegalException;
 import diary.file.mapper.ImageMapper;
 import diary.file.service.ImageStatusService;
-import diary.file.service.filetransactionalservice.FileTransactionalService;
+import diary.file.service.filetransactionalservice.OutboxTransactionalService;
 import diary.utils.OSS.OssUtil;
 import diary.file.service.asyncservice.AsyncService;
 import jakarta.annotation.Resource;
@@ -58,7 +57,7 @@ public class AsyncServiceImpl implements AsyncService {
     private ImageMapper imageMapper;
 
     @Resource
-    private FileTransactionalService fileTransactionService;
+    private OutboxTransactionalService fileTransactionService;
 
     @Async("ossUploadExecutor")
     @Override

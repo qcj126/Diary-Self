@@ -120,4 +120,22 @@
         AND deleted = 0
         LIMIT 1
     </select>
+
+    <insert id="singleAddImageToDb">
+        insert into image(
+            id, user_id, file_size, object_key, original_name,
+            mime_type, type, deleted, status, sha256,width,height
+        ) values (
+            #{id}, #{userId}, #{fileSize}, #{objectKey}, #{originalName}, #{mimeType},
+            #{type}, COALESCE(#{deleted}, 0), #{status}, #{sha256}, #{width}, #{height}
+        )
+    </insert>
+
+    <select id="selectForUploadByIdAndUserId" resultMap="ImageResultMap">
+        select <include refid="imageColumns"/>
+        from image
+        where id = #{imageId}
+        AND user_id = #{userId}
+        AND deleted = 0
+    </select>
 </mapper>

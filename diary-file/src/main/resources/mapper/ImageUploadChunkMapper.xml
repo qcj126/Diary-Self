@@ -19,12 +19,11 @@
         chunk_size, create_time, update_time
     </sql>
 
-    <insert id="insert">
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         INSERT INTO image_upload_chunk (
-            id, upload_id, chunk_index, part_number, chunk_sha256, etag, chunk_size
+            upload_id, chunk_index, part_number, chunk_sha256, etag, chunk_size
         ) VALUES (
-            #{id}, #{uploadId}, #{chunkIndex}, #{partNumber},
-            #{chunkSha256}, #{etag}, #{chunkSize}
+            #{uploadId}, #{chunkIndex}, #{partNumber}, #{chunkSha256}, #{etag}, #{chunkSize}
         )
     </insert>
 

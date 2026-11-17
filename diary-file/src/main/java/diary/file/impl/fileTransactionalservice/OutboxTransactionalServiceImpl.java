@@ -6,7 +6,7 @@ import diary.file.mapper.FileMqOutboxMapper;
 import diary.file.mq.event.ImageUploadedEvent;
 import diary.file.property.FileMqProperties;
 import diary.file.service.ImageStatusService;
-import diary.file.service.filetransactionalservice.FileTransactionalService;
+import diary.file.service.filetransactionalservice.OutboxTransactionalService;
 import diary.utils.common.MyUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +28,7 @@ import static diary.utils.outbox.OutboxUtil.calculateRetryDelaySeconds;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class FileTransactionalServiceImpl implements FileTransactionalService {
+public class OutboxTransactionalServiceImpl implements OutboxTransactionalService {
     private final ImageStatusService imageStatusService;
     private final FileMqProperties fileMqProperties;
     private final FileMqOutboxMapper fileMqOutboxMapper;

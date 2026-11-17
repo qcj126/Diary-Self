@@ -69,7 +69,7 @@ CREATE TABLE `image_upload_session` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='图片分片上传会话表';
 
 CREATE TABLE `image_upload_chunk` (
-                                      `id`           BIGINT UNSIGNED NOT NULL COMMENT '主键',
+                                      `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
                                       `upload_id`    VARCHAR(64)     NOT NULL COMMENT '上传会话ID',
                                       `chunk_index`  INT UNSIGNED    NOT NULL COMMENT '分片序号(从0开始)',
                                       `part_number`  INT UNSIGNED    NOT NULL COMMENT 'OSS分片编号(从1开始)',

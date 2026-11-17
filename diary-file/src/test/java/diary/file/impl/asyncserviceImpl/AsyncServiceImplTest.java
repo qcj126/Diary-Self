@@ -6,7 +6,7 @@ import diary.file.entity.po.ImagePO;
 import diary.file.enums.ImageTransitionResultEnum;
 import diary.file.mapper.ImageMapper;
 import diary.file.service.ImageStatusService;
-import diary.file.service.filetransactionalservice.FileTransactionalService;
+import diary.file.service.filetransactionalservice.OutboxTransactionalService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -37,7 +37,7 @@ class AsyncServiceImplTest {
 
     private ImageMapper imageMapper;
     private ImageStatusService imageStatusService;
-    private FileTransactionalService fileTransactionalService;
+    private OutboxTransactionalService fileTransactionalService;
     private OSS ossClient;
     private AsyncServiceImpl asyncService;
 
@@ -45,7 +45,7 @@ class AsyncServiceImplTest {
     void setUp() {
         imageMapper = mock(ImageMapper.class);
         imageStatusService = mock(ImageStatusService.class);
-        fileTransactionalService = mock(FileTransactionalService.class);
+        fileTransactionalService = mock(OutboxTransactionalService.class);
         ossClient = mock(OSS.class);
 
         asyncService = new AsyncServiceImpl();
