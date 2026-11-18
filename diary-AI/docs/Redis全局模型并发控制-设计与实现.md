@@ -71,8 +71,6 @@ diary:
       global-model-permit:
         lease-seconds: 90
         renewal-interval-seconds: 20
-        capacity-retry-delay-seconds: 10
-        redis-unavailable-retry-delay-seconds: 30
         models:
           QWEN37PLUS:
             max-concurrency: 5
@@ -114,127 +112,32 @@ permit lease 与登录 token 的 TTL 完全无关，不能复用或修改登录 
 
 ## 6. 全局名额满与 Redis 不可用
 
-| 情况 | 是否调用模型 | 任务状态 | 延迟 | 错误码 |
-| --- | --- | --- | --- | --- |
-| 模型池已满 | 否 | `RETRY_WAIT` | 10 秒 + 0～3 秒抖动 | `MODEL_CAPACITY_EXHAUSTED` |
-| Redis 不可用 | 否 | `RETRY_WAIT` | 30 秒 + 0～3 秒抖动 | `REDIS_UNAVAILABLE` |
+保留两类错误的独立日志和错误码，但不再创建第二条“容量延期 Outbox”：
 
-Consumer 在这两种情况下不会直接持续返回 RocketMQ `FAILURE`。它会在同一数据库事务中：
+| 情况 | 是否调用模型 | Consumer结果 | 错误码 |
+| --- | --- | --- | --- |
+| 模型池已满 | 否 | `FAILURE`，交给RocketMQ有限重投 | `MODEL_CAPACITY_EXHAUSTED` |
+| Redis 不可用 | 否 | `FAILURE`，交给RocketMQ有限重投 | `REDIS_UNAVAILABLE` |
 
-```text
-条件更新 ai_task: PENDING / QUEUED → RETRY_WAIT
-  +
-插入未来时间可发送的 AI_TASK_RETRY Outbox
-```
+这是最多三个实例、约100 QPS学习场景下的最小实现。代价是持续满载时会增加MQ重投；只有实际观察到大量重试或DLQ后，才值得恢复独立的容量延期队列。
 
-事务成功后才 ACK 原消息。事务失败则返回 `FAILURE`，保留原消息的恢复机会。
+## 7. 重复消息与任务抢占
 
-## 7. Outbox 发送确认竞态
+RocketMQ至少一次投递可能产生重复消息。`claimForExecution` 使用任务状态、用户、请求ID和数据库CAS抢占执行权；抢占失败的消息直接ACK，真正的Worker继续执行。任务租约过期后，由恢复任务重新创建 `AI_TASK_RETRY` Outbox。
 
-Publisher 不能把“发送到 RocketMQ”和“更新 MySQL 为 SENT”放进同一个本地事务，因此存在窗口：
+历史表中的 `source_event_id` 和唯一索引继续保留以兼容已有数据，但当前主链路不再为容量不足创建因果重试Outbox，不需要回滚数据库迁移。
 
-```text
-Publisher 发送 AI_TASK_RETRY 给 Broker
-  → Broker 立刻投递 Consumer
-  → Consumer 读取到 task 仍为 RETRY_WAIT
-  → Publisher 才确认 SENT，并将 RETRY_WAIT → QUEUED
-```
-
-若 Consumer 在第 3 步把消息误判为旧消息并 ACK，最终会出现：
-
-```text
-task = QUEUED
-outbox = SENT
-Broker 消息已 ACK
-```
-
-任务没有后续消息可消费，形成丢失唤醒。
-
-修复策略：仅当收到的消息事件类型确实是 `AI_TASK_RETRY`，且任务仍为 `RETRY_WAIT` 时，Consumer 可以条件执行：
-
-```text
-RETRY_WAIT → QUEUED
-```
-
-再进入正常 permit 和租约流程。普通 `AI_TASK_CREATED` 的迟到重复消息不能做这一步，否则会绕过延迟时间。
-
-## 8. Retry Outbox 的来源事件去重
-
-### 8.1 问题
-
-RocketMQ 是至少一次投递。Redis 长时间不可用时，迟到或重复的旧消息可能多次尝试安排下一轮 `AI_TASK_RETRY`，导致一条任务出现 Retry Outbox 分叉。
-
-仅靠 `next_retry_time = 30 秒` 无法避免该问题：30 秒限制的是每条新 Retry Outbox 的发送时间，不是同一任务的全局去抖时间。
-
-### 8.2 解决方案
-
-`mq_outbox` 增加：
-
-```text
-source_event_id
-```
-
-含义：当前 Retry 是由哪条已消费消息触发。
-
-数据库唯一约束：
-
-```sql
-UNIQUE KEY uk_retry_source_event (event_type, source_event_id)
-```
-
-其中 `event_id` 与 `source_event_id` 的职责不同：
-
-```text
-event_id        当前 Outbox 自己的唯一身份
-source_event_id 触发当前 Retry 的来源消息身份
-```
-
-形成线性因果链：
-
-```text
-AI_TASK_CREATED(E1)
-  → AI_TASK_RETRY(E2, source_event_id=E1)
-  → AI_TASK_RETRY(E3, source_event_id=E2)
-  → AI_TASK_RETRY(E4, source_event_id=E3)
-```
-
-同一来源事件 E2 被重复投递时，再次插入 `source_event_id=E2` 会触发唯一键冲突。服务将其识别为“该来源已安排过下一轮重试”，不再创建新的 Retry Outbox。
-
-### 8.3 事务顺序
-
-`AiTaskDispatchDeferralServiceImpl` 的事务顺序：
-
-```text
-1. 插入带 source_event_id 的下一条 Retry Outbox，作为唯一预约
-2. 若唯一键冲突，返回 false：来源消息已处理过
-3. 条件更新任务为 RETRY_WAIT
-4. 若第 3 步失败，抛异常并回滚第 1 步，避免孤儿 Retry Outbox
-```
-
-来源事件 ID 为空的消息会被 Consumer 协议校验拒绝，避免去重键失效。
-
-## 9. 数据库迁移
-
-现有数据库必须执行一次迁移：
-
-[`ai_task_outbox_retry_source_event_migration.sql`](../../diary-common/src/main/resources/sql/ai_task_outbox_retry_source_event_migration.sql)
-
-新环境的基础建表定义也已更新：
-
-[`mq.sql`](../src/main/java/diary/diaryai/entity/mq/mq.sql)
-
-## 10. 已完成的验证
+## 8. 已完成的验证
 
 - 单任务正常完成，终态无 Redis permit 遗留；
-- 将同模型上限临时设为 1，第二任务进入 `RETRY_WAIT`，随后成功；
-- 验证容量满时产生 `AI_TASK_RETRY`，而不是 MQ 高频重试；
-- Redis 不可用时得到 `REDIS_UNAVAILABLE`，不调用模型；
-- Redis 恢复后任务最终成功，且只产生一次 `AI_COMPLETED`；
-- 长时间 Redis 故障下，按 `source_event_id` 分组没有重复 Retry Outbox，因果链保持线性。
+- 将同模型上限临时设为1时，后续任务不调用模型并返回消费失败；
+- Redis不可用时记录 `REDIS_UNAVAILABLE`，不调用模型；
+- Redis恢复或模型名额释放后，由RocketMQ重投继续处理任务；
+- 重复消息只能有一个实例通过数据库抢占并调用模型。
 
-## 11. 后续可选增强
+## 9. 后续可选增强
 
-- 任务已进入终态时，取消尚未发送的未来 `AI_TASK_RETRY` Outbox，减少无效消息；
 - 为 permit 续期明确丢失增加模型 SDK 取消策略；
-- 增加自动化测试：容量满、Redis 异常、重复消息、发送确认竞态、Worker 崩溃；
+- 当容量不足导致大量MQ重试或DLQ时，再引入专用延迟消息；
+- 增加自动化测试：容量满、Redis异常、重复消息、Worker崩溃；
 - 增加 permit 指标：模型池使用数、获取失败数、自动过期回收数、Redis 异常数。

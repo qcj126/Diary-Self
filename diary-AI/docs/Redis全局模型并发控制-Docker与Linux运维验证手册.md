@@ -170,17 +170,16 @@ max-concurrency: 1
 
 重启服务后，近似同时提交两个同模型、不同 `clientRequestId` 的任务。
 
-预期第二任务：
+预期第二任务不会调用模型，Consumer记录 `MODEL_CAPACITY_EXHAUSTED` 并返回 `FAILURE`。任务保持原派发状态，等待RocketMQ有限重投：
 
 ```text
-status        = RETRY_WAIT
-error_code    = MODEL_CAPACITY_EXHAUSTED
+status        = PENDING / QUEUED
 attempt_count 不增加
 worker_id     为空
 lease_until   为空
 ```
 
-并生成未来约 10～13 秒可发送的 `AI_TASK_RETRY`。测试结束后恢复正常并发配置并重启服务。
+不会额外生成容量延期 `AI_TASK_RETRY` Outbox。测试结束后恢复正常并发配置并重启服务。
 
 ### 7.3 Redis 不可用
 
@@ -205,10 +204,9 @@ docker unpause <diary-ai-container>
 此时预期：
 
 ```text
-task.status     = RETRY_WAIT
-task.error_code = REDIS_UNAVAILABLE
+task.status     = PENDING / QUEUED
 模型执行器不应被调用
-AI_TASK_RETRY.next_retry_time ≈ 当前时间 + 30～33 秒
+Consumer记录 REDIS_UNAVAILABLE 并返回 FAILURE
 ```
 
 恢复 Redis：
@@ -217,42 +215,38 @@ AI_TASK_RETRY.next_retry_time ≈ 当前时间 + 30～33 秒
 docker unpause <redis-container>
 ```
 
-等待下一轮 Retry Outbox 到期并被 Publisher 扫描。Publisher 扫描周期会额外引入最多一个扫描周期的等待。任务最终应进入：
+恢复Redis后等待RocketMQ重投。任务最终应进入：
 
 ```text
-RETRY_WAIT → QUEUED → RUNNING → SUCCESS
+PENDING / QUEUED → RUNNING → SUCCESS
 ```
 
 ### 7.4 Docker 日志定位
 
 ```bash
 docker compose logs --since 10m <diary-ai-service> \
-  | grep -E 'Redis 模型 permit|延迟重试|AI_TASK_RETRY|taskId='
+  | grep -E 'Redis全局信号量|MODEL_CAPACITY_EXHAUSTED|REDIS_UNAVAILABLE|taskId='
 ```
 
 PowerShell：
 
 ```powershell
 docker compose logs --since 10m <diary-ai-service> |
-  Select-String 'Redis 模型 permit|延迟重试|AI_TASK_RETRY|taskId='
+  Select-String 'Redis全局信号量|MODEL_CAPACITY_EXHAUSTED|REDIS_UNAVAILABLE|taskId='
 ```
 
 ## 8. 常见排障
 
 | 现象 | 重点检查 |
 | --- | --- |
-| 任务停在 `QUEUED` | 是否存在已 `SENT` 的 Retry Outbox；查看 Consumer 是否处理了提前到达的 `AI_TASK_RETRY` |
+| 任务停在 `QUEUED` | 查看RocketMQ重试次数、Consumer日志和全局模型名额是否长期占满 |
 | Redis ZSet 长期有 member | Worker 是否仍在执行；续期日志；permit lease 是否已到期；release 是否异常 |
 | Redis 不可用但任务进入 `RUNNING` | 检查 Consumer 是否绕过 `RedisModelPermitManager.tryAcquire`；这是 fail-closed 违规 |
-| 同一来源出现多条 Retry | 检查 `source_event_id` 迁移与唯一索引是否存在；执行 Retry 分叉 SQL |
-| 应用 SQL 报未知列 `source_event_id` | 数据库迁移尚未执行，或应用版本先于迁移发布 |
-| Redis 恢复后仍未执行 | 检查 `AI_TASK_RETRY.next_retry_time`、Outbox 状态、Publisher 扫描日志与 RocketMQ Consumer Group 堆积 |
+| Redis 恢复后仍未执行 | 检查RocketMQ Consumer Group重试与堆积情况 |
 
 ## 9. 收尾检查清单
 
 - [ ] 正常模型限额已恢复；
-- [ ] 迁移已在当前环境执行；
 - [ ] 单任务、容量满、Redis 不可用场景已验证；
-- [ ] `source_event_id` Retry 分叉查询为空；
 - [ ] 没有遗留 Redis permit；
 - [ ] 不在日志、脚本或文档中保存密码和 token。

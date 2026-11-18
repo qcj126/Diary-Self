@@ -28,14 +28,16 @@ diary:
       chunk-size: 262144
       max-image-size: 104857600
       session-ttl-hours: 24
-    part:
-      part-size: 10485760 # 10MB
-      file-threshold: 104857600 # 100MB
+      # 回收过期Multipart会话及孤儿分片记录
+      cleanup-interval-ms: 60000
+      cleanup-batch-size: 20
     rocketmq:
       # 用于mq的配置
       event-topic: diary-file-event
       image-uploaded-tag: IMAGE_UPLOADED
       image-ready-consumer-group: diary-file-image-ready-consumer
+      image-deleted-tag: IMAGE_DELETED
+      image-cleanup-consumer-group: diary-file-image-cleanup-consumer
       # 用于outbox的配置
       publisher-batch-size: 20
       publisher-interval-ms: 10000

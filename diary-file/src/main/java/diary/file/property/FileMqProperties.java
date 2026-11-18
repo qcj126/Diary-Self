@@ -25,6 +25,12 @@ public class FileMqProperties {
     @NotBlank
     private String imageReadyConsumerGroup;
 
+    @NotBlank
+    private String imageDeletedTag;
+
+    @NotBlank
+    private String imageCleanupConsumerGroup;
+
     /*生产者一次从数据库中取得的数据量*/
     @Min(1)
     @NotNull

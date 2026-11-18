@@ -22,9 +22,13 @@
     <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         INSERT INTO image_upload_chunk (
             upload_id, chunk_index, part_number, chunk_sha256, etag, chunk_size
-        ) VALUES (
-            #{uploadId}, #{chunkIndex}, #{partNumber}, #{chunkSha256}, #{etag}, #{chunkSize}
         )
+        SELECT
+            #{uploadId}, #{chunkIndex}, #{partNumber}, #{chunkSha256}, #{etag}, #{chunkSize}
+        FROM image_upload_session
+        WHERE upload_id = #{uploadId}
+          AND status = 1
+          AND expires_at &gt; CURRENT_TIMESTAMP
     </insert>
 
     <select id="selectByUploadIdAndChunkIndex" resultMap="ImageUploadChunkResultMap">
@@ -51,5 +55,15 @@
     <delete id="deleteByUploadId">
         DELETE FROM image_upload_chunk
         WHERE upload_id = #{uploadId}
+    </delete>
+
+    <delete id="deleteOrphans">
+        DELETE FROM image_upload_chunk
+        WHERE NOT EXISTS (
+            SELECT 1
+            FROM image_upload_session s
+            WHERE s.upload_id = image_upload_chunk.upload_id
+        )
+        LIMIT #{limit}
     </delete>
 </mapper>

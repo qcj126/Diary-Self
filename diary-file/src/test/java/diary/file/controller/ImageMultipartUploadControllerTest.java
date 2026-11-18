@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -24,6 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -131,6 +133,20 @@ class ImageMultipartUploadControllerTest {
 
         verify(uploadInitService).getUploadConfig();
         verify(currentUser, never()).getUser();
+    }
+
+    @Test
+    void legacyWholeFileUploadEndpointIsRemoved() throws Exception {
+        MockMultipartFile image = new MockMultipartFile(
+                "files", "legacy.jpg", "image/jpeg", new byte[]{1, 2, 3}
+        );
+
+        mockMvc.perform(multipart("/file/upload/images")
+                        .file(image)
+                        .param("code", "1000"))
+                .andExpect(status().isNotFound());
+
+        verifyNoInteractions(uploadInitService, chunkUploadService, uploadCompleteService, currentUser);
     }
 
     private String validRequestJson(Long untrustedUserId) throws Exception {

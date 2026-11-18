@@ -26,4 +26,5 @@ public class ThumbnailProperties {
     @NotNull
     @Min(1)
     private Integer maxPixels;
+
 }

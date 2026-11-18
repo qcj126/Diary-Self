@@ -149,7 +149,8 @@ class ImageUploadCompleteServiceImplTest {
         ImageUploadCompleteVO result = service.completeUpload(UPLOAD_ID, request(), USER_ID);
 
         assertEquals(IMAGE_ID, result.getImageId());
-        verifyNoInteractions(ossStorageService, transactionalService, imageStatusService);
+        verifyNoInteractions(ossStorageService, imageStatusService);
+        verify(transactionalService).completeMultipartUpload(UPLOAD_ID, USER_ID, IMAGE_ID);
     }
 
     @Test
@@ -193,7 +194,8 @@ class ImageUploadCompleteServiceImplTest {
                 () -> service.completeUpload(UPLOAD_ID, request(), USER_ID));
 
         assertEquals("上传会话已过期", exception.getMessage());
-        verifyNoInteractions(chunkMapper, ossStorageService, transactionalService, imageStatusService);
+        verifyNoInteractions(chunkMapper, ossStorageService, imageStatusService);
+        verifyNoInteractions(transactionalService);
     }
 
     @Test
@@ -327,7 +329,8 @@ class ImageUploadCompleteServiceImplTest {
         ImageUploadCompleteVO result = service.completeUpload(UPLOAD_ID, request(), USER_ID);
 
         assertEquals(IMAGE_ID, result.getImageId());
-        verifyNoInteractions(chunkMapper, ossStorageService, transactionalService, imageStatusService);
+        verifyNoInteractions(chunkMapper, ossStorageService, imageStatusService);
+        verify(transactionalService).completeMultipartUpload(UPLOAD_ID, USER_ID, IMAGE_ID);
     }
 
     @Test
@@ -341,7 +344,8 @@ class ImageUploadCompleteServiceImplTest {
         assertThrows(ConflictException.class,
                 () -> service.completeUpload(UPLOAD_ID, request(), USER_ID));
 
-        verifyNoInteractions(chunkMapper, ossStorageService, transactionalService, imageStatusService);
+        verifyNoInteractions(chunkMapper, ossStorageService, imageStatusService);
+        verify(transactionalService).completeMultipartUpload(UPLOAD_ID, USER_ID, IMAGE_ID);
     }
 
     @Test

@@ -22,6 +22,7 @@ public final class DTOConvertToPO {
                 .location(dietRecordAddDTO.getLocation())
                 .note(dietRecordAddDTO.getNote())
                 .imageUrl(dietRecordAddDTO.getImageUrl())
+                .imageId(dietRecordAddDTO.getImageId() == null ? 0L : dietRecordAddDTO.getImageId())
                 .build();
     }
 
@@ -35,6 +36,7 @@ public final class DTOConvertToPO {
                 .location(dietRecordDTO.getLocation())
                 .note(dietRecordDTO.getNote())
                 .imageUrl(dietRecordDTO.getImageUrl())
+                .imageId(dietRecordDTO.getImageId())
                 .build();
     }
 }

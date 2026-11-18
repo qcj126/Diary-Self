@@ -43,7 +43,7 @@ public class ImageMultipartUploadController {
         return ApiResponse.success(uploadInitService.getUploadConfig());
     }
 
-    @PostMapping(value = "/{uploadId}/chunks/{chunkIndex}")
+    @PostMapping(value = "/{uploadId}/chunks/{chunkIndex}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<String> uploadChunk(
             @PathVariable String uploadId,
             @PathVariable int chunkIndex,
@@ -55,7 +55,7 @@ public class ImageMultipartUploadController {
         return ApiResponse.success("分片上传成功");
     }
 
-    @PostMapping(value = "/{uploadId}/complete")
+    @PostMapping(value = "/{uploadId}/complete", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ApiResponse<ImageUploadCompleteVO> completeUpload(
             @PathVariable String uploadId,
             @RequestBody ImageUploadCompleteReqDto request

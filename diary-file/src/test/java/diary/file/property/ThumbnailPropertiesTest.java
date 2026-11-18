@@ -84,7 +84,9 @@ class ThumbnailPropertiesTest {
     }
 
     private String[] validProperties() {
-        return new String[]{MAX_WIDTH, MAX_HEIGHT, JPEG_QUALITY, MAX_PIXELS};
+        return new String[]{
+                MAX_WIDTH, MAX_HEIGHT, JPEG_QUALITY, MAX_PIXELS
+        };
     }
 
     private String[] propertiesWithout(String missingProperty) {

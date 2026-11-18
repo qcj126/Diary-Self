@@ -5,79 +5,38 @@
 - 模块名称：`diary-file`
 - 基础路径：`/file`
 - 网关路径：`http://gateway:10000/file/**`
-- 主要职责：图片上传、图片签名 URL 查询、轮播图查询、图片下载、视频上传和文件删除。
+- 主要职责：图片分片上传、原图与缩略图读取、上传状态查询和图片删除。
+- 详细上传字段、状态和前端示例见根目录《前端调用后端参数文档.md》。
 
 ## 通用约定
 
-所有业务接口默认返回 `ApiResponse<T>`：
+除直接返回图片流的接口外，业务接口统一返回 `ApiResponse<T>`。
 
-```json
-{
-  "code": 200,
-  "message": "success",
-  "data": {}
-}
-```
+## 图片接口
 
-失败时返回：
+| 方法 | 路径 | 说明 |
+|---|---|---|
+| GET | `/file/upload/images/config` | 查询分片大小、文件上限和允许的 MIME |
+| POST | `/file/upload/images/init` | 初始化上传或命中 READY 秒传 |
+| POST | `/file/upload/images/{uploadId}/chunks/{chunkIndex}` | 上传一个 256 KiB 分片 |
+| POST | `/file/upload/images/{uploadId}/complete` | 合并并校验完整文件 |
+| POST | `/file/query/images/statuses` | 批量查询图片处理状态 |
+| POST | `/file/query/images/urls` | 批量查询 READY 原图地址 |
+| POST | `/file/query/thumbnails/urls` | 批量查询 READY 缩略图地址 |
+| GET | `/file/originals/{imageId}` | 流式读取当前用户的原图 |
+| GET | `/file/thumbnails/{imageId}` | 流式读取当前用户的缩略图 |
+| GET | `/file/images/{fileName}` | 兼容旧数据中已经保存的原图地址 |
+| POST | `/file/query/images/carousel` | 查询轮播图片地址 |
+| POST | `/file/delete/{id}` | 删除当前用户的图片 |
 
-```json
-{
-  "code": 500,
-  "message": "错误信息",
-  "data": null
-}
-```
+旧的 `POST /file/upload/images` 整文件上传、视频上传和下载到服务节点接口已经删除。原图和缩略图直接从 OSS 流式返回，不写入节点本地目录。
 
-## 接口列表
+## 查询地址示例
 
-| 序号 | 方法 | 路径 | Content-Type | 说明 |
-|---:|---|---|---|---|
-| 1 | POST | `/file/upload/images` | `multipart/form-data` | 批量上传图片 |
-| 2 | POST | `/file/query/images/urls` | `application/json` | 根据图片 ID 列表查询签名 URL |
-| 3 | POST | `/file/query/images/carousel` | `application/json` | 查询轮播图图片 |
-| 4 | POST | `/file/download/image` | `application/json` | 批量下载图片 |
-| 5 | POST | `/file/upload/video` | `multipart/form-data` | 上传视频 |
-| 6 | POST | `/file/delete/{id}` | `application/json` | 删除图片文件记录 |
-
-## 参数说明
-
-### 上传图片
-
-| 参数 | 类型 | 位置 | 说明 |
-|---|---|---|---|
-| files | List<MultipartFile> | form-data | 图片文件列表 |
-| code | Integer | form-data | 图片类型编码 |
-
-响应 `data` 为 `List<Long>`，表示已入库图片 ID。
-
-### 查询图片 URL
-
-请求体为图片 ID 数组：
+请求：
 
 ```json
 [1, 2, 3]
 ```
 
-响应 `data` 为 `List<ImageVO>`，字段为 `id`、`url`。
-
-### 下载图片
-
-请求体为图片 ID 到 URL 的映射：
-
-```json
-{
-  "1": "https://example.com/a.jpg",
-  "2": "https://example.com/b.jpg"
-}
-```
-
-响应 `data` 为下载结果 Map。
-
-### 上传视频
-
-| 参数 | 类型 | 位置 | 说明 |
-|---|---|---|---|
-| file | MultipartFile | form-data | 视频文件 |
-
-视频接口会先入库，再异步上传 OSS 并发送 MQ 消息。
+原图地址响应中的 `url` 形如 `/file/originals/1`，缩略图地址形如 `/file/thumbnails/1`。只有属于当前用户且状态为 `READY` 的图片才会返回。

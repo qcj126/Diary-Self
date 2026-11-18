@@ -80,10 +80,6 @@ diary:
         lease-seconds: 90
         # 正常长任务每 20 秒续一次；必须明显小于 90 秒。
         renewal-interval-seconds: 20
-        # 模型名额满时，延迟重投的基础等待时间。
-        capacity-retry-delay-seconds: 10
-        # Redis 故障时更保守地等待，优先保护供应商配额。
-        redis-unavailable-retry-delay-seconds: 30
         models:
           QWEN37PLUS:
             max-concurrency: 5

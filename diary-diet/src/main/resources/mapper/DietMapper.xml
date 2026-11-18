@@ -13,6 +13,7 @@
         <result column="location" property="location"/>
         <result column="note" property="note"/>
         <result column="image_url" property="imageUrl"/>
+        <result column="image_id" property="imageId"/>
         <result column="deleted" property="deleted"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
@@ -20,17 +21,17 @@
 
     <!-- 基础字段 -->
     <sql id="BaseColumns">
-        id, user_id, eat_time, meal_type, food_name, location, note, image_url,
+        id, user_id, eat_time, meal_type, food_name, location, note, image_url, image_id,
         deleted, create_time, update_time
     </sql>
 
     <!-- 插入饮食记录 -->
     <insert id="insert" parameterType="diary.diarydiet.entity.po.DietRecordPO">
         INSERT INTO diet_record (
-            id, user_id, eat_time, meal_type, food_name, location, note, image_url,
+            id, user_id, eat_time, meal_type, food_name, location, note, image_url, image_id,
             deleted, create_time, update_time
         ) VALUES (
-            #{id}, #{userId}, #{eatTime}, #{mealType}, #{foodName}, #{location}, #{note}, #{imageUrl},
+            #{id}, #{userId}, #{eatTime}, #{mealType}, #{foodName}, #{location}, #{note}, #{imageUrl}, #{imageId},
             #{deleted}, NOW(), NOW()
         )
     </insert>
@@ -62,6 +63,7 @@
             <if test="location != null">location = #{location},</if>
             <if test="note != null">note = #{note},</if>
             <if test="imageUrl != null">image_url = #{imageUrl},</if>
+            <if test="imageId != null">image_id = #{imageId},</if>
             <if test="deleted != null">deleted = #{deleted},</if>
             update_time = NOW()
         </set>

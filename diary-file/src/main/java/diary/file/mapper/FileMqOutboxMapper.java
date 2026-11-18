@@ -14,6 +14,11 @@ public interface FileMqOutboxMapper {
     FileMqOutboxPO selectById(
             @Param("id") Long id
     );
+    /*按图片和事件类型查询唯一业务事件*/
+    FileMqOutboxPO selectByImageIdAndEventType(
+            @Param("imageId") Long imageId,
+            @Param("eventType") String eventType
+    );
     /*查询一批可投递到mq的outbox消息，让下游的消费者进行消费*/
     List<FileMqOutboxPO> selectPublishableOutboxBatch(
             @Param("limit") int limit

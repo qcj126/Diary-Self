@@ -23,4 +23,14 @@ public class ImageUploadProperties {
     @NotNull
     @Min(1)
     private Integer sessionTtlHours;
+
+    /** 过期会话清理任务执行间隔。 */
+    @NotNull
+    @Min(1000)
+    private Long cleanupIntervalMs;
+
+    /** 单次清理上限，避免长事务和OSS请求突增。 */
+    @NotNull
+    @Min(1)
+    private Integer cleanupBatchSize;
 }

@@ -22,4 +22,6 @@ public interface ImageUploadChunkMapper {
     int countByUploadId(@Param("uploadId") String uploadId);
 
     int deleteByUploadId(@Param("uploadId") String uploadId);
+
+    int deleteOrphans(@Param("limit") int limit);
 }

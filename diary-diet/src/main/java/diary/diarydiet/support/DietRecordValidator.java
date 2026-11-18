@@ -28,6 +28,7 @@ public final class DietRecordValidator {
                 .notEmpty(dto.getFoodName(), "foodName")
                 .notEmpty(dto.getLocation(), "location"));
         validateMealType(dto.getMealType());
+        validateImageId(dto.getImageId());
     }
 
     public static void validateForUpdate(DietRecordDTO dto) {
@@ -40,6 +41,7 @@ public final class DietRecordValidator {
                 .notEmpty(dto.getFoodName(), "foodName")
                 .notEmpty(dto.getLocation(), "location"));
         validateMealType(dto.getMealType());
+        validateImageId(dto.getImageId());
     }
 
     public static void validateQuery(DietQueryDTO query) {
@@ -58,6 +60,12 @@ public final class DietRecordValidator {
     private static void validateMealType(Byte mealType) {
         if (mealType != null && !MEAL_TYPES.contains(mealType)) {
             throw new ParamIllegalException("mealType 不在允许范围内");
+        }
+    }
+
+    private static void validateImageId(Long imageId) {
+        if (imageId != null && imageId < 0) {
+            throw new ParamIllegalException("imageId 不能小于0");
         }
     }
 

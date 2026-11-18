@@ -46,6 +46,14 @@
         WHERE id = #{id}
     </select>
 
+    <select id="selectByImageIdAndEventType" resultMap="FileMqOutboxResultMap">
+        SELECT <include refid="FileMqOutboxColumns"/>
+        FROM file_mq_outbox
+        WHERE image_id = #{imageId}
+          AND event_type = #{eventType}
+        LIMIT 1
+    </select>
+
     <select id="selectPublishableOutboxBatch" resultMap="FileMqOutboxResultMap">
         SELECT <include refid="FileMqOutboxColumns"/>
         FROM file_mq_outbox

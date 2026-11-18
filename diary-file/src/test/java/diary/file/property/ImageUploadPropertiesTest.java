@@ -17,6 +17,8 @@ class ImageUploadPropertiesTest {
     private static final String CHUNK_SIZE = "diary.file.image-upload.chunk-size=262144";
     private static final String MAX_IMAGE_SIZE = "diary.file.image-upload.max-image-size=104857600";
     private static final String SESSION_TTL_HOURS = "diary.file.image-upload.session-ttl-hours=24";
+    private static final String CLEANUP_INTERVAL_MS = "diary.file.image-upload.cleanup-interval-ms=60000";
+    private static final String CLEANUP_BATCH_SIZE = "diary.file.image-upload.cleanup-batch-size=20";
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
             .withUserConfiguration(TestConfiguration.class);
@@ -30,6 +32,8 @@ class ImageUploadPropertiesTest {
             assertThat(properties.getChunkSize()).isEqualTo(262_144);
             assertThat(properties.getMaxImageSize()).isEqualTo(104_857_600);
             assertThat(properties.getSessionTtlHours()).isEqualTo(24);
+            assertThat(properties.getCleanupIntervalMs()).isEqualTo(60_000L);
+            assertThat(properties.getCleanupBatchSize()).isEqualTo(20);
         });
     }
 
@@ -37,7 +41,9 @@ class ImageUploadPropertiesTest {
     @ValueSource(strings = {
             "diary.file.image-upload.chunk-size",
             "diary.file.image-upload.max-image-size",
-            "diary.file.image-upload.session-ttl-hours"
+            "diary.file.image-upload.session-ttl-hours",
+            "diary.file.image-upload.cleanup-interval-ms",
+            "diary.file.image-upload.cleanup-batch-size"
     })
     void shouldFailWhenRequiredPropertyIsMissing(String missingProperty) {
         assertBindingFails(propertiesWithout(missingProperty));
@@ -47,7 +53,9 @@ class ImageUploadPropertiesTest {
     @ValueSource(strings = {
             "diary.file.image-upload.chunk-size=0",
             "diary.file.image-upload.max-image-size=0",
-            "diary.file.image-upload.session-ttl-hours=0"
+            "diary.file.image-upload.session-ttl-hours=0",
+            "diary.file.image-upload.cleanup-interval-ms=999",
+            "diary.file.image-upload.cleanup-batch-size=0"
     })
     void shouldFailWhenPropertyIsNotPositive(String invalidProperty) {
         assertBindingFails(propertiesWithOverride(invalidProperty));
@@ -62,7 +70,7 @@ class ImageUploadPropertiesTest {
     }
 
     private String[] validProperties() {
-        return new String[]{CHUNK_SIZE, MAX_IMAGE_SIZE, SESSION_TTL_HOURS};
+        return new String[]{CHUNK_SIZE, MAX_IMAGE_SIZE, SESSION_TTL_HOURS, CLEANUP_INTERVAL_MS, CLEANUP_BATCH_SIZE};
     }
 
     private String[] propertiesWithout(String missingProperty) {

@@ -8,6 +8,7 @@ CREATE TABLE diet_record
     location    VARCHAR(100)            DEFAULT 'home'               NOT NULL COMMENT '用餐地点，前端使用home/outside',
     note        VARCHAR(500)                                         NULL COMMENT '备注',
     image_url   VARCHAR(1000)                                        NULL COMMENT '食物图片地址',
+    image_id    BIGINT UNSIGNED         DEFAULT 0                    NOT NULL COMMENT '关联image.id，0表示未关联',
     deleted     TINYINT(1)              DEFAULT 0                    NOT NULL COMMENT '逻辑删除：0正常 1删除',
     create_time DATETIME(3)             DEFAULT CURRENT_TIMESTAMP(3) NOT NULL COMMENT '创建时间',
     update_time DATETIME(3)             DEFAULT CURRENT_TIMESTAMP(3) NOT NULL ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '更新时间',

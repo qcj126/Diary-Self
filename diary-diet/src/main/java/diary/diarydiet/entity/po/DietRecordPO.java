@@ -53,6 +53,11 @@ public class DietRecordPO {
     private String imageUrl;
 
     /**
+     * 关联图片ID；0表示旧数据或未关联文件服务图片。
+     */
+    private Long imageId;
+
+    /**
      * 逻辑删除 0正常 1删除
      */
     private Boolean deleted;

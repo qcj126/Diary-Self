@@ -9,6 +9,7 @@ create table diet_record
     location    varchar(100) default 'home'               not null comment '用餐地点，前端使用home/outside',
     note        varchar(500)                              null comment '备注',
     image_url   varchar(1000)                             null comment '食物图片地址',
+    image_id    bigint unsigned default 0                 not null comment '关联image.id，0表示未关联',
     deleted     tinyint(1)   default 0                    not null comment '逻辑删除：0正常 1删除',
     create_time datetime(3)  default CURRENT_TIMESTAMP(3) not null comment '创建时间',
     update_time datetime(3)  default CURRENT_TIMESTAMP(3) not null on update CURRENT_TIMESTAMP(3) comment '更新时间'

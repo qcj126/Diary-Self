@@ -40,4 +40,61 @@
           AND deleted = 0
         LIMIT 1
     </select>
+
+    <select id="selectAnyByImageIdAndUserId" resultMap="ThumbnailResultMap">
+        SELECT <include refid="thumbnailColumns"/>
+        FROM thumbnail
+        WHERE image_id = #{imageId}
+          AND user_id = #{userId}
+        LIMIT 1
+    </select>
+
+    <!--
+      卡片页批量查询必须一次完成用户、原图状态、类型和缩略图状态校验，
+      避免按图片逐条查询造成N+1。imageTypes由ImageTypeEnum统一提供。
+    -->
+    <select id="selectReadyByImageIdsAndUserId" resultMap="ThumbnailResultMap">
+        SELECT
+            t.id, t.image_id, t.user_id, t.file_size, t.mime_type, t.width, t.height,
+            t.object_key, t.status, t.deleted, t.create_time, t.update_time
+        FROM thumbnail t
+        INNER JOIN image i ON i.id = t.image_id AND i.user_id = t.user_id
+        WHERE t.user_id = #{userId}
+          AND t.deleted = 0
+          AND t.status = #{thumbnailStatus}
+          AND i.deleted = 0
+          AND i.status = #{imageStatus}
+          AND i.type IN
+          <foreach collection="imageTypes" item="imageType" open="(" separator="," close=")">
+              #{imageType}
+          </foreach>
+          AND t.image_id IN
+          <foreach collection="imageIds" item="imageId" open="(" separator="," close=")">
+              #{imageId}
+          </foreach>
+    </select>
+
+    <update id="softDeleteByImageIdAndUserId">
+        UPDATE thumbnail
+        SET deleted = 1,
+            update_time = CURRENT_TIMESTAMP
+        WHERE image_id = #{imageId}
+          AND user_id = #{userId}
+          AND deleted = 0
+    </update>
+
+    <update id="updateIfStatus">
+        UPDATE thumbnail
+        SET file_size = #{thumbnail.fileSize},
+            mime_type = #{thumbnail.mimeType},
+            width = #{thumbnail.width},
+            height = #{thumbnail.height},
+            object_key = #{thumbnail.objectKey},
+            status = #{thumbnail.status},
+            update_time = CURRENT_TIMESTAMP
+        WHERE image_id = #{thumbnail.imageId}
+          AND user_id = #{thumbnail.userId}
+          AND deleted = 0
+          AND status = #{expectedStatus}
+    </update>
 </mapper>

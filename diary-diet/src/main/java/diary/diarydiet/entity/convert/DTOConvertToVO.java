@@ -25,6 +25,7 @@ public final class DTOConvertToVO {
                 .location(dto.getLocation())
                 .note(dto.getNote())
                 .imageUrl(dto.getImageUrl())
+                .imageId(dto.getImageId())
                 .build();
     }
 }

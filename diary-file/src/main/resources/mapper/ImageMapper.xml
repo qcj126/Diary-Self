@@ -23,51 +23,16 @@
         id, user_id, file_size, object_key, original_name, mime_type, type, deleted, status, sha256, width, height, create_time, update_time
     </sql>
 
-    <select id="selectImageById" resultMap="ImageResultMap">
-        SELECT id, object_key, original_name FROM image WHERE id = #{id}
-        and deleted = 0 and status = 1000
-    </select>
-
-    <select id="selectImageByOriginalName" resultMap="ImageResultMap">
-        SELECT id, object_key, original_name, mime_type FROM image
+    <select id="selectReadyByOriginalNameAndUserId" resultMap="ImageResultMap">
+        SELECT <include refid="imageColumns"/>
+        FROM image
         WHERE original_name = #{originalName}
+          AND user_id = #{userId}
           AND deleted = 0
           AND status = 1000
         ORDER BY update_time DESC
         LIMIT 1
     </select>
-
-    <select id="selectImagesForUploadByIds" resultMap="ImageResultMap">
-        SELECT id, object_key FROM image WHERE id IN
-        <foreach item="id" collection="imageIds" separator="," open="(" close=")">
-            #{id}
-        </foreach>
-        and deleted = 0
-    </select>
-
-    <update id="updateImageStatusById">
-        update image set object_key = #{objectKey}, status = #{status} where id = #{id}
-    </update>
-
-    <select id="selectImageByTypeAndName" resultType="java.lang.Long">
-        select id from image where original_name = #{originalFilename}
-    </select>
-
-    <insert id="batchAddImageToDb" parameterType="list">
-        INSERT INTO image (
-            id, user_id, file_size, object_key, original_name, mime_type,
-            type, deleted, status, sha256, width, height
-        )
-        VALUES
-        <foreach collection="imageList" item="item" separator=",">
-            (
-                #{item.id}, #{item.userId}, #{item.fileSize}, #{item.objectKey},
-                #{item.originalName}, #{item.mimeType}, #{item.type},
-                COALESCE(#{item.deleted}, 0), #{item.status}, #{item.sha256},
-                #{item.width}, #{item.height}
-            )
-        </foreach>
-    </insert>
 
     <select id="selectLatestTwoImagesForCarousel" resultMap="ImageResultMap">
         select distinct a.id
@@ -77,9 +42,15 @@
         group by c.id limit 20
     </select>
 
-    <delete id="deleteImageById">
-        DELETE FROM image WHERE id = #{id}
-    </delete>
+    <update id="softDeleteOwnedImage">
+        UPDATE image
+        SET deleted = 1,
+            sha256 = NULL,
+            update_time = CURRENT_TIMESTAMP
+        WHERE id = #{imageId}
+          AND user_id = #{userId}
+          AND deleted = 0
+    </update>
 
     <select id="selectImageStatusById" resultMap="ImageResultMap">
         select id, status, object_key from image where deleted = 0 and id = #{imageId}
@@ -138,4 +109,50 @@
         AND user_id = #{userId}
         AND deleted = 0
     </select>
+
+    <select id="selectForThumbnailById" resultMap="ImageResultMap">
+        SELECT <include refid="imageColumns"/>
+        FROM image
+        WHERE id = #{imageId}
+          AND deleted = 0
+        LIMIT 1
+    </select>
+
+    <select id="selectAnyByIdAndUserId" resultMap="ImageResultMap">
+        SELECT <include refid="imageColumns"/>
+        FROM image
+        WHERE id = #{imageId}
+          AND user_id = #{userId}
+        LIMIT 1
+    </select>
+
+    <select id="selectAnyByIdAndUserIdForUpdate" resultMap="ImageResultMap">
+        SELECT <include refid="imageColumns"/>
+        FROM image
+        WHERE id = #{imageId}
+          AND user_id = #{userId}
+        LIMIT 1
+        FOR UPDATE
+    </select>
+
+    <update id="updateDimensionsIfMissing">
+        UPDATE image
+        SET width = COALESCE(width, #{width}),
+            height = COALESCE(height, #{height}),
+            update_time = CURRENT_TIMESTAMP
+        WHERE id = #{imageId}
+          AND deleted = 0
+          AND (width IS NULL OR height IS NULL)
+    </update>
+
+    <update id="softDeleteAbandonedUpload">
+        UPDATE image
+        SET deleted = 1,
+            sha256 = NULL,
+            update_time = CURRENT_TIMESTAMP
+        WHERE id = #{imageId}
+          AND user_id = #{userId}
+          AND deleted = 0
+          AND status IN (1100, 1200, 1210, 1230)
+    </update>
 </mapper>

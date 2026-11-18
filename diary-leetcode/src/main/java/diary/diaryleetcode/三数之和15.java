@@ -1,7 +1,5 @@
 package diary.diaryleetcode;
 
-import com.sun.source.tree.ReturnTree;
-
 import java.util.*;
 
 public class 三数之和15 {

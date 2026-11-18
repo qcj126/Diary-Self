@@ -90,6 +90,11 @@ public class DietRecordVO {
     private String imageUrl;
 
     /**
+     * 关联图片ID；0表示旧数据或未关联文件服务图片。
+     */
+    private Long imageId;
+
+    /**
      * 创建时间
      */
     private LocalDateTime createTime;

@@ -22,11 +22,13 @@ class ImageStatusTransitionPolicyTest {
             new Transition(PENDING_UPLOAD, UPLOADING),
             new Transition(PENDING_UPLOAD, UPLOAD_FAILED),
             new Transition(UPLOADING, UPLOADED),
+            new Transition(UPLOADING, READY),
             new Transition(UPLOADING, RETRY_WAIT),
             new Transition(UPLOADING, UPLOAD_FAILED),
             new Transition(RETRY_WAIT, UPLOADING),
             new Transition(RETRY_WAIT, UPLOAD_FAILED),
-            new Transition(UPLOADED, READY)
+            new Transition(UPLOADED, READY),
+            new Transition(UPLOADED, UPLOAD_FAILED)
     );
 
     @Test

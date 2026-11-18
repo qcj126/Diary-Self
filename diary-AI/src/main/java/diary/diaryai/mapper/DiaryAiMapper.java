@@ -136,5 +136,4 @@ public interface DiaryAiMapper {
             @Param("userId") Long userId
     );
     // 只允许状态转换：PENDING / QUEUED → RETRY_WAIT
-    int markRetryWaitIfDispatchable(AiTaskProcessDto request);
 }

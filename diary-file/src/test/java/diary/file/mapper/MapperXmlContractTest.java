@@ -45,7 +45,8 @@ class MapperXmlContractTest {
                 Arguments.of(ImageMapper.class, "mapper/ImageMapper.xml"),
                 Arguments.of(ThumbnailMapper.class, "mapper/ThumbnailMapper.xml"),
                 Arguments.of(ImageUploadSessionMapper.class, "mapper/ImageUploadSessionMapper.xml"),
-                Arguments.of(ImageUploadChunkMapper.class, "mapper/ImageUploadChunkMapper.xml")
+                Arguments.of(ImageUploadChunkMapper.class, "mapper/ImageUploadChunkMapper.xml"),
+                Arguments.of(FileMqOutboxMapper.class, "mapper/FileMqOutboxMapper.xml")
         );
     }
 }

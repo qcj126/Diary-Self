@@ -2,49 +2,39 @@ package diary.file.impl.queryserviceImpl;
 
 import diary.file.entity.po.ImagePO;
 import diary.file.entity.vo.ImageVO;
+import diary.file.enums.ImageStatusEnum;
 import diary.file.mapper.ImageMapper;
-import diary.file.service.ImageFileService;
 import diary.file.service.queryurlservice.QueryUrlService;
 import diary.utils.common.MyUtils;
-import jakarta.annotation.Resource;
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.util.UriUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
-@Slf4j
 @Service
+@RequiredArgsConstructor
 public class QueryUrlServiceImpl implements QueryUrlService {
-    @Resource
-    private ImageMapper imageMapper;
+    private final ImageMapper imageMapper;
 
-    @Resource
-    private ImageFileService imageFileService;
-
-    public List<ImageVO> queryImageUrls(List<Long> imageIds) {
-        MyUtils.check().listNotContainsEmpty(imageIds, "图片ID列表");
+    public List<ImageVO> queryImageUrls(List<Long> imageIds, Long userId) {
+        MyUtils.check().listNotContainsEmpty(imageIds, "图片ID列表").notNull(userId, "userId");
         List<ImageVO> imageVOS = new ArrayList<>();
         for (Long imageId : imageIds) {
+            ImagePO imagePO = imageMapper.selectForUploadByIdAndUserId(imageId, userId);
+            if (imagePO == null || !Objects.equals(imagePO.getStatus(), ImageStatusEnum.READY.getCode())) continue;
             ImageVO imageVO = new ImageVO();
-            ImagePO imagePO = imageMapper.selectImageById(imageId);
-            if (imagePO == null) continue;
-            if (imageFileService.getOrRestore(imagePO) == null) {
-                log.warn("图片不可用，本地与 OSS 均未找到: id={}, originalName={}", imageId, imagePO.getOriginalName());
-                continue;
-            }
             imageVO.setId(imageId);
-            imageVO.setUrl("/file/images/" + UriUtils.encodePathSegment(imagePO.getOriginalName(), StandardCharsets.UTF_8));
+            imageVO.setUrl("/file/originals/" + imageId);
             imageVOS.add(imageVO);
         }
         return imageVOS;
     }
 
     @Override
-    public List<ImageVO> queryCarouselImages() {
+    public List<ImageVO> queryCarouselImages(Long userId) {
         List<ImagePO> imagePOS = imageMapper.selectLatestTwoImagesForCarousel();
-        return queryImageUrls(imagePOS.stream().map(ImagePO::getId).toList());
+        return queryImageUrls(imagePOS.stream().map(ImagePO::getId).toList(), userId);
     }
 }

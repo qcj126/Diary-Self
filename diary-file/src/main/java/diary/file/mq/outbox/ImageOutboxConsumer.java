@@ -1,11 +1,10 @@
 package diary.file.mq.outbox;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import diary.file.entity.po.ImagePO;
-import diary.file.enums.ImageTransitionResultEnum;
-import diary.file.mapper.ImageMapper;
+import diary.file.exception.PermanentThumbnailProcessingException;
+import diary.file.exception.RetryableThumbnailProcessingException;
 import diary.file.mq.event.ImageUploadedEvent;
-import diary.file.service.ImageStatusService;
+import diary.file.service.thumbnail.ImageThumbnailProcessService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.annotation.RocketMQMessageListener;
@@ -19,8 +18,6 @@ import java.util.Objects;
 
 import static diary.file.consts.FileMqProtocolConst.IMAGE_UPLOADED_EVENT_TYPE;
 import static diary.file.consts.FileMqProtocolConst.IMAGE_UPLOADED_SCHEMA_VERSION;
-import static diary.file.enums.ImageTransitionResultEnum.REJECTED;
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -32,9 +29,7 @@ import static diary.file.enums.ImageTransitionResultEnum.REJECTED;
 )
 public class ImageOutboxConsumer implements RocketMQListener {
     private final ObjectMapper objectMapper;
-//    private final FileMqOutboxMapper fileMqOutboxMapper;
-    private final ImageMapper imageMapper;
-    private final ImageStatusService imageStatusService;
+    private final ImageThumbnailProcessService thumbnailProcessService;
 
     @Override
     public ConsumeResult consume(MessageView messageView) {
@@ -48,39 +43,29 @@ public class ImageOutboxConsumer implements RocketMQListener {
             validateMessage(imageUploadedEvent);
         } catch (Exception parseException) {
             /*
-             * 以前只捕获 IOException，schemaVersion、taskId 等协议错误没有明确分类，可能直接穿透 Listener。
-             * 这类消息无法定位到可靠任务，返回 FAILURE 让 RocketMQ 按消费策略有限重试并最终进入 DLQ。
+             * 协议或JSON永久非法时，重复投递相同字节没有恢复价值。ACK并记录messageId，
+             * 避免坏消息无限占用消费重试；原始消息仍可通过Broker/应用日志定位。
              */
-            log.error("Invalid AI task message, messageId={}", messageView.getMessageId(), parseException);
-            return ConsumeResult.FAILURE;
-        }
-
-        ImagePO imagePO;
-        try {
-            // 通过imageId查询图片信息
-            imagePO = imageMapper.selectImageStatusById(imageUploadedEvent.getImageId());
-            if (imagePO == null) {
-                log.error("消息中imageId在传输中已被更改，当前imageId = {}", imageUploadedEvent.getImageId());
-                return ConsumeResult.FAILURE;
-            }
-            if (!imagePO.getObjectKey().equals(imageUploadedEvent.getObjectKey())) {
-                log.error("消息中objectKey在传输中已被更改，当前imageId = {}, 当前objectKey = {}, 期望objectKey = {}",
-                        imageUploadedEvent.getImageId(), imagePO.getObjectKey(), imageUploadedEvent.getObjectKey());
-                return ConsumeResult.FAILURE;
-            }
-        } catch (Exception e) {
-            log.error("查询图片数据失败，imageId = {}", imageUploadedEvent.getImageId(), e);
-            return ConsumeResult.FAILURE;
-        }
-
-        try {
-            ImageTransitionResultEnum transitionResultEnum = imageStatusService.markReady(imagePO.getId());
-            if (transitionResultEnum == REJECTED) {
-                log.warn("状态拒绝迁移，imageId为 = {}", imagePO.getId());
-            }
+            log.error("非法IMAGE_UPLOADED消息，已停止重试, messageId={}",
+                    messageView.getMessageId(), parseException);
             return ConsumeResult.SUCCESS;
-        } catch (Exception e) {
-            log.error("流转READY状态出现异常，imageId = {}", imagePO.getId(), e);
+        }
+
+        try {
+            thumbnailProcessService.process(imageUploadedEvent);
+            return ConsumeResult.SUCCESS;
+        } catch (PermanentThumbnailProcessingException permanentException) {
+            /*处理服务已经尝试原子记录thumbnail FAILED和图片失败终态。*/
+            log.error("缩略图永久处理失败，已停止重试, messageId={}, imageId={}",
+                    messageView.getMessageId(), imageUploadedEvent.getImageId(), permanentException);
+            return ConsumeResult.SUCCESS;
+        } catch (RetryableThumbnailProcessingException retryableException) {
+            log.warn("缩略图临时处理失败，等待RocketMQ重投, messageId={}, imageId={}",
+                    messageView.getMessageId(), imageUploadedEvent.getImageId(), retryableException);
+            return ConsumeResult.FAILURE;
+        } catch (RuntimeException unexpectedException) {
+            log.error("缩略图处理发生未分类异常，按可重试处理, messageId={}, imageId={}",
+                    messageView.getMessageId(), imageUploadedEvent.getImageId(), unexpectedException);
             return ConsumeResult.FAILURE;
         }
     }
@@ -99,7 +84,7 @@ public class ImageOutboxConsumer implements RocketMQListener {
                 || message.getOriginalName().isBlank()
                 || !Objects.equals(IMAGE_UPLOADED_SCHEMA_VERSION, message.getSchemaVersion())
                 || !Objects.equals(IMAGE_UPLOADED_EVENT_TYPE, message.getEventType())) {
-            throw new IllegalArgumentException("AI任务消息字段或协议版本不合法");
+            throw new IllegalArgumentException("IMAGE_UPLOADED消息字段或协议版本不合法");
         }
     }
 }

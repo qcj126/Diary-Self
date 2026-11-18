@@ -18,10 +18,10 @@ public class ImageOutboxCleanHandler {
         Integer sentRetentionDays = fileMqProperties.getSentRetentionDays();
         Integer cleanBatchSize = fileMqProperties.getCleanBatchSize();
         int cleanCnt = fileMqOutboxMapper.cleanSentOutboxData(sentRetentionDays, cleanBatchSize);
-        if (cleanBatchSize != cleanCnt) {
-            log.warn("成功删除Outbox消息 数据量：{}条, 期望删除数据量：{}条", cleanCnt, cleanBatchSize);
+        if (cleanCnt > 0) {
+            log.info("已清理过期SENT Outbox, count={}, batchLimit={}", cleanCnt, cleanBatchSize);
         } else {
-            log.info("成功删除Outbox消息 {}条", cleanCnt);
+            log.debug("本轮没有需要清理的SENT Outbox");
         }
     }
 }

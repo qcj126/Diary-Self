@@ -13,11 +13,11 @@ public class AiRedisKeyFactory {
     private final AiTaskProperties properties;
 
     public String submitRate(Long userId, long epochMinute) {
-        return properties.getRedis().getKeyPrefix() + ":submit:rate:" + userId + ":" + epochMinute;
+        return properties.getCache().getKeyPrefix() + ":submit:rate:" + userId + ":" + epochMinute;
     }
 
     public String globalModelPermit(AIEnum model) {
         Objects.requireNonNull(model, "model must not be null");
-        return properties.getRedis().getKeyPrefix() + ":global-permit:model:" + model.name();
+        return properties.getCache().getKeyPrefix() + ":global-permit:model:" + model.name();
     }
 }

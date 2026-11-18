@@ -24,7 +24,7 @@ public class AiTaskProperties {
     @Valid
     private Task task = new Task();
     @Valid
-    private Cache redis = new Cache();
+    private Cache cache = new Cache();
     @Valid
     private Limit limit = new Limit();
     @Valid
@@ -105,10 +105,6 @@ public class AiTaskProperties {
         private int leaseSeconds;
         @Min(1)
         private int renewalIntervalSeconds;
-        @Min(1)
-        private int capacityRetryDelaySeconds;
-        @Min(1)
-        private int redisUnavailableRetryDelaySeconds;
         @Valid
         @NotEmpty
         private Map<AIEnum, ModelPermit> models = new EnumMap<>(AIEnum.class);

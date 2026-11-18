@@ -1,6 +1,7 @@
 package diary.diarydiet.entity.dto;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -42,6 +43,12 @@ public class DietRecordAddDTO {
      */
     @Size(max = 1000, message = "图片地址最多1000字符")
     private String imageUrl;
+
+    /**
+     * 关联图片ID；0表示未关联文件服务图片。
+     */
+    @PositiveOrZero(message = "图片ID不能小于0")
+    private Long imageId = 0L;
 
     /**
      * 可选备注。

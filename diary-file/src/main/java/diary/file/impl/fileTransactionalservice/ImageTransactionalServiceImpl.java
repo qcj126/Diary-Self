@@ -4,10 +4,15 @@ import diary.common.exception.ConflictException;
 import diary.common.exception.ParamIllegalException;
 import diary.file.entity.po.ImagePO;
 import diary.file.entity.po.ImageUploadSessionPO;
+import diary.file.entity.mq.po.FileMqOutboxPO;
 import diary.file.enums.ImageStatusEnum;
+import diary.file.enums.ImageTypeEnum;
 import diary.file.enums.ImageUploadSessionStatusEnum;
+import diary.file.mapper.FileMqOutboxMapper;
 import diary.file.mapper.ImageMapper;
 import diary.file.mapper.ImageUploadSessionMapper;
+import diary.file.mapper.ImageUploadChunkMapper;
+import diary.file.mq.outbox.ImageUploadedOutboxFactory;
 import diary.file.service.filetransactionalservice.ImageTransactionalService;
 import diary.file.state.ImageStatusTransitionPolicy;
 import lombok.RequiredArgsConstructor;
@@ -16,12 +21,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
+import static diary.file.consts.FileMqProtocolConst.IMAGE_UPLOADED_EVENT_TYPE;
+
 @Service
 @RequiredArgsConstructor
 public class ImageTransactionalServiceImpl implements ImageTransactionalService {
     private final ImageMapper imageMapper;
     private final ImageUploadSessionMapper sessionMapper;
+    private final ImageUploadChunkMapper chunkMapper;
     private final ImageStatusTransitionPolicy transitionPolicy;
+    private final FileMqOutboxMapper outboxMapper;
+    private final ImageUploadedOutboxFactory outboxFactory;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -41,7 +51,11 @@ public class ImageTransactionalServiceImpl implements ImageTransactionalService 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void completeMultipartUpload(String uploadId, Long userId, Long imageId) {
-        ImageUploadSessionPO session = sessionMapper.selectByUploadIdAndUserId(uploadId, userId);
+        /*
+         * 锁定上传会话，串行化同一图片的“完成上传”和“补写缺失Outbox”流程。
+         * 多实例并发仍由数据库行锁、状态/版本CAS和唯一索引共同保证。
+         */
+        ImageUploadSessionPO session = sessionMapper.selectByUploadIdAndUserIdForUpdate(uploadId, userId);
         ImagePO image = imageMapper.selectForUploadByIdAndUserId(imageId, userId);
 
         if (session == null || image == null || !imageId.equals(session.getImageId())) {
@@ -49,11 +63,18 @@ public class ImageTransactionalServiceImpl implements ImageTransactionalService 
         }
 
         ImageStatusEnum imageStatus = ImageStatusEnum.fromCode(image.getStatus());
+        boolean thumbnailRequired = ImageTypeEnum.fromCode(image.getType()).isThumbnailRequired();
 
         if (Objects.equals(session.getStatus(), ImageUploadSessionStatusEnum.COMPLETED.getCode())) {
-            if (imageStatus == ImageStatusEnum.UPLOADED || imageStatus == ImageStatusEnum.READY) {
+            if (thumbnailRequired && (imageStatus == ImageStatusEnum.UPLOADED || imageStatus == ImageStatusEnum.READY)) {
+                ensureImageUploadedOutbox(image);
                 return;
             }
+            if (!thumbnailRequired && imageStatus == ImageStatusEnum.UPLOADED) {
+                markReadyWithoutThumbnail(image);
+                return;
+            }
+            if (!thumbnailRequired && imageStatus == ImageStatusEnum.READY) return;
             throw new ConflictException("会话已完成，但图片状态不一致");
         }
 
@@ -62,11 +83,12 @@ public class ImageTransactionalServiceImpl implements ImageTransactionalService 
         }
 
         if (imageStatus == ImageStatusEnum.UPLOADING) {
-            if (!transitionPolicy.canTransition(imageStatus, ImageStatusEnum.UPLOADED)) {
-                throw new ConflictException("图片状态不允许迁移到UPLOADED");
+            ImageStatusEnum targetStatus = thumbnailRequired ? ImageStatusEnum.UPLOADED : ImageStatusEnum.READY;
+            if (!transitionPolicy.canTransition(imageStatus, targetStatus)) {
+                throw new ConflictException("图片状态不允许迁移到" + targetStatus.name());
             }
 
-            int imageUpdated = imageMapper.updateStatusIfCurrent(imageId, imageStatus.getCode(), ImageStatusEnum.UPLOADED.getCode());
+            int imageUpdated = imageMapper.updateStatusIfCurrent(imageId, imageStatus.getCode(), targetStatus.getCode());
 
             if (imageUpdated != 1) {
                 throw new ConflictException("图片状态并发更新冲突");
@@ -81,13 +103,15 @@ public class ImageTransactionalServiceImpl implements ImageTransactionalService 
         );
 
         if (sessionUpdated != 1) {
-            ImageUploadSessionPO latest = sessionMapper.selectByUploadIdAndUserId(uploadId, userId);
-
-            if (latest != null && Objects.equals(latest.getStatus(), ImageUploadSessionStatusEnum.COMPLETED.getCode())) {
-                return;
-            }
-
             throw new ConflictException("上传会话最终状态并发更新冲突");
+        }
+
+        /*
+         * Outbox插入和两项状态更新属于同一个本地事务。这里不能发送RocketMQ，
+         * 任意数据库操作失败都会让session、image和Outbox一起回滚。
+         */
+        if (thumbnailRequired) {
+            ensureImageUploadedOutbox(image);
         }
     }
 
@@ -133,6 +157,85 @@ public class ImageTransactionalServiceImpl implements ImageTransactionalService 
 
         if (sessionUpdated != 1) {
             throw new ConflictException("上传会话失败状态并发更新冲突");
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean claimExpiredSession(ImageUploadSessionPO candidate) {
+        if (candidate == null || candidate.getUploadId() == null || candidate.getUserId() == null
+                || candidate.getStatus() == null || candidate.getVersion() == null) {
+            throw new ParamIllegalException("过期上传会话候选数据不完整");
+        }
+        if (Objects.equals(candidate.getStatus(), ImageUploadSessionStatusEnum.EXPIRED.getCode())) {
+            return true;
+        }
+        if (!Objects.equals(candidate.getStatus(), ImageUploadSessionStatusEnum.INITIATING.getCode())
+                && !Objects.equals(candidate.getStatus(), ImageUploadSessionStatusEnum.UPLOADING.getCode())) {
+            return false;
+        }
+        return sessionMapper.updateStatusIfVersion(
+                candidate.getUploadId(), candidate.getUserId(), candidate.getStatus(),
+                ImageUploadSessionStatusEnum.EXPIRED.getCode(), candidate.getVersion()
+        ) == 1;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void cleanupExpiredSession(String uploadId, Long userId, Long imageId) {
+        ImageUploadSessionPO session = sessionMapper.selectByUploadIdAndUserIdForUpdate(uploadId, userId);
+        if (session == null) {
+            return;
+        }
+        if (!Objects.equals(session.getImageId(), imageId)
+                || !Objects.equals(session.getStatus(), ImageUploadSessionStatusEnum.EXPIRED.getCode())) {
+            throw new ConflictException("上传会话不允许执行过期清理");
+        }
+
+        ImagePO image = imageMapper.selectAnyByIdAndUserId(imageId, userId);
+        if (image != null && !Objects.equals(image.getDeleted(), 1)) {
+            int deleted = imageMapper.softDeleteAbandonedUpload(imageId, userId);
+            if (deleted != 1) {
+                throw new ConflictException("图片已进入完成态，拒绝清理过期上传会话");
+            }
+        }
+        chunkMapper.deleteByUploadId(uploadId);
+        if (sessionMapper.deleteByUploadIdAndUserId(uploadId, userId) != 1) {
+            throw new IllegalStateException("过期上传会话删除失败, uploadId=" + uploadId);
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int cleanupOrphanChunks(int limit) {
+        if (limit <= 0) {
+            throw new ParamIllegalException("孤儿分片清理上限必须大于0");
+        }
+        return chunkMapper.deleteOrphans(limit);
+    }
+
+    private void ensureImageUploadedOutbox(ImagePO image) {
+        FileMqOutboxPO existing = outboxMapper.selectByImageIdAndEventType(
+                image.getId(), IMAGE_UPLOADED_EVENT_TYPE
+        );
+        if (existing != null) {
+            outboxFactory.validateExisting(existing, image);
+            return;
+        }
+
+        FileMqOutboxPO created = outboxFactory.create(image);
+        int inserted = outboxMapper.insert(created);
+        if (inserted != 1) {
+            throw new IllegalStateException("IMAGE_UPLOADED Outbox插入失败, imageId=" + image.getId());
+        }
+    }
+
+    private void markReadyWithoutThumbnail(ImagePO image) {
+        if (!transitionPolicy.canTransition(ImageStatusEnum.UPLOADED, ImageStatusEnum.READY)
+                || imageMapper.updateStatusIfCurrent(
+                image.getId(), ImageStatusEnum.UPLOADED.getCode(), ImageStatusEnum.READY.getCode()
+        ) != 1) {
+            throw new ConflictException("无需缩略图的图片READY状态恢复失败");
         }
     }
 }

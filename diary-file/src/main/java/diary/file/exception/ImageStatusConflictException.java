@@ -1,10 +1,10 @@
 package diary.file.exception;
 
 
-import diary.common.exception.CustomException;
+import diary.common.exception.ConflictException;
 import diary.file.enums.ImageStatusEnum;
 
-public class ImageStatusConflictException extends CustomException {
+public class ImageStatusConflictException extends ConflictException {
     public ImageStatusConflictException(Long imageId, ImageStatusEnum currentStatus, ImageStatusEnum targetStatus, ImageStatusEnum latestStatus) {
         super(
                 "状态变更异常: imageId = " + imageId + ", " +

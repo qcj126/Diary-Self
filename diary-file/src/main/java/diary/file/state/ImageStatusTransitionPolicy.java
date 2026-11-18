@@ -17,11 +17,14 @@ public class ImageStatusTransitionPolicy {
         return switch (currentStatus) {
             case PENDING_UPLOAD -> targetStatus == UPLOADING || targetStatus == UPLOAD_FAILED;
 
-            case UPLOADING -> targetStatus == UPLOADED || targetStatus == RETRY_WAIT || targetStatus == UPLOAD_FAILED;
+            /* 不需要缩略图的类型在整文件校验成功后可以直接进入READY。 */
+            case UPLOADING -> targetStatus == UPLOADED || targetStatus == READY
+                    || targetStatus == RETRY_WAIT || targetStatus == UPLOAD_FAILED;
 
             case RETRY_WAIT -> targetStatus == UPLOADING || targetStatus == UPLOAD_FAILED;
 
-            case UPLOADED -> targetStatus == READY;
+            /*原图已落OSS但缩略图永久无法生成时，必须收敛为失败终态。*/
+            case UPLOADED -> targetStatus == READY || targetStatus == UPLOAD_FAILED;
 
             case READY, UPLOAD_FAILED -> false;
         };

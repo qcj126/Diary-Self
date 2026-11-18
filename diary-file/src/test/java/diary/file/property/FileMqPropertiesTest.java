@@ -30,10 +30,13 @@ class FileMqPropertiesTest {
             assertThat(properties.getEventTopic()).isEqualTo("diary-file-event");
             assertThat(properties.getImageUploadedTag()).isEqualTo("IMAGE_UPLOADED");
             assertThat(properties.getImageReadyConsumerGroup()).isEqualTo("diary-file-image-ready-consumer");
+            assertThat(properties.getImageDeletedTag()).isEqualTo("IMAGE_DELETED");
+            assertThat(properties.getImageCleanupConsumerGroup()).isEqualTo("diary-file-image-cleanup-consumer");
             assertThat(properties.getPublisherBatchSize()).isEqualTo(20);
             assertThat(properties.getPublisherIntervalMs()).isEqualTo(10_000);
             assertThat(properties.getOutboxSendingTimeoutSeconds()).isEqualTo(60);
             assertThat(properties.getOutboxMaxRetries()).isEqualTo(5);
+            assertThat(properties.getOutboxCleanMs()).isEqualTo(60_000);
             assertThat(properties.getSentRetentionDays()).isEqualTo(7);
             assertThat(properties.getCleanBatchSize()).isEqualTo(500);
         });
@@ -43,7 +46,9 @@ class FileMqPropertiesTest {
     @ValueSource(strings = {
             "event-topic",
             "image-uploaded-tag",
-            "image-ready-consumer-group"
+            "image-ready-consumer-group",
+            "image-deleted-tag",
+            "image-cleanup-consumer-group"
     })
     void shouldFailWhenRequiredTextPropertyIsMissing(String propertyName) {
         assertBindingFails(propertiesWithout(propertyName));
@@ -55,6 +60,7 @@ class FileMqPropertiesTest {
             "publisher-interval-ms",
             "outbox-sending-timeout-seconds",
             "outbox-max-retries",
+            "outbox-clean-ms",
             "sent-retention-days",
             "clean-batch-size"
     })
@@ -68,6 +74,7 @@ class FileMqPropertiesTest {
             "publisher-interval-ms, 99",
             "outbox-sending-timeout-seconds, 0",
             "outbox-max-retries, -1",
+            "outbox-clean-ms, -1",
             "sent-retention-days, 0",
             "clean-batch-size, 0"
     })
@@ -112,10 +119,13 @@ class FileMqPropertiesTest {
                 PREFIX + "event-topic=diary-file-event",
                 PREFIX + "image-uploaded-tag=IMAGE_UPLOADED",
                 PREFIX + "image-ready-consumer-group=diary-file-image-ready-consumer",
+                PREFIX + "image-deleted-tag=IMAGE_DELETED",
+                PREFIX + "image-cleanup-consumer-group=diary-file-image-cleanup-consumer",
                 PREFIX + "publisher-batch-size=20",
                 PREFIX + "publisher-interval-ms=10000",
                 PREFIX + "outbox-sending-timeout-seconds=60",
                 PREFIX + "outbox-max-retries=5",
+                PREFIX + "outbox-clean-ms=60000",
                 PREFIX + "sent-retention-days=7",
                 PREFIX + "clean-batch-size=500"
         };

@@ -9,4 +9,10 @@ public interface ImageTransactionalService {
     void completeMultipartUpload(String uploadId, Long userId, Long imageId);
 
     void failMultipartUpload(String uploadId, Long userId, Long imageId);
+
+    boolean claimExpiredSession(ImageUploadSessionPO session);
+
+    void cleanupExpiredSession(String uploadId, Long userId, Long imageId);
+
+    int cleanupOrphanChunks(int limit);
 }

@@ -22,6 +22,7 @@ public final class POConvertToVO {
                 .location(po.getLocation())
                 .note(po.getNote())
                 .imageUrl(po.getImageUrl())
+                .imageId(po.getImageId())
                 .createTime(po.getCreateTime())
                 .updateTime(po.getUpdateTime())
                 .build();

@@ -35,11 +35,9 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -89,7 +87,13 @@ public class ImageUploadCompleteServiceImpl implements ImageUploadCompleteServic
         /*并发请求中，如果状态已为COMLETED，那么进入幂等检查*/
         ImageUploadSessionStatusEnum imageUploadSessionStatusEnum = ImageUploadSessionStatusEnum.fromCode(sessionPO.getStatus());
         if (imageUploadSessionStatusEnum == ImageUploadSessionStatusEnum.COMPLETED) {
-            /*会话状态COMPLETED对应图片状态READY和UPLOADED*/
+            /*
+             * 即使会话已经完成，也必须进入最终数据库事务核验/恢复唯一Outbox，
+             * 避免历史COMPLETED记录永久停留在UPLOADED却没有缩略图事件。
+             */
+            transactionalService.completeMultipartUpload(
+                    sessionPO.getUploadId(), userId, sessionPO.getImageId()
+            );
             return completedResponse(sessionPO, userId);
         }
         /*如果会话状态为INITIATING、ABORTED、EXPIRED，则直接拒绝*/
@@ -114,10 +118,13 @@ public class ImageUploadCompleteServiceImpl implements ImageUploadCompleteServic
         ImageUploadSessionPO session = enterCompleting(sessionPO, request, userId);
 
         if (Objects.equals(session.getStatus(), ImageUploadSessionStatusEnum.COMPLETED.getCode())) {
+            transactionalService.completeMultipartUpload(
+                    session.getUploadId(), userId, session.getImageId()
+            );
             return completedResponse(session, userId);
         }
 
-        ensureImageUploadingOrLater(session, userId);
+        ensureImageUploadingOrLater(session);
 
         OssCompleteResult completeResult;
         try {
@@ -254,33 +261,10 @@ public class ImageUploadCompleteServiceImpl implements ImageUploadCompleteServic
         return ImageUploadCompleteVO.builder().imageId(session.getImageId()).build();
     }
 
-    private void ensureImageUploadingOrLater(ImageUploadSessionPO session, Long userId) {
+    private void ensureImageUploadingOrLater(ImageUploadSessionPO session) {
         ImageTransitionResultEnum result = imageStatusService.markUploading(session.getImageId());
-
-        if (result != ImageTransitionResultEnum.REJECTED) {
-            return;
-        }
-
-        /*
-         * UPLOADED/READY 可能来自另一实例已完成或旧的不一致状态。
-         * 最终事务会再次核对 session 和 image。
-         */
-        ImagePO image = imageMapper.selectForUploadByIdAndUserId(
-                session.getImageId(),
-                userId
-        );
-
-        if (image == null) {
-            throw new ConflictException("图片不存在或不属于当前用户");
-        }
-
-        ImageStatusEnum status = ImageStatusEnum.fromCode(image.getStatus());
-
-        if (status != ImageStatusEnum.UPLOADED
-                && status != ImageStatusEnum.READY) {
-            throw new ConflictException(
-                    "图片当前状态不允许完成上传：" + status.name()
-            );
+        if (result == ImageTransitionResultEnum.REJECTED) {
+            throw new ConflictException("图片当前状态不允许完成上传");
         }
     }
 
@@ -288,25 +272,16 @@ public class ImageUploadCompleteServiceImpl implements ImageUploadCompleteServic
         if (session == null) {
             throw new ParamIllegalException("上传会话不存在或无权访问");
         }
-        if (session.getUploadId() == null
-                || session.getUploadId().isBlank()
+        if (session.getUploadId() == null || session.getUploadId().isBlank()
                 || session.getImageId() == null
-                || session.getImageId() <= 0
-                || session.getUserId() == null
                 || session.getStatus() == null
                 || session.getVersion() == null
-                || session.getVersion() < 0
-                || session.getObjectKey() == null
-                || session.getObjectKey().isBlank()
-                || session.getOssUploadId() == null
-                || session.getOssUploadId().isBlank()
+                || session.getObjectKey() == null || session.getObjectKey().isBlank()
+                || session.getOssUploadId() == null || session.getOssUploadId().isBlank()
                 || session.getSha256() == null
-                || session.getFileSize() == null
-                || session.getFileSize() <= 0
-                || session.getChunkSize() == null
-                || session.getChunkSize() <= 0
-                || session.getTotalChunks() == null
-                || session.getTotalChunks() <= 0) {
+                || session.getFileSize() == null || session.getFileSize() <= 0
+                || session.getChunkSize() == null || session.getChunkSize() <= 0
+                || session.getTotalChunks() == null || session.getTotalChunks() <= 0) {
             throw new CustomException("上传会话数据不完整");
         }
 
@@ -325,13 +300,10 @@ public class ImageUploadCompleteServiceImpl implements ImageUploadCompleteServic
             throw new ConflictException("上传分片数量不完整");
         }
 
-        Set<Integer> chunkIndexes = new HashSet<>();
-        Set<Integer> partNumbers = new HashSet<>();
         long totalSize = 0L;
 
-        /*率先校验最后一块分片是否正确，不正确则快速失败*/
-        long lastChunkSize = Math.subtractExact(session.getFileSize(),
-                Math.multiplyExact((long) session.getTotalChunks() - 1L, (long) session.getChunkSize()));
+        long lastChunkSize = session.getFileSize()
+                - (long) (session.getTotalChunks() - 1) * session.getChunkSize();
         if (lastChunkSize <= 0 || lastChunkSize > session.getChunkSize()) {
             throw new CustomException("上传会话最后一片大小异常");
         }
@@ -346,14 +318,6 @@ public class ImageUploadCompleteServiceImpl implements ImageUploadCompleteServic
                 throw new CustomException("上传分片记录不完整");
             }
 
-            if (!chunkIndexes.add(chunk.getChunkIndex())) {
-                throw new ConflictException("存在重复chunkIndex：" + chunk.getChunkIndex());
-            }
-
-            if (!partNumbers.add(chunk.getPartNumber())) {
-                throw new ConflictException("存在重复partNumber：" + chunk.getPartNumber());
-            }
-
             if (chunk.getChunkIndex() != index) {
                 throw new ConflictException("chunkIndex不连续，期望：" + index + "，实际：" + chunk.getChunkIndex());
             }
@@ -362,11 +326,7 @@ public class ImageUploadCompleteServiceImpl implements ImageUploadCompleteServic
                 throw new ConflictException("partNumber不连续，期望：" + expectedPartNumber + "，实际：" + chunk.getPartNumber());
             }
 
-            if (chunk.getPartNumber() != chunk.getChunkIndex() + 1) {
-                throw new ConflictException("partNumber与chunkIndex关系不正确");
-            }
-
-            int expectedSize = index == chunks.size() - 1 ? Math.toIntExact(lastChunkSize) : session.getChunkSize();
+            int expectedSize = index == chunks.size() - 1 ? (int) lastChunkSize : session.getChunkSize();
 
             if (chunk.getChunkSize() != expectedSize) {
                 throw new ConflictException("分片大小不正确，chunkIndex=" + chunk.getChunkIndex());
@@ -378,7 +338,7 @@ public class ImageUploadCompleteServiceImpl implements ImageUploadCompleteServic
                 throw new ConflictException("分片ETag为空，chunkIndex=" + chunk.getChunkIndex());
             }
 
-            totalSize = Math.addExact(totalSize, chunk.getChunkSize());
+            totalSize += chunk.getChunkSize();
         }
 
         if (totalSize != session.getFileSize()) {
@@ -392,53 +352,39 @@ public class ImageUploadCompleteServiceImpl implements ImageUploadCompleteServic
     }
 
     private ImageUploadSessionPO enterCompleting(ImageUploadSessionPO session, ImageUploadCompleteReqDto request, Long userId) {
-        while (true) {
-            ImageUploadSessionStatusEnum status = ImageUploadSessionStatusEnum.fromCode(session.getStatus());
-
-            if (status == ImageUploadSessionStatusEnum.COMPLETING || status == ImageUploadSessionStatusEnum.COMPLETED) {
-                return session;
-            }
-
-            if (status != ImageUploadSessionStatusEnum.UPLOADING) {
-                throw new ConflictException("上传会话当前状态不允许完成：" + status.name());
-            }
-
-            if (session.getExpiresAt() == null || !session.getExpiresAt().isAfter(LocalDateTime.now())) {
-                throw new ConflictException("上传会话已过期");
-            }
-
-            int updated = sessionMapper.updateStatusIfVersion(
-                    session.getUploadId(),
-                    userId,
-                    ImageUploadSessionStatusEnum.UPLOADING.getCode(),
-                    ImageUploadSessionStatusEnum.COMPLETING.getCode(),
-                    session.getVersion()
-            );
-
-            ImageUploadSessionPO latestSession = sessionMapper.selectByUploadIdAndUserId(session.getUploadId(), userId);
-
-            if (latestSession == null) {
-                throw new ParamIllegalException("上传会话不存在或无权访问");
-            }
-            validateSession(latestSession);
-            if (!request.getSha256().equals(latestSession.getSha256()) ||
-                    !request.getImageId().equals(latestSession.getImageId()) ||
-                    !Objects.equals(request.getTotalChunks(), latestSession.getTotalChunks())) {
-                throw new ConflictException("请求数据与期望数据不一致");
-            }
-
-            if (updated == 1) {
-                if (!Objects.equals(latestSession.getStatus(), ImageUploadSessionStatusEnum.COMPLETING.getCode())
-                        && !Objects.equals(latestSession.getStatus(), ImageUploadSessionStatusEnum.COMPLETED.getCode())) {
-                    throw new ConflictException("上传会话状态抢占结果异常");
-                }
-                return latestSession;
-            }
-
-            /*
-             * CAS 失败不直接报错，重新根据数据库最新状态判断。
-             */
-            session = latestSession;
+        ImageUploadSessionStatusEnum status = ImageUploadSessionStatusEnum.fromCode(session.getStatus());
+        if (status == ImageUploadSessionStatusEnum.COMPLETING || status == ImageUploadSessionStatusEnum.COMPLETED) {
+            return session;
         }
+        if (status != ImageUploadSessionStatusEnum.UPLOADING) {
+            throw new ConflictException("上传会话当前状态不允许完成：" + status.name());
+        }
+        if (session.getExpiresAt() == null || !session.getExpiresAt().isAfter(LocalDateTime.now())) {
+            throw new ConflictException("上传会话已过期");
+        }
+
+        /*
+         * 最多三个服务实例可能同时收到 complete。status + version CAS 保证只有一个实例
+         * 将会话推进到 COMPLETING；唯一约束负责数据唯一，CAS 负责状态所有权，后续 MQ
+         * 重复投递再由消费者幂等处理。抢占失败只读取一次最新状态，不循环推测毫秒级时序。
+         */
+        sessionMapper.updateStatusIfVersion(
+                session.getUploadId(), userId,
+                ImageUploadSessionStatusEnum.UPLOADING.getCode(),
+                ImageUploadSessionStatusEnum.COMPLETING.getCode(), session.getVersion()
+        );
+        ImageUploadSessionPO latest = sessionMapper.selectByUploadIdAndUserId(session.getUploadId(), userId);
+        validateSession(latest);
+        if (!request.getSha256().equals(latest.getSha256())
+                || !request.getImageId().equals(latest.getImageId())
+                || !Objects.equals(request.getTotalChunks(), latest.getTotalChunks())) {
+            throw new ConflictException("请求数据与期望数据不一致");
+        }
+        ImageUploadSessionStatusEnum latestStatus = ImageUploadSessionStatusEnum.fromCode(latest.getStatus());
+        if (latestStatus != ImageUploadSessionStatusEnum.COMPLETING
+                && latestStatus != ImageUploadSessionStatusEnum.COMPLETED) {
+            throw new ConflictException("上传会话状态抢占失败：" + latestStatus.name());
+        }
+        return latest;
     }
 }

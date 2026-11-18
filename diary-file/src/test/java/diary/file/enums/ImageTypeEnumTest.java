@@ -24,4 +24,12 @@ class ImageTypeEnumTest {
         assertThatThrownBy(() -> ImageTypeEnum.fromCode(-1))
                 .isInstanceOf(CustomException.class);
     }
+
+    @Test
+    void onlyCurrentCardImageTypesRequireThumbnails() {
+        assertThat(ImageTypeEnum.DIET.isThumbnailRequired()).isTrue();
+        assertThat(ImageTypeEnum.RECIPE.isThumbnailRequired()).isTrue();
+        assertThat(ImageTypeEnum.DAILY.isThumbnailRequired()).isTrue();
+        assertThat(ImageTypeEnum.INGREDIENT.isThumbnailRequired()).isFalse();
+    }
 }
