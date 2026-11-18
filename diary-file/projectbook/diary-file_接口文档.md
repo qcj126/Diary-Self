@@ -25,11 +25,10 @@
 | POST | `/file/query/thumbnails/urls` | 批量查询 READY 缩略图地址 |
 | GET | `/file/originals/{imageId}` | 流式读取当前用户的原图 |
 | GET | `/file/thumbnails/{imageId}` | 流式读取当前用户的缩略图 |
-| GET | `/file/images/{fileName}` | 兼容旧数据中已经保存的原图地址 |
 | POST | `/file/query/images/carousel` | 查询轮播图片地址 |
 | POST | `/file/delete/{id}` | 删除当前用户的图片 |
 
-旧的 `POST /file/upload/images` 整文件上传、视频上传和下载到服务节点接口已经删除。原图和缩略图直接从 OSS 流式返回，不写入节点本地目录。
+旧的整文件上传、视频上传、按文件名读取和下载到服务节点接口已经删除。原图和缩略图直接从 OSS 流式返回，不写入节点本地目录。
 
 ## 查询地址示例
 

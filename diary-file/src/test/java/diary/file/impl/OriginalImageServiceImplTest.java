@@ -50,16 +50,6 @@ class OriginalImageServiceImplTest {
         verify(ossStorageService, never()).openObject("images/original/11/22.jpg");
     }
 
-    @Test
-    void legacyFileNameLookupStillUsesCurrentUser() {
-        ImagePO image = image(ImageStatusEnum.READY.getCode());
-        when(imageMapper.selectReadyByOriginalNameAndUserId("photo.jpg", 11L)).thenReturn(image);
-
-        service.openByOriginalName("photo.jpg", 11L);
-
-        verify(imageMapper).selectReadyByOriginalNameAndUserId("photo.jpg", 11L);
-    }
-
     private ImagePO image(int status) {
         ImagePO image = new ImagePO();
         image.setId(22L);

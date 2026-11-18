@@ -23,17 +23,6 @@
         id, user_id, file_size, object_key, original_name, mime_type, type, deleted, status, sha256, width, height, create_time, update_time
     </sql>
 
-    <select id="selectReadyByOriginalNameAndUserId" resultMap="ImageResultMap">
-        SELECT <include refid="imageColumns"/>
-        FROM image
-        WHERE original_name = #{originalName}
-          AND user_id = #{userId}
-          AND deleted = 0
-          AND status = 1000
-        ORDER BY update_time DESC
-        LIMIT 1
-    </select>
-
     <select id="selectLatestTwoImagesForCarousel" resultMap="ImageResultMap">
         select distinct a.id
         from image a

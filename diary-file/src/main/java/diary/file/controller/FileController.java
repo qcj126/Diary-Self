@@ -21,9 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
-import org.springframework.web.util.UriUtils;
-
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
@@ -63,28 +60,14 @@ public class FileController {
 
     @OperLog(module = "文件管理", description = "批量查询图片上传状态", operationType = "SELECT", saveParams = true, saveResult = true)
     @PostMapping("/query/images/statuses")
-    public ApiResponse<List<ImageUploadStatusVO>> queryImageUploadStatuses(
-            @RequestBody List<Long> imageIds) {
-        return ApiResponse.success(
-                imageUploadStatusQueryService.queryStatuses(
-                        imageIds,
-                        currentUser.getUser()
-                )
-        );
+    public ApiResponse<List<ImageUploadStatusVO>> queryImageUploadStatuses(@RequestBody List<Long> imageIds) {
+        return ApiResponse.success(imageUploadStatusQueryService.queryStatuses(imageIds, currentUser.getUser()));
     }
 
     @OperLog(module = "文件管理", description = "获取原图", operationType = "DOWNLOAD", saveResult = false)
     @GetMapping("/originals/{imageId}")
     public ResponseEntity<StreamingResponseBody> getOriginalImage(@PathVariable Long imageId) {
         return stream(originalImageService.openByImageId(imageId, currentUser.getUser()));
-    }
-
-    /** 兼容历史数据中已经保存的 /file/images/{fileName} 地址，不再写入节点本地目录。 */
-    @OperLog(module = "文件管理", description = "兼容旧原图地址", operationType = "DOWNLOAD", saveResult = false)
-    @GetMapping("/images/{fileName:.+}")
-    public ResponseEntity<StreamingResponseBody> getImage(@PathVariable String fileName) {
-        String originalName = UriUtils.decode(fileName, StandardCharsets.UTF_8);
-        return stream(originalImageService.openByOriginalName(originalName, currentUser.getUser()));
     }
 
     @OperLog(module = "文件管理", description = "查询轮播图片", operationType = "SELECT", saveParams = false, saveResult = false)

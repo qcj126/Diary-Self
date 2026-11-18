@@ -33,7 +33,6 @@ import java.util.UUID;
 
 import static diary.file.consts.ImageConst.ALLOWED_EXTENSIONS;
 import static diary.file.consts.ImageConst.ALLOWED_MIME_TYPES;
-import static diary.file.consts.ImageConst.SHA256_PATTERN;
 
 @Slf4j
 @Service
@@ -129,15 +128,8 @@ public class ImageUploadInitServiceImpl implements ImageUploadInitService {
         return ImageUploadConfigVO.builder()
                 .chunkSize(imageUploadProperties.getChunkSize())
                 .maxImageSize(imageUploadProperties.getMaxImageSize())
-                .allowedMimeTypes(List.of(
-                        "image/png",
-                        "image/jpeg"
-                ))
-                .allowedExtensions(List.of(
-                        "png",
-                        "jpg",
-                        "jpeg"
-                ))
+                .allowedMimeTypes(List.of("image/png", "image/jpeg"))
+                .allowedExtensions(List.of("png", "jpg", "jpeg"))
                 .build();
     }
 
@@ -187,9 +179,7 @@ public class ImageUploadInitServiceImpl implements ImageUploadInitService {
         }
 
         /*查看会话是否过期，过期直接返回null，不进行过期会话的激活*/
-        if (uploadSessionPO.getExpiresAt() == null ||
-            !uploadSessionPO.getExpiresAt().isAfter(LocalDateTime.now())
-        ) {
+        if (uploadSessionPO.getExpiresAt() == null || !uploadSessionPO.getExpiresAt().isAfter(LocalDateTime.now())) {
             log.warn("图片上传会话已过期，图片id = {}", imagePO.getId());
             return null;
         }

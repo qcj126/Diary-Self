@@ -37,11 +37,6 @@ public interface ImageMapper {
             @Param("height") int height
     );
 
-    ImagePO selectReadyByOriginalNameAndUserId(
-            @Param("originalName") String originalName,
-            @Param("userId") Long userId
-    );
-
     List<ImagePO> selectLatestTwoImagesForCarousel ();
 
     int softDeleteOwnedImage (

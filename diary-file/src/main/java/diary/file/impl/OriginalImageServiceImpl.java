@@ -24,12 +24,6 @@ public class OriginalImageServiceImpl implements OriginalImageService {
         return openReadyImage(imageMapper.selectForUploadByIdAndUserId(imageId, userId));
     }
 
-    @Override
-    public OssObjectResource openByOriginalName(String originalName, Long userId) {
-        MyUtils.check().notEmpty(originalName, "originalName").notNull(userId, "userId");
-        return openReadyImage(imageMapper.selectReadyByOriginalNameAndUserId(originalName, userId));
-    }
-
     private OssObjectResource openReadyImage(ImagePO image) {
         if (image == null
                 || !Objects.equals(image.getStatus(), ImageStatusEnum.READY.getCode())

@@ -34,7 +34,6 @@ public class ImageMultipartUploadController {
     @PostMapping("/init")
     public ApiResponse<ImageUploadInitVO> initializeUpload(@RequestBody ImageUploadInitReqDto request) {
         Long userId = currentUser.getUser();
-
         return ApiResponse.success(uploadInitService.initialize(request, userId));
     }
 
@@ -51,7 +50,6 @@ public class ImageMultipartUploadController {
             @RequestParam("chunkSha256") String chunkSha256) {
         Long userId = currentUser.getUser();
         chunkUploadService.uploadChunk(uploadId, chunkIndex, chunk, chunkSha256, userId);
-
         return ApiResponse.success("分片上传成功");
     }
 
